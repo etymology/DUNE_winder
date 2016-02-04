@@ -1,4 +1,5 @@
 from threading import Lock
+import atexit
 import csv
 import os.path
 
@@ -14,6 +15,8 @@ class LogManager( object ):
       self._time_manager = time_manager
       self.log_directory = log_directory
       self.machine_log_filename = machine_log_name
+
+      atexit.register( self._close_files )
 
    def add_message( self, message_source, message_type, message_description, message_data = None, operator_id = None, apa_id = None ):
       message_timestamp = self._time_manager.formatted_current_time_utc
@@ -97,3 +100,26 @@ class LogManager( object ):
          self._time_manager_instance = value
 
    _time_manager = property( fget = _get_time_manager, fset = _set_time_manager )
+
+   def _get_apa_log_directory( self, apa_id ):
+      if apa_id is None:
+         raise ValueError( "APA ID cannot be None." )
+      elif len( apa_id ) == 0:
+         raise ValueError( "APA ID cannot be empty." )
+      else:
+         try:
+            result = os.path.join( self.log_directory, apa_id )
+         except Exception:
+            raise ValueError( "APA ID ('%s') is malformed." % apa_id )
+         else:
+            return result
+
+   def _get_apa_log( self, apa_id ):
+      raise NotImplementedError
+
+   def _close_files( self ):
+      if self._machine_log is not None:
+         with self._machine_log_lock:
+            # self._machine_log.flush()
+            # self._machine_log.close()
+            self._machine_log = None
