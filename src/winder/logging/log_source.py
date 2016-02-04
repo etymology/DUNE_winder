@@ -1,4 +1,4 @@
-from enumeration_value import EnumerationValue
+from winder.utility.enumeration_value import EnumerationValue
 
 class LogSource( EnumerationValue ):
    def __init__( self, value, label = None ):

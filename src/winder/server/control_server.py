@@ -1,8 +1,12 @@
+from __future__ import print_function
+
+from control_server_thread import ControlServerThread
+
 from winder.camera_management.camera_manager import CameraManager
-from winder.logging.enumeration_value import EnumerationValue
 from winder.logging.log_manager import LogManager
 from winder.logging.log_sources import LogSources
 from winder.time_management.time_manager import TimeManager
+from winder.utility.enumeration_value import EnumerationValue
 
 class ControlServer( object ):
    class LogMessageTypes:
@@ -20,7 +24,7 @@ class ControlServer( object ):
       self.log_manager = LogManager( self.time_manager, logging_directory )
       self._initialize_camera_manager()
 
-      self.is_running = start_server
+      self._initialize_server_communication( start_server )
 
    def _initialize_camera_manager( self ):
       try:
@@ -33,6 +37,12 @@ class ControlServer( object ):
          message_type = ControlServer.LogMessageTypes.Information
       finally:
          self.log_manager.add_message( LogSources.MasterServer, message_type, message )
+
+   def _initialize_server_communication( self, start_listening, host = "localhost", port = 35023, shutdown_poll_interval_seconds = 0.5 ):
+      self._socket_server_thread = ControlServerThread( self, host, port, shutdown_poll_interval_seconds )
+
+      if start_listening:
+         self.start()
 
    def _get_is_running( self ):
       return self._is_running
@@ -66,7 +76,31 @@ class ControlServer( object ):
 
    camera_manager = property( fget = _get_camera_manager, fset = _set_camera_manager )
 
+   def _get_socket_server_thread( self ):
+      return self._ss_thread
+
+   def _set_socket_server_thread( self, value ):
+      self._ss_thread = value
+
+   _socket_server_thread = property( fget = _get_socket_server_thread, fset = _set_socket_server_thread )
+
+   def start( self ):
+      if not self.is_running:
+         self.is_running = self._socket_server_thread.start()
+      else:
+         raise RuntimeError( "Cannot start control server: server is already running." )
+
+   def stop( self, suppress_exceptions = False ):
+      if self.is_running:
+         self._socket_server_thread.stop( suppress_exceptions )
+         self._socket_server_thread.join()
+         self.is_running = self._socket_server_thread.is_running
+      elif not suppress_exceptions:
+         raise RuntimeError( "Cannot stop control system server: server is not running." )
+
 if __name__ == "__main__":
+   import sys
+
    def get_log_directory():
       import os
       import os.path
@@ -82,6 +116,24 @@ if __name__ == "__main__":
 
       return result
 
-   server = ControlServer( get_log_directory() )
+   try:
+      server = ControlServer( get_log_directory() )
+   except Exception, e:
+      print( "Error starting server: %s" % e, file = sys.stderr )
+   else:
+      if server.is_running:
+         exit_command = "exit"
 
-   print( "Server is running?: %s" % server.is_running )
+         print( "Server is running." )
+         print( "Enter '%s' to shutdown the server." % exit_command )
+
+         value_entered = ""
+         while value_entered.strip() != exit_command:
+            try:
+               value_entered = raw_input( "> " )
+            except EOFError:
+               value_entered = exit_command
+
+         print( "Server is shutdown." )
+      else:
+         print( "Unable to start server.", file = sys.stderr )
