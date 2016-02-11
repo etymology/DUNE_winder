@@ -1,7 +1,7 @@
 class EnumerationValue( object ):
    def __init__( self, value, label = None ):
-      self.value = value
-      self.label = label
+      self._set_value( value )
+      self._set_label( label )
 
    def _get_value( self ):
       return self._value
@@ -9,7 +9,7 @@ class EnumerationValue( object ):
    def _set_value( self, value ):
       self._value = value
 
-   value = property( fget = _get_value, fset = _set_value )
+   value = property( fget = _get_value )
 
    def _get_label( self ):
       return self._label
@@ -17,7 +17,7 @@ class EnumerationValue( object ):
    def _set_label( self, value ):
       self._label = value
 
-   label = property( fget = _get_label, fset = _set_label )
+   label = property( fget = _get_label )
 
    def __eq__( self, other ):
       return self.value == other.value
