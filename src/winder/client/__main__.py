@@ -59,7 +59,7 @@ def main( args = None ):
          print( "Enter '%s' to exit." % exit_command )
 
          while True:
-            input_line = raw_input( shell_prompt ).strip()
+            input_line = raw_input( shell_prompt )
 
             if input_line == exit_command:
                break

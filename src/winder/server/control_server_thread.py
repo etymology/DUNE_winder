@@ -2,10 +2,9 @@ from __future__ import print_function
 
 from threading import Lock, Thread
 import SocketServer
-import sys
 
+from winder.common.networking.sockets import read_payload, send_payload
 from winder.utility.enumeration_value import EnumerationValue
-from winder.utility.sockets import socket_file_readlines
 
 class ControlServerThread( Thread ):
    class States:
@@ -107,30 +106,28 @@ class ControlServerThread( Thread ):
    def run( self ):
       self._socket_server.serve_forever()
 
-   class SocketHandler( SocketServer.StreamRequestHandler ):
+   class SocketHandler( SocketServer.BaseRequestHandler ):
       """
       See: https://docs.python.org/2/library/socketserver.html
       """
 
       def __init__( self, request, client_address, server ):
-         SocketServer.StreamRequestHandler.__init__( self, request, client_address, server )
+         SocketServer.BaseRequestHandler.__init__( self, request, client_address, server )
 
       def handle( self ):
          data = self._receive_request_data()
 
-         response_data = "Echo Chamber:\r\n%s" % "\r\n".join( data )
+         response_data = "Echo Chamber:\r\n%s" % data
 
          self._send_request_response( response_data )
 
       def _send_request_response( self, data ):
-         self.wfile.write( data + '\n' )
-         self.wfile.flush()
+         send_payload( self.request, data )
 
          print( "Response data sent: %s" % data )
 
       def _receive_request_data( self ):
-         lines = socket_file_readlines( self.rfile )
-         result = map( lambda line: line.rstrip( "\r\n" ), lines )
+         result = read_payload( self.request )
 
          return result
 

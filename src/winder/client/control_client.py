@@ -1,7 +1,7 @@
 from threading import Lock
 import socket
 from client_types import ClientTypes
-from winder.utility.sockets import socket_file_readlines
+from winder.common.networking.sockets import read_payload, send_payload
 
 class ControlClient( object ):
    def __init__( self, client_type, host, port ):
@@ -105,9 +105,9 @@ class ControlClient( object ):
 
       return result
 
-   def _disconnect( self, socket_file, suppress_exceptions = False ):
+   def _disconnect( self, sock, suppress_exceptions = False ):
       if self.is_connected:
-         socket_file.close()
+         sock.close()
          self._set_socket( None )
          self._clear_internal_recordkeeping()
 
@@ -129,28 +129,24 @@ class ControlClient( object ):
       with self._connection_lock:
          if self._connect_to( self.host, self.port, suppress_exceptions ):
             try:
-               socket_file = self._socket.makefile( "w+" )
+               self._send_data( self._socket, message, suppress_exceptions )
 
-               self._send_data( socket_file, message, suppress_exceptions )
-
-               result = self._receive_response( socket_file, suppress_exceptions )
+               result = self._receive_response( self._socket, suppress_exceptions )
             finally:
-               self._disconnect( socket_file, suppress_exceptions )
+               self._disconnect( self._socket, suppress_exceptions )
 
             return result
          elif not suppress_exceptions:
             raise RuntimeError( "Cannot sent message: client is not connected." )
 
-   def _send_data( self, socket_file, data, suppress_exceptions = False ):
+   def _send_data( self, sock, data, suppress_exceptions = False ):
       try:
-         socket_file.write( data + '\n' )
-         socket_file.flush()
+         send_payload( sock, data )
       except Exception, e:
          if not suppress_exceptions:
             raise RuntimeError( "Unable to send message: %s" % e )
 
-   def _receive_response( self, socket_file, suppress_exceptions = False, reception_buffer_size = 1024 ):
-      lines = socket_file_readlines( socket_file )
-      result = map( lambda line: line.rstrip( "\r\n" ), lines )
+   def _receive_response( self, sock, suppress_exceptions = False, reception_buffer_size = 1024 ):
+      result = read_payload( sock, reception_buffer_size )
 
       return result
