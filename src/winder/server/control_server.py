@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from control_server_thread import ControlServerThread
 
 from winder.camera_management.camera_manager import CameraManager
@@ -97,43 +95,3 @@ class ControlServer( object ):
          self.is_running = self._socket_server_thread.is_running
       elif not suppress_exceptions:
          raise RuntimeError( "Cannot stop control system server: server is not running." )
-
-if __name__ == "__main__":
-   import sys
-
-   def get_log_directory():
-      import os
-      import os.path
-
-      pwd = os.getcwd()
-      result = os.path.abspath( os.path.join( pwd, "logs" ) )
-
-      if not os.path.exists( result ):
-         try:
-            os.makedirs( result )
-         except Exception, e:
-            raise IOError( "Unable to create the log directory ('%s'): %s" % ( result, e ) )
-
-      return result
-
-   try:
-      server = ControlServer( get_log_directory() )
-   except Exception, e:
-      print( "Error starting server: %s" % e, file = sys.stderr )
-   else:
-      if server.is_running:
-         exit_command = "exit"
-
-         print( "Server is running." )
-         print( "Enter '%s' to shutdown the server." % exit_command )
-
-         value_entered = ""
-         while value_entered.strip() != exit_command:
-            try:
-               value_entered = raw_input( "> " )
-            except EOFError:
-               value_entered = exit_command
-
-         print( "Server is shutdown." )
-      else:
-         print( "Unable to start server.", file = sys.stderr )
