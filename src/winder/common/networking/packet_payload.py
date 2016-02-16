@@ -52,7 +52,7 @@ class ProtocolVersionIds:
    @staticmethod
    def get_sending_formatters():
       if ProtocolVersionIds._sending_formatters is None or len( ProtocolVersionIds._sending_formatters ) == 0:
-         ProtocolVersionIds._sending_formatters = { ProtocolVersionIds.Version_1_0 : _format_payloadfor_sending_proto_10 }
+         ProtocolVersionIds._sending_formatters = { ProtocolVersionIds.Version_1_0 : _format_payload_for_sending_proto_10 }
 
       return ProtocolVersionIds._sending_formatters
 
@@ -77,7 +77,7 @@ def format_payload_for_sending( data = None, data_format = PayloadFormats.Binary
 
    return result
 
-def _format_payloadfor_sending_proto_10( data, data_format, protocol_version_id ):
+def _format_payload_for_sending_proto_10( data, data_format, protocol_version_id ):
    """
    Format: <protocol version ID : 1-byte><data package length length : 1-byte><data package length : <data package length length> bytes><data format : 1-byte><data>
 
@@ -112,6 +112,13 @@ def _format_payloadfor_sending_proto_10( data, data_format, protocol_version_id 
    return result
 
 def read_payload_from_socket( target_socket, chunk_size = 2048 ):
+   """
+   Returns:
+   Tuple of:
+      1. protocol version ID
+      2. packet payload (as a string)
+   """
+
    if target_socket is None:
       raise ValueError( "Socket to read from cannot be None." )
    elif chunk_size <= 0:
@@ -130,6 +137,15 @@ def read_payload_from_socket( target_socket, chunk_size = 2048 ):
       return result
 
 def _read_payload_from_socket_proto_10( target_socket, chunk_size ):
+   """
+   Format: <protocol version ID : 1-byte><data package length length : 1-byte><data package length : <data package length length> bytes><data format : 1-byte><data>
+
+   Returns:
+   Tuple of:
+      1. protocol version ID
+      2. packet payload (as a string)
+   """
+
    data_package_length_length = str_to_int( _read_from_socket( target_socket, 1, chunk_size ) )
 
    if data_package_length_length > 0:
