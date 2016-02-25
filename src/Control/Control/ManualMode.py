@@ -8,23 +8,25 @@
 #   2016-02-16 - QUE - Creation.
 #==============================================================================
 
-from IO.IO import io
+#from IO.IO import self.io.
 from Library.StateMachineState import StateMachineState
 
 class ManualMode( StateMachineState ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, stateMachine, state, manualCommand ) :
+  def __init__( self, stateMachine, state, io, manualCommand ) :
     """
     Constructor.
 
     Args:
       stateMachine: Parent state machine.
       state: Integer representation of state.
+      self.io.: Instance of I/O map.
       manualCommand: Instance of Control.ManualCommand
     """
 
     StateMachineState.__init__( self, stateMachine, state )
+    self.io = io
     self.manualCommand = manualCommand
 
   #---------------------------------------------------------------------
@@ -46,15 +48,15 @@ class ManualMode( StateMachineState ) :
       # Seek to the requested location.  Resets seek positions.
       #
       if self.manualCommand.seekX :
-        io.xAxis.setDesiredPosition( self.manualCommand.seekX )
+        self.io.xAxis.setDesiredPosition( self.manualCommand.seekX )
         self.manualCommand.seekX = None
 
       if self.manualCommand.seekY :
-        io.yAxis.setDesiredPosition( self.manualCommand.seekY )
+        self.io.yAxis.setDesiredPosition( self.manualCommand.seekY )
         self.manualCommand.seekY = None
 
       if self.manualCommand.seekZ :
-        io.zAxis.setDesiredPosition( self.manualCommand.seekZ )
+        self.io.zAxis.setDesiredPosition( self.manualCommand.seekZ )
         self.manualCommand.seekZ = None
 
     return result
@@ -67,7 +69,7 @@ class ManualMode( StateMachineState ) :
     """
 
     # Is movement done?
-    if not io.xyAxis.isSeeking() and not io.zAxisisSeeking() :
+    if not self.io.xyAxis.isSeeking() and not self.io.zAxisisSeeking() :
       self.changeState( self.stateMachine.States.STOP )
 
 

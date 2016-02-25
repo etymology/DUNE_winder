@@ -11,9 +11,6 @@
 #   variables as the main I/O map, but using software I/O instead of actual
 #   I/O.
 #==============================================================================
-from IO.Types.SoftwareAnalogOutput import SoftwareAnalogOutput
-from IO.Types.SoftwareAnalogInput import SoftwareAnalogInput
-from IO.Types.SoftwareOutput import SoftwareOutput
 from IO.Types.SoftwareInput import SoftwareInput
 from IO.Types.SoftwareMotor import SoftwareMotor
 from IO.Systems.MultiAxisMotor import MultiAxisMotor
@@ -33,5 +30,9 @@ class SimulatedIO:
   xyAxis = MultiAxisMotor( "xyAxis", [ xAxis, yAxis ] )
 
   start = SoftwareInput( "start" )
+
+
+  def pollInputs( self ) :
+    pass
 
 # end class

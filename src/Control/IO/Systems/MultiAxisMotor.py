@@ -11,8 +11,6 @@
 #   set where to the motors act in unison.
 #==============================================================================
 
-from IO.Primitives.Motor import Motor
-
 class MultiAxisMotor :
   #---------------------------------------------------------------------
   def __init__( self, name, motors ) :

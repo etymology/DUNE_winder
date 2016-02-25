@@ -8,20 +8,24 @@
 #   2016-02-04 - QUE - Creation.
 #==============================================================================
 from PrimaryThread import PrimaryThread
-from Control.ControlStateMachine import ControlStateMachine
+#from Control.ControlStateMachine import ControlStateMachine
 
 import time  # $$$DEBUG
 
 class ControlThread( PrimaryThread ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, stateMachine ) :
+  def __init__( self, io, stateMachine ) :
     """
     Constructor.
 
+    Args:
+      io: Instance of I/O map.
+      stateMachine: Instance of state machine.
     """
 
     PrimaryThread.__init__( self, "ControlThread" )
+    self.io = io
     self.stateMachine = stateMachine
 
   #---------------------------------------------------------------------
@@ -30,9 +34,9 @@ class ControlThread( PrimaryThread ) :
     Body of thread. $$$DEBUG
 
     """
-
-
     while PrimaryThread.isRunning :
+
+      self.io.pollInputs()
       self.stateMachine.update()
 
       # $$$DEBUG - This should be a wait for an I/O event.

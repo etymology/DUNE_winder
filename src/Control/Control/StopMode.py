@@ -8,7 +8,6 @@
 #   2016-02-11 - QUE - Creation.
 #==============================================================================
 
-from IO.IO import io
 from Library.StateMachineState import StateMachineState
 from Library.LoggedStateMachine import LoggedStateMachine
 
@@ -20,18 +19,19 @@ class StopMode( StateMachineState ) :
   #====================================
   class Idle( StateMachineState ) :
     #-------------------------------------------------------------------
-    def __init__( self, stateMachine, state, control ) :
+    def __init__( self, stateMachine, state, io, control ) :
       """
       Constructor.
 
       Args:
         stateMachine: Parent state machine.
         state: Integer representation of state.
+        io: Instance of I/O map.
         control: Instance of primary control state machine.
-
       """
 
       StateMachineState.__init__( self, stateMachine, state )
+      self.io = io
       self.control = control
 
     #-------------------------------------------------------------------
@@ -42,11 +42,11 @@ class StopMode( StateMachineState ) :
       """
 
       # Check for E-Stop.
-      if io.estop.get() :
+      if self.io.estop.get() :
         self.changeState( self.stateMachine.States.ESTOP )
-      elif io.park.get() :
+      elif self.io.park.get() :
         self.changeState( self.stateMachine.States.PARK )
-      elif io.start.get() :
+      elif self.io.start.get() :
         self.control.changeState( self.control.States.WIND )
       else:
         #
@@ -61,18 +61,20 @@ class StopMode( StateMachineState ) :
   #====================================
   class EStop( StateMachineState ) :
     #-------------------------------------------------------------------
-    def __init__( self, stateMachine, state, control ) :
+    def __init__( self, stateMachine, state, io, control ) :
       """
       Constructor.
 
       Args:
         stateMachine: Parent state machine.
         state: Integer representation of state.
+        io: Instance of I/O map.
         control: Instance of primary control state machine.
 
       """
 
       StateMachineState.__init__( self, stateMachine, state )
+      self.io = io
       self.control = control
 
     #-------------------------------------------------------------------
@@ -83,7 +85,7 @@ class StopMode( StateMachineState ) :
       """
 
       # Not allowed to change to other modes until E-Stop is clear.
-      if not io.estop.get() :
+      if not self.io.estop.get() :
         self.changeState( self.stateMachine.States.IDLE )
 
   #====================================
@@ -94,18 +96,20 @@ class StopMode( StateMachineState ) :
   #====================================
   class Park( StateMachineState ) :
     #-------------------------------------------------------------------
-    def __init__( self, stateMachine, state, control ) :
+    def __init__( self, stateMachine, state, io, control ) :
       """
       Constructor.
 
       Args:
         stateMachine: Parent state machine.
         state: Integer representation of state.
+        io: Instance of I/O map.
         control: Instance of primary control state machine.
 
       """
 
       StateMachineState.__init__( self, stateMachine, state )
+      self.io = io
       self.control = control
 
     #-------------------------------------------------------------------
@@ -116,10 +120,10 @@ class StopMode( StateMachineState ) :
       """
 
       # Check for E-Stop.
-      if io.estop.get() :
+      if self.io.estop.get() :
         self.changeState( self.stateMachine.States.ESTOP )
       # See if still in park.
-      elif not io.park.get() :
+      elif not self.io.park.get() :
         self.changeState( self.stateMachine.States.IDLE )
 
   #=====================================================================
@@ -133,39 +137,42 @@ class StopMode( StateMachineState ) :
     #end class
 
     #-------------------------------------------------------------------
-    def __init__( self, control, log ) :
+    def __init__( self, control, io, log ) :
       """
       Constructor.
 
       Args:
         control: Instance of primary control state machine.
+        io: Instance of I/O map.
         log: Log file to write state changes.
 
       """
 
       LoggedStateMachine.__init__( self, log )
-      StopMode.Idle(  self, self.States.IDLE, control )
-      StopMode.EStop( self, self.States.ESTOP, control )
-      StopMode.Park(  self, self.States.PARK, control )
+      StopMode.Idle(  self, self.States.IDLE,  io, control )
+      StopMode.EStop( self, self.States.ESTOP, io, control )
+      StopMode.Park(  self, self.States.PARK,  io, control )
 
       self.changeState( self.States.IDLE )
   #end class
 
   #---------------------------------------------------------------------
-  def __init__( self, stateMachine, state, log ) :
+  def __init__( self, stateMachine, state, io, log ) :
     """
     Constructor.
 
     Args:
       stateMachine: Parent state machine.
       state: Integer representation of state.
+      io: Instance of I/O map.
       log: Log file to write state changes.
-
     """
 
     StateMachineState.__init__( self, stateMachine, state )
 
-    self.stopStateMachine = self.StopStateMachine( stateMachine, log )
+    self.io = io
+    self.stateMachine = stateMachine
+    self.stopStateMachine = self.StopStateMachine( stateMachine, io, log )
 
   #---------------------------------------------------------------------
   def update( self ):
@@ -173,6 +180,13 @@ class StopMode( StateMachineState ) :
     Update function that is called periodically.
 
     """
+
+    ## Hardware not communicating?
+    #if not self.io.isFunctional() :
+    #  self.stateMachine.changeState( self.stateMachine.States.HARDWARE )
+    #else :
+    #  # Update active sub-state.
+    #  self.stopStateMachine.update()
 
     # Update active sub-state.
     self.stopStateMachine.update()

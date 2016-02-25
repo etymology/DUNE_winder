@@ -1,6 +1,6 @@
 #==============================================================================
-# Name: SoftwareMotor.py
-# Uses: Motor simulation.
+# Name: AB_Motor.py
+# Uses: Allen-Bradley motor.
 # Date: 2016-02-07
 # Author(s):
 #   Andrew Que <aque@bb7.com>
@@ -9,39 +9,109 @@
 #==============================================================================
 
 from IO.Primitives.Motor import Motor
-from Simulator.Motion import Motion
-from Library.SystemSemaphore import SystemSemaphore
-#import threading
+from IO.Types.AB_Tag import AB_Tag
 
-class SoftwareMotor( Motor ) :
+class AB_Motor( Motor ) :
+
+  list = []
+
   #---------------------------------------------------------------------
-  def __init__( self, name, simulationTime ) :
+  def __init__( self, name, plc, tagBase ) :
     """
     Constructor.
 
     Args:
       name: Name of motor.
-
+      plc: Instance of AB_PLC.
+      tagBase: All tags will start with this prepended to the name.
     """
 
     Motor.__init__( self, name )
-    self._simulationTime  = simulationTime
-    self._wasEnabled      = False
-    self._isEnabled       = False
-    self._inMotion        = False
-    self._torque          = 0
-    self._maxTorque       = 1000
-    self._seekPosition    = 0
-    self._position        = 0
-    self._velocity        = 0
-    self._acceleration    = 0
-    self._position        = 0
-    self._jerk            = 200
-    self._maxAcceleration = 200
-    self._maxVelocity     = 400
-    self._startTime       = simulationTime.get()
-    self._motion          = Motion()
-    self._seekSemaphore   = None
+    AB_Motor.list.append( self )
+    self._seekFlag = False
+    self._plc = plc
+    self._tagBase = tagBase
+
+    self._setPosition = \
+      AB_Tag(
+        name + "_setPosition",
+        plc,
+        tagBase + "_POSITION",
+        tagType="REAL"
+      )
+
+    self._maxVelocity = \
+      AB_Tag(
+        name + "_maxVelocity",
+        plc,
+        tagBase + "_DATA.CommandVelocity",
+        tagType="REAL"
+      )
+
+    self._jogSpeed = \
+      AB_Tag(
+        name + "_jogSpeed",
+        plc,
+        tagBase + "_SPEED",
+        tagType="REAL"
+      )
+
+    self._jogDirection = \
+      AB_Tag(
+        name + "_jogDirection",
+        plc,
+        tagBase + "_DIR",
+        tagType="DINT"
+      )
+
+    # Read-only attributes.
+    attributes = AB_Tag.Attributes()
+    attributes.canWrite = False
+    self._position = \
+      AB_Tag(
+        name + "_position",
+        plc,
+        tagBase + "_DATA.ActualPosition",
+        attributes
+      )
+
+    self._velocity = \
+      AB_Tag(
+        name + "_velocity",
+        plc,
+        tagBase + "_DATA.ActualVelocity",
+        attributes
+      )
+
+    self._acceleration = \
+      AB_Tag(
+        name + "_acceleration",
+        plc,
+        tagBase + "_DATA.ActualAcceleration",
+        attributes
+      )
+
+    self._movement = \
+      AB_Tag(
+        name + "_movement",
+        plc,
+        tagBase + "_DATA.CoordinatedMotionStatus",
+        attributes,
+        "BOOL"
+      )
+
+    attributes.defaultValue = True
+    self._faulted = \
+      AB_Tag(
+        name + "_fault",
+        plc,
+        tagBase + "_DATA.ModuleFault",
+        tagType="BOOL"
+      )
+
+
+    #self._maxAcceleration = 200
+    #self._maxVelocity     = 400
 
   #---------------------------------------------------------------------
   def stop( self ) :
@@ -50,8 +120,21 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    self._inMotion = False
-    self.motionUpdate()
+    # $$$DEBUG
+    pass
+
+  #---------------------------------------------------------------------
+  def isFunctional( self ) :
+    """
+    Check to see if motor is ready to run.
+
+    Returns:
+      True if functional, False if not.
+    """
+
+    #print self._name, self._faulted.get()
+
+    return not bool( self._faulted.get() )
 
   #---------------------------------------------------------------------
   def setEnable( self, isEnabled ) :
@@ -63,19 +146,8 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    self._inMotion = False
-    self._isEnabled = isEnabled
-    self.motionUpdate()
-
-  #---------------------------------------------------------------------
-  def isFunctional( self ) :
-    """
-    Check to see if motor is ready to run.
-
-    Returns:
-      True if functional, False if not.
-    """
-    return True
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def setDesiredPosition( self, position ) :
@@ -84,23 +156,10 @@ class SoftwareMotor( Motor ) :
 
     Args:
       positions: Position to seek (in motor units).
-
     """
-
-    if self._isEnabled \
-      and not position == self._position :
-        self._inMotion = True
-        self._seekPosition = position
-        self._startTime = self._simulationTime.get()
-        self._motion =                    \
-          Motion                          \
-          (                               \
-            self._jerk,                   \
-            self._maxAcceleration,        \
-            self._maxVelocity,            \
-            self._position,               \
-            position                      \
-          )
+    #$$$DEBUG print "Set position", position
+    self._setPosition.set( position )
+    #self._seekFlag = True
 
   #---------------------------------------------------------------------
   def getDesiredPosition( self ) :
@@ -110,8 +169,7 @@ class SoftwareMotor( Motor ) :
     Returns:
       Desired motor position.
     """
-
-    return self._seekPosition
+    return self._setPosition.get()
 
   #---------------------------------------------------------------------
   def isSeeking( self ) :
@@ -122,7 +180,12 @@ class SoftwareMotor( Motor ) :
       True if seeking desired position, False if at desired position.
     """
 
-    return self._inMotion
+    result = bool( self._movement.get() )
+    #if self._seekFlag and result :
+    #  self._seekFlag = False
+
+    #result |= self._seekFlag
+    return result
 
   #---------------------------------------------------------------------
   def seekWait( self ) :
@@ -131,9 +194,8 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    if self._inMotion:
-      self._seekSemaphore = SystemSemaphore( 0 )
-      self._seekSemaphore.acquire()
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def getPosition( self ) :
@@ -144,7 +206,7 @@ class SoftwareMotor( Motor ) :
       Motor position (in motor units).
     """
 
-    return self._position
+    return self._position.get()
 
   #---------------------------------------------------------------------
   def setMaxVelocity( self, maxVelocity ) :
@@ -155,8 +217,7 @@ class SoftwareMotor( Motor ) :
       maxVelocity: Maximum velocity.
 
     """
-
-    self._maxVelocity = maxVelocity
+    self._jogSpeed.set( maxVelocity )
 
   #---------------------------------------------------------------------
   def getMaxVelocity( self ) :
@@ -168,7 +229,7 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    return self._maxVelocity
+    return self._maxVelocity.get()
 
   #---------------------------------------------------------------------
   def getVelocity( self ) :
@@ -179,7 +240,24 @@ class SoftwareMotor( Motor ) :
       Current motor velocity (in motor units/second).
     """
 
-    return self._velocity
+    return self._velocity.get()
+
+  #---------------------------------------------------------------------
+  def setVelocity( self, velocity ) :
+    """
+    Set motor velocity.  Useful for jogging motor.  Set to 0 to stop.
+
+    Args:
+      velocity: Desired velocity.  Negative velocity is reverse direction.
+    """
+
+    direction = 0
+    if velocity < 0 :
+      direction = 1
+      velocity = -velocity
+
+    self._jogSpeed.set( velocity )
+    self._jogDirection.set( direction )
 
   #---------------------------------------------------------------------
   def setMaxAcceleration( self, maxAcceleration ) :
@@ -191,7 +269,8 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    self._maxAcceleration = maxAcceleration
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def getMaxAcceleration( self ) :
@@ -202,7 +281,8 @@ class SoftwareMotor( Motor ) :
       Maximum acceleration motor may move.
     """
 
-    return self._maxAcceleration
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def getAcceleration( self ) :
@@ -213,7 +293,7 @@ class SoftwareMotor( Motor ) :
       Motor acceleration (in motor units/second squared).
     """
 
-    return self._acceleration
+    return self._acceleration.get()
 
   #---------------------------------------------------------------------
   def setMaxTorque( self, maxTorque ) :
@@ -225,7 +305,8 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    self._maxTorque = maxTorque
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def getMaxTorque( self ) :
@@ -236,7 +317,8 @@ class SoftwareMotor( Motor ) :
       Maximum torque.
     """
 
-    return self._maxTorque
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def getTorque( self ) :
@@ -247,7 +329,8 @@ class SoftwareMotor( Motor ) :
       Torque on motor shaft (in motor torque units).
     """
 
-    return self._torque
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
   def setTorque( self, torque ) :
@@ -258,34 +341,30 @@ class SoftwareMotor( Motor ) :
       Torque the motor reports.
     """
 
-    self._torque = torque
+    # $$$DEBUG
+    pass
 
   #---------------------------------------------------------------------
-  def motionUpdate( self ) :
+  def poll( self ) :
     """
-    Update motion. Call after a change to simulation time.
+    $$$DEBUG
+    """
+    self._faulted.poll()
+    self._position.poll()
+    self._velocity.poll()
+    self._acceleration.poll()
+    self._movement.poll()
 
+    pass
+
+  #---------------------------------------------------------------------
+  @staticmethod
+  def pollAll() :
+    """
+    $$$DEBUG
     """
 
-
-    delta = self._simulationTime.get() - self._startTime
-    time = delta.total_seconds()
-
-    if self._inMotion :
-      self._inMotion     = self._motion.isMoving( time )
-      self._position     = self._motion.interpolatePosition( time )
-      self._velocity     = self._motion.interpolateVelocity( time )
-      self._acceleration = self._motion.interpolateAcceleration( time )
-
-      if not self._inMotion and None != self._seekSemaphore :
-        self._seekSemaphore.release()
-        self._seekSemaphore = None
-    elif self._wasEnabled :
-      self._motion.hardStop( time )
-      self._position     = self._motion.interpolatePosition( time )
-      self._velocity     = self._motion.interpolateVelocity( time )
-      self._acceleration = self._motion.interpolateAcceleration( time )
-
-    self._wasEnabled = self._inMotion
+    for instance in AB_Motor.list :
+      instance.poll() # $$$DEBUG - Do single read.
 
 # end class

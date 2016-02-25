@@ -8,7 +8,6 @@
 #   2016-02-10 - QUE - Creation.
 #==============================================================================
 from StateMachine import StateMachine
-from Log import Log
 
 class LoggedStateMachine( StateMachine ) :
   #---------------------------------------------------------------------

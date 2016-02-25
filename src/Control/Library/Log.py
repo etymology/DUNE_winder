@@ -7,7 +7,6 @@
 # Revisions:
 #   2016-02-04 - QUE - Creation.
 #==============================================================================
-import datetime
 import threading
 
 class Log:
@@ -76,13 +75,13 @@ class Log:
     self._lock.release()
 
   #---------------------------------------------------------------------
-  def add( self, module, type, message, parameters = [] ) :
+  def add( self, module, typeName, message, parameters = [] ) :
     """
     Add a message to log file.
 
     Args:
       module: Which module. Use "self.__class__.__name__".
-      type: Message type.
+      typeName: Message type.
       message: Human readable message.
       parameters: A list of all data associated with entry.
 
@@ -94,7 +93,7 @@ class Log:
       + "\t"                 \
       + str( module )        \
       + "\t"                 \
-      + str( type )          \
+      + str( typeName )      \
       + "\t"                 \
       + message
 
@@ -103,8 +102,8 @@ class Log:
 
     # Write the message to each open log file.
     self._lock.acquire()
-    for fileName, file in self._outputFileList.iteritems():
-      file.write( line + "\n" )
+    for _, outputFile in self._outputFileList.iteritems():
+      outputFile.write( line + "\n" )
     self._lock.release()
 
     # Local echo if requested.

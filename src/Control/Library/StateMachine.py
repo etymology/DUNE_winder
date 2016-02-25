@@ -28,6 +28,21 @@ class StateMachine :
     self.states = {}
 
   #---------------------------------------------------------------------
+  def getState( self ) :
+    """
+    Return the state (as a number).
+
+    Returns:
+      Current state (as number).  -1 for uninitialized state.
+    """
+    result = -1
+    if self.state :
+      result = (key for key,value in self.states.items() if value==self.state).next()
+      #result = self.states.index( self.state )
+
+    return result
+
+  #---------------------------------------------------------------------
   def changeState( self, newState ) :
     """
     Transition to a new state.

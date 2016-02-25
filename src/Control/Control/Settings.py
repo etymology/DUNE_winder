@@ -13,3 +13,11 @@ class Settings :
   SERVER_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
   SERVER_BACK_LOG             = 5     # Default recommended by Python manual.
   CLIENT_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
+
+  #---------------------------------------------------------------------
+  @staticmethod
+  def defaultConfig( configuration ) :
+    """
+    Setup default values for configuration.
+    """
+    configuration.default( "plcAddress", "192.168.1.36" )

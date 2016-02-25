@@ -9,7 +9,7 @@
 #==============================================================================
 
 # Import I/O map.
-from IO.IO import io
+from IO.Maps.Test_IO import Test_IO
 
 from Control.Settings import Settings
 from Control.GCodeHandler import GCodeHandler
@@ -22,11 +22,10 @@ from Threads.ControlThread import ControlThread
 from Threads.DebugThread import DebugThread
 from Library.SystemTime import SystemTime
 from Library.Log import Log
+from Library.Configuration import Configuration
 
-import datetime
 import time
 import signal
-import sys
 
 #-----------------------------------------------------------------------
 def commandHandler( command ) :
@@ -60,10 +59,6 @@ def signalHandler( signal, frame ):
   print "Forced shutdown"
   PrimaryThread.stopAllThreads()
 
-def magic() :
-  print datetime.datetime.utcnow()
-  io.simulationTime.set( datetime.datetime.utcnow() )
-
 #-----------------------------------------------------------------------
 # Main
 #-----------------------------------------------------------------------
@@ -77,17 +72,23 @@ signal.signal( signal.SIGINT, signalHandler )
 
 systemTime = SystemTime()
 log = Log( systemTime, 'log.txt' )
-log.attach( 'log2.txt' )
-log.add( "Main", "START", "Control system starts." )
-log.detach( 'log2.txt' )
-gCodeHandler = GCodeHandler()
-manualCommand = ManualCommand()
-controlStateMachine = ControlStateMachine( log, gCodeHandler, manualCommand )
+
+# Load configuration and setup default values.
+configuration = Configuration()
+Settings.defaultConfig( configuration )
+
+# Create I/O map.
+io = Test_IO( configuration.get( "plcAddress" ) )
+#io = SimulatedIO()
+
+gCodeHandler = GCodeHandler( io )
+manualCommand = ManualCommand( io, log )
+controlStateMachine = ControlStateMachine( io, log, gCodeHandler, manualCommand )
 
 # Initialize threads.
 uiServer = UI_ServerThread( commandHandler, log )
-controlThread = ControlThread( controlStateMachine )
-debugUI = DebugThread( '', Settings.SERVER_PORT )
+controlThread = ControlThread( io, controlStateMachine )
+debugUI = DebugThread( '127.0.0.1', Settings.SERVER_PORT )
 
 # Begin operation.
 PrimaryThread.startAllThreads()
@@ -101,4 +102,5 @@ io.zAxis.setEnable( True )
 while ( PrimaryThread.isRunning ) :
   time.sleep( 0.1 )
 
+configuration.save()
 log.add( "Main", "END", "Control system stops." )

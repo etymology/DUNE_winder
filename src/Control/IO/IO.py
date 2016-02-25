@@ -11,7 +11,8 @@
 #   nothing else in this directory.
 #
 #==============================================================================
-from Maps.SimulatedIO import SimulatedIO
-
-# Create instance of I/O.
-io = SimulatedIO()
+# $$$DEBUG from Maps.SimulatedIO import SimulatedIO
+# $$$DEBUG
+# $$$DEBUG # Create instance of I/O.
+# $$$DEBUG io = SimulatedIO()
+io = None

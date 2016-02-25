@@ -86,7 +86,7 @@ class DigitalOutput( DigitalIO ) :
     self._state = state
 
     # Actually set the state.
-    doSet( state )
+    self._doSet( state )
 
   #---------------------------------------------------------------------
   def _doGet( self ) :

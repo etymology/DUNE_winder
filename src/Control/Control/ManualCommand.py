@@ -19,7 +19,16 @@
 class ManualCommand :
 
   #---------------------------------------------------------------------
-  def __init__( self ) :
+  def __init__( self, io, log ) :
+    """
+    Constructor.
+
+    Args:
+      io: Instance of I/O map.
+      log: Log file to write state changes.
+    """
+    self.io = io
+    self.log = log
     self.isManualRequest = False
     self.isSeeking = False
     self.seekX = None

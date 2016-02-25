@@ -38,7 +38,8 @@ class DebugThread( PrimaryThread ):
     """
 
     wxApplication = wx.App()
-    guiFrame = DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
+    #guiFrame = DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
+    DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
     wxApplication.MainLoop()
 
     # If this point is reached, the GUI has shutdown.

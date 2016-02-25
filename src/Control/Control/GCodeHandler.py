@@ -8,7 +8,6 @@
 # Revisions:
 #   2016-02-11 - QUE - Creation.
 #==============================================================================
-from IO.IO import io
 from Library.GCode import GCode, GCodeCallbacks
 
 class GCodeHandler :
@@ -37,6 +36,18 @@ class GCodeHandler :
     self.y = y
 
   #---------------------------------------------------------------------
+  def setVelocity( self, velocity ) :
+    """
+    Callback for setting velocity.
+
+    Args:
+      velocity: Desired maximum velocity.
+    Returns:
+      None.
+    """
+    self.velocity = velocity
+
+  #---------------------------------------------------------------------
   def setLine( self, line ) :
     """
     Callback for setting line number.
@@ -48,6 +59,20 @@ class GCodeHandler :
       None.
     """
     self.line = line
+
+  #---------------------------------------------------------------------
+  def runFunction( self, function ) :
+    """
+    Callback for G-Code function.
+
+    Args:
+      function: Function number to execute.
+
+    Returns:
+      None.
+    """
+    isOn = bool( function[ 1 ] == "1" )
+    self.io.blinky.set( isOn )
 
   #---------------------------------------------------------------------
   def isDone( self ) :
@@ -73,19 +98,29 @@ class GCodeHandler :
       None.
     """
     self.gCode.executeNextLine()
-    io.xyAxis.setDesiredPosition( [ self.x, self.y ] )
+    self.io.maxVelocity.set( self.velocity )
+    self.io.maxAcceleration.set( 10 )
+    self.io.maxDeceleration.set( 5 )
+
+    self.io.xyAxis.setDesiredPosition( [ self.x, self.y ] )
+    self.io.moveType.set( 2 )
 
     #
     # $$$DEBUG Log G-Code output.
     #
 
   #---------------------------------------------------------------------
-  def __init__( self ):
+  def loadG_Code( self, fileName ) :
+    #self.gCode = GCode( fileName, callbacks )p
+    pass
+
+  #---------------------------------------------------------------------
+  def __init__( self, io ):
     """
     Constructor.
 
     Args:
-      None.
+      io: Instance of I/O map.
 
     Returns:
       None.
@@ -93,11 +128,18 @@ class GCodeHandler :
     callbacks = GCodeCallbacks()
     callbacks.registerCallback( 'X', self.setX )
     callbacks.registerCallback( 'Y', self.setY )
+    callbacks.registerCallback( 'F', self.setVelocity )
+    callbacks.registerCallback( 'G', self.runFunction )
     callbacks.registerCallback( 'N', self.setLine )
 
-    # $$$DEBUG
-    self.gCode = GCode( 'GCodeTest.txt', callbacks )
+    self.gCode = None
 
+    # $$$DEBUG
+    self.gCode = GCode( 'GCodeA.txt', callbacks )
+
+    self.io = io
+
+    self.velocity = 1.0
     self.x = 0
     self.y = 0
     self.line = 0

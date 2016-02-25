@@ -15,7 +15,6 @@ from PrimaryThread import PrimaryThread
 from Control.Settings import Settings
 import select
 import socket
-import sys
 import threading     # For additional threads.
 
 #------------------------------------------------------------------------------
@@ -93,7 +92,6 @@ class UI_ServerThread( PrimaryThread ):
 
     """
 
-
     PrimaryThread.__init__( self, "UI_ServerThread" )
     self._callback = commandCallback
     self._log = log
@@ -105,7 +103,6 @@ class UI_ServerThread( PrimaryThread ):
 
     """
 
-
     # Assume all is well.
     isError = False
 
@@ -114,7 +111,7 @@ class UI_ServerThread( PrimaryThread ):
       server = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
       server.bind( ( '', Settings.SERVER_PORT ) )
       server.listen( Settings.SERVER_BACK_LOG )
-    except socket.error, ( value, message ):
+    except socket.error:
       # Unable to open listening socket.
       isError = True
       if server:
@@ -126,7 +123,7 @@ class UI_ServerThread( PrimaryThread ):
       while PrimaryThread.isRunning :
 
         # Wait for a connection, or 100 ms.
-        inputReady, outputReady, exceptReady = \
+        inputReady, _, _ = \
           select.select( [ server ], [], [], 0.1 )
 
         # For all the results the unblocked...
@@ -134,7 +131,8 @@ class UI_ServerThread( PrimaryThread ):
           # Was the source our server getting a connection?
           if readySource == server:
             # Start a thread to deal with this client
-            client = _Client( server.accept(), self._callback, self._log )
+            #$$$DEBUG client = _Client( server.accept(), self._callback, self._log )
+            _Client( server.accept(), self._callback, self._log )
         # end for
 
       # end while

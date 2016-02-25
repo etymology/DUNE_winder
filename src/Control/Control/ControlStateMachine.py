@@ -8,7 +8,6 @@
 #   2016-02-11 - QUE - Creation.
 #==============================================================================
 
-from IO.IO import io
 from Library.LoggedStateMachine import LoggedStateMachine
 from Control.HardwareMode import HardwareMode
 from Control.StopMode import StopMode
@@ -27,21 +26,38 @@ class ControlStateMachine( LoggedStateMachine ) :
   # end class
 
   #---------------------------------------------------------------------
-  def __init__( self, log, gCodeHandler, manualCommand ) :
+  def update( self ) :
+    """
+    Overriden update function.  Runs some base logic before any other
+    state.
+
+    """
+
+    if not self.io.isFunctional() \
+      and self.getState() != self.States.HARDWARE :
+        self.changeState( self.States.HARDWARE )
+
+    LoggedStateMachine.update( self )
+
+  #---------------------------------------------------------------------
+  def __init__( self, io, log, gCodeHandler, manualCommand ) :
     """
     Constructor.
 
     Args:
+      io: Instance of I/O map.
       log: Log file to write state changes.
       gCodeHandler: Instance of GCodeHandler.
-
+      manualCommand: $$$DEBUG
     """
 
     LoggedStateMachine.__init__( self, log )
-    self.hardwareMode = HardwareMode( self, self.States.HARDWARE )
-    self.stopMode     = StopMode( self, self.States.STOP, log )
-    self.windMode     = WindMode( self, self.States.WIND, gCodeHandler )
-    self.manualMode   = ManualMode( self, self.States.MANUAL, manualCommand )
+    self.hardwareMode = HardwareMode( self, self.States.HARDWARE, io, log )
+    self.stopMode     = StopMode(     self, self.States.STOP,     io, log )
+    self.windMode     = WindMode(     self, self.States.WIND,     io, log, gCodeHandler )
+    self.manualMode   = ManualMode(   self, self.States.MANUAL,   io, manualCommand )
+
+    self.io = io
 
     self.changeState( self.States.HARDWARE )
 

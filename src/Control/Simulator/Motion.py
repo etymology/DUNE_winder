@@ -135,7 +135,7 @@ class Motion :
       endPosition: Finial position.
 
     """
-    self._point = [ self.Point() for i in range( self.Point.POINTS ) ]
+    self._point = [ self.Point() for _ in range( self.Point.POINTS ) ]
     self.compute( jerk, acceleration, velocity, startPosition, endPosition )
 
   #---------------------------------------------------------------------
@@ -238,7 +238,7 @@ class Motion :
       self._nextPoint( self.Point.T6, self.Point.T5, 0, t2 )
       self._nextPoint( self.Point.T7, self.Point.T6, forwardJerk, t1 )
     else:
-      self._point = [ self.Point() for i in range( self.Point.POINTS ) ]
+      self._point = [ self.Point() for _ in range( self.Point.POINTS ) ]
       for point in self._point :
         point.x = startPosition
 

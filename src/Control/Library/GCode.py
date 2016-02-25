@@ -105,7 +105,7 @@ class GCodeFeedRate( GCodeClass ) :
 #======================================
 class GCodeCommand( GCodeClass ) :
   def addParameter( self, parameter ) :
-    self.parameters.append( int( parameter ) )
+    self.parameters.append( parameter )
 
 #======================================
 # Function (M)
@@ -302,6 +302,7 @@ class GCode :
 
     """
 
+    self.fileName = fileName
 
     # Read input file.
     with open( fileName ) as inputFile :
@@ -312,6 +313,22 @@ class GCode :
 
     self.index = 0
     self.callbacks = callbacks
+
+  #---------------------------------------------------------------------
+  def setRelativeLine( self, line ) :
+    """
+    Set the line number relative to the current line.
+
+    Args:
+      line: Lines to advance if positive, line to backup if negative.
+
+    """
+    self.index += line
+    if self.index < 0 :
+      self.index = 0
+    elif self.index > len( self.lines ) :
+      self.index = line
+
 
   #---------------------------------------------------------------------
   def rewind( self ) :
