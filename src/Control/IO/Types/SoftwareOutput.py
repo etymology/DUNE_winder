@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: SoftwareOutput.py
 # Uses: Software controlled digital output.  Debug class.
 # Date: 2016-02-02
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-02 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from IO.Primitives.DigitalOutput import DigitalOutput
 
 class SoftwareOutput( DigitalOutput ) :

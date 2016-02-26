@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: SoftwareAnalogInput.py
 # Uses: Fake analog input.  Useful for debugging.
 # Date: 2016-02-02
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-02 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from IO.Primitives.AnalogInput import AnalogInput
 
 class SoftwareAnalogInput( AnalogInput ) :

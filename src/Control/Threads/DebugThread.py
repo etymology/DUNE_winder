@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: DebugThread.py
 # Uses: Thread for debug interface.
 # Date: 2016-02-08
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-08 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from PrimaryThread import PrimaryThread
 from Debug.DebugGUI import DebugGUI
 from Control.Settings import Settings

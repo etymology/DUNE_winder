@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: IO_Device.py
 # Uses: Abstract class to describe an I/O device.
 # Date: 2016-02-02
@@ -11,7 +11,7 @@
 #   Examples include the PCF8575 I2C I/O expander, TLC5940 serial 16-channel
 #   PWM chip, and MCP3008 SPI 8-channel 10-bit ADC.  Each of these chips
 #   would have be an IO_Device child.
-#==============================================================================
+###############################################################################
 
 from abc import ABCMeta, abstractmethod
 

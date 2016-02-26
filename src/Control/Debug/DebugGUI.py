@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: DebugGUI.py
 # Uses: Debug user interface.
 # Date: 2016-02-08
@@ -6,10 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-08 - QUE - Creation.
-#==============================================================================
+###############################################################################
 import wx
 import datetime
-#import time
 
 from Library.UI_ClientConnection import UI_ClientConnection
 
@@ -23,21 +22,13 @@ class DebugGUI( wx.Frame ):
       event.Skip()
 
     def jogStart( self, x, y ) :
-      self.remote( "io.xAxis.setVelocity( " + str( x ) + " )" )
-      self.remote( "io.yAxis.setVelocity( " + str( y ) + " )" )
-      self.remote( "io.moveType.set( 1 )" )
+      self.remote( "io.plcLogic.jogXY(" + str( x ) + "," + str( y ) + ")" )
 
     def jogStop( self ) :
-      self.remote( "io.xAxis.setVelocity( 0.0 )" )
-      self.remote( "io.yAxis.setVelocity( 0.0 )" )
+      self.remote( "io.plcLogic.jogXY( 0, 0 )" )
 
     def setPosition( self, event ) :
-      self._temp += 1
-      if self._temp > 10 :
-        self._temp = 0
-      self.remote( "io.xAxis.setDesiredPosition( " + str( self._temp ) + " )" )
-      self.remote( "io.yAxis.setDesiredPosition( " + str( self._temp ) + " )" )
-      self.remote( "io.moveType.set( 2 )" )
+      self.remote( "io.plcLogic.setXY_Position( 0, 0 )" )
 
     def __init__( self, parent, address, port, maxReceiveSize ) :
       super( DebugGUI, self ).__init__( None )
@@ -118,6 +109,10 @@ class DebugGUI( wx.Frame ):
       jogXY_FU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
       jogXY_FZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
       jogXY_FD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+
+
+      jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.setPosition( e ) )
+
 
       #jogX_Forward.Bind( wx.EVT_LEFT_DOWN, self.jogX_StartF )
       #jogX_Forward.Bind( wx.EVT_LEFT_UP,   self.jogX_Stop )
@@ -268,9 +263,9 @@ class DebugGUI( wx.Frame ):
         self.remote( "io.yAxis.stop()" )
         self.remote( "io.zAxis.stop()" )
 
-      self.remote( "io.xAxis.motionUpdate()" )
-      self.remote( "io.yAxis.motionUpdate()" )
-      self.remote( "io.zAxis.motionUpdate()" )
+      #self.remote( "io.xAxis.motionUpdate()" )
+      #self.remote( "io.yAxis.motionUpdate()" )
+      #self.remote( "io.zAxis.motionUpdate()" )
 
       self.estop.SetLabel( self.remote( "io.estop" ) )
       self.park.SetLabel(  self.remote( "io.park" ) )
@@ -321,5 +316,6 @@ class DebugGUI( wx.Frame ):
 
 if __name__ == "__main__":
     wxApplication = wx.App()
-    guiFrame = DebugGUI( None, "172.16.21.47", 6626 )
+    guiFrame = DebugGUI( None, "192.168.56.102", 6626 )
+    #DebugGUI( None, "172.16.21.47", 6626 )
     wxApplication.MainLoop()

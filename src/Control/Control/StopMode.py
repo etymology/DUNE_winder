@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: StopMode.py
 # Uses: Root state in which there is no machine motion.
 # Date: 2016-02-11
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-11 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from Library.StateMachineState import StateMachineState
 from Library.LoggedStateMachine import LoggedStateMachine

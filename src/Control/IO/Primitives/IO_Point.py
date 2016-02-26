@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: IO_Point.py
 # Uses: A generic abstract class used for all I/O points. Keeps a static list
 #       of all I/O points and requires all I/O points to have a name.
@@ -7,7 +7,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-02 - Creation.
-#==============================================================================
+###############################################################################
 
 from abc import ABCMeta, abstractmethod
 

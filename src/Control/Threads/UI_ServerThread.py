@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: UI_ServerThread.py
 # Uses: User Interface server thread.
 # Date: 2016-02-03
@@ -10,7 +10,7 @@
 #   The user interface server is a TCP socket that accepts commands and
 #   dispatches these commands to a handler.  The handler processes the command
 #   and returns results which are then sent back to the client.
-#==============================================================================
+###############################################################################
 from PrimaryThread import PrimaryThread
 from Control.Settings import Settings
 import select

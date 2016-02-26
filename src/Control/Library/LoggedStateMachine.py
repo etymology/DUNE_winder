@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: LoggedStateMachine.py
 # Uses: A state machine whose transitions are logged.
 # Date: 2016-02-10
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-10 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from StateMachine import StateMachine
 
 class LoggedStateMachine( StateMachine ) :

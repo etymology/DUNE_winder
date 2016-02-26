@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: Configuration.py
 # Uses: Simple non-volatile configuration.
 # Date: 2016-02-23
@@ -13,7 +13,7 @@
 #   configuration.set( "Name", "Andrew Que" )
 #   configuration.set( "e-mail", "aque@bb7.com" )
 #   name = configuration.get( "Name" )  # <- 'name' will be "Andrew Que"
-#==============================================================================
+###############################################################################
 
 import xml.dom.minidom
 

@@ -1,5 +1,5 @@
-#==============================================================================
-# Name: AB_PLC.py
+###############################################################################
+# Name: ControllogixPLC.py
 # Uses: Functions for communicating to Allen-Bradley Controllogix PLC.
 # Date: 2016-02-10
 # Author(s):
@@ -12,13 +12,13 @@
 #   using Common Industrial Protocol (CIP) which specifies how tags are read
 #   and written.  The library "pycomm" handles the CIP connection and this
 #   class provides the I/O device.
-#==============================================================================
+###############################################################################
 
-from IO_Device import IO_Device
+from PLC import PLC
 from pycomm.ab_comm.clx import Driver as ClxDriver
 import threading
 
-class AB_PLC( IO_Device ) :
+class ControllogixPLC( PLC ) :
   #---------------------------------------------------------------------
   def initialize( self ) :
     """
@@ -30,8 +30,6 @@ class AB_PLC( IO_Device ) :
     self._lock.acquire()
     self._isFunctional = True
     try :
-      #self._plc.close()
-
       # Attempt to open a connection to PLC.
       isOk = self._plc.open( self._ipAddress )
       if not isOk :
@@ -74,8 +72,6 @@ class AB_PLC( IO_Device ) :
       try :
         result = self._plc.read_tag( tag )
       except Exception:
-        # $$$DEBUG print "Unable to read", tag, self._isFunctional
-
         # If tag reading threw an exception, the connection is dead.
         self._isFunctional = False
 
@@ -117,7 +113,7 @@ class AB_PLC( IO_Device ) :
     Args:
       ipAddress: IP address of PLC to communicate with.
     """
-    IO_Device.__init__( self, "ControllogixPLC" )
+    PLC.__init__( self, "ControllogixPLC" )
     self._ipAddress = ipAddress
     self._plc = ClxDriver()
     self._isFunctional = False

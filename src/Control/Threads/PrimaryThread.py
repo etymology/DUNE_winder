@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: PrimaryThread.py
 # Uses: Class for primary threads.
 # Date: 2016-02-03
@@ -11,7 +11,7 @@
 #   program loads and run until the program finishes.  They are signaled to
 #   stop when PrimaryThread.isRunning to False.  When this occurs, each thread must
 #   shutdown.
-#==============================================================================
+###############################################################################
 import threading
 from Library.SystemSemaphore import SystemSemaphore
 

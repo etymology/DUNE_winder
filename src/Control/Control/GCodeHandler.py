@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: GCodeHandler.py
 # Uses: Hardware specific G-code handling.  Associates the G-code command to a
 #       actual hardware.
@@ -7,7 +7,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-11 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from Library.GCode import GCode, GCodeCallbacks
 
 class GCodeHandler :
@@ -72,7 +72,8 @@ class GCodeHandler :
       None.
     """
     isOn = bool( function[ 1 ] == "1" )
-    self.io.blinky.set( isOn )
+    #self.io.blinky.set( isOn )
+    self.io.debugLight.set( isOn )
 
   #---------------------------------------------------------------------
   def isDone( self ) :
@@ -98,12 +99,13 @@ class GCodeHandler :
       None.
     """
     self.gCode.executeNextLine()
-    self.io.maxVelocity.set( self.velocity )
-    self.io.maxAcceleration.set( 10 )
-    self.io.maxDeceleration.set( 5 )
-
-    self.io.xyAxis.setDesiredPosition( [ self.x, self.y ] )
-    self.io.moveType.set( 2 )
+    #self.io.maxVelocity.set( self.velocity )
+    #self.io.maxAcceleration.set( 10 )
+    #self.io.maxDeceleration.set( 5 )
+    #
+    #self.io.xyAxis.setDesiredPosition( [ self.x, self.y ] )
+    #self.io.moveType.set( 2 )
+    self.io.plcLogic.setXY_Position( self.x, self.y, self.velocity )
 
     #
     # $$$DEBUG Log G-Code output.

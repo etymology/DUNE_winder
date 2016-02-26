@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: ControlStateMachine.py
 # Uses: Root level state machine.
 # Date: 2016-02-11
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-11 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from Library.LoggedStateMachine import LoggedStateMachine
 from Control.HardwareMode import HardwareMode

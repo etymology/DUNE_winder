@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: HardwareMode.py
 # Uses: Root state in which the system attempts to connect to hardware.
 # Date: 2016-02-11
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-11 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from Library.StateMachineState import StateMachineState
 

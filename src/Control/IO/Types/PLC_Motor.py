@@ -1,17 +1,18 @@
-#==============================================================================
-# Name: AB_Motor.py
-# Uses: Allen-Bradley motor.
+###############################################################################
+# Name: PLC_Motor.py
+# Uses: Motor on a PLC.
 # Date: 2016-02-07
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-07 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from IO.Primitives.Motor import Motor
-from IO.Types.AB_Tag import AB_Tag
+from IO.Devices.PLC import PLC
+#from IO.Types.PLC.Tag import PLC.Tag
 
-class AB_Motor( Motor ) :
+class PLC_Motor( Motor ) :
 
   list = []
 
@@ -22,18 +23,18 @@ class AB_Motor( Motor ) :
 
     Args:
       name: Name of motor.
-      plc: Instance of AB_PLC.
+      plc: Instance of IO_Device.PLC.
       tagBase: All tags will start with this prepended to the name.
     """
 
     Motor.__init__( self, name )
-    AB_Motor.list.append( self )
+    PLC_Motor.list.append( self )
     self._seekFlag = False
     self._plc = plc
     self._tagBase = tagBase
 
     self._setPosition = \
-      AB_Tag(
+      PLC.Tag(
         name + "_setPosition",
         plc,
         tagBase + "_POSITION",
@@ -41,7 +42,7 @@ class AB_Motor( Motor ) :
       )
 
     self._maxVelocity = \
-      AB_Tag(
+      PLC.Tag(
         name + "_maxVelocity",
         plc,
         tagBase + "_DATA.CommandVelocity",
@@ -49,7 +50,7 @@ class AB_Motor( Motor ) :
       )
 
     self._jogSpeed = \
-      AB_Tag(
+      PLC.Tag(
         name + "_jogSpeed",
         plc,
         tagBase + "_SPEED",
@@ -57,7 +58,7 @@ class AB_Motor( Motor ) :
       )
 
     self._jogDirection = \
-      AB_Tag(
+      PLC.Tag(
         name + "_jogDirection",
         plc,
         tagBase + "_DIR",
@@ -65,10 +66,10 @@ class AB_Motor( Motor ) :
       )
 
     # Read-only attributes.
-    attributes = AB_Tag.Attributes()
+    attributes = PLC.Tag.Attributes()
     attributes.canWrite = False
     self._position = \
-      AB_Tag(
+      PLC.Tag(
         name + "_position",
         plc,
         tagBase + "_DATA.ActualPosition",
@@ -76,7 +77,7 @@ class AB_Motor( Motor ) :
       )
 
     self._velocity = \
-      AB_Tag(
+      PLC.Tag(
         name + "_velocity",
         plc,
         tagBase + "_DATA.ActualVelocity",
@@ -84,7 +85,7 @@ class AB_Motor( Motor ) :
       )
 
     self._acceleration = \
-      AB_Tag(
+      PLC.Tag(
         name + "_acceleration",
         plc,
         tagBase + "_DATA.ActualAcceleration",
@@ -92,7 +93,7 @@ class AB_Motor( Motor ) :
       )
 
     self._movement = \
-      AB_Tag(
+      PLC.Tag(
         name + "_movement",
         plc,
         tagBase + "_DATA.CoordinatedMotionStatus",
@@ -102,13 +103,12 @@ class AB_Motor( Motor ) :
 
     attributes.defaultValue = True
     self._faulted = \
-      AB_Tag(
+      PLC.Tag(
         name + "_fault",
         plc,
         tagBase + "_DATA.ModuleFault",
         tagType="BOOL"
       )
-
 
     #self._maxAcceleration = 200
     #self._maxVelocity     = 400
@@ -136,18 +136,18 @@ class AB_Motor( Motor ) :
 
     return not bool( self._faulted.get() )
 
-  #---------------------------------------------------------------------
-  def setEnable( self, isEnabled ) :
-    """
-    Enable/disable motor.
-
-    Args:
-      isEnabled: True if enabled, False if not.
-
-    """
-
-    # $$$DEBUG
-    pass
+  # #---------------------------------------------------------------------
+  # def setEnable( self, isEnabled ) :
+  #   """
+  #   Enable/disable motor.
+  #
+  #   Args:
+  #     isEnabled: True if enabled, False if not.
+  #
+  #   """
+  #
+  #   # $$$DEBUG
+  #   pass
 
   #---------------------------------------------------------------------
   def setDesiredPosition( self, position ) :
@@ -157,9 +157,7 @@ class AB_Motor( Motor ) :
     Args:
       positions: Position to seek (in motor units).
     """
-    #$$$DEBUG print "Set position", position
     self._setPosition.set( position )
-    #self._seekFlag = True
 
   #---------------------------------------------------------------------
   def getDesiredPosition( self ) :
@@ -187,15 +185,15 @@ class AB_Motor( Motor ) :
     #result |= self._seekFlag
     return result
 
-  #---------------------------------------------------------------------
-  def seekWait( self ) :
-    """
-    Block until seek is obtained.
-
-    """
-
-    # $$$DEBUG
-    pass
+  # #---------------------------------------------------------------------
+  # def seekWait( self ) :
+  #   """
+  #   Block until seek is obtained.
+  #
+  #   """
+  #
+  #   # $$$DEBUG
+  #   pass
 
   #---------------------------------------------------------------------
   def getPosition( self ) :
@@ -364,7 +362,7 @@ class AB_Motor( Motor ) :
     $$$DEBUG
     """
 
-    for instance in AB_Motor.list :
+    for instance in PLC_Motor.list :
       instance.poll() # $$$DEBUG - Do single read.
 
 # end class

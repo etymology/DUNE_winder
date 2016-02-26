@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: StateMachineState.py
 # Uses: Template of a state of a state machine.
 # Date: 2016-02-10
@@ -11,7 +11,7 @@
 #   'StateMachine' and contains a template that defines functions that need to
 #   run when the state machine transitions into, and out of the state, as well
 #   as the logic for the state.
-#==============================================================================
+###############################################################################
 class StateMachineState :
   #---------------------------------------------------------------------
   def __init__( self, stateMachine, stateIndex ) :

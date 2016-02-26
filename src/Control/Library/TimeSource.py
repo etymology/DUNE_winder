@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: TimeSource.py
 # Uses: Abstract class for a source of time.
 # Date: 2016-02-12
@@ -14,7 +14,7 @@
 #     What objects are actually returned are irrelevant to this unit, but
 #   need to stay consistent in the implementation used.  It will typically
 #   be a time.time() object.
-#==============================================================================
+###############################################################################
 
 from abc import ABCMeta, abstractmethod
 

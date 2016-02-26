@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: MultiAxisMotor.py
 # Uses: Group of several motors that are controlled together.
 # Date: 2016-02-09
@@ -9,7 +9,7 @@
 # Notes:
 #   Motors can be grouped to act together.  This is most useful for an x/y
 #   set where to the motors act in unison.
-#==============================================================================
+###############################################################################
 
 class MultiAxisMotor :
   #---------------------------------------------------------------------
@@ -112,6 +112,22 @@ class MultiAxisMotor :
     """
 
     return self._motor[ 0 ].getMaxVelocity()
+
+  #---------------------------------------------------------------------
+  def setVelocity( self, velocities ) :
+    """
+    Set motor velocities.  Useful for jogging motor.  Set to 0 to stop.
+
+    Args:
+      velocity: Desired velocity.  Negative velocity is reverse direction.
+    """
+
+    assert( len( velocities ) == len( self._motors ) )
+
+    index = 0
+    for motor in self._motors :
+      motor.setVelocity( velocities[ index ] )
+      index += 1
 
   #---------------------------------------------------------------------
   def setMaxAcceleration( self, maxAcceleration ) :

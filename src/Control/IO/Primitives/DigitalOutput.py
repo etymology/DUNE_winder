@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: DigitalOutput.py
 # Uses: Abstract class defining functions digital outputs have.
 # Date: 2016-02-02
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-02 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from abc import ABCMeta, abstractmethod
 from DigitalIO import DigitalIO
 

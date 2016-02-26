@@ -1,3 +1,4 @@
 *.pyc
 /src/Control/log.txt
 *.bak
+/src/Control/log.csv

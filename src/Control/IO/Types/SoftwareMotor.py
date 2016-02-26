@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: SoftwareMotor.py
 # Uses: Motor simulation.
 # Date: 2016-02-07
@@ -6,12 +6,10 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-07 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from IO.Primitives.Motor import Motor
 from Simulator.Motion import Motion
-from Library.SystemSemaphore import SystemSemaphore
-#import threading
 
 class SoftwareMotor( Motor ) :
   #---------------------------------------------------------------------
@@ -27,7 +25,7 @@ class SoftwareMotor( Motor ) :
     Motor.__init__( self, name )
     self._simulationTime  = simulationTime
     self._wasEnabled      = False
-    self._isEnabled       = False
+    #self._isEnabled       = False
     self._inMotion        = False
     self._torque          = 0
     self._maxTorque       = 1000
@@ -41,7 +39,7 @@ class SoftwareMotor( Motor ) :
     self._maxVelocity     = 400
     self._startTime       = simulationTime.get()
     self._motion          = Motion()
-    self._seekSemaphore   = None
+    #self._seekSemaphore   = None
 
   #---------------------------------------------------------------------
   def stop( self ) :
@@ -51,21 +49,21 @@ class SoftwareMotor( Motor ) :
     """
 
     self._inMotion = False
-    self.motionUpdate()
+    self.poll()
 
-  #---------------------------------------------------------------------
-  def setEnable( self, isEnabled ) :
-    """
-    Enable/disable motor.
-
-    Args:
-      isEnabled: True if enabled, False if not.
-
-    """
-
-    self._inMotion = False
-    self._isEnabled = isEnabled
-    self.motionUpdate()
+  # #---------------------------------------------------------------------
+  # def setEnable( self, isEnabled ) :
+  #   """
+  #   Enable/disable motor.
+  #
+  #   Args:
+  #     isEnabled: True if enabled, False if not.
+  #
+  #   """
+  #
+  #   self._inMotion = False
+  #   self._isEnabled = isEnabled
+  #   self.motionUpdate()
 
   #---------------------------------------------------------------------
   def isFunctional( self ) :
@@ -87,8 +85,7 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    if self._isEnabled \
-      and not position == self._position :
+    if not position == self._position :
         self._inMotion = True
         self._seekPosition = position
         self._startTime = self._simulationTime.get()
@@ -124,16 +121,16 @@ class SoftwareMotor( Motor ) :
 
     return self._inMotion
 
-  #---------------------------------------------------------------------
-  def seekWait( self ) :
-    """
-    Block until seek is obtained.
-
-    """
-
-    if self._inMotion:
-      self._seekSemaphore = SystemSemaphore( 0 )
-      self._seekSemaphore.acquire()
+  # #---------------------------------------------------------------------
+  # def seekWait( self ) :
+  #   """
+  #   Block until seek is obtained.
+  #
+  #   """
+  #
+  #   if self._inMotion:
+  #     self._seekSemaphore = SystemSemaphore( 0 )
+  #     self._seekSemaphore.acquire()
 
   #---------------------------------------------------------------------
   def getPosition( self ) :
@@ -180,6 +177,18 @@ class SoftwareMotor( Motor ) :
     """
 
     return self._velocity
+
+  #---------------------------------------------------------------------
+  def setVelocity( self, velocity ) :
+    """
+    Set motor velocity.  Useful for jogging motor.  Set to 0 to stop.
+
+    Args:
+      velocity: Desired velocity.  Negative velocity is reverse direction.
+    """
+
+    # $$$DEBUG - Doesn't do much.
+    self._velocity = velocity
 
   #---------------------------------------------------------------------
   def setMaxAcceleration( self, maxAcceleration ) :
@@ -261,12 +270,11 @@ class SoftwareMotor( Motor ) :
     self._torque = torque
 
   #---------------------------------------------------------------------
-  def motionUpdate( self ) :
+  def poll( self ) :
     """
     Update motion. Call after a change to simulation time.
 
     """
-
 
     delta = self._simulationTime.get() - self._startTime
     time = delta.total_seconds()
@@ -277,9 +285,9 @@ class SoftwareMotor( Motor ) :
       self._velocity     = self._motion.interpolateVelocity( time )
       self._acceleration = self._motion.interpolateAcceleration( time )
 
-      if not self._inMotion and None != self._seekSemaphore :
-        self._seekSemaphore.release()
-        self._seekSemaphore = None
+      #if not self._inMotion and None != self._seekSemaphore :
+      #  self._seekSemaphore.release()
+      #  self._seekSemaphore = None
     elif self._wasEnabled :
       self._motion.hardStop( time )
       self._position     = self._motion.interpolatePosition( time )

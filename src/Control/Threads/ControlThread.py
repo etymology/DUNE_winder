@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: ControlThread.py
 # Uses: Primary system control thread.  Loop runs master state machine.
 # Date: 2016-02-04
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-04 - QUE - Creation.
-#==============================================================================
+###############################################################################
 from PrimaryThread import PrimaryThread
 #from Control.ControlStateMachine import ControlStateMachine
 

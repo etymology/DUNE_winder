@@ -1,16 +1,16 @@
-#==============================================================================
-# Name: AB_Tag.py
+###############################################################################
+# Name: SoftwareTag.py
 # Uses: Tag object on Allen-Bradley PLC.
 # Date: 2016-02-24
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-24 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from IO.Primitives.IO_Word import IO_Word
 
-class AB_Tag( IO_Word ) :
+class SoftwareTag( IO_Word ) :
 
   list = []
 
@@ -22,21 +22,21 @@ class AB_Tag( IO_Word ) :
     defaultValue = None   # Default state if tag is unreadable.
 
   #---------------------------------------------------------------------
-  def __init__( self, name, abPLC, tag, attributes = Attributes(), tagType="DINT" ) :
+  def __init__( self, name, plc, tag, attributes = Attributes(), tagType="DINT" ) :
     """
     Constructor.
 
     Args:
       name: Name of output.
-      abPLC: Instance of IO_Device.AB_PLC.
+      plc: Instance of IO_Device.PLC.
       tag: Which PLC tag this input is assigned.
       tagType: The type of tag value.
 
       attributes: Attributes of tag (must be instance of Attributes)
     """
     IO_Word.__init__( self, name )
-    AB_Tag.list.append( self )
-    self._abPLC = abPLC
+    SoftwareTag.list.append( self )
+    self._plc = plc
     self._tag   = tag
     self._attributes = attributes
     self._type  = tagType
@@ -47,11 +47,12 @@ class AB_Tag( IO_Word ) :
     """
     Update the input by reading the value form PLC.  Call periodically.
     """
-    value = self._abPLC.read( self._tag )
-    if not value == None and not self._abPLC.isNotFunctional() :
-      self.updateFromReadTag( value )
-    else :
-      self._value = self._attributes.defaultValue
+    #value = self._plc.read( self._tag )
+    #if not value == None and not self._plc.isNotFunctional() :
+    #  self.updateFromReadTag( value )
+    #else :
+    #  self._value = self._attributes.defaultValue
+    pass
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -59,7 +60,7 @@ class AB_Tag( IO_Word ) :
     """
     $$$DEBUG
     """
-    for instance in AB_Tag.list :
+    for instance in SoftwareTag.list :
       instance.poll() # $$$DEBUG - Do single read.
 
   #---------------------------------------------------------------------
@@ -111,16 +112,8 @@ class AB_Tag( IO_Word ) :
     Returns:
         True if there was an error, False if not.
     """
-    isError = False
+    self._value = value
 
-    result = self._abPLC.write( self._tag, value, self._type )
-    if None == result :
-      isError = True
-    else :
-      self._value = value
-
-    #$$$DEBUG print "Set", self._tag, value, self._type, isError # $$$DEBUG
-
-    return isError
+    return False
 
 # end class

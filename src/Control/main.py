@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: main.py
 # Uses: Initialize and start the control system.
 # Date: 2016-02-03
@@ -6,10 +6,11 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-03 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 # Import I/O map.
 from IO.Maps.Test_IO import Test_IO
+from IO.Maps.SimulatedIO import SimulatedIO
 
 from Control.Settings import Settings
 from Control.GCodeHandler import GCodeHandler
@@ -26,6 +27,24 @@ from Library.Configuration import Configuration
 
 import time
 import signal
+import sys, traceback
+
+#==============================================================================
+
+# True if using simulated I/O.
+isSimulated = False
+
+# True to use debug interface.
+debugInterface = True
+
+# True to echo log to screen.
+isLogEchoed = True
+
+#==============================================================================
+
+
+
+
 
 #-----------------------------------------------------------------------
 def commandHandler( command ) :
@@ -41,8 +60,18 @@ def commandHandler( command ) :
 
   try:
     result = eval( command )
-  except Exception :
+  except Exception as exception:
     result = "Invalid request"
+
+    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+    tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
+    log.add(
+      "MAIN",
+      "commandHandler",
+      "Invalid command issued from UI.",
+      [ exception, exceptionType, exceptionValue, tracebackString ]
+    )
+
   return result
 
 #-----------------------------------------------------------------------
@@ -55,8 +84,6 @@ def signalHandler( signal, frame ):
     frame: Ignored.
 
   """
-
-  print "Forced shutdown"
   PrimaryThread.stopAllThreads()
 
 #-----------------------------------------------------------------------
@@ -71,15 +98,17 @@ signal.signal( signal.SIGINT, signalHandler )
 #
 
 systemTime = SystemTime()
-log = Log( systemTime, 'log.txt' )
+log = Log( systemTime, 'log.csv', isLogEchoed )
 
 # Load configuration and setup default values.
 configuration = Configuration()
 Settings.defaultConfig( configuration )
 
 # Create I/O map.
-io = Test_IO( configuration.get( "plcAddress" ) )
-#io = SimulatedIO()
+if isSimulated :
+  io = SimulatedIO()
+else:
+  io = Test_IO( configuration.get( "plcAddress" ) )
 
 gCodeHandler = GCodeHandler( io )
 manualCommand = ManualCommand( io, log )
@@ -88,15 +117,21 @@ controlStateMachine = ControlStateMachine( io, log, gCodeHandler, manualCommand 
 # Initialize threads.
 uiServer = UI_ServerThread( commandHandler, log )
 controlThread = ControlThread( io, controlStateMachine )
-debugUI = DebugThread( '127.0.0.1', Settings.SERVER_PORT )
+
+if debugInterface :
+  debugUI = \
+    DebugThread(
+      configuration.get( "serverAddress" ),
+      int( configuration.get( "serverPort" ) )
+    )
 
 # Begin operation.
 PrimaryThread.startAllThreads()
 
-# $$$DEBUG - Remove from this location.
-io.xAxis.setEnable( True )
-io.yAxis.setEnable( True )
-io.zAxis.setEnable( True )
+# # $$$DEBUG - Remove from this location.
+# io.xAxis.setEnable( True )
+# io.yAxis.setEnable( True )
+# io.zAxis.setEnable( True )
 
 # While the program is running...
 while ( PrimaryThread.isRunning ) :

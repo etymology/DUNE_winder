@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: WindMode.py
 # Uses: Main control mode for winding process.
 # Date: 2016-02-11
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-11 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 #from IO.IO import self.io.
 #from Library.GCode import GCode
@@ -101,12 +101,12 @@ class WindMode( StateMachineState ) :
     elif self.io.stop.get() :
       # We didn't finish this line.  Run it again.
       #self.gCodeHandler.gCode.setRelativeLine( -1 )
-      self.io.moveType.set( 0 )
+      #self.io.moveType.set( 0 )
+      self.io.plcLogic.stopXY()
       self.changeState( self.stateMachine.States.STOP )
     else:
       # Done moving?
-      #if not self.io.xyAxis.isSeeking() :
-      if 1 == self.io.state.get() :
+      if self.io.plcLogic.isXY_SeekComplete() :
 
         # Done with G-Code script?
         if self.gCodeHandler.isDone() :

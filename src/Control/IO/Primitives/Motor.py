@@ -1,4 +1,4 @@
-#==============================================================================
+###############################################################################
 # Name: Motor.py
 # Uses: Abstract class for motor control.
 # Date: 2016-02-04
@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-04 - QUE - Creation.
-#==============================================================================
+###############################################################################
 
 from IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
@@ -42,18 +42,18 @@ class Motor( IO_Point ) :
 
     pass
 
-  #---------------------------------------------------------------------
-  @abstractmethod
-  def setEnable( self, isEnabled ) :
-    """
-    Enable/disable motor.
-
-    Args:
-      isEnabled: True if enabled, False if not.
-
-    """
-
-    pass
+  # #---------------------------------------------------------------------
+  # @abstractmethod
+  # def setEnable( self, isEnabled ) :
+  #   """
+  #   Enable/disable motor.
+  #
+  #   Args:
+  #     isEnabled: True if enabled, False if not.
+  #
+  #   """
+  #
+  #   pass
 
   #---------------------------------------------------------------------
   @abstractmethod
@@ -92,15 +92,15 @@ class Motor( IO_Point ) :
 
     pass
 
-  #---------------------------------------------------------------------
-  @abstractmethod
-  def seekWait( self ) :
-    """
-    Block until seek is obtained.
-
-    """
-
-    pass
+  # #---------------------------------------------------------------------
+  # @abstractmethod
+  # def seekWait( self ) :
+  #   """
+  #   Block until seek is obtained.
+  #
+  #   """
+  #
+  #   pass
 
   #---------------------------------------------------------------------
   @abstractmethod
@@ -150,6 +150,17 @@ class Motor( IO_Point ) :
       Current motor velocity (in motor units/second).
     """
 
+    pass
+
+  #---------------------------------------------------------------------
+  @abstractmethod
+  def setVelocity( self, velocity ) :
+    """
+    Set motor velocity.  Useful for jogging motor.  Set to 0 to stop.
+
+    Args:
+      velocity: Desired velocity.  Negative velocity is reverse direction.
+    """
     pass
 
   #---------------------------------------------------------------------
@@ -236,5 +247,23 @@ class Motor( IO_Point ) :
     """
 
     return self.getPosition()
+
+  #---------------------------------------------------------------------
+  @abstractmethod
+  def poll( self ) :
+    """
+    Periodic update function used to update internal status.
+    """
+    pass
+
+  #---------------------------------------------------------------------
+  @staticmethod
+  def pollAll() :
+    """
+    Update all motors.
+    """
+
+    for instance in Motor.list :
+      instance.poll()
 
 # end class
