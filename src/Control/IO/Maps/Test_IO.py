@@ -52,7 +52,6 @@ class Test_IO:
     """
     Constructor.
     """
-    self.count = 0
     self.simulationTime = SimulationTime()
 
     self.plc = ControllogixPLC( plcAddress )

@@ -34,7 +34,7 @@ import sys, traceback
 #==============================================================================
 
 # True if using simulated I/O.
-isSimulated = False
+isSimulated = True
 
 # True to use debug interface.
 debugInterface = True
@@ -121,6 +121,7 @@ controlStateMachine = ControlStateMachine( io, log, gCodeHandler, manualCommand 
 uiServer = UI_ServerThread( commandHandler, log )
 controlThread = ControlThread( io, controlStateMachine )
 
+# Setup debug interface (if enabled).
 if debugInterface :
   debugUI = \
     DebugThread(

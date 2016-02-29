@@ -48,7 +48,7 @@ class ControlStateMachine( LoggedStateMachine ) :
       io: Instance of I/O map.
       log: Log file to write state changes.
       gCodeHandler: Instance of GCodeHandler.
-      manualCommand: $$$DEBUG
+      manualCommand: Instance of ManualCommand.
     """
 
     LoggedStateMachine.__init__( self, log )
