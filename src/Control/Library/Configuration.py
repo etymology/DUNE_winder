@@ -118,7 +118,13 @@ class Configuration :
     result = None
     if [] != node :
       node = node[ 0 ]
-      result = node.firstChild.nodeValue
+      # Allow for empty values.
+      # This isn't None--this is an empty string.
+      result = ""
+
+      # If there is a text field...
+      if node.firstChild and node.firstChild.nodeValue :
+        result = node.firstChild.nodeValue
 
     return result
 

@@ -379,10 +379,10 @@ class Motion :
   #---------------------------------------------------------------------
   def hardStop( self, time ) :
     """
-    $$$DEBUG
+    Compute position from an instant stop at current time.
 
-    Returns:
-      $$$DEBUG
+    Args:
+      time - Current time.
     """
 
     currentPosition = self.interpolatePosition( time )

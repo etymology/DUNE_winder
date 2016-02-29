@@ -26,7 +26,11 @@ class Test_IO:
 
   #---------------------------------------------------------------------
   def isFunctional( self ) :
-    """$$$DEBUG
+    """
+    Check to see that all hardware is functional.
+
+    Returns:
+      True if all hardware is functional, False for any error.
     """
     result = True
     result &= not self.plc.isNotFunctional()
@@ -39,7 +43,7 @@ class Test_IO:
   #---------------------------------------------------------------------
   def pollInputs( self ) :
     """
-    $$$DEBUG
+    Update inputs.  Call periodically.
     """
     self.plcLogic.poll()
 

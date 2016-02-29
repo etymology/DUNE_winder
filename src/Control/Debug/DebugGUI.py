@@ -90,7 +90,7 @@ class DebugGUI( wx.Frame ):
       jogXY_RD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1, -1 ) )
 
       jogXY_ZU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  1 ) )
-      jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  0 ) )
+      #jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  0 ) )
       jogXY_ZD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0, -1 ) )
 
       jogXY_FU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1,  1 ) )
@@ -103,7 +103,7 @@ class DebugGUI( wx.Frame ):
       jogXY_RD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
 
       jogXY_ZU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-      jogXY_ZZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+      #jogXY_ZZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
       jogXY_ZD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
 
       jogXY_FU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )

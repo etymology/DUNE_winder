@@ -102,7 +102,7 @@ class PLC_Logic :
     """
     #PLC_Input.pollAll()
     PLC.Tag.pollAll()
-    PLC_Motor.pollAll()
+    #PLC_Motor.pollAll()
     self._state.poll()
 
   #---------------------------------------------------------------------

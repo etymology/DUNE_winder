@@ -6,11 +6,16 @@
 #   Andrew Que <aque@bb7.com>
 # Revisions:
 #   2016-02-07 - QUE - Creation.
+#
+# $$$DEBUG - To-do:
+#  - Accelerations.
+#  - Torque.
+#  - Stop.
+#
 ###############################################################################
 
 from IO.Primitives.Motor import Motor
 from IO.Devices.PLC import PLC
-#from IO.Types.PLC.Tag import PLC.Tag
 
 class PLC_Motor( Motor ) :
 
@@ -67,6 +72,7 @@ class PLC_Motor( Motor ) :
 
     # Read-only attributes.
     attributes = PLC.Tag.Attributes()
+    attributes.isPolled = True
     attributes.canWrite = False
     self._position = \
       PLC.Tag(
@@ -132,22 +138,7 @@ class PLC_Motor( Motor ) :
       True if functional, False if not.
     """
 
-    #print self._name, self._faulted.get()
-
     return not bool( self._faulted.get() )
-
-  # #---------------------------------------------------------------------
-  # def setEnable( self, isEnabled ) :
-  #   """
-  #   Enable/disable motor.
-  #
-  #   Args:
-  #     isEnabled: True if enabled, False if not.
-  #
-  #   """
-  #
-  #   # $$$DEBUG
-  #   pass
 
   #---------------------------------------------------------------------
   def setDesiredPosition( self, position ) :
@@ -179,21 +170,8 @@ class PLC_Motor( Motor ) :
     """
 
     result = bool( self._movement.get() )
-    #if self._seekFlag and result :
-    #  self._seekFlag = False
 
-    #result |= self._seekFlag
     return result
-
-  # #---------------------------------------------------------------------
-  # def seekWait( self ) :
-  #   """
-  #   Block until seek is obtained.
-  #
-  #   """
-  #
-  #   # $$$DEBUG
-  #   pass
 
   #---------------------------------------------------------------------
   def getPosition( self ) :
@@ -345,24 +323,8 @@ class PLC_Motor( Motor ) :
   #---------------------------------------------------------------------
   def poll( self ) :
     """
-    $$$DEBUG
+    Update motor.  Call periodically.  (Unneeded for this type of motor.)
     """
-    self._faulted.poll()
-    self._position.poll()
-    self._velocity.poll()
-    self._acceleration.poll()
-    self._movement.poll()
-
     pass
-
-  #---------------------------------------------------------------------
-  @staticmethod
-  def pollAll() :
-    """
-    $$$DEBUG
-    """
-
-    for instance in PLC_Motor.list :
-      instance.poll() # $$$DEBUG - Do single read.
 
 # end class

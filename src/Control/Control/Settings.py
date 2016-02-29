@@ -13,6 +13,7 @@ class Settings :
   SERVER_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
   SERVER_BACK_LOG             = 5     # Default recommended by Python manual.
   CLIENT_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
+  IO_UPDATE_TIME              = 0.1   # In seconds.  Currently 10 times/sec.
 
   #---------------------------------------------------------------------
   @staticmethod

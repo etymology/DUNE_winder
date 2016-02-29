@@ -40,22 +40,6 @@ class PLC_Input( DigitalInput ) :
     self._defaultState = defaultState
     self._state = defaultState
 
-  # #---------------------------------------------------------------------
-  # def poll( self ) :
-  #   """
-  #   Update the input by reading the value form PLC.  Call periodically.
-  #   """
-  #   self._tag.poll()
-  #
-  # #---------------------------------------------------------------------
-  # @staticmethod
-  # def pollAll() :
-  #   """
-  #   $$$DEBUG
-  #   """
-  #   for instance in PLC_Input.list :
-  #     instance.poll() # $$$DEBUG - Do single read.
-
   #---------------------------------------------------------------------
   def _doGet( self ) :
     """

@@ -7,10 +7,10 @@
 # Revisions:
 #   2016-02-04 - QUE - Creation.
 ###############################################################################
+from Control.Settings import Settings
 from PrimaryThread import PrimaryThread
-#from Control.ControlStateMachine import ControlStateMachine
 
-import time  # $$$DEBUG
+import time
 
 class ControlThread( PrimaryThread ) :
 
@@ -31,15 +31,14 @@ class ControlThread( PrimaryThread ) :
   #---------------------------------------------------------------------
   def run( self ) :
     """
-    Body of thread. $$$DEBUG
-
+    Body of control thread--the "main loop" of the program.
     """
     while PrimaryThread.isRunning :
 
       self.io.pollInputs()
       self.stateMachine.update()
 
-      # $$$DEBUG - This should be a wait for an I/O event.
-      time.sleep( 0.1 )
+      # Wait before updating again.
+      time.sleep( Settings.IO_UPDATE_TIME )
 
 # end class

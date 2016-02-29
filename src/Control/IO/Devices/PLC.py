@@ -13,8 +13,16 @@ from abc import ABCMeta, abstractmethod
 
 class PLC( IO_Device ) :
 
+  # Make class abstract.
+  __metaclass__ = ABCMeta
 
+  #============================================================================
   class Tag :
+    """
+    PLC Tag.  System PLC's use to represent data.
+    Notes:
+      Use the Attributes subclass to define how the tag behaves.
+    """
     list = []
 
     # Various attributes an I/O word can have.
@@ -26,32 +34,31 @@ class PLC( IO_Device ) :
     # end class
 
     #---------------------------------------------------------------------
-    def __init__( self, name, plc, tag, attributes = Attributes(), tagType="DINT" ) :
+    def __init__( self, name, plc, tagName, attributes = Attributes(), tagType="DINT" ) :
       """
       Constructor.
 
       Args:
         name: Name of output.
         plc: Instance of IO_Device.PLC.
-        tag: Which PLC tag this input is assigned.
+        tagName: Which PLC tag this input is assigned.
         tagType: The type of tag value.
-
         attributes: Attributes of tag (must be instance of Attributes)
       """
       #IO_Word.__init__( self, name )
       PLC.Tag.list.append( self )
-      self._plc = plc
-      self._tag = tag
+      self._plc        = plc
+      self._tagName    = tagName
       self._attributes = attributes
-      self._type  = tagType
-      self._value = attributes.defaultValue
+      self._type       = tagType
+      self._value      = attributes.defaultValue
 
     #---------------------------------------------------------------------
     def poll( self ) :
       """
       Update the input by reading the value form PLC.  Call periodically.
       """
-      value = self._plc.read( self._tag )
+      value = self._plc.read( self._tagName )
       if not value == None and not self._plc.isNotFunctional() :
         self.updateFromReadTag( value )
       else :
@@ -61,10 +68,15 @@ class PLC( IO_Device ) :
     @staticmethod
     def pollAll() :
       """
-      $$$DEBUG
+      Update all tags.
+
+      Future:
+        All tags could be read at once, which may be useful in reducing
+        Ethernet traffic.
       """
-      for instance in PLC.Tag.list :
-        instance.poll() # $$$DEBUG - Do single read.
+      for tag in PLC.Tag.list :
+        if tag._attributes.isPolled :
+          tag.poll()
 
     #---------------------------------------------------------------------
     def getReadTag( self ) :
@@ -76,7 +88,7 @@ class PLC( IO_Device ) :
       """
       result = None
       if self._attributes.canRead :
-        result = self._tag
+        result = self._tagName
 
       return result
 
@@ -117,15 +129,26 @@ class PLC( IO_Device ) :
       """
       isError = False
 
-      result = self._plc.write( self._tag, value, self._type )
+      result = self._plc.write( self._tagName, value, self._type )
       if None == result :
         isError = True
       else :
         self._value = value
 
-      #$$$DEBUG print "Set", self._tag, value, self._type, isError # $$$DEBUG
-
       return isError
+  # end class
+  #============================================================================
+
+  #---------------------------------------------------------------------
+  @abstractmethod
+  def initialize( self ) :
+    """
+    Try and establish a connection to the PLC.
+
+    Returns:
+      True if there was an error, False if connection was made.
+    """
+    pass
 
   #---------------------------------------------------------------------
   @abstractmethod

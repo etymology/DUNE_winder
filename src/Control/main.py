@@ -25,6 +25,8 @@ from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
 
+from Simulator.PLC_Simulator import PLC_Simulator
+
 import time
 import signal
 import sys, traceback
@@ -107,6 +109,7 @@ Settings.defaultConfig( configuration )
 # Create I/O map.
 if isSimulated :
   io = SimulatedIO()
+  plcSimulator = PLC_Simulator( io )
 else:
   io = Test_IO( configuration.get( "plcAddress" ) )
 
@@ -127,11 +130,6 @@ if debugInterface :
 
 # Begin operation.
 PrimaryThread.startAllThreads()
-
-# # $$$DEBUG - Remove from this location.
-# io.xAxis.setEnable( True )
-# io.yAxis.setEnable( True )
-# io.zAxis.setEnable( True )
 
 # While the program is running...
 while ( PrimaryThread.isRunning ) :

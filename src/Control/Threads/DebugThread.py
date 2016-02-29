@@ -33,12 +33,10 @@ class DebugThread( PrimaryThread ):
   #---------------------------------------------------------------------
   def run( self ):
     """
-    Body of thread. $$$DEBUG
-
+    Body of thread.  Create GUI and run it.
     """
 
     wxApplication = wx.App()
-    #guiFrame = DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
     DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
     wxApplication.MainLoop()
 

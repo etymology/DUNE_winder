@@ -37,11 +37,6 @@ class HardwareMode( StateMachineState ) :
 
     """
 
-
-    #
-    # $$$DEBUG - Check that hardware is functional.
-    #
-
     # Hardware not communicating?
     if self.io.plc.isNotFunctional() :
       if self.isPLC_Working :

@@ -18,6 +18,16 @@ class SimulatedPLC( PLC ) :
   tags = {}
 
   #---------------------------------------------------------------------
+  def initialize( self ) :
+    """
+    Try and establish a connection to the PLC.
+
+    Returns:
+      True if there was an error, False if connection was made.
+    """
+    return False
+
+  #---------------------------------------------------------------------
   def isNotFunctional( self ) :
     """
     See if the PLC is communicating correctly.
@@ -25,7 +35,7 @@ class SimulatedPLC( PLC ) :
     Returns:
       True there is a problem with hardware, false if not.
     """
-    pass
+    return False
 
   #---------------------------------------------------------------------
   def read( self, tag ) :
@@ -39,8 +49,8 @@ class SimulatedPLC( PLC ) :
       Result of the data read, or None if there was a problem.
     """
     result = None
-    if tag in tags.keys() :
-      result = tags[ tag ]
+    if tag in SimulatedPLC.tags.keys() :
+      result = [ SimulatedPLC.tags[ tag ] ]
 
     return result
 
@@ -57,14 +67,37 @@ class SimulatedPLC( PLC ) :
     Returns:
         None is returned in case of error otherwise the tag list is returned.
     """
-    if tag in tags.keys() :
-      tags[ tag ] = data
+    if tag in SimulatedPLC.tags.keys() :
+      SimulatedPLC.tags[ tag ] = data
+
+  #---------------------------------------------------------------------
+  def getTag( self, tag ) :
+    """
+    Return tag data.  Simulator function.
+
+    Args:
+      tag: Which tag.
+
+    Returns:
+      Data in tag.  This is not an array like 'read' will return.
+    """
+    result = self.read( tag )
+    if result :
+      result = result[ 0 ]
+
+    return result
 
   #---------------------------------------------------------------------
   def setupTag( self, tag, data=None ) :
     """
-    Setup a tag
+    Setup a tag.
+
+    Args:
+      tag: Name of tag to add.
+      data: Initial data in tag.
     """
-    tags[ tag ] = data
+    SimulatedPLC.tags[ tag ] = data
+
+    return tag
 
 # end class

@@ -131,7 +131,6 @@ class UI_ServerThread( PrimaryThread ):
           # Was the source our server getting a connection?
           if readySource == server:
             # Start a thread to deal with this client
-            #$$$DEBUG client = _Client( server.accept(), self._callback, self._log )
             _Client( server.accept(), self._callback, self._log )
         # end for
 

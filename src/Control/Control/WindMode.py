@@ -95,13 +95,10 @@ class WindMode( StateMachineState ) :
 
 
     # If ESTOP or I/O isn't ready...
-    # $$$DEBUG - Added I/O check.
     if self.io.estop.get() :
       self.changeState( self.stateMachine.States.STOP )
     elif self.io.stop.get() :
       # We didn't finish this line.  Run it again.
-      #self.gCodeHandler.gCode.setRelativeLine( -1 )
-      #self.io.moveType.set( 0 )
       self.io.plcLogic.stopXY()
       self.changeState( self.stateMachine.States.STOP )
     else:

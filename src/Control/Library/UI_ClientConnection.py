@@ -13,10 +13,12 @@ class UI_ClientConnection:
   #---------------------------------------------------------------------
   def __init__( self, address, port, maxReceiveSize ) :
     """
-    $$$DEBUG
+    Constructor.
 
-    Returns:
-      
+    Args:
+      address - Address of server.
+      port - Port of server.
+      maxReceiveSize - Largest packet that can be read.
     """
 
     self._connection = socket.socket()
@@ -26,10 +28,13 @@ class UI_ClientConnection:
   #---------------------------------------------------------------------
   def get( self, command ) :
     """
-    $$$DEBUG
+    Fetch data from remote server.
+
+    Args:
+      command: A command to execute on remote server.
 
     Returns:
-      
+      The results of the command to remote server.
     """
 
     self._connection.send( command )
@@ -38,10 +43,13 @@ class UI_ClientConnection:
   #---------------------------------------------------------------------
   def __call__( self, command ) :
     """
-    $$$DEBUG
+    Emulating callable object is mapped to the "get" function.
+
+    Args:
+      command: A command to execute on remote server.
 
     Returns:
-      
+      The results of the command to remote server.
     """
 
     return self.get( command )
