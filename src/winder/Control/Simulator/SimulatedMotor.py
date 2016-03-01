@@ -101,6 +101,7 @@ class SimulatedMotor :
         self._acceleration = self._motion.interpolateAcceleration( time )
         self._isSeek = False
 
+    self._plc.write( self._motionTag, self._inMotion )
     self._plc.write( self._positionTag, self._position )
     self._plc.write( self._velocityTag, self._velocity )
     self._plc.write( self._accelerationTag, self._acceleration )

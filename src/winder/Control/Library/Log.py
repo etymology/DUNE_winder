@@ -8,6 +8,7 @@
 #   2016-02-04 - QUE - Creation.
 ###############################################################################
 import threading
+import os.path
 
 class Log:
 
@@ -53,7 +54,12 @@ class Log:
     """
 
     self._lock.acquire()
+    needsHeader = not os.path.isfile( outputFileName )
     outputFile = open( outputFileName, 'a' )
+
+    if needsHeader :
+      outputFile.write( "Time\tModule\tType\tMessage\n" )
+
     self._outputFileList[ outputFileName ] = outputFile
     self._outputFiles.append( outputFile )
     self._lock.release()

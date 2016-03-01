@@ -1,0 +1,4 @@
+"Time	Module	Type	Message"
+2016-03-01 21:03:09.255000	Main	START	Control system starts.
+2016-03-01 21:03:14.851000	StopStateMachine	MODE	Mode changed from <None> to Idle	<None>	Idle
+2016-03-01 21:03:14.851000	ControlStateMachine	MODE	Mode changed from <None> to HardwareMode	<None>	HardwareMode

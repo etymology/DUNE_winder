@@ -51,6 +51,8 @@ class SimulatedPLC( PLC ) :
     result = None
     if tag in SimulatedPLC.tags.keys() :
       result = [ SimulatedPLC.tags[ tag ] ]
+    else :
+      print "Unknown tag", tag
 
     return result
 
@@ -69,6 +71,8 @@ class SimulatedPLC( PLC ) :
     """
     if tag in SimulatedPLC.tags.keys() :
       SimulatedPLC.tags[ tag ] = data
+
+    return []
 
   #---------------------------------------------------------------------
   def getTag( self, tag ) :

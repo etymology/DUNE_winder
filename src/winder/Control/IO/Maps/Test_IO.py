@@ -56,9 +56,6 @@ class Test_IO:
 
     self.plc = ControllogixPLC( plcAddress )
 
-    self.estop = PLC_Input( "estop", self.plc, "Point_IO:1:I", 0, True )
-    self.park  = PLC_Input( "park", self.plc, "Point_IO:1:I", 1 )
-
     self.xAxis = PLC_Motor( "xAxis", self.plc, "X" )
     self.yAxis = PLC_Motor( "yAxis", self.plc, "Y" )
     self.zAxis = SoftwareMotor( "zAxis", self.simulationTime )
@@ -66,6 +63,37 @@ class Test_IO:
     self.xyAxis = MultiAxisMotor( "xyAxis", [ self.xAxis, self.yAxis ] )
 
     self.plcLogic = PLC_Logic( self.plc, self.xyAxis )
+
+    #
+    # Inputs
+    # NOTE: Most of these inputs do not exist on the test hardware fixture.
+    #
+
+    self.estop = PLC_Input( "estop", self.plc, "Point_IO:1:I", 0, True )
+
+    # End of travel sensors.
+    self.endOfTravelPositiveX = PLC_Input( "endOfTravelX+", self.plc, "Point_IO:2:I", 0 )
+    self.endOfTravelNegativeX = PLC_Input( "endOfTravelX-", self.plc, "Point_IO:2:I", 1 )
+    self.endOfTravelPositiveY = PLC_Input( "endOfTravelY+", self.plc, "Point_IO:2:I", 2 )
+    self.endOfTravelNegativeY = PLC_Input( "endOfTravelY-", self.plc, "Point_IO:2:I", 3 )
+    self.endOfTravelPositiveZ = PLC_Input( "endOfTravelZ+", self.plc, "Point_IO:2:I", 4 )
+    self.endOfTravelNegativeZ = PLC_Input( "endOfTravelZ-", self.plc, "Point_IO:2:I", 5 )
+
+    # Transfer sensors.
+    self.park      = PLC_Input( "park",      self.plc, "Point_IO:1:I", 1 )
+    self.xTransfer = PLC_Input( "xTransfer", self.plc, "Point_IO:1:I", 2 )
+    self.yTransfer = PLC_Input( "yTransfer", self.plc, "Point_IO:1:I", 3 )
+    self.yMount    = PLC_Input( "yMount",    self.plc, "Point_IO:1:I", 4 )
+
+    # Z-Control
+    self.zExtended    = PLC_Input( "zExtended",    self.plc, "Point_IO:1:I", 5 )
+    self.zRetract1    = PLC_Input( "zRetract1",    self.plc, "Point_IO:1:I", 6 )
+    self.zRetract2    = PLC_Input( "zRetract2",    self.plc, "Point_IO:1:I", 7 )
+    self.zLatch       = PLC_Input( "zLatch",       self.plc, "Point_IO:1:I", 8 )
+    self.zCompensator = PLC_Input( "zCompensator", self.plc, "Point_IO:1:I", 9 )
+    self.zFixedLatch  = PLC_Input( "zFixedLatch",  self.plc, "Point_IO:1:I", 10 )
+    self.zFixedSense  = PLC_Input( "zFixedSense",  self.plc, "Point_IO:1:I", 11 )
+
 
     #
     # $$$DEBUG - All I/O below this line is temporary.
