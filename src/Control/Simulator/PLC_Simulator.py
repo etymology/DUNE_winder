@@ -8,8 +8,7 @@
 #   2016-02-29 - QUE - Creation.
 ###############################################################################
 
-from SimulatedMotor import SimulatedMotor
-from SimulationTime import SimulationTime
+from Simulator.SimulatedMotor import SimulatedMotor
 
 class PLC_Simulator :
 
@@ -74,6 +73,7 @@ class PLC_Simulator :
     self._maxVelocityTag     = io.plc.setupTag( "XY_MAX_VELOCITY", 0.0 )
     self._maxAccelerationTag = io.plc.setupTag( "XY_MAX_ACCELERATION", 0.0 )
     self._maxDecelerationTag = io.plc.setupTag( "XY_MAX_DECELERATION", 0.0 )
+    self._blinky             = io.plc.setupTag( "BLINKY", 0.0 )
 
     # Initial states of PLC state machine.
     self._lastState = io.plcLogic.States.READY

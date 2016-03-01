@@ -8,10 +8,6 @@
 #   2016-02-03 - QUE - Creation.
 ###############################################################################
 
-# Import I/O map.
-from IO.Maps.Test_IO import Test_IO
-from IO.Maps.SimulatedIO import SimulatedIO
-
 from Control.Settings import Settings
 from Control.GCodeHandler import GCodeHandler
 from Control.ControlStateMachine import ControlStateMachine
@@ -20,21 +16,27 @@ from Control.ManualCommand import ManualCommand
 from Threads.PrimaryThread import PrimaryThread
 from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
-from Threads.DebugThread import DebugThread
 from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
 
 from Simulator.PLC_Simulator import PLC_Simulator
 
+from Process.AnodePlaneArray import AnodePlaneArray
+
 import time
 import signal
-import sys, traceback
+import sys
+import traceback
 
+#==============================================================================
+# Debug settings.
+# These should all be set to False for production.
+# Can be overridden from the command-line.
 #==============================================================================
 
 # True if using simulated I/O.
-isSimulated = True
+isSimulated = False
 
 # True to use debug interface.
 debugInterface = True
@@ -43,10 +45,6 @@ debugInterface = True
 isLogEchoed = True
 
 #==============================================================================
-
-
-
-
 
 #-----------------------------------------------------------------------
 def commandHandler( command ) :
@@ -68,7 +66,7 @@ def commandHandler( command ) :
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
     log.add(
-      "MAIN",
+      "Main",
       "commandHandler",
       "Invalid command issued from UI.",
       [ exception, exceptionType, exceptionValue, tracebackString ]
@@ -92,6 +90,21 @@ def signalHandler( signal, frame ):
 # Main
 #-----------------------------------------------------------------------
 
+# Handle command line.
+for argument in sys.argv:
+  argument = argument.upper()
+  option = argument
+  value = "TRUE"
+  if -1 != argument.find( "=" ) :
+    option, value = argument.split( "=" )
+
+  if "SIMULATED" == option or "SIMULATOR" == option :
+    isSimulated = ( "TRUE" == value )
+  elif "DEBUG" == option :
+    debugInterface = ( "TRUE" == value )
+  elif "LOG" == option :
+    isLogEchoed = ( "TRUE" == value )
+
 # Install signal handler for Ctrl-C shutdown.
 signal.signal( signal.SIGINT, signalHandler )
 
@@ -100,17 +113,22 @@ signal.signal( signal.SIGINT, signalHandler )
 #
 
 systemTime = SystemTime()
-log = Log( systemTime, 'log.csv', isLogEchoed )
 
 # Load configuration and setup default values.
 configuration = Configuration()
 Settings.defaultConfig( configuration )
 
+# Setup log file.
+log = Log( systemTime, configuration.get( "LogDirectory" ) + '/log.csv', isLogEchoed )
+log.add( "Main", "START", "Control system starts." )
+
 # Create I/O map.
 if isSimulated :
+  from IO.Maps.SimulatedIO import SimulatedIO
   io = SimulatedIO()
   plcSimulator = PLC_Simulator( io )
 else:
+  from IO.Maps.Test_IO import Test_IO
   io = Test_IO( configuration.get( "plcAddress" ) )
 
 gCodeHandler = GCodeHandler( io )
@@ -123,11 +141,21 @@ controlThread = ControlThread( io, controlStateMachine )
 
 # Setup debug interface (if enabled).
 if debugInterface :
+  from Threads.DebugThread import DebugThread
   debugUI = \
     DebugThread(
       configuration.get( "serverAddress" ),
       int( configuration.get( "serverPort" ) )
     )
+
+
+
+# $$$DEBUG
+apa = AnodePlaneArray( configuration.get( "APA_LogDirectory" ), "TestAPA", log, True )
+apa.loadRecipie( gCodeHandler, "GCodeA.txt", 128 )
+apa.close()
+
+
 
 # Begin operation.
 PrimaryThread.startAllThreads()

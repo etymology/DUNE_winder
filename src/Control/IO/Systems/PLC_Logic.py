@@ -14,8 +14,6 @@
 #   PLC.  No operation that isn't specific to the ladder logic should be in
 #   this unit.
 ###############################################################################
-from IO.Types.PLC_Input import PLC_Input
-from IO.Types.PLC_Motor import PLC_Motor
 from IO.Devices.PLC import PLC
 
 class PLC_Logic :

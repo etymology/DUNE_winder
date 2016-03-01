@@ -26,3 +26,7 @@ class Settings :
     # Default for GUI server.
     configuration.default( "serverAddress", "127.0.0.1" )
     configuration.default( "serverPort", Settings.SERVER_PORT )
+
+    # Log file locations.
+    configuration.default( "LogDirectory", "../Data" )
+    configuration.default( "APA_LogDirectory", "../Data/APA" )

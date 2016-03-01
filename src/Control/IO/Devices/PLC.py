@@ -45,7 +45,6 @@ class PLC( IO_Device ) :
         tagType: The type of tag value.
         attributes: Attributes of tag (must be instance of Attributes)
       """
-      #IO_Word.__init__( self, name )
       PLC.Tag.list.append( self )
       self._plc        = plc
       self._tagName    = tagName
