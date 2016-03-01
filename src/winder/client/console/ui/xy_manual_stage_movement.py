@@ -25,38 +25,30 @@ class _XyCurrentPositionCommand( _Command ):
 
 class _PositiveXDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-#       print( "+X pressed." )
       self.move_start( 1, 0 )
 
    def on_release( self ):
-#       print( "+X released." )
       self.move_stop()
 
 class _NegativeXDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-#       print( "-X pressed." )
       self.move_start( -1, 0 )
 
    def on_release( self ):
-#       print( "-X released." )
       self.move_stop()
 
 class _PositiveYDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-#       print( "+Y pressed." )
       self.move_start( 0, 1 )
 
    def on_release( self ):
-#       print( "+Y released." )
       self.move_stop()
 
 class _NegativeYDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-      print( "-Y pressed." )
       self.move_start( 0, -1 )
 
    def on_release( self ):
-      print( "-Y released." )
       self.move_stop()
 
 class ManualXyStageMovement( SparseGridLayout ):
