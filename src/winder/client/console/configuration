@@ -1,0 +1,9 @@
+[Client]
+resource_path = ./ui/resources
+
+[Server]
+address = localhost
+port = 35000
+
+[UI]
+theme = default.theme
