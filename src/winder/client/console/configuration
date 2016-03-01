@@ -2,7 +2,7 @@
 resource_path = ./ui/resources
 
 [Server]
-address = localhost
+address = 172.16.21.130
 port = 6626
 
 [UI]
