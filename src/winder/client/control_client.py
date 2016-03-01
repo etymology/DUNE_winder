@@ -1,7 +1,6 @@
 from threading import Lock
-import socket
 from client_types import ClientTypes
-from winder.common.networking.sockets import read_payload, send_payload
+from winder.Control.Library.UI_ClientConnection import UI_ClientConnection
 
 class ControlClient( object ):
    def __init__( self, client_type, host, port ):
@@ -9,8 +8,7 @@ class ControlClient( object ):
       self._set_client_type( client_type )
       self._set_host( host )
       self._set_port( port )
-      self._set_socket( None )
-      self._clear_internal_recordkeeping()
+      self._set_client_connection( None )
 
    def get_client_type( self ):
       return self._client_type
@@ -46,107 +44,36 @@ class ControlClient( object ):
 
    port = property( fget = get_port )
 
-   def _get_socket( self ):
-      return self._sock
+   def _get_client_connection( self ):
+      return self._client_conn
 
-   def _set_socket( self, value ):
-      self._sock = value
+   def _set_client_connection( self, value ):
+      self._client_conn = value
 
-   _socket = property( fget = _get_socket, fset = _set_socket )
-
-   def get_is_connected( self ):
-      return self._is_connected
-
-   def _set_is_connected( self, value ):
-      self._is_connected = value
-
-   is_connected = property( fget = get_is_connected )
-
-   def get_connected_host( self ):
-      return self._connected_host
-
-   def _set_connected_host( self, value ):
-      self._connected_host = value
-
-   connected_host = property( fget = get_connected_host )
-
-   def get_connected_port( self ):
-      return self._connected_port
-
-   def _set_connected_port( self, value ):
-      self._connected_port = value
-
-   connected_port = property( get_connected_port )
-
-   def _clear_internal_recordkeeping( self ):
-      self._set_connected_host( None )
-      self._set_connected_port( None )
-      self._set_is_connected( False )
-
-   def _connect_to( self, host, port, suppress_exceptions = False ):
-      if not self.is_connected:
-         if self._socket is None:
-            self._socket = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
-
-         try:
-            self._socket.connect( ( host, port ) )
-         except Exception:
-            self._clear_internal_recordkeeping()
-         else:
-            self._set_connected_host( host )
-            self._set_connected_port( port )
-            self._set_is_connected( True )
-
-         result = self.is_connected
-      elif not suppress_exceptions:
-         raise RuntimeError( "Connection attempt aborted: client is already connected to a server." )
-      else:
-         result = False
-
-      return result
-
-   def _disconnect( self, sock, suppress_exceptions = False ):
-      if self.is_connected:
-         sock.close()
-         self._set_socket( None )
-         self._clear_internal_recordkeeping()
-
-         result = True
-      elif not suppress_exceptions:
-         raise RuntimeError( "Disconnection attempt aborted: client is not connected to a server." )
-      else:
-         result = False
-
-      return result
+   _client_connection = property( fget = _get_client_connection )
 
    def send_message( self, message, suppress_exceptions = False ):
       """
       Sends a message to the control server.
+      """
 
-      Implementation Note: Each message is sent using a different socket. See https://stackoverflow.com/questions/29571770/python-socketserver-closes-tcp-connection-unexpectedly for why.
+      return self.send_messages( [ message ] , suppress_exceptions )[ 0 ]
+
+   def send_messages( self, messages, suppress_exceptions = False ):
+      """
+      Sends a message to the control server.
       """
 
       with self._connection_lock:
-         if self._connect_to( self.host, self.port, suppress_exceptions ):
+         if self._client_connection is None:
+            self._set_client_connection( UI_ClientConnection( self.host, self.port, 1024 ) )
+
+         result = []
+         for message in messages:
             try:
-               self._send_data( self._socket, message, suppress_exceptions )
-
-               result = self._receive_response( self._socket, suppress_exceptions )
-            finally:
-               self._disconnect( self._socket, suppress_exceptions )
-
-            return result
-         elif not suppress_exceptions:
-            raise RuntimeError( "Cannot sent message: client is not connected." )
-
-   def _send_data( self, sock, data, suppress_exceptions = False ):
-      try:
-         send_payload( sock, data )
-      except Exception, e:
-         if not suppress_exceptions:
-            raise RuntimeError( "Unable to send message: %s" % e )
-
-   def _receive_response( self, sock, suppress_exceptions = False, reception_buffer_size = 1024 ):
-      result = read_payload( sock, reception_buffer_size )
+               result.append( self._client_connection.get( message ) )
+            except Exception, e:
+               if not suppress_exceptions:
+                  raise e
 
       return result

@@ -1,4 +1,6 @@
+from ..clients import ConsoleControlClient
 from .settings import Settings
+
 
 class AppShare( object ):
    _instance = None
@@ -15,6 +17,7 @@ class AppShare( object ):
 
    def clear( self ):
       self._set_settings( None )
+      self._set_client_connection( None )
 
    def _get_settings( self ):
       if self._settings is None:
@@ -26,3 +29,14 @@ class AppShare( object ):
       self._settings = value
 
    settings = property( fget = _get_settings )
+
+   def _get_client_connection( self ):
+      if self._client_connection is None:
+         self._set_client_connection( ConsoleControlClient( self.settings.server_address, self.settings.server_listening_port ) )
+
+      return self._client_connection
+
+   def _set_client_connection( self, value ):
+      self._client_connection = value
+
+   client_connection = property( fget = _get_client_connection )
