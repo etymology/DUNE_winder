@@ -12,7 +12,7 @@ from Library.GCode import GCode, GCodeCallbacks
 
 class GCodeHandler :
   #---------------------------------------------------------------------
-  def setX( self, x ) :
+  def _setX( self, x ) :
     """
     Callback for setting x-axis.
 
@@ -21,10 +21,11 @@ class GCodeHandler :
     Returns:
       None.
     """
-    self.x = x
+    self._xyChange = True
+    self._x = x
 
   #---------------------------------------------------------------------
-  def setY( self, y ) :
+  def _setY( self, y ) :
     """
     Callback for setting y-axis.
 
@@ -33,10 +34,11 @@ class GCodeHandler :
     Returns:
       None.
     """
-    self.y = y
+    self._xyChange = True
+    self._y = y
 
   #---------------------------------------------------------------------
-  def setVelocity( self, velocity ) :
+  def _setVelocity( self, velocity ) :
     """
     Callback for setting velocity.
 
@@ -45,10 +47,10 @@ class GCodeHandler :
     Returns:
       None.
     """
-    self.velocity = velocity
+    self._velocity = velocity
 
   #---------------------------------------------------------------------
-  def setLine( self, line ) :
+  def _setLine( self, line ) :
     """
     Callback for setting line number.
 
@@ -58,10 +60,10 @@ class GCodeHandler :
     Returns:
       None.
     """
-    self.line = line
+    self._line = line
 
   #---------------------------------------------------------------------
-  def runFunction( self, function ) :
+  def _runFunction( self, function ) :
     """
     Callback for G-Code function.
 
@@ -71,9 +73,13 @@ class GCodeHandler :
     Returns:
       None.
     """
-    isOn = bool( function[ 1 ] == "1" )
-    #self.io.blinky.set( isOn )
-    self.io.debugLight.set( isOn )
+    if "100" == function[ 0 ] :
+      isOn = bool( function[ 1 ] == "1" )
+      self._io.debugLight.set( isOn )
+    elif "101" == function[ 0 ] :
+      length = float( function[ 1 ] )
+      # $$$DEBUG - Subtract wire length by parameter.
+
 
   #---------------------------------------------------------------------
   def isDone( self ) :
@@ -98,23 +104,88 @@ class GCodeHandler :
     Returns:
       None.
     """
+
+    self._currentLine = self.gCode.getLine()
+
+    # Interpret the next line.
     self.gCode.executeNextLine()
-    #self.io.maxVelocity.set( self.velocity )
-    #self.io.maxAcceleration.set( 10 )
-    #self.io.maxDeceleration.set( 5 )
-    #
-    #self.io.xyAxis.setDesiredPosition( [ self.x, self.y ] )
-    #self.io.moveType.set( 2 )
-    self.io.plcLogic.setXY_Position( self.x, self.y, self.velocity )
+
+    # If an X/Y coordinate change is needed...
+    if self._xyChange :
+      # Make the move.
+      self._io.plcLogic.setXY_Position( self._x, self._y, self._velocity )
+
+      # Reset change flag.
+      self._xyChange = False
 
     #
     # $$$DEBUG Log G-Code output.
     #
 
   #---------------------------------------------------------------------
+  def stop( self ):
+    """
+    """
+
+    # If we are still executing this line,
+    if self.gCode :
+      self.gCode.backup()
+
+
+  #---------------------------------------------------------------------
   def loadG_Code( self, fileName ) :
-    #self.gCode = GCode( fileName, callbacks )p
-    pass
+    """
+    Load G-Code file.
+
+    Args:
+      fileName: Full file name to G-Code to be loaded.
+    """
+    self.gCode = GCode( fileName, self._callbacks )
+    self._currentLine = 0
+
+  #---------------------------------------------------------------------
+  def getCurrentLineNumber( self ) :
+    """
+    $$$DEBUG
+    """
+
+    # $$$DEBUG - Broken, does not always reflect current line.
+
+    result = None
+    if self.gCode :
+      result = self._currentLine
+
+    return result
+
+  #---------------------------------------------------------------------
+  def getNextLineNumber( self ) :
+    """
+    Return the next line of G-Code to be executed.
+
+    Returns:
+      The next line of G-Code to be executed.  None if there is no G-Code
+      file currently loaded.
+    """
+    result = None
+    if self.gCode :
+      result = self.gCode.getLine()
+
+    return result
+
+  #---------------------------------------------------------------------
+  def getTotalLines( self ) :
+    """
+    Return the total number of G-Code lines for the current G-Code file.
+
+    Returns:
+      Total number of G-Code lines for the current G-Code file.  None if there
+      is no G-Code file currently loaded.
+    """
+    result = None
+    if self.gCode :
+      result = self.gCode.getLines()
+
+    return result
 
   #---------------------------------------------------------------------
   def __init__( self, io ):
@@ -127,21 +198,20 @@ class GCodeHandler :
     Returns:
       None.
     """
-    callbacks = GCodeCallbacks()
-    callbacks.registerCallback( 'X', self.setX )
-    callbacks.registerCallback( 'Y', self.setY )
-    callbacks.registerCallback( 'F', self.setVelocity )
-    callbacks.registerCallback( 'G', self.runFunction )
-    callbacks.registerCallback( 'N', self.setLine )
+    self._callbacks = GCodeCallbacks()
+    self._callbacks.registerCallback( 'X', self._setX )
+    self._callbacks.registerCallback( 'Y', self._setY )
+    self._callbacks.registerCallback( 'F', self._setVelocity )
+    self._callbacks.registerCallback( 'G', self._runFunction )
+    self._callbacks.registerCallback( 'N', self._setLine )
 
     self.gCode = None
 
-    # $$$DEBUG
-    self.gCode = GCode( 'GCodeA.txt', callbacks )
+    self._io = io
 
-    self.io = io
-
-    self.velocity = 1.0
-    self.x = 0
-    self.y = 0
-    self.line = 0
+    self._velocity = 1.0
+    self._x = 0
+    self._y = 0
+    self._line = 0
+    self._xyChange = False
+    self._currentLine = None

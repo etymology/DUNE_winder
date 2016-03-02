@@ -22,7 +22,7 @@ from Library.Configuration import Configuration
 
 from Simulator.PLC_Simulator import PLC_Simulator
 
-from Process.AnodePlaneArray import AnodePlaneArray
+from Control.Process import Process
 
 import time
 import signal
@@ -39,7 +39,7 @@ import traceback
 isSimulated = False
 
 # True to use debug interface.
-debugInterface = True
+debugInterface = False
 
 # True to echo log to screen.
 isLogEchoed = True
@@ -115,7 +115,7 @@ signal.signal( signal.SIGINT, signalHandler )
 systemTime = SystemTime()
 
 # Load configuration and setup default values.
-configuration = Configuration()
+configuration = Configuration( Settings.CONFIG_FILE )
 Settings.defaultConfig( configuration )
 
 # Setup log file.
@@ -148,14 +148,7 @@ if debugInterface :
       int( configuration.get( "serverPort" ) )
     )
 
-
-
-# $$$DEBUG
-apa = AnodePlaneArray( configuration.get( "APA_LogDirectory" ), "TestAPA", log, True )
-apa.loadRecipie( gCodeHandler, "GCodeA.txt", 128 )
-apa.close()
-
-
+process = Process( io, log, configuration, gCodeHandler, controlStateMachine )
 
 # Begin operation.
 PrimaryThread.startAllThreads()
@@ -163,6 +156,8 @@ PrimaryThread.startAllThreads()
 # While the program is running...
 while ( PrimaryThread.isRunning ) :
   time.sleep( 0.1 )
+
+process.closeAPA()
 
 configuration.save()
 log.add( "Main", "END", "Control system stops." )

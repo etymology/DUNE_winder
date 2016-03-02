@@ -60,6 +60,7 @@ class WindMode( StateMachineState ) :
       )
 
     if not isError :
+      self.stateMachine.stopRequest = False
       self.log.add(
         self.__class__.__name__,
         "WIND",
@@ -93,14 +94,15 @@ class WindMode( StateMachineState ) :
 
     """
 
-
     # If ESTOP or I/O isn't ready...
     if self.io.estop.get() :
       self.changeState( self.stateMachine.States.STOP )
-    elif self.io.stop.get() :
+    #elif self.io.stop.get() :
+    elif self.stateMachine.stopRequest :
       # We didn't finish this line.  Run it again.
       self.io.plcLogic.stopXY()
       self.changeState( self.stateMachine.States.STOP )
+      self.stateMachine.stopRequest = False
     else:
       # Done moving?
       if self.io.plcLogic.isXY_SeekComplete() :
@@ -117,7 +119,7 @@ class WindMode( StateMachineState ) :
           self.changeState( self.stateMachine.States.STOP )
         else :
           self._temp += 1
-          if 2 == self._temp :
+          if 5 == self._temp :
             self.gCodeHandler.runNextLine()
             self._temp = 0
 

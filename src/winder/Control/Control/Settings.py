@@ -15,6 +15,9 @@ class Settings :
   CLIENT_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
   IO_UPDATE_TIME              = 0.1   # In seconds.  Currently 10 times/sec.
 
+  # Path to configuration file.
+  CONFIG_FILE = "../configuration.xml"
+
   #---------------------------------------------------------------------
   @staticmethod
   def defaultConfig( configuration ) :
@@ -30,3 +33,5 @@ class Settings :
     # Log file locations.
     configuration.default( "LogDirectory", "../Data" )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
+    configuration.default( "recipeDirectory", "../Recipe" )
+

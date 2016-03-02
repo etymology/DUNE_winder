@@ -54,6 +54,12 @@ class Log:
     """
 
     self._lock.acquire()
+
+    # Create the path if it does not exist.
+    path = os.path.dirname( outputFileName )
+    if not os.path.exists( path ) :
+      os.makedirs( path )
+
     needsHeader = not os.path.isfile( outputFileName )
     outputFile = open( outputFileName, 'a' )
 

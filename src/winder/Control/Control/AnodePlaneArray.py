@@ -30,7 +30,7 @@ class AnodePlaneArray( Serializable ) :
   #   apa = APA()
 
   #---------------------------------------------------------------------
-  def __init__( self, rootDirectory, name, log, createNew=False ) :
+  def __init__( self, gCodeHandler, apaDirectory, recipeDirectory, name, log, createNew=False ) :
     """
     Constructor.
 
@@ -47,10 +47,11 @@ class AnodePlaneArray( Serializable ) :
 
     AnodePlaneArray.activeAPA = self
 
-    self._rootDirectory = rootDirectory
+    self._apaDirectory = apaDirectory
+    self._recipeDirectory = recipeDirectory
     self._name = name
     self._log = log
-
+    self._gCodeHandler = gCodeHandler
 
     # Uninitialized data.
     self._lineNumber = None
@@ -66,7 +67,7 @@ class AnodePlaneArray( Serializable ) :
 
     self._log.attach( self._getPath() + AnodePlaneArray.LOG_FILE )
 
-    if not apaExists :
+    if not apaExists and createNew :
       self._log.add(
         self.__class__.__name__,
         "NEW",
@@ -81,28 +82,74 @@ class AnodePlaneArray( Serializable ) :
     """
     Get the path for all files related to this APA.
     """
-    return self._rootDirectory + "/" + self._name + "/"
+    return self._apaDirectory + "/" + self._name + "/"
 
   #---------------------------------------------------------------------
-  def loadRecipie( self, gCodeHandler, recipeFile=None, startingLine=None ) :
+  def loadRecipe( self, recipeFile=None, startingLine=None ) :
     """
-    $$$DEBUG -
+    Load a recipe file into GCodeHandler.
+
+    Args:
+      gCodeHandler: An instance of GCodeHandler that will execute the code.
+      recipeFile: File name of recipe to load.
+      startingLine: What line to start from in recipe.
+
+    Returns:
+      True if there was an error, False if not.
     """
-    if recipeFile :
+    isError = False
+
+    if None != recipeFile :
       self._recipeFile = recipeFile
 
-    if startingLine :
+    if None != startingLine :
       self._lineNumber = startingLine
 
-    self._log.add(
-      self.__class__.__name__,
-      "GCODE",
-      "Loaded G-Code file " + self._recipeFile + ", starting at line " + str( self._lineNumber ),
-      [ self._name, self._lineNumber ]
-    )
+    try:
+      self._gCodeHandler.loadG_Code( self._recipeDirectory + "/" + self._recipeFile )
+    except:
+      isError = True
+      error = "Unable to load file."
 
-    gCodeHandler.loadG_Code( self._recipeFile )
-    gCodeHandler.setLine( self._lineNumber )
+    if not isError :
+      isError |= self._gCodeHandler.gCode.setLine( self._lineNumber )
+      if isError :
+        error = "Invalid line number."
+
+    if not isError :
+      self._log.add(
+        self.__class__.__name__,
+        "GCODE",
+        "Loaded G-Code file " + self._recipeFile + ", starting at line " + str( self._lineNumber ),
+        [
+          self._recipeFile,
+          self._lineNumber,
+          self._gCodeHandler.gCode.getDescription(),
+          self._gCodeHandler.gCode.getID()
+        ]
+      )
+    else:
+      self._log.add(
+        self.__class__.__name__,
+        "GCODE",
+        "Failed to loaded G-Code file " + self._recipeFile + ", starting at line " + str( self._lineNumber ),
+        [
+          error,
+          self._recipeFile,
+          self._lineNumber
+        ]
+      )
+
+    return isError
+
+  # MOVED #---------------------------------------------------------------------
+  # MOVED def start( self ) :
+  # MOVED   """
+  # MOVED   Begin executing recipe.
+  # MOVED
+  # MOVED   Returns:
+  # MOVED     True if recipe execution began, False if not.
+  # MOVED   """
 
   #---------------------------------------------------------------------
   def load( self ) :
@@ -124,6 +171,9 @@ class AnodePlaneArray( Serializable ) :
       node = xmlDocument.getElementsByTagName( self._name )
       self.unserialize( node[ 0 ] )
 
+      if self._recipeFile :
+        self.loadRecipe()
+
   #---------------------------------------------------------------------
   def save( self ) :
     """
@@ -131,6 +181,9 @@ class AnodePlaneArray( Serializable ) :
     """
 
     # $$$DEBUG - Error checking.
+
+    if self._gCodeHandler.gCode :
+      self._lineNumber = self._gCodeHandler.gCode.getLine()
 
     xmlDocument = xml.dom.minidom.parseString( '<AnodePlaneArray/>' )
     node = self.serialize( xmlDocument )

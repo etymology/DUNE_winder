@@ -33,7 +33,7 @@ class ControlStateMachine( LoggedStateMachine ) :
 
     """
 
-    if not self.io.isFunctional() \
+    if not self._io.isFunctional() \
       and self.getState() != self.States.HARDWARE :
         self.changeState( self.States.HARDWARE )
 
@@ -57,7 +57,10 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.windMode     = WindMode(     self, self.States.WIND,     io, log, gCodeHandler )
     self.manualMode   = ManualMode(   self, self.States.MANUAL,   io, manualCommand )
 
-    self.io = io
+    self._io = io
+
+    self.startRequest = False
+    self.stopRequest = False
 
     self.changeState( self.States.HARDWARE )
 

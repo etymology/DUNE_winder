@@ -41,13 +41,17 @@ class StopMode( StateMachineState ) :
 
       """
 
+      #print vars( self.control )
+
       # Check for E-Stop.
       if self.io.estop.get() :
         self.changeState( self.stateMachine.States.ESTOP )
       elif self.io.park.get() :
         self.changeState( self.stateMachine.States.PARK )
-      elif self.io.start.get() :
+      #elif self.io.start.get() :
+      elif self.control.startRequest :
         self.control.changeState( self.control.States.WIND )
+        self.control.startRequest = False
       else:
         #
         # $$$ DEBUG - Allowed to change to other modes.
@@ -180,13 +184,6 @@ class StopMode( StateMachineState ) :
     Update function that is called periodically.
 
     """
-
-    ## Hardware not communicating?
-    #if not self.io.isFunctional() :
-    #  self.stateMachine.changeState( self.stateMachine.States.HARDWARE )
-    #else :
-    #  # Update active sub-state.
-    #  self.stopStateMachine.update()
 
     # Update active sub-state.
     self.stopStateMachine.update()

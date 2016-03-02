@@ -11,9 +11,11 @@
 #
 ###############################################################################
 
-###############################################################################
+import re
+
+#=============================================================================
 #
-###############################################################################
+#=============================================================================
 class GCodeClass :
   #---------------------------------------------------------------------
   def __init__( self, parentLine ) :
@@ -88,11 +90,11 @@ class GCodeClass :
 
     return self.__class__.__name__ + ": " + str( self.get() )
 
-###############################################################################
+#=============================================================================
 # Implementations of the various G-Codes.
 # These are all simple children of 'GCodeClass' setup to handle information
 # specific to them.
-###############################################################################
+#=============================================================================
 
 #======================================
 # Feed rate (F)
@@ -153,9 +155,9 @@ class GCodeSetY( GCodeClass ) :
 class GCodeSetZ( GCodeClass ) :
   pass
 
-###############################################################################
+#=============================================================================
 # Table for holding callback functions run for each G-Code.
-###############################################################################
+#=============================================================================
 class GCodeCallbacks :
   callbacks = \
   {
@@ -194,9 +196,9 @@ class GCodeCallbacks :
 
     self.callbacks[ code ] = callback
 
-###############################################################################
+#=============================================================================
 # Breakdown of a single line of G-code.
-###############################################################################
+#=============================================================================
 class GCodeLine :
 
   # A lookup table that will translate a code to a G-code object.
@@ -286,9 +288,9 @@ class GCodeLine :
 
     return result
 
-###############################################################################
+#=============================================================================
 # Interpreter for a G-code file.
-###############################################################################
+#=============================================================================
 class GCode :
 
   #---------------------------------------------------------------------
@@ -300,12 +302,36 @@ class GCode :
       fileName: Name of G-code file.
       callbacks: Instance of GCodeCallbacks.
 
+    Raises:
+      Exception: Malformed header in G-Code file.
+      IOError: Problems reading specified G-Code file.
     """
 
     self.fileName = fileName
 
     # Read input file.
     with open( fileName ) as inputFile :
+
+      # Regular expression for header.  Headings must be in the following format:
+      #   ( Description; UUID )
+      # Where the description is a text field ending with a comma, and the UUID
+      # conforms to nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn format where n is a
+      # hex digit.
+      headerCheck = \
+        '\( .+?; [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12} \)'
+
+      # Read file header.
+      header = inputFile.readline()
+
+      if re.search( headerCheck, header ) :
+        header = header.replace( "( ", "" )
+        header = header.replace( " )", "" )
+        header = header.strip()
+        self._description, self._uuid = header.split( ";" )
+      else :
+        raise Exception( "G-Code contains no heading." )
+
+      # Get the rest of the lines.
       self.lines = inputFile.readlines()
 
     # Strip off line feeds and other white space from end of line.
@@ -340,6 +366,37 @@ class GCode :
     self.index = 0
 
   #---------------------------------------------------------------------
+  def backup( self ) :
+    """
+    Go to the previous line.  Useful if line execution was aborted.
+    """
+    if self.index > 0 :
+      self.index -= 1
+
+  #---------------------------------------------------------------------
+  def getDescription( self ) :
+    """
+    Return the description of this recipe.  Comes from header of G-Code.
+
+    Returns:
+      Description of G-Code file.
+    """
+    return self._description
+
+  #---------------------------------------------------------------------
+  def getID( self ) :
+    """
+    Return the unique ID of this recipe.  Comes from header of G-Code.
+
+    Returns:
+      ID G-Code file.
+
+    Notes:
+      The ID is a UUID that correlates the file to version control.
+    """
+    return self._uuid
+
+  #---------------------------------------------------------------------
   def getLine( self ) :
     """
     Get the current line number. This is the line to execute next.
@@ -349,6 +406,17 @@ class GCode :
     """
 
     return self.index
+
+  #---------------------------------------------------------------------
+  def getLines( self ) :
+    """
+    Get the number of lines of GCode.
+
+    Returns:
+      Number of lines.
+    """
+
+    return len( self.lines )
 
   #---------------------------------------------------------------------
   def setLine( self, line ) :
@@ -386,8 +454,6 @@ class GCode :
     Run a line of G-code.
 
     """
-
-
     if self.index < len( self.lines ) :
       gCodeLine = GCodeLine( self.callbacks, self.lines[ self.index ] )
       gCodeLine.execute()
@@ -408,10 +474,6 @@ if __name__ == "__main__":
   callbacks.registerCallback( 'X', lambda parameter: printf( "Set X: " + str( parameter ) ) )
   callbacks.registerCallback( 'Y', lambda parameter: printf( "Set Y: " + str( parameter ) ) )
   callbacks.registerCallback( 'Z', lambda parameter: printf( "Set Z: " + str( parameter ) ) )
-
-  #line = "OMain X123.456 Y456.789 Z987 G44 P1 P2 P3"
-  #gGoceLine = GCodeLine( callbacks, line )
-  #gGoceLine.execute()
 
   gCode = GCode( 'GCodeTest.txt', callbacks )
 
