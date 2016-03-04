@@ -1,6 +1,6 @@
 ###############################################################################
 # Name: Process.py
-# Uses: $$$DEBUG
+# Uses: High-level process control.
 # Date: 2016-03-01
 # Author(s):
 #   Andrew Que <aque@bb7.com>
@@ -10,19 +10,23 @@
 
 import os
 from AnodePlaneArray import AnodePlaneArray
+from Control.GCodeHandler import GCodeHandler
+from Control.ControlStateMachine import ControlStateMachine
 
 class Process :
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log, configuration, gCodeHandler, controlStateMachine ) :
+  def __init__( self, io, log, configuration ) :
     """
     Constructor.
     """
     self._io = io
     self._log = log
     self._configuration = configuration
-    self._gCodeHandler = gCodeHandler
-    self._controlStateMachine = controlStateMachine
+    self.gCodeHandler = GCodeHandler( io )
+    self.controlStateMachine = ControlStateMachine( io, log )
+
+    self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     self.apa = None
 
@@ -70,14 +74,14 @@ class Process :
     """
     Request that the winding process begin.
     """
-    self._controlStateMachine.startRequest = True
+    self.controlStateMachine.startRequest = True
 
   #---------------------------------------------------------------------
   def stop( self ) :
     """
     Request that the winding process stop.
     """
-    self._controlStateMachine.stopRequest = True
+    self.controlStateMachine.stopRequest = True
 
   #---------------------------------------------------------------------
   def createAPA( self, apaName ) :
@@ -99,7 +103,7 @@ class Process :
       try:
         self.apa = \
           AnodePlaneArray(
-            self._gCodeHandler,
+            self.gCodeHandler,
             self._configuration.get( "APA_LogDirectory" ),
             self._configuration.get( "recipeDirectory" ),
             apaName,
@@ -133,21 +137,32 @@ class Process :
     Returns:
       True if there was an error, False if not.
     """
-    isError = False
-    try:
-      self.apa = \
-        AnodePlaneArray(
-          self._gCodeHandler,
-          self._configuration.get( "APA_LogDirectory" ),
-          self._configuration.get( "recipeDirectory" ),
-          apaName,
-          self._log,
-          False
-        )
-    except:
-      isError = True
-
-    return isError
+    self.apa = \
+      AnodePlaneArray(
+        self.gCodeHandler,
+        self._configuration.get( "APA_LogDirectory" ),
+        self._configuration.get( "recipeDirectory" ),
+        self._configuration.get( "recipeArchiveDirectory" ),
+        apaName,
+        self._log,
+        False
+      )
+    #isError = False
+    #try:
+    #  self.apa = \
+    #    AnodePlaneArray(
+    #      self.gCodeHandler,
+    #      self._configuration.get( "APA_LogDirectory" ),
+    #      self._configuration.get( "recipeDirectory" ),
+    #      self._configuration.get( "recipeArchiveDirectory" ),
+    #      apaName,
+    #      self._log,
+    #      False
+    #    )
+    #except Exception as exception:
+    #  isError = True
+    #
+    #return isError
 
   #---------------------------------------------------------------------
   def closeAPA( self ) :
@@ -165,13 +180,46 @@ class Process :
     """
     $$$DEBUG
     """
-    pass
-
+    if ( 0 != xVelocity or 0 != yVelocity ) and self.controlStateMachine.isMovementReady() :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Jog X/Y at " + str( xVelocity ) + ", " + str( yVelocity ) + ".",
+        [ xVelocity, yVelocity ]
+      )
+      self.controlStateMachine.manualRequest = True
+      self.controlStateMachine.isJogging = True
+      self._io.plcLogic.jogXY( xVelocity, yVelocity )
+    elif 0 == xVelocity and 0 == yVelocity and self.controlStateMachine.isJogging :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Jog X/Y stop."
+      )
+      self.controlStateMachine.isJogging = False
+      self._io.plcLogic.jogXY( xVelocity, yVelocity )
+    else:
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Jog request ignored.",
+        [ xVelocity, yVelocity ]
+      )
   #---------------------------------------------------------------------
-  def manualSeekXY( self, xPosition, yPosition ) :
+  def manualSeekXY( self, xPosition, yPosition, velocity=None ) :
     """
     $$$DEBUG
     """
-    pass
+    if self.controlStateMachine.isMovementReady() :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Manual move X/Y to (" + str( xPosition ) + ", " + str( yPosition ) + ") at " + str( velocity ) + ".",
+        [ xPosition, yPosition, velocity ]
+      )
+      self.controlStateMachine.seekX = xPosition
+      self.controlStateMachine.seekY = yPosition
+      self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.manualRequest = True
 
 # end class

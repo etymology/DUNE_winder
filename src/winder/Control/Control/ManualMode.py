@@ -8,26 +8,28 @@
 #   2016-02-16 - QUE - Creation.
 ###############################################################################
 
-#from IO.IO import self.io.
 from Library.StateMachineState import StateMachineState
 
 class ManualMode( StateMachineState ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, stateMachine, state, io, manualCommand ) :
+  def __init__( self, stateMachine, state, io, log ) :
     """
     Constructor.
 
     Args:
       stateMachine: Parent state machine.
       state: Integer representation of state.
-      self.io.: Instance of I/O map.
+      io: Instance of I/O map.
       manualCommand: Instance of Control.ManualCommand
     """
 
     StateMachineState.__init__( self, stateMachine, state )
-    self.io = io
-    self.manualCommand = manualCommand
+    self._io   = io
+    self._log  = log
+    self._jogX = 0
+    self._jogY = 0
+    self._jogZ = 0
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -38,28 +40,34 @@ class ManualMode( StateMachineState ) :
       True if there was an error, false if not.  The error can happen
       if there isn't a manual action to preform.
     """
-    result = False
+    isError = True
 
-    # Cannot switch into manual mode if no request has been made.
-    if not self.manualCommand.isManualRequest :
-      result = True
-    else:
-      #
-      # Seek to the requested location.  Resets seek positions.
-      #
-      if self.manualCommand.seekX :
-        self.io.xAxis.setDesiredPosition( self.manualCommand.seekX )
-        self.manualCommand.seekX = None
+    # X/Y axis move?
+    if None != self.stateMachine.seekX or None != self.stateMachine.seekY :
 
-      if self.manualCommand.seekY :
-        self.io.yAxis.setDesiredPosition( self.manualCommand.seekY )
-        self.manualCommand.seekY = None
+      x = self.stateMachine.seekX
+      if None == x :
+        x = self._io.xAxis.getPosition()
 
-      if self.manualCommand.seekZ :
-        self.io.zAxis.setDesiredPosition( self.manualCommand.seekZ )
-        self.manualCommand.seekZ = None
+      y = self.stateMachine.seekX
+      if None == y :
+        y = self._io.yAxis.getPosition()
 
-    return result
+      self._io.plcLogic.setXY_Position( x, y, self.stateMachine.seekVelocity )
+      self.stateMachine.seekX = None
+      self.stateMachine.seekY = None
+      self.stateMachine.seekVelocity = None
+      isError = False
+
+    if self.stateMachine.isJogging :
+      isError = False
+
+    if None != self.stateMachine.seekZ :
+      self._io.zAxis.setDesiredPosition( self.stateMachine.seekZ )
+      self.stateMachine.seekZ = None
+      isError = False
+
+    return isError
 
   #---------------------------------------------------------------------
   def update( self ):
@@ -69,8 +77,10 @@ class ManualMode( StateMachineState ) :
     """
 
     # Is movement done?
-    if not self.io.xyAxis.isSeeking() and not self.io.zAxisisSeeking() :
-      self.changeState( self.stateMachine.States.STOP )
+    if not self._io.xyAxis.isSeeking()   \
+      and not self._io.zAxis.isSeeking() \
+      and not self.stateMachine.isJogging :
+        self.changeState( self.stateMachine.States.STOP )
 
 
 #end class

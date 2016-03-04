@@ -18,6 +18,7 @@ class PLC_Simulator :
     Update simulator.  Call periodically.
     """
     moveType = self._io.plc.getTag( self._moveTypeTag )
+
     if self._lastMoveType != moveType :
       # Stop?
       if self._io.plcLogic.MoveTypes.IDLE == moveType :

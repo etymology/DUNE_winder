@@ -28,9 +28,8 @@ class ControlStateMachine( LoggedStateMachine ) :
   #---------------------------------------------------------------------
   def update( self ) :
     """
-    Overriden update function.  Runs some base logic before any other
+    Overridden update function.  Runs some base logic before any other
     state.
-
     """
 
     if not self._io.isFunctional() \
@@ -40,7 +39,28 @@ class ControlStateMachine( LoggedStateMachine ) :
     LoggedStateMachine.update( self )
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log, gCodeHandler, manualCommand ) :
+  def isStopped( self ) :
+    """
+    See if state machine is in stop.
+
+    Return:
+      True if state machine is in stop.
+    """
+    return self.States.STOP == self.getState()
+
+  #---------------------------------------------------------------------
+  def isMovementReady( self ) :
+    """
+    Check to see if the state machine is in a state suitable for starting
+    motion.
+
+    Returns:
+      True if machine can begin motion.
+    """
+    return self.States.STOP == self.getState() and self.stopMode.isIdle()
+
+  #---------------------------------------------------------------------
+  def __init__( self, io, log ) :
     """
     Constructor.
 
@@ -54,14 +74,25 @@ class ControlStateMachine( LoggedStateMachine ) :
     LoggedStateMachine.__init__( self, log )
     self.hardwareMode = HardwareMode( self, self.States.HARDWARE, io, log )
     self.stopMode     = StopMode(     self, self.States.STOP,     io, log )
-    self.windMode     = WindMode(     self, self.States.WIND,     io, log, gCodeHandler )
-    self.manualMode   = ManualMode(   self, self.States.MANUAL,   io, manualCommand )
+    self.windMode     = WindMode(     self, self.States.WIND,     io, log )
+    self.manualMode   = ManualMode(   self, self.States.MANUAL,   io, log )
+
+    self.changeState( self.States.HARDWARE )
 
     self._io = io
+
+    self.gCodeHandler = None
 
     self.startRequest = False
     self.stopRequest = False
 
-    self.changeState( self.States.HARDWARE )
+    # Manual mode options.
+    self.manualRequest = False
+    self.isJogging = False
+    self.seekX = None
+    self.seekY = None
+    self.seekZ = None
+    self.seekVelocity = None
+
 
 # end class

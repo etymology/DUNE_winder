@@ -52,7 +52,9 @@ class StopMode( StateMachineState ) :
       elif self.control.startRequest :
         self.control.changeState( self.control.States.WIND )
         self.control.startRequest = False
-      else:
+      elif self.control.manualRequest:
+        self.control.changeState( self.control.States.MANUAL )
+        self.control.manualRequest = False
         #
         # $$$ DEBUG - Allowed to change to other modes.
         #
@@ -187,3 +189,13 @@ class StopMode( StateMachineState ) :
 
     # Update active sub-state.
     self.stopStateMachine.update()
+
+  #---------------------------------------------------------------------
+  def isIdle( self ) :
+    """
+    Return true if the sub-state idle.
+
+    Returns:
+      True if the sub-state idle.
+    """
+    return self.stopStateMachine.States.IDLE == self.stopStateMachine.getState()

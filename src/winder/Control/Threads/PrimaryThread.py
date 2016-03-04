@@ -19,6 +19,7 @@ class PrimaryThread( threading.Thread ):
 
   list = []
   isRunning = False
+  semaphore = threading.Lock()
 
   #---------------------------------------------------------------------
   def __init__( self, name ) :
@@ -46,6 +47,8 @@ class PrimaryThread( threading.Thread ):
     for instance in PrimaryThread.list:
       instance.start()
 
+    PrimaryThread.semaphore.acquire()
+
   #---------------------------------------------------------------------
   @staticmethod
   def stopAllThreads():
@@ -53,8 +56,8 @@ class PrimaryThread( threading.Thread ):
     Stop all threads. Call at end of program.
 
     """
-
     PrimaryThread.isRunning = False
     SystemSemaphore.releaseAll()
+    PrimaryThread.semaphore.release()
 
 # end class

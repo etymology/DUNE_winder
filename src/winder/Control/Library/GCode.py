@@ -294,12 +294,12 @@ class GCodeLine :
 class GCode :
 
   #---------------------------------------------------------------------
-  def __init__( self, fileName, callbacks ) :
+  def __init__( self, lines, callbacks ) :
     """
     Constructor.
 
     Args:
-      fileName: Name of G-code file.
+      lines: List of G-Code lines.
       callbacks: Instance of GCodeCallbacks.
 
     Raises:
@@ -307,35 +307,8 @@ class GCode :
       IOError: Problems reading specified G-Code file.
     """
 
-    self.fileName = fileName
-
-    # Read input file.
-    with open( fileName ) as inputFile :
-
-      # Regular expression for header.  Headings must be in the following format:
-      #   ( Description; UUID )
-      # Where the description is a text field ending with a comma, and the UUID
-      # conforms to nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn format where n is a
-      # hex digit.
-      headerCheck = \
-        '\( .+?; [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12} \)'
-
-      # Read file header.
-      header = inputFile.readline()
-
-      if re.search( headerCheck, header ) :
-        header = header.replace( "( ", "" )
-        header = header.replace( " )", "" )
-        header = header.strip()
-        self._description, self._uuid = header.split( ";" )
-      else :
-        raise Exception( "G-Code contains no heading." )
-
-      # Get the rest of the lines.
-      self.lines = inputFile.readlines()
-
     # Strip off line feeds and other white space from end of line.
-    self.lines = map( str.strip, self.lines )
+    self.lines = map( str.strip, lines )
 
     self.index = 0
     self.callbacks = callbacks
@@ -372,29 +345,6 @@ class GCode :
     """
     if self.index > 0 :
       self.index -= 1
-
-  #---------------------------------------------------------------------
-  def getDescription( self ) :
-    """
-    Return the description of this recipe.  Comes from header of G-Code.
-
-    Returns:
-      Description of G-Code file.
-    """
-    return self._description
-
-  #---------------------------------------------------------------------
-  def getID( self ) :
-    """
-    Return the unique ID of this recipe.  Comes from header of G-Code.
-
-    Returns:
-      ID G-Code file.
-
-    Notes:
-      The ID is a UUID that correlates the file to version control.
-    """
-    return self._uuid
 
   #---------------------------------------------------------------------
   def getLine( self ) :

@@ -9,9 +9,9 @@
 ###############################################################################
 
 from Control.Settings import Settings
-from Control.GCodeHandler import GCodeHandler
-from Control.ControlStateMachine import ControlStateMachine
-from Control.ManualCommand import ManualCommand
+#from Control.GCodeHandler import GCodeHandler
+#from Control.ControlStateMachine import ControlStateMachine
+#from Control.ManualCommand import ManualCommand
 
 from Threads.PrimaryThread import PrimaryThread
 from Threads.UI_ServerThread import UI_ServerThread
@@ -24,7 +24,6 @@ from Simulator.PLC_Simulator import PLC_Simulator
 
 from Control.Process import Process
 
-import time
 import signal
 import sys
 import traceback
@@ -43,6 +42,10 @@ debugInterface = False
 
 # True to echo log to screen.
 isLogEchoed = True
+
+# True to log I/O.
+# CAUTION: Log file will get large very quickly.
+isIO_Logged = False
 
 #==============================================================================
 
@@ -69,7 +72,7 @@ def commandHandler( command ) :
       "Main",
       "commandHandler",
       "Invalid command issued from UI.",
-      [ exception, exceptionType, exceptionValue, tracebackString ]
+      [ command, exception, exceptionType, exceptionValue, tracebackString ]
     )
 
   return result
@@ -104,6 +107,8 @@ for argument in sys.argv:
     debugInterface = ( "TRUE" == value )
   elif "LOG" == option :
     isLogEchoed = ( "TRUE" == value )
+  elif "LOG_IO" == option :
+    isIO_Logged = ( "TRUE" == value )
 
 # Install signal handler for Ctrl-C shutdown.
 signal.signal( signal.SIGINT, signalHandler )
@@ -122,42 +127,64 @@ Settings.defaultConfig( configuration )
 log = Log( systemTime, configuration.get( "LogDirectory" ) + '/log.csv', isLogEchoed )
 log.add( "Main", "START", "Control system starts." )
 
-# Create I/O map.
-if isSimulated :
-  from IO.Maps.SimulatedIO import SimulatedIO
-  io = SimulatedIO()
-  plcSimulator = PLC_Simulator( io )
-else:
-  from IO.Maps.Test_IO import Test_IO
-  io = Test_IO( configuration.get( "plcAddress" ) )
+try:
+  # Create I/O map.
+  if isSimulated :
+    from IO.Maps.SimulatedIO import SimulatedIO
+    io = SimulatedIO()
+    plcSimulator = PLC_Simulator( io )
+  else:
+    from IO.Maps.Test_IO import Test_IO
+    io = Test_IO( configuration.get( "plcAddress" ) )
 
-gCodeHandler = GCodeHandler( io )
-manualCommand = ManualCommand( io, log )
-controlStateMachine = ControlStateMachine( io, log, gCodeHandler, manualCommand )
+  # Primary control process.
+  process = Process( io, log, configuration )
 
-# Initialize threads.
-uiServer = UI_ServerThread( commandHandler, log )
-controlThread = ControlThread( io, controlStateMachine )
+  #
+  # Initialize threads.
+  #
+  uiServer = UI_ServerThread( commandHandler, log )
+  controlThread = ControlThread( io, process.controlStateMachine, systemTime, isIO_Logged )
 
-# Setup debug interface (if enabled).
-if debugInterface :
-  from Threads.DebugThread import DebugThread
-  debugUI = \
-    DebugThread(
-      configuration.get( "serverAddress" ),
-      int( configuration.get( "serverPort" ) )
-    )
+  # Setup debug interface (if enabled).
+  if debugInterface :
+    from Threads.DebugThread import DebugThread
+    debugUI = \
+      DebugThread(
+        configuration.get( "serverAddress" ),
+        int( configuration.get( "serverPort" ) )
+      )
 
-process = Process( io, log, configuration, gCodeHandler, controlStateMachine )
+  # Begin operation.
+  PrimaryThread.startAllThreads()
 
-# Begin operation.
-PrimaryThread.startAllThreads()
+  # Wait while the program is running...
+  # (The threads have it from here.)
+  PrimaryThread.semaphore.acquire()
 
-# While the program is running...
-while ( PrimaryThread.isRunning ) :
-  time.sleep( 0.1 )
+  # # While the program is running...
+  # while ( PrimaryThread.isRunning ) :
+  #   time.sleep( 0.1 )
 
-process.closeAPA()
+  # Shutdown the current processes.
+  process.closeAPA()
 
-configuration.save()
+  # Save configuration.
+  configuration.save()
+
+except Exception as exception:
+
+  exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+  tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
+  log.add(
+    "Main",
+    "FAILURE",
+    "Caught an exception.",
+    [ exception, exceptionType, exceptionValue, tracebackString ]
+  )
+
+# Sign off.
 log.add( "Main", "END", "Control system stops." )
+
+# "If you think you understand quantum mechanics, you don't understand quantum
+# mechanics." -- Richard Feynman

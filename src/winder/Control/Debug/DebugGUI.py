@@ -10,6 +10,7 @@
 import wx
 import datetime
 import ast
+import math
 
 from Library.UI_ClientConnection import UI_ClientConnection
 
@@ -26,15 +27,28 @@ class DebugGUI( wx.Frame ):
 
   #---------------------------------------------------------------------
   def jogStart( self, x, y ) :
-    self.remote( "io.plcLogic.jogXY(" + str( x ) + "," + str( y ) + ")" )
+
+    velocity = self.slider.GetValue() / 100.0
+    x *= velocity
+    y *= velocity
+
+    # When both velocities are the same, calculate the maximum linear velocity
+    # and use that.
+    if 0 != x and 0 != y and abs( x ) == abs( y ) :
+      x = math.sqrt( x * x / 2.0 )
+      y = x
+
+    self.remote( "process.jogXY(" + str( x ) + "," + str( y ) + ")" )
 
   #---------------------------------------------------------------------
   def jogStop( self ) :
     self.remote( "io.plcLogic.jogXY( 0, 0 )" )
+    self.remote( "process.jogXY( 0, 0 )" )
 
   #---------------------------------------------------------------------
   def setPosition( self, event ) :
-    self.remote( "io.plcLogic.setXY_Position( 0, 0 )" )
+    velocity = self.slider.GetValue() / 100.0
+    self.remote( "process.manualSeekXY( 0, 0, " + str( velocity ) + " )" )
 
   #---------------------------------------------------------------------
   def gCodeSelect( self, event ):
@@ -78,8 +92,6 @@ class DebugGUI( wx.Frame ):
     gs = wx.GridSizer( 3, 4, 5, 5 )
     startButton = wx.Button( panel, label='Start' )
     startButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.start()" ) )
-    #startButton.Bind( wx.EVT_LEFT_DOWN, lambda e: self.setIO( "io.start", True, e ) )
-    #startButton.Bind( wx.EVT_LEFT_UP,   lambda e: self.setIO( "io.start", False, e ) )
 
     stopButton = wx.Button( panel, label='Stop' )
     stopButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.stop()" ) )
@@ -152,6 +164,31 @@ class DebugGUI( wx.Frame ):
     outer.Add( gs, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
 
     vbox.Add( outer )
+
+
+
+
+
+    gs = wx.GridSizer( 1, 1, 5, 5 )
+    self.slider = \
+      wx.Slider(
+        panel,
+        -1,
+        100,
+        1, 500,
+        wx.DefaultPosition,
+        (500, -1),
+        wx.SL_AUTOTICKS | wx.SL_HORIZONTAL | wx.SL_LABELS
+      )
+    self.slider.Bind( wx.EVT_SCROLL, lambda e: self.remote( "process.gCodeHandler.setMaxVelocity( " + str( self.slider.GetValue() / 100.0 ) + ")" ) )
+
+    gs.AddMany(
+      [
+        ( self.slider )
+      ]
+    )
+    vbox.Add( gs )
+
 
     gs = wx.FlexGridSizer( 4, 6, 5, 5 )
 
@@ -240,7 +277,7 @@ class DebugGUI( wx.Frame ):
     self.Bind( wx.EVT_TIMER, self.update, self.timer )
     self.timer.Start( 100 )
 
-    self.SetSize( (550, 300) )
+    self.SetSize( (520, 350) )
     self.SetTitle( 'DUNE Winder Simulator' )
     self.Show( True )
 
@@ -310,17 +347,17 @@ class DebugGUI( wx.Frame ):
     self.estop.SetLabel( self.remote( "io.estop" ) )
     self.park.SetLabel(  self.remote( "io.park" ) )
 
-    currentLine = self.remote.get( "gCodeHandler.getCurrentLineNumber()" )
+    currentLine = self.remote.get( "process.gCodeHandler.getCurrentLineNumber()" )
     if "None" != currentLine :
       currentLine = int( currentLine ) + 1
 
     self.lineValue.SetLabel(
       str( currentLine )
        + "/"
-       + self.remote.get( "gCodeHandler.getTotalLines()" )
+       + self.remote.get( "process.gCodeHandler.getTotalLines()" )
     )
 
-    self.stateValue.SetLabel( self.remote.get( "controlStateMachine.state.__class__.__name__" ) )
+    self.stateValue.SetLabel( self.remote.get( "process.controlStateMachine.state.__class__.__name__" ) )
 
     xAxisMotion       = self.remote.get( "io.xAxis.isSeeking()" )
     yAxisMotion       = self.remote.get( "io.yAxis.isSeeking()" )

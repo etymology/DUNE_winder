@@ -16,7 +16,7 @@ from Library.StateMachineState import StateMachineState
 class WindMode( StateMachineState ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, stateMachine, state, io, log, gCodeHandler ) :
+  def __init__( self, stateMachine, state, io, log ) :
     """
     Constructor.
 
@@ -30,7 +30,6 @@ class WindMode( StateMachineState ) :
     StateMachineState.__init__( self, stateMachine, state )
     self.io = io
     self.log = log
-    self.gCodeHandler = gCodeHandler
     self._temp = 0   # $$$DEBUG
 
   #---------------------------------------------------------------------
@@ -51,7 +50,7 @@ class WindMode( StateMachineState ) :
         "Wind cannot start because stop is still requested."
       )
 
-    if None == self.gCodeHandler.gCode :
+    if None == self.stateMachine.gCodeHandler or None == self.stateMachine.gCodeHandler.gCode :
       isError = True
       self.log.add(
         self.__class__.__name__,
@@ -64,11 +63,9 @@ class WindMode( StateMachineState ) :
       self.log.add(
         self.__class__.__name__,
         "WIND",
-        "G-Code execution of "
-          + self.gCodeHandler.gCode.fileName
-          + " begins at line "
-          + str( self.gCodeHandler.gCode.getLine() ),
-        [ self.gCodeHandler.gCode.fileName, self.gCodeHandler.gCode.getLine() ]
+        "G-Code execution begins at line "
+          + str( self.stateMachine.gCodeHandler.gCode.getLine() ),
+        [ self.stateMachine.gCodeHandler.gCode.getLine() ]
       )
 
     return isError
@@ -83,7 +80,7 @@ class WindMode( StateMachineState ) :
     """
 
     # We didn't finish this line.  Run it again.
-    self.gCodeHandler.gCode.setRelativeLine( -1 )
+    self.stateMachine.gCodeHandler.gCode.setRelativeLine( -1 )
 
     return False
 
@@ -108,8 +105,8 @@ class WindMode( StateMachineState ) :
       if self.io.plcLogic.isXY_SeekComplete() :
 
         # Done with G-Code script?
-        if self.gCodeHandler.isDone() :
-          self.gCodeHandler.gCode.rewind()
+        if self.stateMachine.gCodeHandler.isDone() :
+          self.stateMachine.gCodeHandler.gCode.rewind()
           self.log.add(
             self.__class__.__name__,
             "WIND",
@@ -120,6 +117,6 @@ class WindMode( StateMachineState ) :
         else :
           self._temp += 1
           if 5 == self._temp :
-            self.gCodeHandler.runNextLine()
+            self.stateMachine.gCodeHandler.runNextLine()
             self._temp = 0
 

@@ -49,10 +49,16 @@ class SimulatedPLC( PLC ) :
       Result of the data read, or None if there was a problem.
     """
     result = None
-    if tag in SimulatedPLC.tags.keys() :
-      result = [ SimulatedPLC.tags[ tag ] ]
-    else :
-      print "Unknown tag", tag
+
+    if not isinstance( tag, list ) :
+      tags = [ tag ]
+    else:
+      tags = tag
+
+    result = []
+    for tag in tags :
+      if tag in SimulatedPLC.tags.keys() :
+        result.append( [ tag, SimulatedPLC.tags[ tag ], "" ] )
 
     return result
 
@@ -87,7 +93,7 @@ class SimulatedPLC( PLC ) :
     """
     result = self.read( tag )
     if result :
-      result = result[ 0 ]
+      result = result[ 0 ][ 1 ]
 
     return result
 

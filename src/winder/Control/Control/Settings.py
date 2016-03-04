@@ -18,6 +18,8 @@ class Settings :
   # Path to configuration file.
   CONFIG_FILE = "../configuration.xml"
 
+  IO_LOG = "../Data/IO_log.csv"
+
   #---------------------------------------------------------------------
   @staticmethod
   def defaultConfig( configuration ) :
@@ -34,4 +36,8 @@ class Settings :
     configuration.default( "LogDirectory", "../Data" )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
     configuration.default( "recipeDirectory", "../Recipe" )
+    configuration.default( "recipeArchiveDirectory", "../Data/Recipes" )
+
+    # Slow-mode maximum velocity.
+    configuration.default( "maxSlowVelocity", 0.5 )
 

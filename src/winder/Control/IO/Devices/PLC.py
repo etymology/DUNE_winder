@@ -9,9 +9,17 @@
 ###############################################################################
 
 from IO_Device import IO_Device
+from IO_Device import IO_Device
 from abc import ABCMeta, abstractmethod
 
 class PLC( IO_Device ) :
+
+  # There is a limit to the length of packets to/from the PLC.  When reading
+  # tags the request must be limited.  I have found no documentation as to how
+  # to calculate this limit, but found I could read 18 with the tag name sizes
+  # currently in the queue.  So 16 seems a safe number.
+  MAX_TAG_READS = 16
+
 
   # Make class abstract.
   __metaclass__ = ABCMeta
@@ -23,7 +31,14 @@ class PLC( IO_Device ) :
     Notes:
       Use the Attributes subclass to define how the tag behaves.
     """
+
+    # List of all tags.
     list = []
+
+    # Look-up table to match tag names to instances of Tag.  The look-up is
+    # a list of tag instances in case there are multiple Tag instances for the
+    # same tag name.
+    map = {}
 
     # Various attributes an I/O word can have.
     class Attributes :
@@ -39,18 +54,40 @@ class PLC( IO_Device ) :
       Constructor.
 
       Args:
-        name: Name of output.
+        name: Name of tag.
         plc: Instance of IO_Device.PLC.
         tagName: Which PLC tag this input is assigned.
         tagType: The type of tag value.
         attributes: Attributes of tag (must be instance of Attributes)
       """
+
+      # Cannot create a tag that cannot be read but is polled.
+      assert( attributes.canRead or not attributes.isPolled )
+
       PLC.Tag.list.append( self )
+
+      # Add this tag to the look-up table.
+      if tagName in PLC.Tag.map :
+        PLC.Tag.map[ tagName ].append( self )
+      else:
+        PLC.Tag.map[ tagName ] = [ self ]
+
+      self._name       = name
       self._plc        = plc
       self._tagName    = tagName
       self._attributes = attributes
       self._type       = tagType
       self._value      = attributes.defaultValue
+
+    #---------------------------------------------------------------------
+    def getName( self ) :
+      """
+      Return name of this tag.
+
+      Args:
+        name: Name of this tag.
+      """
+      return self._name
 
     #---------------------------------------------------------------------
     def poll( self ) :
@@ -59,13 +96,13 @@ class PLC( IO_Device ) :
       """
       value = self._plc.read( self._tagName )
       if not value == None and not self._plc.isNotFunctional() :
-        self.updateFromReadTag( value )
+        self.updateFromReadTag( value[ 0 ] )
       else :
         self._value = self._attributes.defaultValue
 
     #---------------------------------------------------------------------
     @staticmethod
-    def pollAll() :
+    def pollAll( plc ) :
       """
       Update all tags.
 
@@ -73,9 +110,35 @@ class PLC( IO_Device ) :
         All tags could be read at once, which may be useful in reducing
         Ethernet traffic.
       """
+
+      tagList = []
       for tag in PLC.Tag.list :
+        # If this tag is polled...
         if tag._attributes.isPolled :
-          tag.poll()
+          tagName = tag.getReadTag()
+
+          # If this tag is not already in the list...
+          if not tagName in tagList :
+            tagList.append( tagName )
+
+      # Break list into sub-sets of no more than 'maxTagsAtOnce' tags.
+      tagSubset = \
+        [
+          tagList[ tag : tag + PLC.MAX_TAG_READS ]
+            for tag in xrange( 0, len( tagList ), PLC.MAX_TAG_READS )
+        ]
+
+      # For each tag subset...
+      for tagList in tagSubset :
+        # Read all the tags in this subset.
+        results = plc.read( tagList )
+
+        # Distribute the results to the tag objects.
+        for result in results :
+          # For each object that uses this tag name...
+          for tag in PLC.Tag.map[ result[ 0 ] ] :
+            # Send it the result.
+            tag.updateFromReadTag( result[ 1 ] )
 
     #---------------------------------------------------------------------
     def getReadTag( self ) :
@@ -98,7 +161,7 @@ class PLC( IO_Device ) :
       been done at once to feed back data.
       """
       if self._attributes.canRead :
-        self._value = value[ 0 ]
+        self._value = value
 
 
     #---------------------------------------------------------------------

@@ -9,6 +9,7 @@
 ###############################################################################
 
 from Library.Serializable import Serializable
+from Library.Recipe import Recipe
 import xml.dom.minidom
 import os.path
 
@@ -30,7 +31,16 @@ class AnodePlaneArray( Serializable ) :
   #   apa = APA()
 
   #---------------------------------------------------------------------
-  def __init__( self, gCodeHandler, apaDirectory, recipeDirectory, name, log, createNew=False ) :
+  def __init__(
+    self,
+    gCodeHandler,
+    apaDirectory,
+    recipeDirectory,
+    recipeArchiveDirectory,
+    name,
+    log,
+    createNew=False
+  ) :
     """
     Constructor.
 
@@ -49,6 +59,7 @@ class AnodePlaneArray( Serializable ) :
 
     self._apaDirectory = apaDirectory
     self._recipeDirectory = recipeDirectory
+    self._recipeArchiveDirectory = recipeArchiveDirectory
     self._name = name
     self._log = log
     self._gCodeHandler = gCodeHandler
@@ -56,6 +67,7 @@ class AnodePlaneArray( Serializable ) :
     # Uninitialized data.
     self._lineNumber = None
     self._recipeFile = None
+    self._recipe = None
 
     # $$$DEBUG Error check.
     # $$$DEBUG What to do on failure?
@@ -105,11 +117,15 @@ class AnodePlaneArray( Serializable ) :
     if None != startingLine :
       self._lineNumber = startingLine
 
-    try:
-      self._gCodeHandler.loadG_Code( self._recipeDirectory + "/" + self._recipeFile )
-    except:
-      isError = True
-      error = "Unable to load file."
+    self._recipe = Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
+    self._gCodeHandler.loadG_Code( self._recipe.getLines() )
+    #self._gCodeHandler.loadG_Code( self._recipeDirectory + "/" + self._recipeFile )
+    #try:
+    #  recipe = Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
+    #  self._gCodeHandler.loadG_Code( self._recipeDirectory + "/" + self._recipeFile )
+    #except:
+    #  isError = True
+    #  error = "Unable to load file."
 
     if not isError :
       isError |= self._gCodeHandler.gCode.setLine( self._lineNumber )
@@ -124,8 +140,8 @@ class AnodePlaneArray( Serializable ) :
         [
           self._recipeFile,
           self._lineNumber,
-          self._gCodeHandler.gCode.getDescription(),
-          self._gCodeHandler.gCode.getID()
+          self._recipe.getDescription(),
+          self._recipe.getID()
         ]
       )
     else:
@@ -244,7 +260,12 @@ class AnodePlaneArray( Serializable ) :
       True if there was an error, False if not.
     """
     self._recipeFile = node.getAttribute( "recipeFile" )
-    self._lineNumber = int( node.getAttribute( "lineNumber" ) )
+
+    lineNumberString = node.getAttribute( "lineNumber" )
+    if "None" != lineNumberString :
+      self._lineNumber = int( lineNumberString )
+    else :
+      self._lineNumber = None
 
     return False
 

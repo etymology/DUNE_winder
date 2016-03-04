@@ -46,8 +46,13 @@ class GCodeHandler :
       velocity: Desired maximum velocity.
     Returns:
       None.
+    Notes:
+      Limited to 'maxVelocity'.
     """
-    self._velocity = velocity
+    if velocity < self.maxVelocity :
+      self._velocity = velocity
+    else :
+      self._velocity = self.maxVelocity
 
   #---------------------------------------------------------------------
   def _setLine( self, line ) :
@@ -133,14 +138,14 @@ class GCodeHandler :
 
 
   #---------------------------------------------------------------------
-  def loadG_Code( self, fileName ) :
+  def loadG_Code( self, lines ) :
     """
     Load G-Code file.
 
     Args:
       fileName: Full file name to G-Code to be loaded.
     """
-    self.gCode = GCode( fileName, self._callbacks )
+    self.gCode = GCode( lines, self._callbacks )
     self._currentLine = 0
 
   #---------------------------------------------------------------------
@@ -188,6 +193,12 @@ class GCodeHandler :
     return result
 
   #---------------------------------------------------------------------
+  def setMaxVelocity( self, maxVelocity ) :
+    """
+    """
+    self.maxVelocity = maxVelocity
+
+  #---------------------------------------------------------------------
   def __init__( self, io ):
     """
     Constructor.
@@ -209,6 +220,7 @@ class GCodeHandler :
 
     self._io = io
 
+    self.maxVelocity = 5.0
     self._velocity = 1.0
     self._x = 0
     self._y = 0

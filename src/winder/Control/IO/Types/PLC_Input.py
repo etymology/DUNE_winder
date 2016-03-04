@@ -52,10 +52,14 @@ class PLC_Input( DigitalInput ) :
       Does not reflect any useful value until polled.  If the PLC isn't
       functional, this value returns a default value.
     """
-    value = int( self._tag.get() )
-    value >>= self._bit
-    value &= 0x01
-    value = bool( value == 1 )
+    value = self._tag.get()
+    if None != value :
+      value = int( value )
+      value >>= self._bit
+      value &= 0x01
+      value = bool( value == 1 )
+    else :
+      value = self._defaultState
 
     return value
 

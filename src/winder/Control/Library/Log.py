@@ -9,6 +9,7 @@
 ###############################################################################
 import threading
 import os.path
+import collections
 
 class Log:
 
@@ -42,6 +43,8 @@ class Log:
       self.attach( outputFileName )
 
     self._localEcho = localEcho
+    if self._localEcho :
+      print "Time                       Message"
 
   #---------------------------------------------------------------------
   def attach( self, outputFileName ):
@@ -52,7 +55,6 @@ class Log:
       outputFileName: File to append.
 
     """
-
     self._lock.acquire()
 
     # Create the path if it does not exist.
@@ -79,7 +81,6 @@ class Log:
       outputFileName: Log file previously attached.
 
     """
-
     self._lock.acquire()
     outputFile = self._outputFileList[ outputFileName ]
     self._outputFileList.pop( outputFileName )
@@ -120,4 +121,18 @@ class Log:
 
     # Local echo if requested.
     if self._localEcho :
+      line = str( currentTime ) + " " + message
+      isFirst = True
+      parameterLine = ""
+      for parameter in parameters:
+        if not isFirst :
+          parameterLine += ", "
+        isFirst = False
+        parameterLine += str( parameter )
+
+      if "" != parameterLine :
+        parameterLine = " [" + parameterLine + "]"
+
+      line += parameterLine
+
       print line

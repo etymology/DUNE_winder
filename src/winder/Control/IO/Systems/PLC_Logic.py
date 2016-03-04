@@ -98,10 +98,7 @@ class PLC_Logic :
     """
     Internal update. Call periodically.
     """
-    #PLC_Input.pollAll()
-    PLC.Tag.pollAll()
-    #PLC_Motor.pollAll()
-    self._state.poll()
+    PLC.Tag.pollAll( self._plc )
 
   #---------------------------------------------------------------------
   def __init__( self, plc, xyAxis ) :
@@ -115,8 +112,11 @@ class PLC_Logic :
     self._plc = plc
     self._xyAxis = xyAxis
 
-    self._moveType = PLC.Tag( "Move type", plc, "MOVE_TYPE", tagType="INT" )
-    self._state    = PLC.Tag( "State", plc, "STATE", tagType="DINT" )
+    attributes = PLC.Tag.Attributes()
+    attributes.isPolled = True
+    self._moveType = PLC.Tag( "Move type", plc, "MOVE_TYPE", attributes, tagType="INT" )
+    self._state    = PLC.Tag( "State", plc, "STATE", attributes, tagType="DINT" )
+
     self._maxVelocity = PLC.Tag( "MaxVelocity", plc, "XY_MAX_VELOCITY", tagType="REAL" )
     self._maxAcceleration = PLC.Tag( "MaxAcceleration", plc, "XY_MAX_ACCELERATION", tagType="REAL" )
     self._maxDeceleration = PLC.Tag( "MaxDeceleration", plc, "XY_MAX_DECELERATION", tagType="REAL" )
