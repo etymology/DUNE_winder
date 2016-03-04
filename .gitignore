@@ -2,3 +2,5 @@
 /src/Control/log.txt
 *.bak
 /src/Control/log.csv
+/src/winder/Data
+/src/winder/configuration.xml
