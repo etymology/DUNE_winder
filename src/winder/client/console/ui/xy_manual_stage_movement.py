@@ -12,7 +12,7 @@ class _Command( object ):
 
 class _XyCommands( _Command ):
    def move_start( self, x, y ):
-      command = "io.plcLogic.jogXY( %s, %s )" % ( x, y )
+      command = "process.jogXY( %s, %s )" % ( x, y )
       return self.send_command( command )
 
    def move_stop( self ):
