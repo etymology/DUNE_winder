@@ -24,17 +24,27 @@ class PLC_Simulator :
       if self._io.plcLogic.MoveTypes.IDLE == moveType :
         self._xAxis.stop()
         self._yAxis.stop()
-      # Seek?
-      elif self._io.plcLogic.MoveTypes.SEEK == moveType :
+      # Seek in X/Y?
+      elif self._io.plcLogic.MoveTypes.SEEK_XY == moveType :
         velocity = self._io.plc.getTag( self._maxVelocityTag )
         self._xAxis.startSeek( velocity )
         self._yAxis.startSeek( velocity )
 
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
-      # Jog?
-      elif self._io.plcLogic.MoveTypes.JOG == moveType :
+      # Jog in X/Y?
+      elif self._io.plcLogic.MoveTypes.JOG_XY == moveType :
         self._xAxis.startJog()
         self._yAxis.startJog()
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
+      # Seek in Z?
+      elif self._io.plcLogic.MoveTypes.SEEK_Z == moveType :
+        velocity = self._io.plc.getTag( self._maxVelocityTag )
+        self._zAxis.startSeek( velocity )
+
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
+      # Jog in Z?
+      elif self._io.plcLogic.MoveTypes.JOG_XY == moveType :
+        self._zAxis.startJog()
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
 
       self._lastMoveType = moveType
@@ -46,6 +56,22 @@ class PLC_Simulator :
     if not self._xAxis.isInMotion() and not self._yAxis.isInMotion() :
       self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.IDLE )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
+
+      # Force an update of move state machine.
+      # NOTE: We use None because the winder may immediately request an other
+      # move, putting the move type back to where it was.
+      self._lastMoveType = None
+
+  #---------------------------------------------------------------------
+  def _writeCallback( self, tag, data ) :
+    """
+    Callback run whenever a tag is written.
+
+    Args:
+      tag: Ignored.
+      data: Ignored.
+    """
+    self.poll()
 
   #---------------------------------------------------------------------
   def __init__( self, io ) :

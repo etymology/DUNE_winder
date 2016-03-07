@@ -10,6 +10,7 @@
 
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
+from Control.Settings import Settings
 import xml.dom.minidom
 import os.path
 
@@ -22,13 +23,6 @@ class AnodePlaneArray( Serializable ) :
   # There can only be a single working instance of an APA, and it must be
   # saved before loading or starting a new one.
   activeAPA = None
-
-  # #---------------------------------------------------------------------
-  # @staticmethod
-  # def create( name, recipeFile, log ) :
-  #   """
-  #   """
-  #   apa = APA()
 
   #---------------------------------------------------------------------
   def __init__(
@@ -45,13 +39,16 @@ class AnodePlaneArray( Serializable ) :
     Constructor.
 
     Args:
+      gCodeHandler: Instance of GCodeHandler.
+      apaDirectory: Directory APA data is stored.
+      recipeDirectory: Directory recipes are stored.
+      recipeArchiveDirectory: Directory recipes are archived.
       name: Name/serial number of APA.
       log: Instance of system log file.
       createNew: True if this APA should be created should it not already exist.
     """
 
     # If there was an APA previously active, save it.
-    # $$$DEBUG - Log message about changing APAs?
     if AnodePlaneArray.activeAPA :
       AnodePlaneArray.activeAPA.close()
 
@@ -68,41 +65,64 @@ class AnodePlaneArray( Serializable ) :
     self._lineNumber = None
     self._recipeFile = None
     self._recipe = None
-
-    # $$$DEBUG Error check.
-    # $$$DEBUG What to do on failure?
+    self._layer = None
 
     # Create directory if it doesn't exist.
     apaExists = os.path.exists( self._getPath() )
+    pathsCreated = False
     if not apaExists and createNew :
       os.makedirs( self._getPath() )
+      pathsCreated = True
 
-    self._log.attach( self._getPath() + AnodePlaneArray.LOG_FILE )
+    # Attach a log file such that all future messages are logged to this APA
+    # as well.
+    if apaExists or pathsCreated :
+      self._log.attach( self._getPath() + AnodePlaneArray.LOG_FILE )
 
-    if not apaExists and createNew :
-      self._log.add(
-        self.__class__.__name__,
-        "NEW",
-        "Created new APA called " + self._name,
-        [ self._name ]
-      )
+    if not apaExists :
+      if createNew :
+        self._log.add(
+          self.__class__.__name__,
+          "NEW",
+          "Created new APA called " + self._name,
+          [ self._name ]
+        )
+      else:
+        self._log.add(
+          self.__class__.__name__,
+          "NEW",
+          "Unable to load APA called " + self._name
+            + ".  Active layer " + self._layer ,
+          [ self._name, self._layer ]
+        )
+        raise Exception( "APA not found" )
     else:
       self.load()
 
   #---------------------------------------------------------------------
-  def _getPath( self ):
+  def _getPath( self ) :
     """
     Get the path for all files related to this APA.
     """
     return self._apaDirectory + "/" + self._name + "/"
 
   #---------------------------------------------------------------------
-  def loadRecipe( self, recipeFile=None, startingLine=None ) :
+  def _getG_CodeLogName( self, layer ) :
+    """
+    Get the name of the G-Code log for this layer.
+
+    Args:
+      layer: Name of the layer.
+    """
+    return self._getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
+
+  #---------------------------------------------------------------------
+  def loadRecipe( self, layer=None, recipeFile=None, startingLine=None ) :
     """
     Load a recipe file into GCodeHandler.
 
     Args:
-      gCodeHandler: An instance of GCodeHandler that will execute the code.
+      layer: The current working layer.
       recipeFile: File name of recipe to load.
       startingLine: What line to start from in recipe.
 
@@ -111,21 +131,22 @@ class AnodePlaneArray( Serializable ) :
     """
     isError = False
 
+    if None != layer :
+      self._layer = layer
+
     if None != recipeFile :
       self._recipeFile = recipeFile
 
     if None != startingLine :
       self._lineNumber = startingLine
 
-    self._recipe = Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
+    self._recipe = \
+      Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
     self._gCodeHandler.loadG_Code( self._recipe.getLines() )
-    #self._gCodeHandler.loadG_Code( self._recipeDirectory + "/" + self._recipeFile )
-    #try:
-    #  recipe = Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
-    #  self._gCodeHandler.loadG_Code( self._recipeDirectory + "/" + self._recipeFile )
-    #except:
-    #  isError = True
-    #  error = "Unable to load file."
+
+    # Assign a G-Code log.
+    gCodeLogName = self._getG_CodeLogName( self._layer )
+    self._gCodeHandler.setGCodeLog( gCodeLogName )
 
     if not isError :
       isError |= self._gCodeHandler.gCode.setLine( self._lineNumber )
@@ -136,9 +157,12 @@ class AnodePlaneArray( Serializable ) :
       self._log.add(
         self.__class__.__name__,
         "GCODE",
-        "Loaded G-Code file " + self._recipeFile + ", starting at line " + str( self._lineNumber ),
+        "Loaded G-Code file " + self._recipeFile
+          + ", active layer " + self._layer
+          + ", starting at line " + str( self._lineNumber ),
         [
           self._recipeFile,
+          self._layer,
           self._lineNumber,
           self._recipe.getDescription(),
           self._recipe.getID()
@@ -171,24 +195,37 @@ class AnodePlaneArray( Serializable ) :
   def load( self ) :
     """
     Load
+
+    Returns:
+      True if there was an error, False if not.
     """
-    self._log.add(
-      self.__class__.__name__,
-      "LOAD",
-      "Loaded APA called " + self._name,
-      [ self._name ]
-    )
 
-    # $$$DEBUG - Error checking.
-
+    isError = False
     fileName = self._getPath() + AnodePlaneArray.FILE_NAME
     if os.path.isfile( fileName ) :
+      # Log message about AHA change.
+      self._log.add(
+        self.__class__.__name__,
+        "LOAD",
+        "Loaded APA called " + self._name,
+        [ self._name ]
+      )
       xmlDocument = xml.dom.minidom.parse( fileName )
-      node = xmlDocument.getElementsByTagName( self._name )
+      node = xmlDocument.getElementsByTagName( "APA_" + self._name )
       self.unserialize( node[ 0 ] )
 
       if self._recipeFile :
-        self.loadRecipe()
+        self.loadRecipe( self._layer )
+    else :
+      isError = True
+      self._log.add(
+        self.__class__.__name__,
+        "LOAD",
+        "Unable to load APA called " + self._name + ".  File not found.",
+        [ self._name ]
+      )
+
+    return isError
 
   #---------------------------------------------------------------------
   def save( self ) :
@@ -196,24 +233,25 @@ class AnodePlaneArray( Serializable ) :
     Save state of APA to disk.
     """
 
-    # $$$DEBUG - Error checking.
-
+    # Get the current line in G-Code.
     if self._gCodeHandler.gCode :
       self._lineNumber = self._gCodeHandler.gCode.getLine()
 
+    # Serialize data into XML.
     xmlDocument = xml.dom.minidom.parseString( '<AnodePlaneArray/>' )
     node = self.serialize( xmlDocument )
     xmlDocument.childNodes[ 0 ].appendChild( node )
 
+    # Create text from XML data.
     outputText = xmlDocument.toprettyxml()
 
     # Strip off extraneous line feeds.
     outputText = \
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
-    outputFile = open( self._getPath() + AnodePlaneArray.FILE_NAME, "wb" )
-    outputFile.write( outputText )
-    outputFile.close()
+    # Write XML data to file.
+    with open( self._getPath() + AnodePlaneArray.FILE_NAME, "wb" ) as outputFile :
+      outputFile.write( outputText )
 
   #---------------------------------------------------------------------
   def close( self ) :
@@ -225,8 +263,13 @@ class AnodePlaneArray( Serializable ) :
     self._log.add(
       self.__class__.__name__,
       "CLOSE",
-      "Closing APA " + self._name,
-      [ self._name ]
+      "Closing APA " + self._name + ", "
+        + str( self._recipeFile ) + ":" + str( self._lineNumber ),
+      [
+        self._name,
+        self._recipeFile,
+        self._lineNumber
+      ]
     )
     self._log.detach( self._getPath() + AnodePlaneArray.LOG_FILE )
 
@@ -241,10 +284,11 @@ class AnodePlaneArray( Serializable ) :
     Returns:
       Must return an XML node with the data from this object.
     """
-    node = xmlDocument.createElement( self._name )
+    node = xmlDocument.createElement( "APA_" + self._name )
 
     node.setAttribute( "recipeFile", self._recipeFile )
     node.setAttribute( "lineNumber", str( self._lineNumber ) )
+    node.setAttribute( "layer", str( self._layer ) )
 
     return node
 
@@ -260,6 +304,12 @@ class AnodePlaneArray( Serializable ) :
       True if there was an error, False if not.
     """
     self._recipeFile = node.getAttribute( "recipeFile" )
+
+    layer = node.getAttribute( "layer" )
+    if "None" != layer :
+      self._layer = layer
+    else :
+      self._layer = None
 
     lineNumberString = node.getAttribute( "lineNumber" )
     if "None" != lineNumberString :

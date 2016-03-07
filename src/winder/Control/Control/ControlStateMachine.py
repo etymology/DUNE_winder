@@ -35,6 +35,15 @@ class ControlStateMachine( LoggedStateMachine ) :
     if not self._io.isFunctional() \
       and self.getState() != self.States.HARDWARE :
         self.changeState( self.States.HARDWARE )
+    # Emergency stop.
+    elif self._io.estop.get() \
+      and self.getState() != self.States.STOP :
+        self.log.add(
+          self.__class__.__name__,
+          "ESTOP",
+          "Emergency stop detected."
+        )
+        self.changeState( self.States.STOP )
 
     LoggedStateMachine.update( self )
 

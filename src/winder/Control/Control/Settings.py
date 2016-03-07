@@ -18,6 +18,8 @@ class Settings :
   # Path to configuration file.
   CONFIG_FILE = "../configuration.xml"
 
+  G_CODE_LOG_FILE = "_gCode.txt"
+
   IO_LOG = "../Data/IO_log.csv"
 
   #---------------------------------------------------------------------
@@ -35,7 +37,7 @@ class Settings :
     # Log file locations.
     configuration.default( "LogDirectory", "../Data" )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
-    configuration.default( "recipeDirectory", "../Recipe" )
+    configuration.default( "recipeDirectory", "../Recipes" )
     configuration.default( "recipeArchiveDirectory", "../Data/Recipes" )
 
     # Slow-mode maximum velocity.

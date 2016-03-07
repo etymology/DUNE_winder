@@ -28,6 +28,7 @@ import re
 import hashlib
 import base64
 import os.path
+import shutil
 
 class Recipe :
   #---------------------------------------------------------------------
@@ -93,10 +94,7 @@ class Recipe :
     archiveFile = archiveDirectory + "/" + bodyHash
     if not os.path.isfile( archiveFile ) :
       # Make an archive copy of the file.
-      with open( archiveFile, "w" ) as outputFile :
-        outputFile.write( "( " + self._description + " " + bodyHash + " " + self._headerHash + ")\r\n" )
-        outputFile.writelines( self._lines )
-
+      shutil.copy2( fileName, archiveFile )
 
   #---------------------------------------------------------------------
   def getLines( self ) :
