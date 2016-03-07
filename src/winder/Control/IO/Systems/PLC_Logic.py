@@ -4,8 +4,6 @@
 # Date: 2016-02-26
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-25 - QUE - Creation.
 # Notes:
 #   This unit is designed to work with specific PLC logic.  It handles how
 #   operations must be preformed for the given setup, such as how to initiate

@@ -4,8 +4,6 @@
 # Date: 2016-02-02
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-02 - QUE - Creation.
 # Notes:
 #   An I/O device is some system that contains one or more I/O points.
 #   Examples include the PCF8575 I2C I/O expander, TLC5940 serial 16-channel

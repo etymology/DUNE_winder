@@ -4,8 +4,6 @@
 # Date: 2016-02-09
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-09 - QUE - Creation.
 #
 # $$$FUTURE - Is unit too big?  Consider breaking classes into separate files.
 #

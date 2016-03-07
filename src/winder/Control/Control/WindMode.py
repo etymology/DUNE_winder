@@ -4,13 +4,8 @@
 # Date: 2016-02-11
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-11 - QUE - Creation.
 ###############################################################################
 
-#from IO.IO import self.io.
-#from Library.GCode import GCode
-#from Control.GCodeHandler import GCodeHandler
 from Library.StateMachineState import StateMachineState
 
 class WindMode( StateMachineState ) :

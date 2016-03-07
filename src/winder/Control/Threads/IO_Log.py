@@ -4,8 +4,6 @@
 # Date: 2016-03-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-03-03 - QUE - Creation.
 ###############################################################################
 
 from IO.Primitives.IO_Point import IO_Point

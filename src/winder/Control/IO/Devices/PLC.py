@@ -4,8 +4,6 @@
 # Date: 2016-02-26
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-26 - QUE - Creation.
 ###############################################################################
 
 from IO_Device import IO_Device

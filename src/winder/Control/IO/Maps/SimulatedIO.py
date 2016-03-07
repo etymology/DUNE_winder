@@ -4,8 +4,6 @@
 # Date: 2016-02-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-03 - QUE - Creation.
 # Notes:
 #   This is the I/O map for the machine simulator.  It should contain the same
 #   variables as the main I/O map, but using software I/O instead of actual

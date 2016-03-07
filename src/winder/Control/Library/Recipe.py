@@ -4,8 +4,6 @@
 # Date: 2016-03-04
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-04 - QUE - Creation.
 # Notes:
 #     A recipe is for the most part a G-Code file, but with a standard header.
 #   This header is a single line--a G-Code comment--that contains a description

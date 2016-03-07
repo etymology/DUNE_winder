@@ -4,8 +4,6 @@
 # Date: 2016-02-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-03 - QUE - Creation.
 # Notes:
 #   The user interface server is a TCP socket that accepts commands and
 #   dispatches these commands to a handler.  The handler processes the command

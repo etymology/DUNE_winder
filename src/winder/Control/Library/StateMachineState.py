@@ -4,8 +4,6 @@
 # Date: 2016-02-10
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-10 - QUE - Creation.
 # Notes:
 #   State machines have one or more states.  This class needs to have a parent
 #   'StateMachine' and contains a template that defines functions that need to

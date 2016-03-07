@@ -4,8 +4,6 @@
 # Date: 2016-03-01
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-03-01 - QUE - Creation.
 ###############################################################################
 
 from Library.Serializable import Serializable

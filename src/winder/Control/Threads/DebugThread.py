@@ -4,8 +4,6 @@
 # Date: 2016-02-08
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-08 - QUE - Creation.
 ###############################################################################
 from PrimaryThread import PrimaryThread
 from Debug.DebugGUI import DebugGUI

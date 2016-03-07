@@ -4,8 +4,6 @@
 # Date: 2016-02-07
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-07 - QUE - Creation.
 #
 # $$$DEBUG - To-do:
 #  - Accelerations.

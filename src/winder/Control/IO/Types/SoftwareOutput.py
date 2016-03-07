@@ -4,8 +4,6 @@
 # Date: 2016-02-02
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-02 - QUE - Creation.
 ###############################################################################
 from IO.Primitives.DigitalOutput import DigitalOutput
 
