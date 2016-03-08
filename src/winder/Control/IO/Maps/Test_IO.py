@@ -4,8 +4,6 @@
 # Date: 2016-02-23
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-23 - QUE - Creation.
 # Notes:
 #   This I/O map is for the borrowed test hardware demo unit.
 ###############################################################################

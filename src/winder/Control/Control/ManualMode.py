@@ -4,8 +4,6 @@
 # Date: 2016-02-16
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-16 - QUE - Creation.
 ###############################################################################
 
 from Library.StateMachineState import StateMachineState
@@ -30,6 +28,7 @@ class ManualMode( StateMachineState ) :
     self._jogX = 0
     self._jogY = 0
     self._jogZ = 0
+    self._wasJoggingXY = False
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -60,6 +59,7 @@ class ManualMode( StateMachineState ) :
       isError = False
 
     if self.stateMachine.isJogging :
+      self._wasJoggingXY = True
       isError = False
 
     if None != self.stateMachine.seekZ :
@@ -80,6 +80,17 @@ class ManualMode( StateMachineState ) :
     if not self._io.xyAxis.isSeeking()   \
       and not self._io.zAxis.isSeeking() \
       and not self.stateMachine.isJogging :
+
+        # If we were jogging X/Y axis, note where stopped.
+        if self._wasJoggingXY :
+          x = self._io.xAxis.getPosition()
+          y = self._io.yAxis.getPosition()
+          self._log.add(
+            self.__class__.__name__,
+            "JOG_STOP",
+            "X/Y jog stopped at (" + str( x ) + "," + str( y ) + ")",
+            [ x, y ]
+          )
         self.changeState( self.stateMachine.States.STOP )
 
 

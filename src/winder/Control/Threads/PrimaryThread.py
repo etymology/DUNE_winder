@@ -4,8 +4,6 @@
 # Date: 2016-02-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-03 - QUE - Creation.
 # Notes:
 #   Used to keep a list of primary threads.  Such threads start when the
 #   program loads and run until the program finishes.  They are signaled to

@@ -4,8 +4,6 @@
 # Date: 2016-02-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-03 - QUE - Creation.
 ###############################################################################
 
 from Control.Settings import Settings

@@ -4,8 +4,6 @@
 # Date: 2016-02-10
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-10 - QUE - Creation.
 # Notes:
 #     The Controllogix PLC provides access to I/O through "tags".  Tags are
 #   text names.  Communications to the PLC is done over an Ethernet connection

@@ -4,8 +4,6 @@
 # Date: 2016-02-26
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-25 - QUE - Creation.
 # Notes:
 #   This unit is designed to work with specific PLC logic.  It handles how
 #   operations must be preformed for the given setup, such as how to initiate
@@ -27,9 +25,11 @@ class PLC_Logic :
 
   # States for move type state machine.
   class MoveTypes :
-    IDLE = 0
-    JOG  = 1
-    SEEK = 2
+    IDLE    = 0
+    JOG_XY  = 1
+    SEEK_XY = 2
+    JOG_Z   = 3
+    SEEK_Z  = 4
   # end class
 
   #---------------------------------------------------------------------
@@ -55,7 +55,7 @@ class PLC_Logic :
 
     self._maxVelocity.set( self._velocity )
     self._xyAxis.setDesiredPosition( [ x, y ] )
-    self._moveType.set( self.MoveTypes.SEEK )
+    self._moveType.set( self.MoveTypes.SEEK_XY )
 
   #---------------------------------------------------------------------
   def isXY_SeekComplete( self ) :
@@ -91,7 +91,7 @@ class PLC_Logic :
     """
 
     self._xyAxis.setVelocity( [ xVelocity, yVelocity ] )
-    self._moveType.set( self.MoveTypes.JOG )
+    self._moveType.set( self.MoveTypes.JOG_XY )
 
   #---------------------------------------------------------------------
   def poll( self ) :

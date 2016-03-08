@@ -4,8 +4,6 @@
 # Date: 2016-02-12
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-12 - QUE - Creation.
 # Notes:
 #     A time source provides a reference of forward-moving time.  This
 #   typically just comes from the system clock, but could also come from a

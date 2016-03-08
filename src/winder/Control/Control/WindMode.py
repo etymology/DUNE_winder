@@ -4,13 +4,8 @@
 # Date: 2016-02-11
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-11 - QUE - Creation.
 ###############################################################################
 
-#from IO.IO import self.io.
-#from Library.GCode import GCode
-#from Control.GCodeHandler import GCodeHandler
 from Library.StateMachineState import StateMachineState
 
 class WindMode( StateMachineState ) :
@@ -30,7 +25,8 @@ class WindMode( StateMachineState ) :
     StateMachineState.__init__( self, stateMachine, state )
     self.io = io
     self.log = log
-    self._temp = 0   # $$$DEBUG
+    self._PAUSE = 0        # $$$DEBUG
+    self._pauseCount = 0   # $$$DEBUG
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -91,11 +87,8 @@ class WindMode( StateMachineState ) :
 
     """
 
-    # If ESTOP or I/O isn't ready...
-    if self.io.estop.get() :
-      self.changeState( self.stateMachine.States.STOP )
-    #elif self.io.stop.get() :
-    elif self.stateMachine.stopRequest :
+    # If stop requested...
+    if self.stateMachine.stopRequest :
       # We didn't finish this line.  Run it again.
       self.io.plcLogic.stopXY()
       self.changeState( self.stateMachine.States.STOP )
@@ -115,8 +108,8 @@ class WindMode( StateMachineState ) :
 
           self.changeState( self.stateMachine.States.STOP )
         else :
-          self._temp += 1
-          if 5 == self._temp :
+          self._pauseCount += 1
+          if self._pauseCount >= self._PAUSE :
             self.stateMachine.gCodeHandler.runNextLine()
-            self._temp = 0
+            self._pauseCount = 0
 

@@ -5,8 +5,6 @@
 # Date: 2016-02-11
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-11 - QUE - Creation.
 ###############################################################################
 from Library.GCode import GCode, GCodeCallbacks
 
@@ -18,6 +16,7 @@ class GCodeHandler :
 
     Args:
       x: Desired x-axis location.
+
     Returns:
       None.
     """
@@ -31,11 +30,27 @@ class GCodeHandler :
 
     Args:
       y: Desired y-axis location.
+
     Returns:
       None.
     """
     self._xyChange = True
     self._y = y
+
+
+  #---------------------------------------------------------------------
+  def _setZ( self, z ) :
+    """
+    Callback for setting z-axis.
+
+    Args:
+      z: Desired z-axis location.
+
+    Returns:
+      None.
+    """
+    self._zChange = True
+    self._z = z
 
   #---------------------------------------------------------------------
   def _setVelocity( self, velocity ) :
@@ -49,10 +64,10 @@ class GCodeHandler :
     Notes:
       Limited to 'maxVelocity'.
     """
-    if velocity < self.maxVelocity :
+    if velocity < self._maxVelocity :
       self._velocity = velocity
     else :
-      self._velocity = self.maxVelocity
+      self._velocity = self._maxVelocity
 
   #---------------------------------------------------------------------
   def _setLine( self, line ) :
@@ -78,6 +93,9 @@ class GCodeHandler :
     Returns:
       None.
     """
+
+    self._functions.append( function )
+
     if "100" == function[ 0 ] :
       isOn = bool( function[ 1 ] == "1" )
       self._io.debugLight.set( isOn )
@@ -110,7 +128,16 @@ class GCodeHandler :
       None.
     """
 
-    self._currentLine = self.gCode.getLine()
+    # Reset all values so we know what has changed.
+    self._line = None
+    lastX = self._x
+    lastY = self._y
+    lastZ = self._z
+    self._functions = []
+    lastVelocity = self._velocity
+
+    self._currentLine = self._nextLine
+    self._nextLine = self.gCode.getLine()
 
     # Interpret the next line.
     self.gCode.executeNextLine()
@@ -123,9 +150,52 @@ class GCodeHandler :
       # Reset change flag.
       self._xyChange = False
 
-    #
-    # $$$DEBUG Log G-Code output.
-    #
+    # If Z move...
+    # $$$DEBUG - No coordinate move for Z.
+    if self._zChange :
+      # Make the move.
+      self._io._zAxis.setDesiredPosition( self._z, self._velocity )
+
+      # Reset change flag.
+      self._zChange = False
+
+    # Place adjusted line in G-Code output log.
+    if self._gCodeLog :
+
+      line = ""
+
+      #
+      # Only log what has changed since the last line.
+      #
+
+      if None != self._line :
+        line += "N" + str( self._line ) + " "
+
+      if lastX != self._x :
+        line += "X" + str( self._x ) + " "
+
+      if lastY != self._y :
+        line += "Y" + str( self._y ) + " "
+
+      if lastZ != self._z :
+        line += "Z" + str( self._z ) + " "
+
+      if lastVelocity != self._velocity :
+        line += "F" + str( self._velocity ) + " "
+
+      for function in self._functions :
+        line += "G" + str( function[ 0 ] ) + " "
+        for parameter in function[ 1: ] :
+          line += "P" + str( parameter ) + " "
+
+      # Strip trailing space.
+      line = line.strip()
+
+      # Add line-feed.
+      line += "\r\n"
+
+      # Place in G-Code log.
+      self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
   def stop( self ):
@@ -147,6 +217,7 @@ class GCodeHandler :
     """
     self.gCode = GCode( lines, self._callbacks )
     self._currentLine = 0
+    self._nextLine = 0
 
   #---------------------------------------------------------------------
   def getCurrentLineNumber( self ) :
@@ -195,8 +266,26 @@ class GCodeHandler :
   #---------------------------------------------------------------------
   def setMaxVelocity( self, maxVelocity ) :
     """
+    Set the maximum velocity at which any axis can move.  Useful to slow
+    down operations.
+
+    Args:
+      maxVelocity: New maximum velocity.
+
+    Note:
+      Does not effect the whatever the motors are currently doing.
     """
-    self.maxVelocity = maxVelocity
+    self._maxVelocity = maxVelocity
+
+  #---------------------------------------------------------------------
+  def setGCodeLog( self, gCodeLogFile ) :
+    """
+    Set a file to output resulting G-Code.
+
+    Args:
+      gCodeLogFile: File name to log data.
+    """
+    self._gCodeLog = open( gCodeLogFile, "a" )
 
   #---------------------------------------------------------------------
   def __init__( self, io ):
@@ -220,10 +309,15 @@ class GCodeHandler :
 
     self._io = io
 
-    self.maxVelocity = 5.0
-    self._velocity = 1.0
-    self._x = 0
-    self._y = 0
+    self._maxVelocity = float( "inf" )   # <- No limit.
+    self._velocity = 1.0                 # <- $$$DEBUG
+    self._x = None
+    self._y = None
+    self._z = None
     self._line = 0
     self._xyChange = False
+    self._zChange = False
     self._currentLine = None
+    self._nextLine = None
+    self._gCodeLog = None
+    self._functions = []

@@ -4,8 +4,6 @@
 # Date: 2016-02-09
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-09 - QUE - Creation.
 # Notes:
 #   Motors can be grouped to act together.  This is most useful for an x/y
 #   set where to the motors act in unison.

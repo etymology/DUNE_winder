@@ -4,8 +4,6 @@
 # Date: 2016-02-29
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-29 - QUE - Creation.
 ###############################################################################
 
 from Simulator.Motion import Motion

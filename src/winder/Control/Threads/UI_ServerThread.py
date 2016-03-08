@@ -4,8 +4,6 @@
 # Date: 2016-02-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-03 - QUE - Creation.
 # Notes:
 #   The user interface server is a TCP socket that accepts commands and
 #   dispatches these commands to a handler.  The handler processes the command
@@ -47,8 +45,15 @@ class _Client( threading.Thread ):
     Handle request from client.
 
     """
+    ( address, port ) = self._socket.getpeername()
 
-    self._log.add( self.__class__.__name__, "UI_CONNECT", "Connection from UI established." )
+    self._log.add(
+      self.__class__.__name__,
+      "UI_CONNECT",
+      "Connection from " + str( address ) + ":" + str( port ) + " established.",
+      [ address, port ]
+    )
+
     isRunning = True
     while isRunning :
       try:
@@ -74,7 +79,12 @@ class _Client( threading.Thread ):
     # End the connection.
     self._socket.close()
 
-    self._log.add( self.__class__.__name__, "UI_CONNECT", "Connection from UI closed." )
+    self._log.add(
+      self.__class__.__name__,
+      "UI_CONNECT",
+      "Connection from " + str( address ) + ":" + str( port ) + " closed.",
+      [ address, port ]
+    )
 
 # end class
 

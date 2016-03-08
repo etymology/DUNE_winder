@@ -4,8 +4,6 @@
 # Date: 2016-03-04
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-04 - QUE - Creation.
 # Notes:
 #     A recipe is for the most part a G-Code file, but with a standard header.
 #   This header is a single line--a G-Code comment--that contains a description
@@ -28,6 +26,7 @@ import re
 import hashlib
 import base64
 import os.path
+import shutil
 
 class Recipe :
   #---------------------------------------------------------------------
@@ -93,10 +92,7 @@ class Recipe :
     archiveFile = archiveDirectory + "/" + bodyHash
     if not os.path.isfile( archiveFile ) :
       # Make an archive copy of the file.
-      with open( archiveFile, "w" ) as outputFile :
-        outputFile.write( "( " + self._description + " " + bodyHash + " " + self._headerHash + ")\r\n" )
-        outputFile.writelines( self._lines )
-
+      shutil.copy2( fileName, archiveFile )
 
   #---------------------------------------------------------------------
   def getLines( self ) :

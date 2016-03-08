@@ -4,8 +4,6 @@
 # Date: 2016-02-08
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-08 - QUE - Creation.
 ###############################################################################
 import wx
 import datetime
@@ -52,11 +50,23 @@ class DebugGUI( wx.Frame ):
 
   #---------------------------------------------------------------------
   def gCodeSelect( self, event ):
-    self.remote( "process.apa.loadRecipe( \"" + event.GetString() + "\", 0 )" )
+    layer = self.layerSelection.GetValue()
+    self.remote( "process.apa.loadRecipe( \"" + layer + "\", \"" + event.GetString() + "\", 0 )" )
 
   #---------------------------------------------------------------------
   def apaSelect( self, event ):
     self.remote( "process.switchAPA( \"" + event.GetString() + "\" )" )
+
+  #---------------------------------------------------------------------
+  def newAPA( self ) :
+    self.remote( "process.createAPA( \"" + self.apaText.GetValue() + "\" )" )
+
+    apaList = self.remote.get( "process.getAPA_List()" )
+    apaList = ast.literal_eval( apaList )
+
+    self.apaSelection.Clear()
+    for apa in apaList :
+      self.apaSelection.Append( apa )
 
   #---------------------------------------------------------------------
   def __init__( self, parent, address, port, maxReceiveSize ) :
@@ -71,6 +81,9 @@ class DebugGUI( wx.Frame ):
 
     panel = wx.Panel( self )
 
+    #
+    # Time and basic inputs.
+    #
     vbox = wx.FlexGridSizer( wx.VERTICAL )
 
     outer = wx.FlexGridSizer( 1, 2, 0, 0 )
@@ -89,6 +102,9 @@ class DebugGUI( wx.Frame ):
 
     outer.Add( gs, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
 
+    #
+    # Job buttons.
+    #
     gs = wx.GridSizer( 3, 4, 5, 5 )
     startButton = wx.Button( panel, label='Start' )
     startButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.start()" ) )
@@ -98,8 +114,6 @@ class DebugGUI( wx.Frame ):
 
     parkButton = wx.ToggleButton( panel, label='Park' )
     parkButton.Bind( wx.EVT_TOGGLEBUTTON, lambda e: self.setIO( "io.park", e.Checked(), e ) )
-
-
 
     jogXY_RU = wx.Button( panel, label='\\' )
     jogXY_RZ = wx.Button( panel, label='<-' )
@@ -118,7 +132,6 @@ class DebugGUI( wx.Frame ):
     jogXY_RD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1, -1 ) )
 
     jogXY_ZU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  1 ) )
-    #jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  0 ) )
     jogXY_ZD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0, -1 ) )
 
     jogXY_FU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1,  1 ) )
@@ -131,28 +144,13 @@ class DebugGUI( wx.Frame ):
     jogXY_RD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
 
     jogXY_ZU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-    #jogXY_ZZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
     jogXY_ZD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
 
     jogXY_FU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
     jogXY_FZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
     jogXY_FD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
 
-
     jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.setPosition( e ) )
-
-
-    #jogX_Forward.Bind( wx.EVT_LEFT_DOWN, self.jogX_StartF )
-    #jogX_Forward.Bind( wx.EVT_LEFT_UP,   self.jogX_Stop )
-
-    #jogX_Reverse.Bind( wx.EVT_LEFT_DOWN, self.jogX_StartR )
-    #jogX_Reverse.Bind( wx.EVT_LEFT_UP,   self.jogX_Stop )
-
-
-
-    #jogY_Forward = wx.Button( panel, label='^' )
-    #jogY_Forward.Bind( wx.EVT_LEFT_DOWN, self.setPosition )
-
 
     gs.AddMany(
       [
@@ -165,10 +163,9 @@ class DebugGUI( wx.Frame ):
 
     vbox.Add( outer )
 
-
-
-
-
+    #
+    # Velocity bar.
+    #
     gs = wx.GridSizer( 1, 1, 5, 5 )
     self.slider = \
       wx.Slider(
@@ -189,7 +186,9 @@ class DebugGUI( wx.Frame ):
     )
     vbox.Add( gs )
 
-
+    #
+    # Motor status.
+    #
     gs = wx.FlexGridSizer( 4, 6, 5, 5 )
 
     self.empty = wx.StaticText( panel, -1, '')
@@ -228,7 +227,9 @@ class DebugGUI( wx.Frame ):
 
     vbox.Add( gs )
 
-
+    #
+    # G-Code execution status.
+    #
     gs = wx.FlexGridSizer( 2, 2, 5, 5 )
     self.lineText  = wx.StaticText( panel, label='G-Code line:' )
     self.lineValue = wx.StaticText( panel, label='0000' )
@@ -246,7 +247,10 @@ class DebugGUI( wx.Frame ):
     vbox.Add( gs )
 
 
-    gs = wx.FlexGridSizer( 2, 2, 5, 5 )
+    #
+    # APA, layer, and recipe selection.
+    #
+    gs = wx.FlexGridSizer( 3, 2, 5, 5 )
 
     recipes = self.remote.get( "process.getRecipes()" )
     recipes = ast.literal_eval( recipes )
@@ -258,10 +262,30 @@ class DebugGUI( wx.Frame ):
     self.apaSelection = wx.ComboBox( panel, -1, choices=apaList )
     self.apaSelection.Bind( wx.EVT_COMBOBOX, self.apaSelect )
 
+    self.layerSelection = wx.ComboBox( panel, -1, "G", choices=[ "G", "U", "V", "W" ] )
+
     gs.AddMany(
       [
         wx.StaticText( panel, label='APA'  ), ( self.apaSelection ),
+        wx.StaticText( panel, label='Layer'  ), ( self.layerSelection ),
         wx.StaticText( panel, label='Recipe'  ), ( self.gCodeSelection )
+      ]
+     )
+
+    vbox.Add( gs )
+
+    #
+    # Add APA.
+    #
+    gs = wx.FlexGridSizer( 1, 3, 5, 5 )
+
+    self.apaText = wx.TextCtrl( panel, -1, "", size=(175, -1) )
+    apaAddButton = wx.Button( panel, label='Add' )
+    apaAddButton.Bind( wx.EVT_BUTTON, lambda e: self.newAPA() )
+
+    gs.AddMany(
+      [
+        wx.StaticText(panel, -1, "APA name:"), ( self.apaText ), ( apaAddButton )
       ]
      )
 
@@ -277,7 +301,7 @@ class DebugGUI( wx.Frame ):
     self.Bind( wx.EVT_TIMER, self.update, self.timer )
     self.timer.Start( 100 )
 
-    self.SetSize( (520, 350) )
+    self.SetSize( (520, 425) )
     self.SetTitle( 'DUNE Winder Simulator' )
     self.Show( True )
 
@@ -339,10 +363,10 @@ class DebugGUI( wx.Frame ):
 
     estop = ( "True" == self.remote( "io.estop.get()" ) )
 
-    if estop :
-      self.remote( "io.xAxis.stop()" )
-      self.remote( "io.yAxis.stop()" )
-      self.remote( "io.zAxis.stop()" )
+    #if estop :
+    #  self.remote( "io.xAxis.stop()" )
+    #  self.remote( "io.yAxis.stop()" )
+    #  self.remote( "io.zAxis.stop()" )
 
     self.estop.SetLabel( self.remote( "io.estop" ) )
     self.park.SetLabel(  self.remote( "io.park" ) )

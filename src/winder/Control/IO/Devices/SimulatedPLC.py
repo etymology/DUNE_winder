@@ -4,8 +4,6 @@
 # Date: 2016-02-26
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-02-26 - QUE - Creation.
 # Notes:
 #   The simulated PLC allows a list of PLC tags to be setup, and then just
 #   accepts and returns whatever was last written to the tag.

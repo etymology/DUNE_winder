@@ -4,8 +4,6 @@
 # Date: 2016-03-01
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-# Revisions:
-#   2016-03-01 - QUE - Creation.
 ###############################################################################
 
 import os
@@ -29,6 +27,18 @@ class Process :
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     self.apa = None
+
+    path = self._configuration.get( "APA_LogDirectory" )
+    if not os.path.exists( path ) :
+      os.makedirs( path )
+
+    path = self._configuration.get( "recipeArchiveDirectory" )
+    if not os.path.exists( path ) :
+      os.makedirs( path )
+
+    path = self._configuration.get( "recipeDirectory" )
+    if not os.path.exists( path ) :
+      raise Exception( "Recipe directory (" + path + ") does not exist." )
 
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
@@ -94,24 +104,24 @@ class Process :
     """
     isError = False
 
+    assert( "" != apaName )
+
     apaList = self.getAPA_List()
 
     # Make sure APA name isn't already in list.
     if apaName in apaList :
       isError = True
     else:
-      try:
-        self.apa = \
-          AnodePlaneArray(
-            self.gCodeHandler,
-            self._configuration.get( "APA_LogDirectory" ),
-            self._configuration.get( "recipeDirectory" ),
-            apaName,
-            self._log,
-            True
-          )
-      except:
-        isError = True
+      self.apa = \
+        AnodePlaneArray(
+          self.gCodeHandler,
+          self._configuration.get( "APA_LogDirectory" ),
+          self._configuration.get( "recipeDirectory" ),
+          self._configuration.get( "recipeArchiveDirectory" ),
+          apaName,
+          self._log,
+          True
+        )
 
     return isError
 
@@ -133,9 +143,6 @@ class Process :
 
     Args:
       apaName: Name of the APA to load.  Must exist.
-
-    Returns:
-      True if there was an error, False if not.
     """
     self.apa = \
       AnodePlaneArray(
@@ -147,39 +154,30 @@ class Process :
         self._log,
         False
       )
-    #isError = False
-    #try:
-    #  self.apa = \
-    #    AnodePlaneArray(
-    #      self.gCodeHandler,
-    #      self._configuration.get( "APA_LogDirectory" ),
-    #      self._configuration.get( "recipeDirectory" ),
-    #      self._configuration.get( "recipeArchiveDirectory" ),
-    #      apaName,
-    #      self._log,
-    #      False
-    #    )
-    #except Exception as exception:
-    #  isError = True
-    #
-    #return isError
 
   #---------------------------------------------------------------------
   def closeAPA( self ) :
     """
-    Close APA and store on disk.  Call at program exit.
+    Close APA and store on disk.  Call at program exit.  No additional uses.
     """
 
     if self.apa :
       self.apa.close()
 
-    pass
-
   #---------------------------------------------------------------------
   def jogXY( self, xVelocity, yVelocity ) :
     """
-    $$$DEBUG
+    Jog the X/Y axis at a given velocity.
+
+    Args:
+      xVelocity: Speed of x axis in m/s.  Allows negative for reverse, 0 to stop.
+      yVelocity: Speed of y axis in m/s.  Allows negative for reverse, 0 to stop.
+
+    Returns:
+      True if there was an error, False if not.
     """
+
+    isError = False
     if ( 0 != xVelocity or 0 != yVelocity ) and self.controlStateMachine.isMovementReady() :
       self._log.add(
         self.__class__.__name__,
@@ -199,27 +197,43 @@ class Process :
       self.controlStateMachine.isJogging = False
       self._io.plcLogic.jogXY( xVelocity, yVelocity )
     else:
+      isError = True
       self._log.add(
         self.__class__.__name__,
         "JOG",
         "Jog request ignored.",
         [ xVelocity, yVelocity ]
       )
+
+    return isError
   #---------------------------------------------------------------------
   def manualSeekXY( self, xPosition, yPosition, velocity=None ) :
     """
-    $$$DEBUG
+    Seek an X/Y location.
+
+    Args:
+      xPosition: New position in meters of x.
+      yPosition: New position in meters of y.
+      velocity: Maximum velocity.  None for last velocity used.
+    Returns:
+      True if there was an error, False if not.
     """
+
+    isError = True
     if self.controlStateMachine.isMovementReady() :
+      isError = False
       self._log.add(
         self.__class__.__name__,
         "JOG",
-        "Manual move X/Y to (" + str( xPosition ) + ", " + str( yPosition ) + ") at " + str( velocity ) + ".",
+        "Manual move X/Y to (" + str( xPosition )
+          + ", " + str( yPosition ) + ") at " + str( velocity ) + ".",
         [ xPosition, yPosition, velocity ]
       )
       self.controlStateMachine.seekX = xPosition
       self.controlStateMachine.seekY = yPosition
       self.controlStateMachine.seekVelocity = velocity
       self.controlStateMachine.manualRequest = True
+
+    return isError
 
 # end class
