@@ -38,13 +38,13 @@ class WindMode( StateMachineState ) :
     """
     isError = False
 
-    if self.io.stop.get() :
-      isError = True
-      self.log.add(
-        self.__class__.__name__,
-        "WIND",
-        "Wind cannot start because stop is still requested."
-      )
+    #$$$DEBUG if self.io.stop.get() :
+    #$$$DEBUG   isError = True
+    #$$$DEBUG   self.log.add(
+    #$$$DEBUG     self.__class__.__name__,
+    #$$$DEBUG     "WIND",
+    #$$$DEBUG     "Wind cannot start because stop is still requested."
+    #$$$DEBUG   )
 
     if None == self.stateMachine.gCodeHandler or None == self.stateMachine.gCodeHandler.gCode :
       isError = True

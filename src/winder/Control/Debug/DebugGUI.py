@@ -12,8 +12,8 @@ import math
 
 from Library.UI_ClientConnection import UI_ClientConnection
 
-class DebugGUI( wx.Frame ):
-
+#==============================================================================
+class Remote :
   #---------------------------------------------------------------------
   def getIO( self, ioPoint ) :
     return self.remote( ioPoint + ".get()" )
@@ -24,172 +24,88 @@ class DebugGUI( wx.Frame ):
     event.Skip()
 
   #---------------------------------------------------------------------
-  def jogStart( self, x, y ) :
-
-    velocity = self.slider.GetValue() / 100.0
-    x *= velocity
-    y *= velocity
-
-    # When both velocities are the same, calculate the maximum linear velocity
-    # and use that.
-    if 0 != x and 0 != y and abs( x ) == abs( y ) :
-      x = math.sqrt( x * x / 2.0 )
-      y = x
-
-    self.remote( "process.jogXY(" + str( x ) + "," + str( y ) + ")" )
+  def __init__( self, remote ) :
+    self.remote = remote
 
   #---------------------------------------------------------------------
-  def jogStop( self ) :
-    self.remote( "io.plcLogic.jogXY( 0, 0 )" )
-    self.remote( "process.jogXY( 0, 0 )" )
+  def isFloat( self, value ):
+    result = True
+    try:
+      float( value )
+    except:
+      result = False
+
+    return result
 
   #---------------------------------------------------------------------
-  def setPosition( self, event ) :
-    velocity = self.slider.GetValue() / 100.0
-    self.remote( "process.manualSeekXY( 0, 0, " + str( velocity ) + " )" )
+  def remoteFloat( self, tag, formating ) :
+    result = "--"
+    value = self.remote( tag )
+    if ( self.isFloat( value ) ) :
+      value = float( value )
+      result = formating.format( value )
 
+      # Round -0.00 to 0.00.
+      if 0 == float( result ) :
+        result = formating.format( 0.0 )
+
+    return result
+
+class SystemTime( Remote ) :
   #---------------------------------------------------------------------
-  def gCodeSelect( self, event ):
-    layer = self.layerSelection.GetValue()
-    self.remote( "process.apa.loadRecipe( \"" + layer + "\", \"" + event.GetString() + "\", 0 )" )
+  def __init__( self, remote, panel, vbox ) :
 
-  #---------------------------------------------------------------------
-  def apaSelect( self, event ):
-    self.remote( "process.switchAPA( \"" + event.GetString() + "\" )" )
+    Remote.__init__( self, remote )
 
-  #---------------------------------------------------------------------
-  def newAPA( self ) :
-    self.remote( "process.createAPA( \"" + self.apaText.GetValue() + "\" )" )
-
-    apaList = self.remote.get( "process.getAPA_List()" )
-    apaList = ast.literal_eval( apaList )
-
-    self.apaSelection.Clear()
-    for apa in apaList :
-      self.apaSelection.Append( apa )
-
-  #---------------------------------------------------------------------
-  def __init__( self, parent, address, port, maxReceiveSize ) :
-    super( DebugGUI, self ).__init__( None )
-
-    self.remote = UI_ClientConnection( address, port, maxReceiveSize )
-
-    self._temp = 0
-
-    self._value = 0
-    self._parent = parent
-
-    panel = wx.Panel( self )
-
-    #
-    # Time and basic inputs.
-    #
-    vbox = wx.FlexGridSizer( wx.VERTICAL )
-
-    outer = wx.FlexGridSizer( 1, 2, 0, 0 )
-
-    gs = wx.GridSizer( 3, 2, 5, 5 )
+    grideSizer = wx.GridSizer( 1, 2, 5, 5 )
     self.time  = wx.StaticText( panel, label='9999.99' )
-    self.estop = wx.StaticText( panel, label='' )
-    self.park  = wx.StaticText( panel, label='' )
-    gs.AddMany(
+    grideSizer.AddMany(
       [
         ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ),
-        ( wx.StaticText( panel, label='Stop' ) ),  ( self.estop ),
-        ( wx.StaticText( panel, label='Park'  ) ), ( self.park  )
       ]
     )
 
-    outer.Add( gs, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
+    vbox.Add( grideSizer )
 
+  #---------------------------------------------------------------------
+  def update( self ) :
+    self.remote( "io.simulationTime.setLocal()" )
+    currentTime = self.remote( "io.simulationTime.get()" )
+    try:
+      currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    except ValueError:
+      # Work around.  On some system (Windows) if the time 0 for microseconds,
+      # it does not append the ".0" at the end.  So on a value error, just
+      # try again with the .0 appended.
+      currentTime += ".0"
+      currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+
+    #delta = currentTime - self.startTime
+    #self.time.SetLabel( "{:6.3f}".format( delta.total_seconds() ) )
+    self.time.SetLabel( str( currentTime ) )
+
+
+class MotorStatus( Remote ) :
+  #---------------------------------------------------------------------
+  def __init__( self, remote, panel, vbox ) :
+
+    Remote.__init__( self, remote )
+
+    # grideSizer = wx.GridSizer( 1, 2, 5, 5 )
+    # self.time  = wx.StaticText( panel, label='9999.99' )
+    # grideSizer.AddMany(
+    #   [
+    #     ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ),
+    #   ]
+    # )
     #
-    # Job buttons.
-    #
-    gs = wx.GridSizer( 3, 4, 5, 5 )
-    startButton = wx.Button( panel, label='Start' )
-    startButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.start()" ) )
-
-    stopButton = wx.Button( panel, label='Stop' )
-    stopButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.stop()" ) )
-
-    parkButton = wx.ToggleButton( panel, label='Park' )
-    parkButton.Bind( wx.EVT_TOGGLEBUTTON, lambda e: self.setIO( "io.park", e.Checked(), e ) )
-
-    jogXY_RU = wx.Button( panel, label='\\' )
-    jogXY_RZ = wx.Button( panel, label='<-' )
-    jogXY_RD = wx.Button( panel, label='/' )
-
-    jogXY_ZU = wx.Button( panel, label='^' )
-    jogXY_ZZ = wx.Button( panel, label='*' )
-    jogXY_ZD = wx.Button( panel, label='v' )
-
-    jogXY_FU = wx.Button( panel, label='/' )
-    jogXY_FZ = wx.Button( panel, label='->' )
-    jogXY_FD = wx.Button( panel, label='\\' )
-
-    jogXY_RU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1,  1 ) )
-    jogXY_RZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1,  0 ) )
-    jogXY_RD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1, -1 ) )
-
-    jogXY_ZU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  1 ) )
-    jogXY_ZD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0, -1 ) )
-
-    jogXY_FU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1,  1 ) )
-    jogXY_FZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1,  0 ) )
-    jogXY_FD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1, -1 ) )
-
-
-    jogXY_RU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-    jogXY_RZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-    jogXY_RD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-
-    jogXY_ZU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-    jogXY_ZD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-
-    jogXY_FU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-    jogXY_FZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-    jogXY_FD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
-
-    jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.setPosition( e ) )
-
-    gs.AddMany(
-      [
-        ( startButton ),  ( jogXY_RU ), ( jogXY_ZU ), ( jogXY_FU ),
-        ( stopButton ),   ( jogXY_RZ ), ( jogXY_ZZ ), ( jogXY_FZ ),
-        ( parkButton ),   ( jogXY_RD ), ( jogXY_ZD ), ( jogXY_FD )
-      ]
-    )
-    outer.Add( gs, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
-
-    vbox.Add( outer )
-
-    #
-    # Velocity bar.
-    #
-    gs = wx.GridSizer( 1, 1, 5, 5 )
-    self.slider = \
-      wx.Slider(
-        panel,
-        -1,
-        100,
-        1, 500,
-        wx.DefaultPosition,
-        (500, -1),
-        wx.SL_AUTOTICKS | wx.SL_HORIZONTAL | wx.SL_LABELS
-      )
-    self.slider.Bind( wx.EVT_SCROLL, lambda e: self.remote( "process.gCodeHandler.setMaxVelocity( " + str( self.slider.GetValue() / 100.0 ) + ")" ) )
-
-    gs.AddMany(
-      [
-        ( self.slider )
-      ]
-    )
-    vbox.Add( gs )
+    # vbox.Add( grideSizer )
+    #self.systemTime = SystemTime( remote, panel, vbox )
 
     #
     # Motor status.
     #
-    gs = wx.FlexGridSizer( 4, 6, 5, 5 )
+    grideSizer = wx.FlexGridSizer( 4, 6, 5, 5 )
 
     self.empty = wx.StaticText( panel, -1, '')
     self.xAxis = wx.StaticText( panel, label='x:' )
@@ -216,7 +132,7 @@ class DebugGUI( wx.Frame ):
     self.yAxisA = wx.StaticText( panel, label='+000.00'  )
     self.zAxisA = wx.StaticText( panel, label='+000.00'  )
 
-    gs.AddMany(
+    grideSizer.AddMany(
       [
         ( self.empty ), ( self.xAxisML ), ( self.xAxisSL ), ( self.xAxisPL ), ( self.xAxisVL ), ( self.xAxisAL ),
         ( self.xAxis ), ( self.xAxisM  ), ( self.xAxisS  ), ( self.xAxisP  ), ( self.xAxisV  ), ( self.xAxisA  ),
@@ -225,163 +141,25 @@ class DebugGUI( wx.Frame ):
       ]
      )
 
-    vbox.Add( gs )
-
-    #
-    # G-Code execution status.
-    #
-    gs = wx.FlexGridSizer( 2, 2, 5, 5 )
-    self.lineText  = wx.StaticText( panel, label='G-Code line:' )
-    self.lineValue = wx.StaticText( panel, label='0000' )
-
-    self.stateText  = wx.StaticText( panel, label='State:' )
-    self.stateValue = wx.StaticText( panel, label='<unknown>' )
-
-    gs.AddMany(
-      [
-        ( self.lineText ),  ( self.lineValue ),
-        ( self.stateText ), ( self.stateValue ),
-      ]
-     )
-
-    vbox.Add( gs )
-
-
-    #
-    # APA, layer, and recipe selection.
-    #
-    gs = wx.FlexGridSizer( 3, 2, 5, 5 )
-
-    recipes = self.remote.get( "process.getRecipes()" )
-    recipes = ast.literal_eval( recipes )
-    self.gCodeSelection = wx.ComboBox( panel, -1, choices=recipes )
-    self.gCodeSelection.Bind( wx.EVT_COMBOBOX, self.gCodeSelect )
-
-    apaList = self.remote.get( "process.getAPA_List()" )
-    apaList = ast.literal_eval( apaList )
-    self.apaSelection = wx.ComboBox( panel, -1, choices=apaList )
-    self.apaSelection.Bind( wx.EVT_COMBOBOX, self.apaSelect )
-
-    self.layerSelection = wx.ComboBox( panel, -1, "G", choices=[ "G", "U", "V", "W" ] )
-
-    gs.AddMany(
-      [
-        wx.StaticText( panel, label='APA'  ), ( self.apaSelection ),
-        wx.StaticText( panel, label='Layer'  ), ( self.layerSelection ),
-        wx.StaticText( panel, label='Recipe'  ), ( self.gCodeSelection )
-      ]
-     )
-
-    vbox.Add( gs )
-
-    #
-    # Add APA.
-    #
-    gs = wx.FlexGridSizer( 1, 3, 5, 5 )
-
-    self.apaText = wx.TextCtrl( panel, -1, "", size=(175, -1) )
-    apaAddButton = wx.Button( panel, label='Add' )
-    apaAddButton.Bind( wx.EVT_BUTTON, lambda e: self.newAPA() )
-
-    gs.AddMany(
-      [
-        wx.StaticText(panel, -1, "APA name:"), ( self.apaText ), ( apaAddButton )
-      ]
-     )
-
-    vbox.Add( gs )
-
-
-
-    panel.SetSizer( vbox )
-
-    self.startTime = datetime.datetime.utcnow()
-
-    self.timer = wx.Timer(self)
-    self.Bind( wx.EVT_TIMER, self.update, self.timer )
-    self.timer.Start( 100 )
-
-    self.SetSize( (520, 425) )
-    self.SetTitle( 'DUNE Winder Simulator' )
-    self.Show( True )
-
-    #self.Bind( wx.EVT_CLOSE, self.onClose )
+    vbox.Add( grideSizer )
 
   #---------------------------------------------------------------------
-  #def onClose( self, event ) :
-  #  # On close, signal all threads to shutdown.
-  #  PrimaryThread.stopAllThreads()
-  #  self.Destroy()
-
-
-  #---------------------------------------------------------------------
-  def isFloat( self, value ):
-    result = True
-    try:
-      float( value )
-    except:
-      result = False
-
-    return result
-
-  #---------------------------------------------------------------------
-  def remoteFloat( self, tag, formating ) :
-    result = "--"
-    value = self.remote( tag )
-    if ( self.isFloat( value ) ) :
-      value = float( value )
-      result = formating.format( value )
-
-      # Round -0.00 to 0.00.
-      if 0 == float( result ) :
-        result = formating.format( 0.0 )
-
-    return result
-
-  #---------------------------------------------------------------------
-  def update( self, event ) :
-
-    isRunning = ( "True" == self.remote.get( "PrimaryThread.isRunning" ) )
-
-    # If primary threads are shutting down, close the window.
-    if not isRunning :
-      self.Close()
-
-    self.remote( "io.simulationTime.setLocal()" )
-    currentTime = self.remote( "io.simulationTime.get()" )
-    try:
-      currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
-    except ValueError:
-      # Work around.  On some system (Windows) if the time 0 for microseconds,
-      # it does not append the ".0" at the end.  So on a value error, just
-      # try again with the .0 appended.
-      currentTime += ".0"
-      currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
-
-    delta = currentTime - self.startTime
-    self.time.SetLabel( "{:6.3f}".format( delta.total_seconds() ) )
-
-    estop = ( "True" == self.remote( "io.estop.get()" ) )
-
-    #if estop :
-    #  self.remote( "io.xAxis.stop()" )
-    #  self.remote( "io.yAxis.stop()" )
-    #  self.remote( "io.zAxis.stop()" )
-
-    self.estop.SetLabel( self.remote( "io.estop" ) )
-    self.park.SetLabel(  self.remote( "io.park" ) )
-
-    currentLine = self.remote.get( "process.gCodeHandler.getCurrentLineNumber()" )
-    if "None" != currentLine :
-      currentLine = int( currentLine ) + 1
-
-    self.lineValue.SetLabel(
-      str( currentLine )
-       + "/"
-       + self.remote.get( "process.gCodeHandler.getTotalLines()" )
-    )
-
-    self.stateValue.SetLabel( self.remote.get( "process.controlStateMachine.state.__class__.__name__" ) )
+  def update( self ) :
+    # self.remote( "io.simulationTime.setLocal()" )
+    # currentTime = self.remote( "io.simulationTime.get()" )
+    # try:
+    #   currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    # except ValueError:
+    #   # Work around.  On some system (Windows) if the time 0 for microseconds,
+    #   # it does not append the ".0" at the end.  So on a value error, just
+    #   # try again with the .0 appended.
+    #   currentTime += ".0"
+    #   currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    #
+    # #delta = currentTime - self.startTime
+    # #self.time.SetLabel( "{:6.3f}".format( delta.total_seconds() ) )
+    # self.time.SetLabel( str( currentTime ) )
+    #self.systemTime.update()
 
     xAxisMotion       = self.remote.get( "io.xAxis.isSeeking()" )
     yAxisMotion       = self.remote.get( "io.yAxis.isSeeking()" )
@@ -423,6 +201,433 @@ class DebugGUI( wx.Frame ):
     self.zAxisP.SetLabel( zAxisPosition     )
     self.zAxisV.SetLabel( zAxisVelocity     )
     self.zAxisA.SetLabel( zAxisAcceleration )
+# end class
+
+#==============================================================================
+class JogTab( wx.Panel, Remote ) :
+  #---------------------------------------------------------------------
+  def jogStart( self, x, y ) :
+
+    velocity = self.slider.GetValue() / 100.0
+    x *= velocity
+    y *= velocity
+
+    # When both velocities are the same, calculate the maximum linear velocity
+    # and use that.
+    if 0 != x and 0 != y and abs( x ) == abs( y ) :
+      velocity = math.sqrt( x * x / 2.0 )
+      if x < 0 :
+        x = -velocity
+      else :
+        x = velocity
+
+      if y < 0 :
+        y = -velocity
+      else :
+        y = velocity
+
+    self.remote( "process.jogXY(" + str( x ) + "," + str( y ) + ")" )
+
+  #---------------------------------------------------------------------
+  def jogStop( self ) :
+    self.remote( "io.plcLogic.jogXY( 0, 0 )" )
+    self.remote( "process.jogXY( 0, 0 )" )
+
+  #---------------------------------------------------------------------
+  def setPosition( self, event ) :
+    velocity = self.slider.GetValue() / 100.0
+    self.remote( "process.manualSeekXY( 0, 0, " + str( velocity ) + " )" )
+
+  #---------------------------------------------------------------------
+  def __init__( self, remote, panel ):
+
+    wx.Panel.__init__( self, panel )
+    Remote.__init__( self, remote )
+    self.remote = remote
+
+    vbox = wx.FlexGridSizer( wx.VERTICAL )
+
+    self.systemTime = SystemTime( remote, self, vbox )
+
+    outer = wx.FlexGridSizer( 1, 1, 0, 0 )
+    #
+    # Jog buttons.
+    #
+    grideSizer = wx.GridSizer( 3, 3, 5, 5 )
+    # startButton = wx.Button( self, label='Start' )
+    # startButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.start()" ) )
+    #
+    # stopButton = wx.Button( self, label='Stop' )
+    # stopButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.stop()" ) )
+    #
+    # parkButton = wx.ToggleButton( self, label='Park' )
+    # parkButton.Bind( wx.EVT_TOGGLEBUTTON, lambda e: self.setIO( "io.park", e.Checked(), e ) )
+
+    jogXY_RU = wx.Button( self, label='\\' )
+    jogXY_RZ = wx.Button( self, label='<-' )
+    jogXY_RD = wx.Button( self, label='/' )
+
+    jogXY_ZU = wx.Button( self, label='^' )
+    jogXY_ZZ = wx.Button( self, label='*' )
+    jogXY_ZD = wx.Button( self, label='v' )
+
+    jogXY_FU = wx.Button( self, label='/' )
+    jogXY_FZ = wx.Button( self, label='->' )
+    jogXY_FD = wx.Button( self, label='\\' )
+
+    jogXY_RU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1,  1 ) )
+    jogXY_RZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1,  0 ) )
+    jogXY_RD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart( -1, -1 ) )
+
+    jogXY_ZU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0,  1 ) )
+    jogXY_ZD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  0, -1 ) )
+
+    jogXY_FU.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1,  1 ) )
+    jogXY_FZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1,  0 ) )
+    jogXY_FD.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogStart(  1, -1 ) )
+
+
+    jogXY_RU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+    jogXY_RZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+    jogXY_RD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+
+    jogXY_ZU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+    jogXY_ZD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+
+    jogXY_FU.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+    jogXY_FZ.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+    jogXY_FD.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogStop() )
+
+    jogXY_ZZ.Bind( wx.EVT_LEFT_DOWN, lambda e: self.setPosition( e ) )
+
+    grideSizer.AddMany(
+      [
+        ( jogXY_RU ), ( jogXY_ZU ), ( jogXY_FU ),
+        ( jogXY_RZ ), ( jogXY_ZZ ), ( jogXY_FZ ),
+        ( jogXY_RD ), ( jogXY_ZD ), ( jogXY_FD )
+      ]
+    )
+    outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
+
+    vbox.Add( outer )
+
+    #
+    # Velocity bar.
+    #
+    grideSizer = wx.GridSizer( 1, 1, 5, 5 )
+    self.slider = \
+      wx.Slider(
+        self,
+        -1,
+        100,
+        1, 500,
+        wx.DefaultPosition,
+        (500, -1),
+        wx.SL_AUTOTICKS | wx.SL_HORIZONTAL | wx.SL_LABELS
+      )
+    self.slider.Bind( wx.EVT_SCROLL, lambda e: self.remote( "process.gCodeHandler.setMaxVelocity( " + str( self.slider.GetValue() / 100.0 ) + ")" ) )
+
+    grideSizer.AddMany(
+      [
+        ( self.slider )
+      ]
+    )
+    vbox.Add( grideSizer )
+    self.SetSizer( vbox )
+
+    self.motorStatus = MotorStatus( remote, self, vbox )
+
+    self.timer = wx.Timer(self)
+    self.Bind( wx.EVT_TIMER, self.update, self.timer )
+    self.timer.Start( 100 )
+
+  #---------------------------------------------------------------------
+  def update( self, event ) :
+    self.systemTime.update()
+    self.motorStatus.update()
+
+# end class
+
+#==============================================================================
+class APA_Tab( wx.Panel, Remote ) :
+
+  #---------------------------------------------------------------------
+  def gCodeSelect( self, event ):
+    layer = self.layerSelection.GetValue()
+    self.remote( "process.apa.loadRecipe( \"" + layer + "\", \"" + event.GetString() + "\", 0 )" )
+
+  #---------------------------------------------------------------------
+  def apaSelect( self, event ):
+    self.remote( "process.switchAPA( \"" + event.GetString() + "\" )" )
+
+  #---------------------------------------------------------------------
+  def newAPA( self ) :
+    self.remote( "process.createAPA( \"" + self.apaText.GetValue() + "\" )" )
+
+    apaList = self.remote.get( "process.getAPA_List()" )
+    apaList = ast.literal_eval( apaList )
+
+    self.apaSelection.Clear()
+    for apa in apaList :
+      self.apaSelection.Append( apa )
+
+
+  #---------------------------------------------------------------------
+  def __init__( self, remote, panel ):
+
+    wx.Panel.__init__( self, panel )
+    Remote.__init__( self, remote )
+    self.remote = remote
+
+    vbox = wx.FlexGridSizer( wx.VERTICAL )
+
+    self.systemTime = SystemTime( remote, self, vbox )
+
+    grideSizer = wx.FlexGridSizer( 1, 2, 5, 5 )
+
+    startButton = wx.Button( self, label='Start' )
+    startButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.start()" ) )
+
+    stopButton = wx.Button( self, label='Stop' )
+    stopButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.stop()" ) )
+
+    grideSizer.AddMany(
+      [
+        ( startButton ),
+        ( stopButton ),
+      ]
+     )
+    vbox.Add( grideSizer )
+
+    #
+    # G-Code execution status.
+    #
+    grideSizer = wx.FlexGridSizer( 2, 2, 5, 5 )
+    self.lineText  = wx.StaticText( self, label='G-Code line:' )
+    self.lineValue = wx.StaticText( self, label='0000' )
+
+    self.stateText  = wx.StaticText( self, label='State:' )
+    self.stateValue = wx.StaticText( self, label='<unknown>' )
+
+    grideSizer.AddMany(
+      [
+        ( self.lineText ),  ( self.lineValue ),
+        ( self.stateText ), ( self.stateValue ),
+      ]
+     )
+
+    vbox.Add( grideSizer )
+
+
+    #
+    # APA, layer, and recipe selection.
+    #
+    grideSizer = wx.FlexGridSizer( 3, 2, 5, 5 )
+
+    recipes = self.remote.get( "process.getRecipes()" )
+    recipes = ast.literal_eval( recipes )
+    self.gCodeSelection = wx.ComboBox( self, -1, choices=recipes )
+    self.gCodeSelection.Bind( wx.EVT_COMBOBOX, self.gCodeSelect )
+
+    apaList = self.remote.get( "process.getAPA_List()" )
+    apaList = ast.literal_eval( apaList )
+    self.apaSelection = wx.ComboBox( self, -1, choices=apaList )
+    self.apaSelection.Bind( wx.EVT_COMBOBOX, self.apaSelect )
+
+    self.layerSelection = wx.ComboBox( self, -1, "G", choices=[ "G", "U", "V", "W" ] )
+
+    grideSizer.AddMany(
+      [
+        wx.StaticText( self, label='APA'  ), ( self.apaSelection ),
+        wx.StaticText( self, label='Layer'  ), ( self.layerSelection ),
+        wx.StaticText( self, label='Recipe'  ), ( self.gCodeSelection )
+      ]
+     )
+
+    vbox.Add( grideSizer )
+
+    #
+    # Add APA.
+    #
+    grideSizer = wx.FlexGridSizer( 1, 3, 5, 5 )
+
+    self.apaText = wx.TextCtrl( self, -1, "", size=(175, -1) )
+    apaAddButton = wx.Button( self, label='Add' )
+    apaAddButton.Bind( wx.EVT_BUTTON, lambda e: self.newAPA() )
+
+    grideSizer.AddMany(
+      [
+        wx.StaticText(self, -1, "APA name:"), ( self.apaText ), ( apaAddButton )
+      ]
+     )
+
+    vbox.Add( grideSizer )
+
+    self.motorStatus = MotorStatus( remote, self, vbox )
+
+    self.SetSizer( vbox )
+
+    self.timer = wx.Timer(self)
+    self.Bind( wx.EVT_TIMER, self.update, self.timer )
+    self.timer.Start( 100 )
+
+  #---------------------------------------------------------------------
+  def update( self, event ) :
+    self.systemTime.update()
+    self.motorStatus.update()
+
+    currentLine = self.remote.get( "process.gCodeHandler.getCurrentLineNumber()" )
+    if "None" != currentLine :
+      currentLine = int( currentLine ) + 1
+
+    self.lineValue.SetLabel(
+      str( currentLine )
+       + "/"
+       + self.remote.get( "process.gCodeHandler.getTotalLines()" )
+    )
+
+    self.stateValue.SetLabel( self.remote.get( "process.controlStateMachine.state.__class__.__name__" ) )
+
+#==============================================================================
+class IO_Tab( wx.Panel, Remote ) :
+  #---------------------------------------------------------------------
+  def __init__( self, remote, panel ) :
+
+    wx.Panel.__init__( self, panel )
+    Remote.__init__( self, remote )
+    self.remote = remote
+
+    vbox = wx.FlexGridSizer( wx.VERTICAL )
+
+    self.systemTime = SystemTime( remote, self, vbox )
+
+    #vbox.Add( grideSizer )
+
+    #self.motorStatus = MotorStatus( remote, self, vbox )
+
+    self.SetSizer( vbox )
+
+    self.timer = wx.Timer(self)
+    self.Bind( wx.EVT_TIMER, self.update, self.timer )
+    self.timer.Start( 100 )
+
+  #---------------------------------------------------------------------
+  def update( self, event ) :
+    self.systemTime.update()
+    #self.motorStatus.update()
+
+
+#==============================================================================
+class DebugGUI( wx.Frame, Remote ):
+
+  #---------------------------------------------------------------------
+  def __init__( self, parent, address, port, maxReceiveSize ) :
+    wx.Frame.__init__( self, None )
+
+    self.remote = UI_ClientConnection( address, port, maxReceiveSize )
+
+    Remote.__init__( self, self.remote )
+
+    self._parent = parent
+    panel = wx.Panel( self )
+
+    notebook = wx.Notebook( panel )
+
+    tab1 = JogTab( self.remote, notebook )
+    tab2 = APA_Tab( self.remote, notebook )
+    tab3 = IO_Tab( self.remote, notebook )
+
+    notebook.AddPage( tab1, "Jog" )
+    notebook.AddPage( tab2, "APA" )
+    notebook.AddPage( tab3, "I/O" )
+    sizer = wx.BoxSizer()
+    sizer.Add( notebook, 1, wx.EXPAND )
+    panel.SetSizer( sizer )
+
+    #vbox = wx.FlexGridSizer( wx.VERTICAL )
+    #
+    #  #
+    #  # Time and basic inputs.
+    #  #
+    #  outer = wx.FlexGridSizer( 1, 2, 0, 0 )
+    #
+    #  grideSizer = wx.GridSizer( 3, 2, 5, 5 )
+    #  self.time  = wx.StaticText( panel, label='9999.99' )
+    #  self.estop = wx.StaticText( panel, label='' )
+    #  self.park  = wx.StaticText( panel, label='' )
+    #  grideSizer.AddMany(
+    #    [
+    #      ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ),
+    #      ( wx.StaticText( panel, label='Stop' ) ),  ( self.estop ),
+    #      ( wx.StaticText( panel, label='Park'  ) ), ( self.park  )
+    #    ]
+    #  )
+    #
+    #  outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
+    #  vbox.Add( outer )
+    #
+    #  self.motorStatus = MotorStatus( self.remote, panel, vbox )
+    #
+    #
+    #
+    #
+    #  panel.SetSizer( vbox )
+    #
+    #self.startTime = datetime.datetime.utcnow()
+    #
+    #self.timer = wx.Timer(self)
+    #self.Bind( wx.EVT_TIMER, self.update, self.timer )
+    #self.timer.Start( 100 )
+    #
+    #
+
+    self.SetSize( (520, 425) )
+    self.SetTitle( 'DUNE Winder Simulator' )
+    self.Show( True )
+
+    #
+    #
+    #  #self.Bind( wx.EVT_CLOSE, self.onClose )
+
+  #---------------------------------------------------------------------
+  #def onClose( self, event ) :
+  #  # On close, signal all threads to shutdown.
+  #  PrimaryThread.stopAllThreads()
+  #  self.Destroy()
+
+
+  #---------------------------------------------------------------------
+  def update( self, event ) :
+    isRunning = ( "True" == self.remote.get( "PrimaryThread.isRunning" ) )
+
+    # If primary threads are shutting down, close the window.
+    if not isRunning :
+      self.Close()
+
+    # self.motorStatus.update()
+    #
+    #
+    # self.remote( "io.simulationTime.setLocal()" )
+    # currentTime = self.remote( "io.simulationTime.get()" )
+    # try:
+    #   currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    # except ValueError:
+    #   # Work around.  On some system (Windows) if the time 0 for microseconds,
+    #   # it does not append the ".0" at the end.  So on a value error, just
+    #   # try again with the .0 appended.
+    #   currentTime += ".0"
+    #   currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    #
+    # delta = currentTime - self.startTime
+    # self.time.SetLabel( "{:6.3f}".format( delta.total_seconds() ) )
+    #
+    # estop = ( "True" == self.remote( "io.estop.get()" ) )
+    #
+    # self.estop.SetLabel( self.remote( "io.estop" ) )
+    # self.park.SetLabel(  self.remote( "io.park" ) )
+
+# end class
+
 
 if __name__ == "__main__":
   wxApplication = wx.App()

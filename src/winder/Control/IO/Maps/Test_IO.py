@@ -98,8 +98,6 @@ class Test_IO:
     # $$$DEBUG - NOTE: There should be no reason to have tags in the I/O
     #   map.  Tags should only be in used with-in the I/O package.
     #
-    self.start = SoftwareInput( "start" )
-    self.stop  = SoftwareInput( "stop" )
 
     self.debugLight = PLC_Output( "BLINKY", self.plc, "BLINKY" )
 
