@@ -8,6 +8,7 @@
 
 import os
 from AnodePlaneArray import AnodePlaneArray
+from Library.Spool import Spool
 from Control.GCodeHandler import GCodeHandler
 from Control.ControlStateMachine import ControlStateMachine
 
@@ -21,7 +22,8 @@ class Process :
     self._io = io
     self._log = log
     self._configuration = configuration
-    self.gCodeHandler = GCodeHandler( io )
+    self.spool = Spool( 100, 50 )
+    self.gCodeHandler = GCodeHandler( io, self.spool )
     self.controlStateMachine = ControlStateMachine( io, log )
 
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
@@ -80,11 +82,15 @@ class Process :
     return recipeList
 
   #---------------------------------------------------------------------
-  def start( self ) :
+  def start( self, isLoopMode=False ) :
     """
     Request that the winding process begin.
+
+    Args:
+      isLoopMode: True to continuously loop this G-Code (debug only).
     """
     self.controlStateMachine.startRequest = True
+    self.controlStateMachine.loopMode = isLoopMode
 
   #---------------------------------------------------------------------
   def stop( self ) :
@@ -124,6 +130,14 @@ class Process :
         )
 
     return isError
+
+  #---------------------------------------------------------------------
+  def getG_CodeList( self, center, delta ) :
+    result = []
+    if self.gCodeHandler.gCode :
+      result = self.gCodeHandler.gCode.fetchLines( center, delta )
+
+    return result
 
   #---------------------------------------------------------------------
   def getAPA_List( self ) :

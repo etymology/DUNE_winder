@@ -25,7 +25,7 @@ class WindMode( StateMachineState ) :
     StateMachineState.__init__( self, stateMachine, state )
     self.io = io
     self.log = log
-    self._PAUSE = 0        # $$$DEBUG
+    self._PAUSE = 0         # $$$DEBUG
     self._pauseCount = 0   # $$$DEBUG
 
   #---------------------------------------------------------------------
@@ -38,20 +38,28 @@ class WindMode( StateMachineState ) :
     """
     isError = False
 
-    #$$$DEBUG if self.io.stop.get() :
-    #$$$DEBUG   isError = True
-    #$$$DEBUG   self.log.add(
-    #$$$DEBUG     self.__class__.__name__,
-    #$$$DEBUG     "WIND",
-    #$$$DEBUG     "Wind cannot start because stop is still requested."
-    #$$$DEBUG   )
-
     if None == self.stateMachine.gCodeHandler or None == self.stateMachine.gCodeHandler.gCode :
       isError = True
       self.log.add(
         self.__class__.__name__,
         "WIND",
         "Wind cannot start because no there is no G-Code file loaded to execute."
+      )
+
+    if not isError and self.stateMachine.gCodeHandler.isOutOfWire() :
+      isError = True
+      self.log.add(
+        self.__class__.__name__,
+        "WIND",
+        "Wind cannot start because there isn't enough wire on spool."
+      )
+
+    if not isError and self.stateMachine.gCodeHandler.isDone() :
+      isError = True
+      self.log.add(
+        self.__class__.__name__,
+        "WIND",
+        "Wind cannot start because G-Code is finished."
       )
 
     if not isError :
@@ -75,41 +83,37 @@ class WindMode( StateMachineState ) :
       True if there was an error, false if not.
     """
 
-    # We didn't finish this line.  Run it again.
-    self.stateMachine.gCodeHandler.gCode.setRelativeLine( -1 )
-
     return False
 
   #---------------------------------------------------------------------
   def update( self ):
     """
     Update function that is called periodically.
-
     """
 
     # If stop requested...
     if self.stateMachine.stopRequest :
       # We didn't finish this line.  Run it again.
-      self.io.plcLogic.stopXY()
+      self.io.plcLogic.stopSeek()
       self.changeState( self.stateMachine.States.STOP )
       self.stateMachine.stopRequest = False
     else:
-      # Done moving?
-      if self.io.plcLogic.isXY_SeekComplete() :
 
-        # Done with G-Code script?
-        if self.stateMachine.gCodeHandler.isDone() :
-          self.stateMachine.gCodeHandler.gCode.rewind()
-          self.log.add(
-            self.__class__.__name__,
-            "WIND",
-            "G-Code execution complete"
-          )
+      # Update G-Code handler.
+      isDone = self.stateMachine.gCodeHandler.poll()
 
-          self.changeState( self.stateMachine.States.STOP )
+      # Is G-Code execution complete?
+      if isDone :
+        # Log message that wind is complete.
+        self.log.add(
+          self.__class__.__name__,
+          "WIND",
+          "G-Code execution complete"
+        )
+
+        if self.stateMachine.loopMode :
+          # Rewind.
+          self.stateMachine.gCodeHandler.setLine( 0 )
         else :
-          self._pauseCount += 1
-          if self._pauseCount >= self._PAUSE :
-            self.stateMachine.gCodeHandler.runNextLine()
-            self._pauseCount = 0
-
+          # Return to stopped state.
+          self.changeState( self.stateMachine.States.STOP )

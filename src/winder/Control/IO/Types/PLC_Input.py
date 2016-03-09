@@ -32,7 +32,7 @@ class PLC_Input( DigitalInput ) :
     attributes.canWrite     = False
     attributes.defaultValue = defaultState
     attributes.isPolled     = True
-    self._tag = plc.Tag( name, plc, tagName, attributes )
+    self._tag = plc.Tag( plc, tagName, attributes )
 
     self._bit = bit
     self._defaultState = defaultState

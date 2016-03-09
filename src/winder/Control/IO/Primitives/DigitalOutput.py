@@ -14,6 +14,7 @@ class DigitalOutput( DigitalIO ) :
 
   # Static list of all digital outputs.
   list = []
+  map = {}
 
   _state = False
 
@@ -43,8 +44,13 @@ class DigitalOutput( DigitalIO ) :
 
     """
 
+    # Make sure this name isn't already in use.
+    assert( not name in DigitalOutput.list )
+
     DigitalIO.__init__( self, name )
     DigitalOutput.list.append( self )
+    DigitalOutput.map[ name ] = self
+
     self._state = initialState
 
   #---------------------------------------------------------------------

@@ -26,15 +26,16 @@ class ControllogixPLC( PLC ) :
       True if there was an error, False if connection was made.
     """
     self._lock.acquire()
-    self._isFunctional = True
+    isFunctional = True
     try :
       # Attempt to open a connection to PLC.
       isOk = self._plcDriver.open( self._ipAddress )
       if not isOk :
-        self._isFunctional = False
+        isFunctional = False
     except Exception:
-      self._isFunctional = False
+      isFunctional = False
 
+    self._isFunctional = isFunctional
     if not self._isFunctional :
       self._plcDriver.clean_up()
 

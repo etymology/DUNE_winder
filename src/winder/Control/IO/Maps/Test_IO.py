@@ -12,7 +12,7 @@ from IO.Types.PLC_Input import PLC_Input
 from IO.Types.PLC_Output import PLC_Output
 from IO.Types.PLC_Motor import PLC_Motor
 
-from IO.Types.SoftwareInput import SoftwareInput
+#from IO.Types.SoftwareInput import SoftwareInput
 from IO.Types.SoftwareMotor import SoftwareMotor
 
 from IO.Systems.MultiAxisMotor import MultiAxisMotor
@@ -56,11 +56,11 @@ class Test_IO:
 
     self.xAxis = PLC_Motor( "xAxis", self.plc, "X" )
     self.yAxis = PLC_Motor( "yAxis", self.plc, "Y" )
-    self.zAxis = SoftwareMotor( "zAxis", self.simulationTime )
+    self.zAxis = PLC_Motor( "zAxis", self.plc, "Z" )
 
     self.xyAxis = MultiAxisMotor( "xyAxis", [ self.xAxis, self.yAxis ] )
 
-    self.plcLogic = PLC_Logic( self.plc, self.xyAxis )
+    self.plcLogic = PLC_Logic( self.plc, self.xyAxis, self.zAxis )
 
     #
     # Inputs
@@ -100,5 +100,9 @@ class Test_IO:
     #
 
     self.debugLight = PLC_Output( "BLINKY", self.plc, "BLINKY" )
+    PLC_Output( "Out1", self.plc, "BLINKY" )
+    PLC_Output( "Out2", self.plc, "BLINKY" )
+    PLC_Output( "Out3", self.plc, "BLINKY" )
+    PLC_Output( "Out4", self.plc, "BLINKY" )
 
 # end class

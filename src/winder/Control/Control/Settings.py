@@ -10,7 +10,7 @@ class Settings :
   SERVER_PORT                 = 6626  # Default TCP port number (plank's constant).
   SERVER_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
   SERVER_BACK_LOG             = 5     # Default recommended by Python manual.
-  CLIENT_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.
+  CLIENT_MAX_DATA_SIZE        = 4096  # Max data that can be read from client at once.
   IO_UPDATE_TIME              = 0.1   # In seconds.  Currently 10 times/sec.
 
   # Path to configuration file.

@@ -30,8 +30,13 @@ class DigitalIO( IO_Point ) :
 
     """
 
+    # Make sure this name isn't already in use.
+    assert( not name in DigitalIO.list )
+
     IO_Point.__init__( self, name )
+
     DigitalIO.list.append( self )
+    DigitalIO.map[ name ] = self
 
   #---------------------------------------------------------------------
   @abstractmethod

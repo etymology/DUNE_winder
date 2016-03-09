@@ -33,8 +33,8 @@ class PLC_Output( DigitalOutput ) :
 
     self._plc = plc
     attributes = PLC.Tag.Attributes()
-    attributes.isPolled = True
-    self._tag = plc.Tag( name, plc, tagName, attributes, "BOOL" )
+    attributes.isPolled = False
+    self._tag = plc.Tag( plc, tagName, attributes, "BOOL" )
 
 
   #---------------------------------------------------------------------

@@ -28,22 +28,21 @@ class PLC_Simulator :
         self._xAxis.startSeek( velocity )
         self._yAxis.startSeek( velocity )
 
-        self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_SEEK )
       # Jog in X/Y?
       elif self._io.plcLogic.MoveTypes.JOG_XY == moveType :
         self._xAxis.startJog()
         self._yAxis.startJog()
-        self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_JOG )
       # Seek in Z?
       elif self._io.plcLogic.MoveTypes.SEEK_Z == moveType :
         velocity = self._io.plc.getTag( self._maxVelocityTag )
         self._zAxis.startSeek( velocity )
-
-        self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_SEEK )
       # Jog in Z?
-      elif self._io.plcLogic.MoveTypes.JOG_XY == moveType :
+      elif self._io.plcLogic.MoveTypes.JOG_Z == moveType :
         self._zAxis.startJog()
-        self._io.plc.write( self._stateTag, self._io.plcLogic.States.MOVING )
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_JOG )
 
       self._lastMoveType = moveType
 
@@ -51,7 +50,10 @@ class PLC_Simulator :
     self._yAxis.poll()
     self._zAxis.poll()
 
-    if not self._xAxis.isInMotion() and not self._yAxis.isInMotion() :
+    if not self._xAxis.isInMotion() \
+      and not self._yAxis.isInMotion() \
+      and not self._zAxis.isInMotion() :
+
       self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.IDLE )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
 
@@ -61,15 +63,15 @@ class PLC_Simulator :
       self._lastMoveType = None
 
   #---------------------------------------------------------------------
-  def _writeCallback( self, tag, data ) :
-    """
-    Callback run whenever a tag is written.
-
-    Args:
-      tag: Ignored.
-      data: Ignored.
-    """
-    self.poll()
+  #def _writeCallback( self, tag, data ) :
+  #  """
+  #  Callback run whenever a tag is written.
+  #
+  #  Args:
+  #    tag: Ignored.
+  #    data: Ignored.
+  #  """
+  #  self.poll()
 
   #---------------------------------------------------------------------
   def __init__( self, io ) :
@@ -95,9 +97,9 @@ class PLC_Simulator :
     # Tags for top-level PLC control.
     self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.IDLE )
     self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
-    self._maxVelocityTag     = io.plc.setupTag( "XY_MAX_VELOCITY", 0.0 )
-    self._maxAccelerationTag = io.plc.setupTag( "XY_MAX_ACCELERATION", 0.0 )
-    self._maxDecelerationTag = io.plc.setupTag( "XY_MAX_DECELERATION", 0.0 )
+    self._maxVelocityTag     = io.plc.setupTag( "XY_VELOCITY", 0.0 )
+    self._maxAccelerationTag = io.plc.setupTag( "XY_ACCELERATION", 0.0 )
+    self._maxDecelerationTag = io.plc.setupTag( "XY_DECELERATION", 0.0 )
     self._blinky             = io.plc.setupTag( "BLINKY", 0.0 )
 
     # Initial states of PLC state machine.

@@ -15,8 +15,8 @@ class PLC( IO_Device ) :
   # There is a limit to the length of packets to/from the PLC.  When reading
   # tags the request must be limited.  I have found no documentation as to how
   # to calculate this limit, but found I could read 18 with the tag name sizes
-  # currently in the queue.  So 16 seems a safe number.
-  MAX_TAG_READS = 16
+  # currently in the queue.  So 14 seems a safe number.
+  MAX_TAG_READS = 14
 
 
   # Make class abstract.
@@ -47,12 +47,11 @@ class PLC( IO_Device ) :
     # end class
 
     #---------------------------------------------------------------------
-    def __init__( self, name, plc, tagName, attributes = Attributes(), tagType="DINT" ) :
+    def __init__( self, plc, tagName, attributes = Attributes(), tagType="DINT" ) :
       """
       Constructor.
 
       Args:
-        name: Name of tag.
         plc: Instance of IO_Device.PLC.
         tagName: Which PLC tag this input is assigned.
         tagType: The type of tag value.
@@ -70,7 +69,6 @@ class PLC( IO_Device ) :
       else:
         PLC.Tag.map[ tagName ] = [ self ]
 
-      self._name       = name
       self._plc        = plc
       self._tagName    = tagName
       self._attributes = attributes
@@ -85,7 +83,7 @@ class PLC( IO_Device ) :
       Args:
         name: Name of this tag.
       """
-      return self._name
+      return self._tagName
 
     #---------------------------------------------------------------------
     def poll( self ) :
@@ -131,12 +129,18 @@ class PLC( IO_Device ) :
         # Read all the tags in this subset.
         results = plc.read( tagList )
 
-        # Distribute the results to the tag objects.
-        for result in results :
-          # For each object that uses this tag name...
-          for tag in PLC.Tag.map[ result[ 0 ] ] :
-            # Send it the result.
-            tag.updateFromReadTag( result[ 1 ] )
+        if None != results :
+          # Distribute the results to the tag objects.
+          for result in results :
+            # For each object that uses this tag name...
+            for tag in PLC.Tag.map[ result[ 0 ] ] :
+              # Send it the result.
+              tag.updateFromReadTag( result[ 1 ] )
+        else:
+          for tagName in tagList :
+            for tag in PLC.Tag.map[ tagName ] :
+              tag._value = tag._attributes.defaultValue
+
 
     #---------------------------------------------------------------------
     def getReadTag( self ) :

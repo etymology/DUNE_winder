@@ -7,9 +7,7 @@
 ###############################################################################
 
 from Control.Settings import Settings
-#from Control.GCodeHandler import GCodeHandler
-#from Control.ControlStateMachine import ControlStateMachine
-#from Control.ManualCommand import ManualCommand
+from Control.LowLevelIO import LowLevelIO
 
 from Threads.PrimaryThread import PrimaryThread
 from Threads.UI_ServerThread import UI_ServerThread
@@ -163,6 +161,8 @@ try:
   # # While the program is running...
   # while ( PrimaryThread.isRunning ) :
   #   time.sleep( 0.1 )
+  #
+  # PrimaryThread.stopAllThreads()
 
   # Shutdown the current processes.
   process.closeAPA()

@@ -96,20 +96,36 @@ class GCodeHandler :
 
     self._functions.append( function )
 
+    # Z-Latch.
     if "100" == function[ 0 ] :
       isOn = bool( function[ 1 ] == "1" )
       self._io.debugLight.set( isOn )
+      self._io.plcLogic.initiateLatch()
+
+    # Consumed wire for line.
     elif "101" == function[ 0 ] :
       length = float( function[ 1 ] )
-      # $$$DEBUG - Subtract wire length by parameter.
+      self._spool.subtract( length )
 
+
+  #---------------------------------------------------------------------
+  def isOutOfWire( self ) :
+    """
+    Check to see if spool is low on wire.
+
+    Returns:
+      True if spool is low on wire, False if not.
+    """
+    isOutOfWire = False
+    if self._spool :
+      isOutOfWire |= self._spool.isLow()
+
+    return isOutOfWire
 
   #---------------------------------------------------------------------
   def isDone( self ) :
     """
     Check to see if the G-Code execution has finished.
-
-    Args:
 
     Returns:
       True if finished, false if not.
@@ -117,15 +133,43 @@ class GCodeHandler :
     return self.gCode.isEndOfList()
 
   #---------------------------------------------------------------------
+  def setLine( self, line ) :
+    """
+    Set the line number of G-Code to execute next.
+
+    Args:
+      line: New line number.
+    """
+    result = self.gCode.setLine( line )
+    self._currentLine = self.gCode.getLine()
+    return result
+
+  #---------------------------------------------------------------------
+  def poll( self ) :
+    """
+    Update the logic for executing this line of G-Code.
+
+    Returns:
+      True if either the G-Code list has finished, or if the spool is
+      out of wire, False if not.
+    """
+
+    isDone = False
+
+    if self._io.plcLogic.isReady() :
+      self._currentLine = self.gCode.getLine()
+
+      isDone = self.isDone() or self.isOutOfWire()
+
+      if not isDone :
+        self.runNextLine()
+
+    return isDone
+
+  #---------------------------------------------------------------------
   def runNextLine( self ):
     """
     Interpret and execute the next line of G-Code.
-
-    Args:
-      None.
-
-    Returns:
-      None.
     """
 
     # Reset all values so we know what has changed.
@@ -135,9 +179,6 @@ class GCodeHandler :
     lastZ = self._z
     self._functions = []
     lastVelocity = self._velocity
-
-    self._currentLine = self._nextLine
-    self._nextLine = self.gCode.getLine()
 
     # Interpret the next line.
     self.gCode.executeNextLine()
@@ -151,10 +192,9 @@ class GCodeHandler :
       self._xyChange = False
 
     # If Z move...
-    # $$$DEBUG - No coordinate move for Z.
     if self._zChange :
       # Make the move.
-      self._io._zAxis.setDesiredPosition( self._z, self._velocity )
+      self._io.plcLogic.setZ_Position( self._z, self._velocity )
 
       # Reset change flag.
       self._zChange = False
@@ -198,16 +238,6 @@ class GCodeHandler :
       self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
-  def stop( self ):
-    """
-    """
-
-    # If we are still executing this line,
-    if self.gCode :
-      self.gCode.backup()
-
-
-  #---------------------------------------------------------------------
   def loadG_Code( self, lines ) :
     """
     Load G-Code file.
@@ -217,34 +247,20 @@ class GCodeHandler :
     """
     self.gCode = GCode( lines, self._callbacks )
     self._currentLine = 0
-    self._nextLine = 0
 
   #---------------------------------------------------------------------
   def getCurrentLineNumber( self ) :
     """
-    $$$DEBUG
-    """
+    Get the current line number being executed/ready to execute.
 
-    # $$$DEBUG - Broken, does not always reflect current line.
+    Returns:
+      Line number being executed/ready to execute.  None if no G-Code is
+      loaded.
+    """
 
     result = None
     if self.gCode :
       result = self._currentLine
-
-    return result
-
-  #---------------------------------------------------------------------
-  def getNextLineNumber( self ) :
-    """
-    Return the next line of G-Code to be executed.
-
-    Returns:
-      The next line of G-Code to be executed.  None if there is no G-Code
-      file currently loaded.
-    """
-    result = None
-    if self.gCode :
-      result = self.gCode.getLine()
 
     return result
 
@@ -264,7 +280,7 @@ class GCodeHandler :
     return result
 
   #---------------------------------------------------------------------
-  def setMaxVelocity( self, maxVelocity ) :
+  def setLimitVelocity( self, maxVelocity ) :
     """
     Set the maximum velocity at which any axis can move.  Useful to slow
     down operations.
@@ -288,7 +304,7 @@ class GCodeHandler :
     self._gCodeLog = open( gCodeLogFile, "a" )
 
   #---------------------------------------------------------------------
-  def __init__( self, io ):
+  def __init__( self, io, spool ):
     """
     Constructor.
 
@@ -301,6 +317,7 @@ class GCodeHandler :
     self._callbacks = GCodeCallbacks()
     self._callbacks.registerCallback( 'X', self._setX )
     self._callbacks.registerCallback( 'Y', self._setY )
+    self._callbacks.registerCallback( 'Z', self._setZ )
     self._callbacks.registerCallback( 'F', self._setVelocity )
     self._callbacks.registerCallback( 'G', self._runFunction )
     self._callbacks.registerCallback( 'N', self._setLine )
@@ -308,6 +325,7 @@ class GCodeHandler :
     self.gCode = None
 
     self._io = io
+    self._spool = spool
 
     self._maxVelocity = float( "inf" )   # <- No limit.
     self._velocity = 1.0                 # <- $$$DEBUG
@@ -318,6 +336,5 @@ class GCodeHandler :
     self._xyChange = False
     self._zChange = False
     self._currentLine = None
-    self._nextLine = None
     self._gCodeLog = None
     self._functions = []

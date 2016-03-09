@@ -32,96 +32,33 @@ class PLC_Motor( Motor ) :
 
     Motor.__init__( self, name )
     PLC_Motor.list.append( self )
-    self._seekFlag = False
+
     self._plc = plc
     self._tagBase = tagBase
 
-    self._setPosition = \
-      PLC.Tag(
-        name + "_setPosition",
-        plc,
-        tagBase + "_POSITION",
-        tagType="REAL"
-      )
+    # Write tags.
+    self._setPosition  = PLC.Tag( plc, tagBase + "_POSITION", tagType="REAL" )
+    #self._maxVelocity  = PLC.Tag( plc, tagBase + "_DATA.CommandVelocity", tagType="REAL" )
+    self._jogSpeed     = PLC.Tag( plc, tagBase + "_SPEED", tagType="REAL" )
+    self._jogDirection = PLC.Tag( plc, tagBase + "_DIR", tagType="DINT" )
 
-    self._maxVelocity = \
-      PLC.Tag(
-        name + "_maxVelocity",
-        plc,
-        tagBase + "_DATA.CommandVelocity",
-        tagType="REAL"
-      )
-
-    self._jogSpeed = \
-      PLC.Tag(
-        name + "_jogSpeed",
-        plc,
-        tagBase + "_SPEED",
-        tagType="REAL"
-      )
-
-    self._jogDirection = \
-      PLC.Tag(
-        name + "_jogDirection",
-        plc,
-        tagBase + "_DIR",
-        tagType="DINT"
-      )
-
-    # Read-only attributes.
+    # Read-only attributes tags.
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     attributes.canWrite = False
-    self._position = \
-      PLC.Tag(
-        name + "_position",
-        plc,
-        tagBase + "_DATA.ActualPosition",
-        attributes
-      )
+    self._position     = PLC.Tag( plc, tagBase + "_DATA.ActualPosition", attributes )
+    self._velocity     = PLC.Tag( plc, tagBase + "_DATA.ActualVelocity", attributes )
+    self._acceleration = PLC.Tag( plc, tagBase + "_DATA.ActualAcceleration", attributes )
+    self._movement     = PLC.Tag( plc, tagBase + "_DATA.CoordinatedMotionStatus", attributes )
 
-    self._velocity = \
-      PLC.Tag(
-        name + "_velocity",
-        plc,
-        tagBase + "_DATA.ActualVelocity",
-        attributes
-      )
-
-    self._acceleration = \
-      PLC.Tag(
-        name + "_acceleration",
-        plc,
-        tagBase + "_DATA.ActualAcceleration",
-        attributes
-      )
-
-    self._movement = \
-      PLC.Tag(
-        name + "_movement",
-        plc,
-        tagBase + "_DATA.CoordinatedMotionStatus",
-        attributes,
-        "BOOL"
-      )
-
+    # Motor status tag defaults to a faulted state in case read fails.
     attributes.defaultValue = True
-    self._faulted = \
-      PLC.Tag(
-        name + "_fault",
-        plc,
-        tagBase + "_DATA.ModuleFault",
-        tagType="BOOL"
-      )
-
-    #self._maxAcceleration = 200
-    #self._maxVelocity     = 400
+    self._faulted = PLC.Tag( plc, tagBase + "_DATA.ModuleFault", attributes )
 
   #---------------------------------------------------------------------
   def stop( self ) :
     """
     Stop the motor.
-
     """
 
     # $$$DEBUG
@@ -203,7 +140,9 @@ class PLC_Motor( Motor ) :
 
     """
 
-    return self._maxVelocity.get()
+    # $$$DEBUG
+    #return self._maxVelocity.get()
+    return None
 
   #---------------------------------------------------------------------
   def getVelocity( self ) :

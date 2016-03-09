@@ -10,8 +10,9 @@ from DigitalIO import DigitalIO
 
 class DigitalInput( DigitalIO ) :
 
-  # Static list of all digital inputs.
+  # Static list of all digital inputs, and map of names to instances.
   list = []
+  map = {}
 
   #---------------------------------------------------------------------
   def __str__( self ) :
@@ -38,7 +39,11 @@ class DigitalInput( DigitalIO ) :
 
     """
 
+    # Make sure this name isn't already in use.
+    assert( not name in DigitalInput.list )
+
     DigitalIO.__init__( self, name )
     DigitalInput.list.append( self )
+    DigitalInput.map[ name ] = self
 
 # end class

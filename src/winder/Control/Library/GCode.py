@@ -224,9 +224,11 @@ class GCodeLine :
 
     """
 
-
     # List of commands on this line.
     self.commands = []
+
+    # Remove multiple spaces.
+    line = re.sub( " +", " ", line )
 
     # Split the line into individual commands.
     commands = line.split( ' ' )
@@ -312,6 +314,34 @@ class GCode :
     self.callbacks = callbacks
 
   #---------------------------------------------------------------------
+  def fetchLines( self, center, delta ) :
+    """
+    Fetch a sub-set of the G-Code self.lines.  Useful for showing what has
+    recently executed, and what is to come.
+
+    Args:
+      center: Where to center the list.
+      delta: Number of entries to read +/- center.
+
+    Returns:
+      List of G-Code lines, padded with empty lines if needed.
+    """
+    bottom = center - delta
+    top = center + delta + 1
+    start = max( bottom, 0 )
+    end = min( top, len( self.lines ) )
+    result = self.lines[ start:end ]
+
+    if delta > center :
+      result = [ "" ] * ( delta - center ) + result
+
+    if top > len( self.lines ) :
+      spaces = top - len( self.lines )
+      result = result + [ "" ] * spaces
+
+    return result
+
+  #---------------------------------------------------------------------
   def setRelativeLine( self, line ) :
     """
     Set the line number relative to the current line.
@@ -379,7 +409,7 @@ class GCode :
     """
 
     isError = True
-    if line < len( self.lines ) :
+    if line <= len( self.lines ) :
       self.index = line
       isError = False
 

@@ -30,11 +30,11 @@ class Log:
     Args:
       outputFileName: Name of file to log messages.
       localEcho: True if message is also printed to stdout.
-
     """
 
     self._systemTime = systemTime
     self._lock = threading.Lock()
+    self._recent = collections.deque( maxlen = 20 )
     self._outputFiles = []
     self._outputFileList = {}
     if outputFileName :
@@ -51,7 +51,6 @@ class Log:
 
     Args:
       outputFileName: File to append.
-
     """
     self._lock.acquire()
 
@@ -77,13 +76,22 @@ class Log:
 
     Args:
       outputFileName: Log file previously attached.
-
     """
     self._lock.acquire()
     outputFile = self._outputFileList[ outputFileName ]
     self._outputFileList.pop( outputFileName )
     outputFile.close()
     self._lock.release()
+
+  #---------------------------------------------------------------------
+  def getRecent( self ) :
+    """
+    Return the most recent lines of the log file.
+
+    Returns:
+      The most recent lines of the log file.
+    """
+    return self._recent
 
   #---------------------------------------------------------------------
   def add( self, module, typeName, message, parameters = [] ) :
@@ -95,7 +103,6 @@ class Log:
       typeName: Message type.
       message: Human readable message.
       parameters: A list of all data associated with entry.
-
     """
 
     currentTime = self.getTimestamp()
@@ -113,6 +120,7 @@ class Log:
 
     # Write the message to each open log file.
     self._lock.acquire()
+    self._recent.append( line )
     for _, outputFile in self._outputFileList.iteritems():
       outputFile.write( line + "\n" )
     self._lock.release()

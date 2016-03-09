@@ -12,6 +12,7 @@ class AnalogInput( IO_Point ) :
 
   # Static list of all analog inputs.
   list = []
+  map = {}
 
   #---------------------------------------------------------------------
   def __init__( self, name ) :
@@ -24,8 +25,13 @@ class AnalogInput( IO_Point ) :
 
     """
 
+    # Make sure this name isn't already in use.
+    assert( not name in AnalogInput.list )
+
     IO_Point.__init__( self, name )
+
     AnalogInput.list.append( self )
+    AnalogInput.map[ name ] = self
 
   #---------------------------------------------------------------------
   def __str__( self ):

@@ -7,7 +7,7 @@
 ###############################################################################
 from Control.Settings import Settings
 from PrimaryThread import PrimaryThread
-from IO_Log import IO_Log
+#from IO_Log import IO_Log
 
 import time
 

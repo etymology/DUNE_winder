@@ -29,9 +29,13 @@ class AnalogOutput( IO_Point ) :
 
     """
 
+    # Make sure this name isn't already in use.
+    assert( not name in AnalogOutput.list )
+
     IO_Point.__init__( self, name )
 
     AnalogOutput.list.append( self )
+    AnalogOutput.map[ name ] = self
 
   #---------------------------------------------------------------------
   @abstractmethod

@@ -39,8 +39,6 @@ class StopMode( StateMachineState ) :
 
       """
 
-      #print vars( self.control )
-
       # Check for E-Stop.
       if self.io.estop.get() :
         self.changeState( self.stateMachine.States.ESTOP )

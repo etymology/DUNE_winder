@@ -79,22 +79,21 @@ class ManualMode( StateMachineState ) :
     """
 
     # Is movement done?
-    if self._io.plcLogic.isXY_SeekComplete() \
+    if self._io.plcLogic.isReady() \
       and not self.stateMachine.isJogging :
 
-        # If we were jogging X/Y axis, note where stopped.
-        if self._wasJoggingXY :
-          #print "Here"
-          x = self._io.xAxis.getPosition()
-          y = self._io.yAxis.getPosition()
-          self._log.add(
-            self.__class__.__name__,
-            "JOG_STOP",
-            "X/Y jog stopped at (" + str( x ) + "," + str( y ) + ")",
-            [ x, y ]
-          )
+      # If we were jogging X/Y axis, note where stopped.
+      if self._wasJoggingXY :
+        x = self._io.xAxis.getPosition()
+        y = self._io.yAxis.getPosition()
+        self._log.add(
+          self.__class__.__name__,
+          "JOG_STOP",
+          "X/Y jog stopped at (" + str( x ) + "," + str( y ) + ")",
+          [ x, y ]
+        )
 
-        self.changeState( self.stateMachine.States.STOP )
+      self.changeState( self.stateMachine.States.STOP )
 
 
 #end class

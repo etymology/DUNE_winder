@@ -147,7 +147,7 @@ class AnodePlaneArray( Serializable ) :
     self._gCodeHandler.setGCodeLog( gCodeLogName )
 
     if not isError :
-      isError |= self._gCodeHandler.gCode.setLine( self._lineNumber )
+      isError |= self._gCodeHandler.setLine( self._lineNumber )
       if isError :
         error = "Invalid line number."
 

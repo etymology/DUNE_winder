@@ -15,6 +15,7 @@ class IO_Point:
 
   # Static list of all IO_Point objects in system.
   list = []
+  map = {}
 
   #---------------------------------------------------------------------
   def __init__( self, name ) :
@@ -23,8 +24,13 @@ class IO_Point:
 
     """
 
-    self._name = name
+    # Make sure this name isn't already in use.
+    assert( not name in IO_Point.list )
+
     IO_Point.list.append( self )
+    IO_Point.map[ name ] = self
+
+    self._name = name
 
   #---------------------------------------------------------------------
   def getName( self ) :

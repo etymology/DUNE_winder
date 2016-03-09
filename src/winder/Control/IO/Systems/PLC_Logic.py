@@ -18,9 +18,13 @@ class PLC_Logic :
 
   # States for primary state machine.
   class States :
-    INIT   = 0
-    READY  = 1
-    MOVING = 2  # $$$DEBUG - Is this correct?
+    INIT      = 0
+    READY     = 1
+    XY_JOG    = 2
+    XY_SEEK   = 3
+    Z_JOG     = 4
+    Z_SEEK    = 5
+    LATCHING  = 6
   # end class
 
   # States for move type state machine.
@@ -30,12 +34,32 @@ class PLC_Logic :
     SEEK_XY = 2
     JOG_Z   = 3
     SEEK_Z  = 4
+    LATCH   = 5
   # end class
 
   #---------------------------------------------------------------------
-  def stopXY( self ) :
+  def isReady( self ) :
     """
-    Stop X/Y position seek.
+    Check to see if the PLC is in a ready state.  This can be used to determine
+    if all motion has completed, including all motor motion and latching
+    operations.
+
+    Returns:
+      True if ready, False if some other operation is taking place.
+    """
+    state = self._state.get()
+
+    if self.States.READY == state :
+      result = True
+    else :
+      result = False
+
+    return result
+
+  #---------------------------------------------------------------------
+  def stopSeek( self ) :
+    """
+    Stop all motor position seeks.
     """
     self._moveType.set( self.MoveTypes.IDLE )
 
@@ -58,27 +82,6 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.SEEK_XY )
 
   #---------------------------------------------------------------------
-  def isXY_SeekComplete( self ) :
-    """
-    Check to see if an X/Y seek is complete.
-
-    Returns:
-      True if seek complete, False if not.
-
-    Notes:
-      Checks to see if the movement state machine is idle.  So this
-      also returns False when jogging.
-    """
-    state = self._state.get()
-
-    if self.States.READY == state :
-      result = True
-    else :
-      result = False
-
-    return result
-
-  #---------------------------------------------------------------------
   def jogXY( self, xVelocity, yVelocity ) :
     """
     Jog the X/Y axis at a given velocity.
@@ -94,6 +97,43 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.JOG_XY )
 
   #---------------------------------------------------------------------
+  def setZ_Position( self, position, velocity=None ) :
+    """
+    Move Z-axis to a position.
+
+    Args:
+      position: Position to seek in z-axis (in millimeters).
+      velocity: Maximum velocity at which to make move.  None to use last
+        velocity.
+    """
+    if None != velocity :
+      self._velocity = velocity
+
+    self._maxVelocity.set( self._velocity )
+    self._zAxis.setDesiredPosition( position )
+    self._moveType.set( self.MoveTypes.SEEK_Z )
+
+  #---------------------------------------------------------------------
+  def jogZ( self, velocity ) :
+    """
+    Jog the Z axis at a given velocity.
+
+    Args:
+      velocity: Speed of travel.  0 for no motion or stop, negative
+        for seeking in reverse direction.
+    """
+
+    self._zAxis.setVelocity( velocity )
+    self._moveType.set( self.MoveTypes.JOG_Z )
+
+  #---------------------------------------------------------------------
+  def initiateLatch( self ) :
+    """
+    Start a latching operation.
+    """
+    self._moveType.set( self.MoveTypes.LATCH )
+
+  #---------------------------------------------------------------------
   def poll( self ) :
     """
     Internal update. Call periodically.
@@ -101,7 +141,7 @@ class PLC_Logic :
     PLC.Tag.pollAll( self._plc )
 
   #---------------------------------------------------------------------
-  def __init__( self, plc, xyAxis ) :
+  def __init__( self, plc, xyAxis, zAxis ) :
     """
     Constructor.
 
@@ -111,15 +151,16 @@ class PLC_Logic :
     """
     self._plc = plc
     self._xyAxis = xyAxis
+    self._zAxis = zAxis
 
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
-    self._moveType = PLC.Tag( "Move type", plc, "MOVE_TYPE", attributes, tagType="INT" )
-    self._state    = PLC.Tag( "State", plc, "STATE", attributes, tagType="DINT" )
+    self._state           = PLC.Tag( plc, "STATE", attributes, tagType="DINT" )
 
-    self._maxVelocity = PLC.Tag( "MaxVelocity", plc, "XY_MAX_VELOCITY", tagType="REAL" )
-    self._maxAcceleration = PLC.Tag( "MaxAcceleration", plc, "XY_MAX_ACCELERATION", tagType="REAL" )
-    self._maxDeceleration = PLC.Tag( "MaxDeceleration", plc, "XY_MAX_DECELERATION", tagType="REAL" )
+    self._moveType        = PLC.Tag( plc, "MOVE_TYPE", tagType="INT" )
+    self._maxVelocity     = PLC.Tag( plc, "XY_VELOCITY", tagType="REAL" )
+    self._maxAcceleration = PLC.Tag( plc, "XY_ACCELERATION", tagType="REAL" )
+    self._maxDeceleration = PLC.Tag( plc, "XY_DECELERATION", tagType="REAL" )
 
     self._velocity = 1.0
 

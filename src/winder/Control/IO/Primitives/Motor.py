@@ -15,6 +15,7 @@ class Motor( IO_Point ) :
 
   # Static list of all motors.
   list = []
+  map = {}
 
   #---------------------------------------------------------------------
   def __init__( self, name ) :
@@ -26,9 +27,13 @@ class Motor( IO_Point ) :
 
     """
 
+    # Make sure this name isn't already in use.
+    assert( not name in Motor.list )
+
     IO_Point.__init__( self, name )
 
     Motor.list.append( self )
+    Motor.map[ name ] = self
 
   #---------------------------------------------------------------------
   @abstractmethod

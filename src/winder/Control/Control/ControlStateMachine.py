@@ -30,8 +30,8 @@ class ControlStateMachine( LoggedStateMachine ) :
     state.
     """
 
-    if not self._io.isFunctional() \
-      and self.getState() != self.States.HARDWARE :
+    if not self._io.isFunctional() :
+      if self.getState() != self.States.HARDWARE :
         self.changeState( self.States.HARDWARE )
     # Emergency stop.
     elif self._io.estop.get() \
@@ -90,8 +90,10 @@ class ControlStateMachine( LoggedStateMachine ) :
 
     self.gCodeHandler = None
 
+    # Wind mode.
     self.startRequest = False
-    self.stopRequest = False
+    self.stopRequest  = False
+    self.loopMode     = False  # True to continuously loop the G-Code.
 
     # Manual mode options.
     self.manualRequest = False
