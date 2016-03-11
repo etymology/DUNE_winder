@@ -1,0 +1,7 @@
+Kivy:
+Windows: https://kivy.org/docs/installation/installation-windows.html
+Linux: https://kivy.org/docs/installation/installation-linux.html
+
+pycomm:
+https://github.com/ruscito/pycomm
+   -> Use PyPi: pip install pycomm
