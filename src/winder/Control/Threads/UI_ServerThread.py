@@ -9,7 +9,7 @@
 #   dispatches these commands to a handler.  The handler processes the command
 #   and returns results which are then sent back to the client.
 ###############################################################################
-from PrimaryThread import PrimaryThread
+from Threads.PrimaryThread import PrimaryThread
 from Control.Settings import Settings
 import select
 import socket
@@ -20,21 +20,20 @@ import threading     # For additional threads.
 #------------------------------------------------------------------------------
 class _Client( threading.Thread ):
   #---------------------------------------------------------------------
-  def __init__( self, ( socket, address ), callback, log ):
+  def __init__( self, ( clientSocket, address ), callback, log ):
     """
     Constructor.
 
     Args:
-      socket: Connection to client.
+      clientSocket: Connection to client.
       address: Address of client (ignored)
       callback: Function to send data from client. What the callback returns is then sent back to client.
 
     """
-
-
     threading.Thread.__init__( self )
 
-    self._socket   = socket
+    address = address
+    self._socket   = clientSocket
     self._callback = callback
     self._log      = log
     self.start()
@@ -68,10 +67,28 @@ class _Client( threading.Thread ):
       if isRunning and not '' == data :
 
         # Process the request.
-        result = str( self._callback( data ) )
+        dataString = str( self._callback( data ) )
 
-        # Send the results back to client.
-        self._socket.send( str( result ) )
+        # Break sting into chunks that are no larger than
+        # Settings.SERVER_MAX_DATA_SIZE characters.
+        chunks = \
+          [
+            dataString[ index : index + Settings.SERVER_MAX_DATA_SIZE ]
+              for index in xrange( 0, len( dataString ), Settings.SERVER_MAX_DATA_SIZE )
+          ]
+
+        # Send each chunk of data.
+        chunkSize = 0
+        for subString in chunks :
+          # Send the results back to client.
+          self._socket.send( subString )
+          chunkSize = len( subString )
+
+        # If the last chunk was either empty or exactly the max data size, send
+        # a blank line as the client will expect at least/one more packet.
+        if Settings.SERVER_MAX_DATA_SIZE == chunkSize or 0 == chunkSize :
+          self._socket.send( "" )
+
       else:
         # If there is no data, it is also an indication the socket was closed.
         isRunning = False
@@ -102,12 +119,12 @@ class UI_ServerThread( PrimaryThread ):
 
     """
 
-    PrimaryThread.__init__( self, "UI_ServerThread" )
+    PrimaryThread.__init__( self, "UI_ServerThread", log )
     self._callback = commandCallback
     self._log = log
 
   #---------------------------------------------------------------------
-  def run( self ):
+  def body( self ) :
     """
     Body of thread. Accepts client connections and swans threads to deal with client requests.
 
@@ -148,5 +165,4 @@ class UI_ServerThread( PrimaryThread ):
 
     # Close server socket.
     server.close()
-
 # end class

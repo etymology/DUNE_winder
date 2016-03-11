@@ -11,51 +11,67 @@
 #   shutdown.
 ###############################################################################
 import threading
+import sys
+import traceback
 from Library.SystemSemaphore import SystemSemaphore
 
 class PrimaryThread( threading.Thread ):
 
   list = []
   isRunning = False
-  semaphore = threading.Lock()
+  useGracefulException = True
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name, log ) :
     """
     Constructor.
 
     Args:
       name: Name of thread.
-
     """
 
     threading.Thread.__init__( self )
     PrimaryThread.list.append( self )
     self._name = name
+    self._log = log
 
   #---------------------------------------------------------------------
   @staticmethod
   def startAllThreads():
     """
     Start all threads. Call at start of program after thread creation.
-
     """
 
     PrimaryThread.isRunning = True
     for instance in PrimaryThread.list:
       instance.start()
 
-    PrimaryThread.semaphore.acquire()
-
   #---------------------------------------------------------------------
   @staticmethod
   def stopAllThreads():
     """
     Stop all threads. Call at end of program.
-
     """
     PrimaryThread.isRunning = False
     SystemSemaphore.releaseAll()
-    PrimaryThread.semaphore.release()
+
+  #---------------------------------------------------------------------
+  def run( self ) :
+    try:
+      self.body()
+    except Exception as exception :
+      PrimaryThread.stopAllThreads()
+      exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+      tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
+      self._log.add(
+        self.__class__.__name__,
+        "ThreadException",
+        "Thread had an exception.",
+        [ exception, exceptionType, exceptionValue, tracebackString ]
+      )
+
+      if not PrimaryThread.useGracefulException :
+        raise
+
 
 # end class

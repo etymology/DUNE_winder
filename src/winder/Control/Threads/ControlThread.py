@@ -6,15 +6,15 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 from Control.Settings import Settings
-from PrimaryThread import PrimaryThread
-#from IO_Log import IO_Log
+from Control.IO_Log import IO_Log
+from Threads.PrimaryThread import PrimaryThread
 
 import time
 
 class ControlThread( PrimaryThread ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, io, stateMachine, systemTime, isIO_Logged ) :
+  def __init__( self, io, log, stateMachine, systemTime, isIO_Logged ) :
     """
     Constructor.
 
@@ -23,7 +23,7 @@ class ControlThread( PrimaryThread ) :
       stateMachine: Instance of state machine.
     """
 
-    PrimaryThread.__init__( self, "ControlThread" )
+    PrimaryThread.__init__( self, "ControlThread", log )
     self._io = io
     self._systemTime = systemTime
     self._stateMachine = stateMachine
@@ -33,7 +33,7 @@ class ControlThread( PrimaryThread ) :
       self._ioLog = IO_Log( Settings.IO_LOG )
 
   #---------------------------------------------------------------------
-  def run( self ) :
+  def body( self ) :
     """
     Body of control thread--the "main loop" of the program.
     """

@@ -7,7 +7,7 @@
 ###############################################################################
 
 import os
-from AnodePlaneArray import AnodePlaneArray
+from Control.AnodePlaneArray import AnodePlaneArray
 from Library.Spool import Spool
 from Control.GCodeHandler import GCodeHandler
 from Control.ControlStateMachine import ControlStateMachine
@@ -82,15 +82,11 @@ class Process :
     return recipeList
 
   #---------------------------------------------------------------------
-  def start( self, isLoopMode=False ) :
+  def start( self ) :
     """
     Request that the winding process begin.
-
-    Args:
-      isLoopMode: True to continuously loop this G-Code (debug only).
     """
     self.controlStateMachine.startRequest = True
-    self.controlStateMachine.loopMode = isLoopMode
 
   #---------------------------------------------------------------------
   def stop( self ) :
@@ -134,10 +130,128 @@ class Process :
   #---------------------------------------------------------------------
   def getG_CodeList( self, center, delta ) :
     result = []
-    if self.gCodeHandler.gCode :
-      result = self.gCodeHandler.gCode.fetchLines( center, delta )
+    if self.gCodeHandler.isG_CodeLoaded() :
+      result = self.gCodeHandler.fetchLines( center, delta )
 
     return result
+
+  #---------------------------------------------------------------------
+  def setG_CodeLine( self, line ) :
+    """
+    Set a new line number from loaded recipe to seek.
+
+    Args:
+      line: Line number.
+
+    Returns:
+      True if there was an error, False if not.
+    """
+    isError = True
+    if self.gCodeHandler.isG_CodeLoaded() :
+      initialLine = self.gCodeHandler.getLine()
+      isError = self.gCodeHandler.setLine( line )
+
+      if not isError :
+        self._log.add(
+          self.__class__.__name__,
+          "LINE",
+          "G-Code line changed from " + str( initialLine ) + " to " + str( line ),
+          [ initialLine, line ]
+        )
+
+    if isError :
+      self._log.add(
+        self.__class__.__name__,
+        "LINE",
+        "Unable to change G-Code line changed to " + str( line ),
+        [ line ]
+      )
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def setG_CodeDirection( self, isForward ) :
+    """
+    Set the direction of G-Code execution.
+
+    Args:
+      isForward: True for normal direction, False to run in reverse.
+    """
+    isError = True
+    if self.gCodeHandler.isG_CodeLoaded() :
+      initialDirection = self.gCodeHandler.getDirection()
+      isError = self.gCodeHandler.setDirection( isForward )
+
+      if not isError :
+        self._log.add(
+          self.__class__.__name__,
+          "DIRECTION",
+          "G-Code direction changed from " + str( initialDirection ) + " to " + str( isForward ),
+          [ initialDirection, isForward ]
+        )
+
+    if isError :
+      self._log.add(
+        self.__class__.__name__,
+        "LINE",
+        "Unable to change G-Code direction changed to " + str( isForward ),
+        [ isForward ]
+      )
+
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def setG_CodeRunToLine( self, line ) :
+    """
+    Set the line number to run G-Code and then stop.
+    """
+    isError = True
+    if self.gCodeHandler.isG_CodeLoaded() :
+      initialRunTo = self.gCodeHandler.runToLine
+      #isError = self.gCodeHandler.setDirection( isForward )
+      self.gCodeHandler.runToLine = line
+      isError = False
+
+      if not isError :
+        self._log.add(
+          self.__class__.__name__,
+          "RUN_TO",
+          "G-Code finial line changed from " + str( initialRunTo ) + " to " + str( line ),
+          [ initialRunTo, line ]
+        )
+
+    if isError :
+      self._log.add(
+        self.__class__.__name__,
+        "LINE",
+        "Unable to change G-Code run to line to " + str( line ),
+        [ line ]
+      )
+
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def setG_CodeLoop( self, isLoopMode ) :
+    """
+    Specify if the G-Code should loop continuously.  Useful for testing
+    but not production.
+
+    Args:
+      isLoopMode: True if G-Code should loop.
+    """
+    self._log.add(
+      self.__class__.__name__,
+      "LOOP",
+      "G-Code loop mode set from "
+        + str( self.controlStateMachine.loopMode )
+        + " to "
+        + str( isLoopMode ),
+      [ self.controlStateMachine.loopMode, isLoopMode ]
+    )
+
+    self.controlStateMachine.loopMode = isLoopMode
 
   #---------------------------------------------------------------------
   def getAPA_List( self ) :

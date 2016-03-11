@@ -232,8 +232,7 @@ class AnodePlaneArray( Serializable ) :
     """
 
     # Get the current line in G-Code.
-    if self._gCodeHandler.gCode :
-      self._lineNumber = self._gCodeHandler.gCode.getLine()
+    self._lineNumber = self._gCodeHandler.getLine()
 
     # Serialize data into XML.
     xmlDocument = xml.dom.minidom.parseString( '<AnodePlaneArray/>' )

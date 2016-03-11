@@ -5,19 +5,17 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from PrimaryThread import PrimaryThread
+from Threads.PrimaryThread import PrimaryThread
 from Debug.DebugGUI import DebugGUI
 from Control.Settings import Settings
 import wx
-import sys
-import traceback
 
 #------------------------------------------------------------------------------
 # User interface server thread.
 #------------------------------------------------------------------------------
 class DebugThread( PrimaryThread ):
   #---------------------------------------------------------------------
-  def __init__( self, address, port ):
+  def __init__( self, log, address, port ):
     """
     Constructor.
 
@@ -26,25 +24,18 @@ class DebugThread( PrimaryThread ):
 
     """
 
-    PrimaryThread.__init__( self, "DebugThread" )
+    PrimaryThread.__init__( self, "DebugThread", log )
     self.address = address
     self.port = port
 
   #---------------------------------------------------------------------
-  def run( self ):
+  def body( self ) :
     """
     Body of thread.  Create GUI and run it.
     """
-
-    try :
-      wxApplication = wx.App()
-      DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
-      wxApplication.MainLoop()
-    except :
-      exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-      tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
-      print tracebackString
-      pass
+    wxApplication = wx.App()
+    DebugGUI( None, self.address, self.port, Settings.CLIENT_MAX_DATA_SIZE )
+    wxApplication.MainLoop()
 
     # If this point is reached, the GUI has shutdown.
     PrimaryThread.stopAllThreads()

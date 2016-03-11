@@ -104,9 +104,13 @@ class GCodeHandler :
 
     # Consumed wire for line.
     elif "101" == function[ 0 ] :
+      # Get the length from the parameter.
       length = float( function[ 1 ] )
-      self._spool.subtract( length )
 
+      # Account for direction of travel.  In reverse, the wire is actually
+      # going back onto the spool.
+      length *= self._direction
+      self._spool.subtract( length )
 
   #---------------------------------------------------------------------
   def isOutOfWire( self ) :
@@ -130,7 +134,54 @@ class GCodeHandler :
     Returns:
       True if finished, false if not.
     """
-    return self.gCode.isEndOfList()
+
+    startLine = 0
+    endLine = self._gCode.getLineCount() - 1
+
+    if -1 != self.runToLine :
+      if 1 == self._direction :
+        endLine = self.runToLine - 1
+      else :
+        startLine = self.runToLine - 1
+
+    isDone = False
+    isDone |= 1 == self._direction and self._nextLine >= endLine
+    isDone |= 1 != self._direction and self._nextLine <= startLine
+
+    return isDone
+
+    #return self._gCode.isEndOfList()
+
+  #---------------------------------------------------------------------
+  def getTotalLines( self ) :
+    """
+    Return the total number of G-Code lines for the current G-Code file.
+
+    Returns:
+      Total number of G-Code lines for the current G-Code file.  None if there
+      is no G-Code file currently loaded.
+    """
+    result = None
+    if self._gCode :
+      result = self._gCode.getLineCount()
+
+    return result
+
+  #---------------------------------------------------------------------
+  def getLine( self ) :
+    """
+    Get the current line number being executed/ready to execute.
+
+    Returns:
+      Line number being executed/ready to execute.  None if no G-Code is
+      loaded.
+    """
+
+    result = None
+    if self._gCode :
+      result = self._currentLine
+
+    return result
 
   #---------------------------------------------------------------------
   def setLine( self, line ) :
@@ -140,9 +191,64 @@ class GCodeHandler :
     Args:
       line: New line number.
     """
-    result = self.gCode.setLine( line )
-    self._currentLine = self.gCode.getLine()
-    return result
+
+    isError = True
+    #line -= self._direction
+    if line >= -1 and line < self._gCode.getLineCount() :
+      isError = False
+      self._nextLine = line
+      self._currentLine = line
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def setDirection( self, isForward ) :
+    """
+    Set the direction of G-Code execution.
+
+    Args:
+      isForward: True for normal direction, False to run in reverse.
+    """
+    if isForward :
+      self._direction = 1
+    else :
+      self._direction = -1
+
+  #---------------------------------------------------------------------
+  def getDirection( self ) :
+    """
+    Get the direction of G-Code execution.
+
+    Returns
+      True for normal direction, False to run in reverse.
+    """
+    return 1 == self._direction
+
+  ##---------------------------------------------------------------------
+  #def setRunTo( self, line ) :
+  #  """
+  #  Set the min/max line number at which to stop execution.
+  #
+  #  Args:
+  #    line: Line at which to stop execution.  -1 for end/beginning.
+  #  """
+  #  if isForward :
+  #    self._direction = 1
+  #  else :
+  #    self._direction = -1
+
+  #---------------------------------------------------------------------
+  def stop( self ) :
+    """
+    Stop the running G-Code.  Call when interrupting G-Code sequence.
+    """
+
+    # If we are interrupting a running line, set it as the next line to run.
+    if not self._io.plcLogic.isReady() :
+      #self._currentLine -= self._direction
+      self._nextLine -= self._direction
+      #self._nextLine = self._currentLine
+      #self._nextLine = self._currentLine
 
   #---------------------------------------------------------------------
   def poll( self ) :
@@ -157,12 +263,18 @@ class GCodeHandler :
     isDone = False
 
     if self._io.plcLogic.isReady() :
-      self._currentLine = self.gCode.getLine()
+      self._currentLine = self._nextLine
 
       isDone = self.isDone() or self.isOutOfWire()
 
       if not isDone :
-        self.runNextLine()
+        if self._pauseCount < self._PAUSE :
+          self._pauseCount += 1
+        else :
+          self._pauseCount = 0
+          self._nextLine += self._direction
+          #self._currentLine = self._nextLine
+          self.runNextLine()
 
     return isDone
 
@@ -181,7 +293,7 @@ class GCodeHandler :
     lastVelocity = self._velocity
 
     # Interpret the next line.
-    self.gCode.executeNextLine()
+    self._gCode.executeNextLine( self._nextLine )
 
     # If an X/Y coordinate change is needed...
     if self._xyChange :
@@ -245,37 +357,37 @@ class GCodeHandler :
     Args:
       fileName: Full file name to G-Code to be loaded.
     """
-    self.gCode = GCode( lines, self._callbacks )
-    self._currentLine = 0
+    self._gCode = GCode( lines, self._callbacks )
+    self._currentLine = -1
+    self._nextLine = -1
 
   #---------------------------------------------------------------------
-  def getCurrentLineNumber( self ) :
+  def isG_CodeLoaded( self ) :
     """
-    Get the current line number being executed/ready to execute.
+    Check to see if there is G-Code loaded.
 
     Returns:
-      Line number being executed/ready to execute.  None if no G-Code is
-      loaded.
+      True if G-Code is loaded, False if not.
     """
-
-    result = None
-    if self.gCode :
-      result = self._currentLine
-
-    return result
+    return None != self._gCode
 
   #---------------------------------------------------------------------
-  def getTotalLines( self ) :
+  def fetchLines( self, center, delta ) :
     """
-    Return the total number of G-Code lines for the current G-Code file.
+    Fetch a sub-set of the G-Code self.lines.  Useful for showing what has
+    recently executed, and what is to come.
+
+    Args:
+      center: Where to center the list.
+      delta: Number of entries to read +/- center.
 
     Returns:
-      Total number of G-Code lines for the current G-Code file.  None if there
-      is no G-Code file currently loaded.
+      List of G-Code lines, padded with empty lines if needed.  Empty list if
+      no G-Code is loaded.
     """
-    result = None
-    if self.gCode :
-      result = self.gCode.getLines()
+    result = []
+    if self._gCode :
+      result = self._gCode.fetchLines( center, delta )
 
     return result
 
@@ -322,7 +434,7 @@ class GCodeHandler :
     self._callbacks.registerCallback( 'G', self._runFunction )
     self._callbacks.registerCallback( 'N', self._setLine )
 
-    self.gCode = None
+    self._gCode = None
 
     self._io = io
     self._spool = spool
@@ -335,6 +447,13 @@ class GCodeHandler :
     self._line = 0
     self._xyChange = False
     self._zChange = False
+    self._direction = 1
+    self.runToLine = -1
     self._currentLine = None
+    self._nextLine = None
     self._gCodeLog = None
     self._functions = []
+
+    # Add a pause between G-Code instructions by setting _PAUSE to non-zero value.
+    self._PAUSE = 0
+    self._pauseCount = 0

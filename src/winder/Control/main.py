@@ -23,6 +23,7 @@ from Control.Process import Process
 import signal
 import sys
 import traceback
+import time
 
 #==============================================================================
 # Debug settings.
@@ -62,19 +63,19 @@ def commandHandler( command ) :
   except Exception as exception:
     result = "Invalid request"
 
-    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-    tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
+    exceptionTypeName, exceptionValues, tracebackValue = sys.exc_info()
+    tracebackAsString = repr( traceback.format_tb( tracebackValue ) )
     log.add(
       "Main",
       "commandHandler",
       "Invalid command issued from UI.",
-      [ command, exception, exceptionType, exceptionValue, tracebackString ]
+      [ command, exception, exceptionTypeName, exceptionValues, tracebackAsString ]
     )
 
   return result
 
 #-----------------------------------------------------------------------
-def signalHandler( signal, frame ):
+def signalHandler( signalNumber, frame ):
   """
   Keyboard interrupt handler. Used to shutdown system for Ctrl-C.
 
@@ -83,6 +84,8 @@ def signalHandler( signal, frame ):
     frame: Ignored.
 
   """
+  signalNumber = signalNumber
+  frame = frame
   PrimaryThread.stopAllThreads()
 
 #-----------------------------------------------------------------------
@@ -140,29 +143,28 @@ try:
   # Initialize threads.
   #
   uiServer = UI_ServerThread( commandHandler, log )
-  controlThread = ControlThread( io, process.controlStateMachine, systemTime, isIO_Logged )
+  controlThread = ControlThread( io, log, process.controlStateMachine, systemTime, isIO_Logged )
 
   # Setup debug interface (if enabled).
   if debugInterface :
     from Threads.DebugThread import DebugThread
     debugUI = \
       DebugThread(
+        log,
         configuration.get( "serverAddress" ),
         int( configuration.get( "serverPort" ) )
       )
 
+  PrimaryThread.useGracefulException = not debugInterface
+
   # Begin operation.
   PrimaryThread.startAllThreads()
 
-  # Wait while the program is running...
-  # (The threads have it from here.)
-  PrimaryThread.semaphore.acquire()
+  # While the program is running...
+  while ( PrimaryThread.isRunning ) :
+    time.sleep( 0.1 )
 
-  # # While the program is running...
-  # while ( PrimaryThread.isRunning ) :
-  #   time.sleep( 0.1 )
-  #
-  # PrimaryThread.stopAllThreads()
+  PrimaryThread.stopAllThreads()
 
   # Shutdown the current processes.
   process.closeAPA()
@@ -170,16 +172,21 @@ try:
   # Save configuration.
   configuration.save()
 
-except Exception as exception:
+  # $$$DEBUG - Shutdown I/O.
 
-  exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-  tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
-  log.add(
-    "Main",
-    "FAILURE",
-    "Caught an exception.",
-    [ exception, exceptionType, exceptionValue, tracebackString ]
-  )
+except Exception as exception:
+  PrimaryThread.stopAllThreads()
+  if debugInterface :
+    raise exception
+  else :
+    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+    tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
+    log.add(
+      "Main",
+      "FAILURE",
+      "Caught an exception.",
+      [ exception, exceptionType, exceptionValue, tracebackString ]
+    )
 
 # Sign off.
 log.add( "Main", "END", "Control system stops." )

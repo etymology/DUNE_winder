@@ -342,51 +342,7 @@ class GCode :
     return result
 
   #---------------------------------------------------------------------
-  def setRelativeLine( self, line ) :
-    """
-    Set the line number relative to the current line.
-
-    Args:
-      line: Lines to advance if positive, line to backup if negative.
-
-    """
-    self.index += line
-    if self.index < 0 :
-      self.index = 0
-    elif self.index > len( self.lines ) :
-      self.index = line
-
-
-  #---------------------------------------------------------------------
-  def rewind( self ) :
-    """
-    Set line number to 0.
-
-    """
-
-    self.index = 0
-
-  #---------------------------------------------------------------------
-  def backup( self ) :
-    """
-    Go to the previous line.  Useful if line execution was aborted.
-    """
-    if self.index > 0 :
-      self.index -= 1
-
-  #---------------------------------------------------------------------
-  def getLine( self ) :
-    """
-    Get the current line number. This is the line to execute next.
-
-    Returns:
-      Line number.
-    """
-
-    return self.index
-
-  #---------------------------------------------------------------------
-  def getLines( self ) :
+  def getLineCount( self ) :
     """
     Get the number of lines of GCode.
 
@@ -397,46 +353,14 @@ class GCode :
     return len( self.lines )
 
   #---------------------------------------------------------------------
-  def setLine( self, line ) :
-    """
-    Set the current line number. This is the line to execute next.
-
-    Args:
-      line: New line number.
-
-    Returns:
-      True if there was an error, False if not.
-    """
-
-    isError = True
-    if line <= len( self.lines ) :
-      self.index = line
-      isError = False
-
-    return isError
-
-  #---------------------------------------------------------------------
-  def isEndOfList( self ) :
-    """
-    Check to see if at the end of the G-code.
-
-    Returns:
-      True if there are no more lines of G-code to execute.
-    """
-
-    return self.index >= len( self.lines )
-
-  #---------------------------------------------------------------------
-  def executeNextLine( self ) :
+  def executeNextLine( self, lineNumber ) :
     """
     Run a line of G-code.
 
     """
-    if self.index < len( self.lines ) :
-      gCodeLine = GCodeLine( self.callbacks, self.lines[ self.index ] )
+    if lineNumber < len( self.lines ) :
+      gCodeLine = GCodeLine( self.callbacks, self.lines[ lineNumber ] )
       gCodeLine.execute()
-
-      self.index += 1
 
 #------------------------------------------------------------------------------
 # Unit test.
@@ -455,7 +379,7 @@ if __name__ == "__main__":
 
   gCode = GCode( 'GCodeTest.txt', callbacks )
 
-  while not gCode.executeNextLine() :
-    pass
+  #while not gCode.executeNextLine() :
+  #  pass
 
   #print gGoceLine

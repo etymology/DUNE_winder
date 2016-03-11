@@ -9,9 +9,33 @@ import wx
 import datetime
 import ast
 import math
-import time
 
 from Library.UI_ClientConnection import UI_ClientConnection
+
+#==============================================================================
+class ActivatedTab :
+
+  #---------------------------------------------------------------------
+  def __init__( self, panel, notebook ) :
+    self.notebook = notebook
+    self.timer = wx.Timer(self)
+    panel.Bind( wx.EVT_TIMER, self.update, self.timer )
+    notebook.Bind( wx.EVT_NOTEBOOK_PAGE_CHANGED, self.activate )
+
+  def update( self, event ) :
+    pass
+
+  #---------------------------------------------------------------------
+  def activate( self, event ) :
+    try:
+      if self.notebook.GetCurrentPage() == self :
+        self.timer.Start( 100 )
+      else :
+        self.timer.Stop()
+    except:
+      pass
+
+    event.Skip()
 
 #==============================================================================
 class Remote :
@@ -53,25 +77,10 @@ class Remote :
     return result
 
 class SystemTime( Remote ) :
-  #---------------------------------------------------------------------
-  def __init__( self, remote, panel, vbox ) :
-
-    Remote.__init__( self, remote )
-
-    grideSizer = wx.GridSizer( 1, 2, 5, 5 )
-    self.time  = wx.StaticText( panel, label='9999.99' )
-    grideSizer.AddMany(
-      [
-        ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ),
-      ]
-    )
-
-    vbox.Add( grideSizer )
 
   #---------------------------------------------------------------------
-  def update( self ) :
-    self.remote( "io.simulationTime.setLocal()" )
-    currentTime = self.remote( "io.simulationTime.get()" )
+  def convertTimeString( self, currentTime ) :
+    #currentTime = self.remote( "io.simulationTime.get()" )
     try:
       currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
     except ValueError:
@@ -82,9 +91,106 @@ class SystemTime( Remote ) :
         currentTime += ".0"
         currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
 
+    return currentTime
+
+  #---------------------------------------------------------------------
+  def readTime( self ) :
+    self.remote( "io.simulationTime.setLocal()" )
+    currentTime = self.remote( "io.simulationTime.get()" )
+    #try:
+    #  currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    #except ValueError:
+    #  if "None" != currentTime :
+    #    # Work around.  On some system (Windows) if the time 0 for microseconds,
+    #    # it does not append the ".0" at the end.  So on a value error, just
+    #    # try again with the .0 appended.
+    #    currentTime += ".0"
+    #    currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    currentTime = self.convertTimeString( currentTime )
+
+    return currentTime
+
+  #---------------------------------------------------------------------
+  def __init__( self, remote, panel, vbox ) :
+
+    Remote.__init__( self, remote )
+
+    #grideSizer = wx.FlexGridSizer( 1, 3, 5, 5 )
+    grideSizer = wx.BoxSizer()
+    self.time  = wx.StaticText( panel, label='2000-01-01 12:00:00.000000' )
+    self.timeDelta  = wx.StaticText( panel, label='00000.000' )
+    grideSizer.AddMany(
+      [
+        ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ), ( self.timeDelta  )
+      ]
+    )
+
+    self.startTime = self.readTime()
+
+    vbox.Add( grideSizer )
+
+  #---------------------------------------------------------------------
+  def deltaString( self, endTime ) :
+    delta = endTime - self.startTime
+    delta = delta.total_seconds()
+
+    deltaString = ""
+    days = int( delta / ( 60 * 60 * 24 ) )
+    delta -= days * ( 60 * 60 * 24 )
+
+    hours = int( delta / ( 60 * 60 ) )
+    delta -= hours * ( 60 * 60 )
+
+    minutes = int( delta / ( 60 ) )
+    delta -= minutes * ( 60 )
+
+    if days > 0 :
+      deltaString += str( days ) + "d "
+
+    if hours > 0 :
+      deltaString += str( hours ) + "h "
+
+    if minutes > 0 :
+      deltaString += str( minutes ) + "m "
+
+    deltaString += "{:2.3f}s".format( delta )
+
+    return deltaString
+
+  #---------------------------------------------------------------------
+  def update( self ) :
+    currentTime = self.readTime()
+
     #delta = currentTime - self.startTime
+    #delta = delta.total_seconds()
+
     #self.time.SetLabel( "{:6.3f}".format( delta.total_seconds() ) )
     self.time.SetLabel( str( currentTime ) )
+
+    #deltaString = ""
+    #days = int( delta / ( 60 * 60 * 24 ) )
+    #delta -= days * ( 60 * 60 * 24 )
+    #
+    #hours = int( delta / ( 60 * 60 ) )
+    #delta -= hours * ( 60 * 60 )
+    #
+    #minutes = int( delta / ( 60 ) )
+    #delta -= minutes * ( 60 )
+    #
+    #if days > 0 :
+    #  deltaString += str( days ) + "d "
+    #
+    #if hours > 0 :
+    #  deltaString += str( hours ) + "h "
+    #
+    #if minutes > 0 :
+    #  deltaString += str( minutes ) + "m "
+    #
+    #deltaString += "{:2.3f}s".format( delta )
+    #
+
+    deltaString = self.deltaString( currentTime )
+    self.timeDelta.SetLabel( deltaString )
 
 
 class MotorStatus( Remote ) :
@@ -180,7 +286,7 @@ class MotorStatus( Remote ) :
 # end class
 
 #==============================================================================
-class JogTab( wx.Panel, Remote ) :
+class JogTab( wx.Panel, Remote, ActivatedTab ) :
   #---------------------------------------------------------------------
   def jogStart( self, x, y ) :
 
@@ -219,6 +325,7 @@ class JogTab( wx.Panel, Remote ) :
   def __init__( self, remote, panel ):
 
     wx.Panel.__init__( self, panel )
+    ActivatedTab.__init__( self, self, panel )
     Remote.__init__( self, remote )
     self.remote = remote
 
@@ -306,10 +413,6 @@ class JogTab( wx.Panel, Remote ) :
 
     self.motorStatus = MotorStatus( remote, self, vbox )
 
-    self.timer = wx.Timer(self)
-    self.Bind( wx.EVT_TIMER, self.update, self.timer )
-    self.timer.Start( 100 )
-
   #---------------------------------------------------------------------
   def update( self, event ) :
     event = event
@@ -319,12 +422,12 @@ class JogTab( wx.Panel, Remote ) :
 # end class
 
 #==============================================================================
-class APA_Tab( wx.Panel, Remote ) :
+class APA_Tab( wx.Panel, Remote, ActivatedTab ) :
 
   #---------------------------------------------------------------------
   def gCodeSelect( self, event ):
     layer = self.layerSelection.GetValue()
-    self.remote( "process.apa.loadRecipe( \"" + layer + "\", \"" + event.GetString() + "\", 0 )" )
+    self.remote( "process.apa.loadRecipe( \"" + layer + "\", \"" + event.GetString() + "\", -1 )" )
 
   #---------------------------------------------------------------------
   def apaSelect( self, event ):
@@ -341,32 +444,57 @@ class APA_Tab( wx.Panel, Remote ) :
     for apa in apaList :
       self.apaSelection.Append( apa )
 
+  #---------------------------------------------------------------------
+  def gotoLine( self ) :
+    value = int( self.gotoText.GetValue() ) - 1
+    self.remote.get( "process.setG_CodeLine( " + str( value ) + ")" )
+
+  #---------------------------------------------------------------------
+  def reverse( self, event ) :
+    isReverse = not event.IsChecked()
+    self.remote.get( "process.setG_CodeDirection( " + str( isReverse ) + " )" )
+
+  #---------------------------------------------------------------------
+  def loopMode( self, event ) :
+    isLoop = event.IsChecked()
+    self.remote.get( "process.setG_CodeLoop( " + str( isLoop ) + " )" )
+
+  #---------------------------------------------------------------------
+  def runToLine( self, event ) :
+    event = event
+    value = int( self.runToText.GetValue() )
+    self.remote.get( "process.setG_CodeRunToLine( " + str( value ) + " )" )
 
   #---------------------------------------------------------------------
   def __init__( self, remote, panel ):
 
     wx.Panel.__init__( self, panel )
     Remote.__init__( self, remote )
+    ActivatedTab.__init__( self, self, panel )
     self.remote = remote
 
-    vbox = wx.FlexGridSizer( wx.VERTICAL )
+    vbox = wx.BoxSizer( wx.VERTICAL )
 
     self.systemTime = SystemTime( remote, self, vbox )
 
-    grideSizer = wx.FlexGridSizer( 1, 2, 5, 5 )
+    grideSizer = wx.BoxSizer( wx.HORIZONTAL )
 
     startButton = wx.Button( self, label='Start' )
     startButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.start()" ) )
+    grideSizer.Add( startButton )
 
     stopButton = wx.Button( self, label='Stop' )
     stopButton.Bind( wx.EVT_BUTTON, lambda e: self.remote( "process.stop()" ) )
+    grideSizer.Add( stopButton )
 
-    grideSizer.AddMany(
-      [
-        ( startButton ),
-        ( stopButton ),
-      ]
-     )
+    self.reverseCheck = wx.CheckBox( self, -1, 'Reverse' )
+    self.reverseCheck.Bind( wx.EVT_CHECKBOX, self.reverse )
+    grideSizer.Add( self.reverseCheck )
+
+    self.loopCheck = wx.CheckBox( self, -1, 'Loop' )
+    self.loopCheck.Bind( wx.EVT_CHECKBOX, self.loopMode )
+    grideSizer.Add( self.loopCheck )
+
     vbox.Add( grideSizer )
 
     #
@@ -419,12 +547,14 @@ class APA_Tab( wx.Panel, Remote ) :
 
     vbox.Add( grideSizer )
 
+
     #
     # Add APA.
     #
     grideSizer = wx.FlexGridSizer( 1, 3, 5, 5 )
 
     self.apaText = wx.TextCtrl( self, -1, "", size=(175, -1) )
+
     apaAddButton = wx.Button( self, label='Add' )
     apaAddButton.Bind( wx.EVT_BUTTON, lambda e: self.newAPA() )
 
@@ -437,12 +567,51 @@ class APA_Tab( wx.Panel, Remote ) :
     vbox.Add( grideSizer )
 
     #
+    # Goto line.
+    #
+    grideSizer = wx.FlexGridSizer( 1, 3, 5, 5 )
+
+    self.gotoText = wx.TextCtrl( self, -1, "" )
+    gotoButton = wx.Button( self, label='Go' )
+    gotoButton.Bind( wx.EVT_BUTTON, lambda e: self.gotoLine() )
+
+    grideSizer.AddMany(
+      [
+        wx.StaticText(self, -1, "Goto line:"), ( self.gotoText ), ( gotoButton )
+      ]
+     )
+
+    vbox.Add( grideSizer )
+
+    #
+    # Run to line.
+    #
+    grideSizer = wx.FlexGridSizer( 1, 3, 5, 5 )
+
+    self.runToText = wx.TextCtrl( self, -1, "-1" )
+    runToButton = wx.Button( self, label='Set' )
+    runToButton.Bind( wx.EVT_BUTTON, self.runToLine )
+
+    grideSizer.AddMany(
+      [
+        wx.StaticText(self, -1, "Run to line:"), ( self.runToText ), ( runToButton )
+      ]
+     )
+
+    vbox.Add( grideSizer )
+
+    #
     # Add G-Code following.
+    # Use a ListBox and force a selection in order to highlight the active line.
     #
     grideSizer = wx.FlexGridSizer( 1, 1, 5, 5 )
-    self.gCodeList = wx.ListBox( self, -1, size=(500, 150) )
-    self.gCodeList.SetSelection( 2 )
-    #self.gCodeList.Bind( wx.EVT_LISTBOX, lambda e: return none )
+    self.gCodeList = wx.ListCtrl( self, -1, size=(500, 125) )
+    self.gCodeList.InsertColumn( 0, "", width=500 )
+    self.gCodeList.Bind( wx.EVT_LIST_ITEM_SELECTED, self.clearSelection )
+
+    emptyString = ' ' * 125
+    for index in range( 0, 5 ) :
+      self.gCodeList.InsertStringItem( index, emptyString )
 
     grideSizer.Add( self.gCodeList )
     vbox.Add( grideSizer )
@@ -456,12 +625,18 @@ class APA_Tab( wx.Panel, Remote ) :
     self.timer.Start( 100 )
 
   #---------------------------------------------------------------------
+  def clearSelection( self, event ) :
+    index = event.GetIndex()
+    self.gCodeList.Select( index, False )
+    self.gCodeList.Focus( -1 )
+
+  #---------------------------------------------------------------------
   def update( self, event ) :
     event = event
     self.systemTime.update()
     self.motorStatus.update()
 
-    currentLine = self.remote.get( "process.gCodeHandler.getCurrentLineNumber()" )
+    currentLine = self.remote.get( "process.gCodeHandler.getLine()" )
     if "None" != currentLine :
       currentLine = int( currentLine ) + 1
 
@@ -471,27 +646,43 @@ class APA_Tab( wx.Panel, Remote ) :
        + self.remote.get( "process.gCodeHandler.getTotalLines()" )
     )
 
-    currentLine = self.remote.get( "process.gCodeHandler.getCurrentLineNumber()" )
-    #if "None" != currentLine :
-    #  currentLine = int( currentLine ) + 1
+    currentLine = self.remote.get( "process.gCodeHandler.getLine()" )
 
     gCode = self.remote.get( "process.getG_CodeList( " + str( currentLine ) + ", 2 )" )
     gCode = ast.literal_eval( gCode )
 
-    self.gCodeList.Set( gCode )
-    self.gCodeList.SetSelection( 2 )
+    index = 0
+    for item in gCode :
+      self.gCodeList.SetStringItem( index, 0, item )
+      index += 1
+
+    self.gCodeList.SetColumnWidth( 0, 500 )
+    self.gCodeList.SetItemBackgroundColour( 2, "CYAN" )
+
+    isForward = self.remote.get( "process.gCodeHandler.getDirection()" )
+    isForward = "True" == isForward
+
+    if isForward :
+      self.gCodeList.SetItemBackgroundColour( 3, "GREEN" )
+      self.gCodeList.SetItemBackgroundColour( 1, "WHITE" )
+    else :
+      self.gCodeList.SetItemBackgroundColour( 1, "GREEN" )
+      self.gCodeList.SetItemBackgroundColour( 3, "WHITE" )
+
+    #self.gCodeList.SetSelection( 2 )
 
     self.stateValue.SetLabel( self.remote.get( "process.controlStateMachine.state.__class__.__name__" ) )
     self.wireValue.SetLabel( self.remote.get( "process.spool.getWire()" ) )
 
 
 #==============================================================================
-class IO_Tab( wx.Panel, Remote ) :
+class IO_Tab( wx.Panel, Remote, ActivatedTab ) :
   #---------------------------------------------------------------------
   def __init__( self, remote, panel ) :
 
     wx.Panel.__init__( self, panel )
     Remote.__init__( self, remote )
+    ActivatedTab.__init__( self, self, panel )
     self.remote = remote
 
     vbox = wx.FlexGridSizer( wx.VERTICAL )
@@ -571,12 +762,14 @@ class IO_Tab( wx.Panel, Remote ) :
 
     self.motorStatus.update()
 
+
 #==============================================================================
-class PLC_Tab( wx.Panel, Remote ) :
+class PLC_Tab( wx.Panel, Remote, ActivatedTab ) :
   #---------------------------------------------------------------------
   def __init__( self, remote, panel ) :
 
     wx.Panel.__init__( self, panel )
+    ActivatedTab.__init__( self, self, panel )
     Remote.__init__( self, remote )
     self.remote = remote
 
@@ -608,10 +801,6 @@ class PLC_Tab( wx.Panel, Remote ) :
 
     self.SetSizer( vbox )
 
-    self.timer = wx.Timer(self)
-    self.Bind( wx.EVT_TIMER, self.update, self.timer )
-    self.timer.Start( 100 )
-
   #---------------------------------------------------------------------
   def update( self, event ) :
     event = event
@@ -623,13 +812,59 @@ class PLC_Tab( wx.Panel, Remote ) :
       self._tagLabels[ tagName ].SetLabel( tagValue )
 
 #==============================================================================
+class LogTab( wx.Panel, Remote, ActivatedTab ) :
+  #---------------------------------------------------------------------
+  def __init__( self, remote, panel ) :
+
+    wx.Panel.__init__( self, panel )
+    ActivatedTab.__init__( self, self, panel )
+    Remote.__init__( self, remote )
+    self.remote = remote
+
+    vbox = wx.FlexGridSizer( wx.VERTICAL )
+
+    #
+    # Time.
+    #
+    self.systemTime = SystemTime( remote, self, vbox )
+
+    grideSizer = wx.FlexGridSizer( 1, 1, 5, 5 )
+    self.log = wx.TextCtrl( self, -1, size = (500, 530), style = wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL )
+
+    grideSizer.Add( self.log )
+
+    vbox.Add( grideSizer )
+
+    self.SetSizer( vbox )
+
+  #---------------------------------------------------------------------
+  def update( self, event ) :
+    event = event
+    self.systemTime.update()
+
+    log = self.remote.get( "log.getRecent()" )
+    log = ast.literal_eval( log )
+    result = ""
+    for line in log :
+      sections = line.split( "\t" )
+
+      eventTime = self.systemTime.convertTimeString( sections[ 0 ] )
+      eventTime = self.systemTime.deltaString( eventTime )
+
+      result += eventTime + " " + sections[ 3 ] + "\n"
+
+    log = result
+
+    self.log.SetValue( log )
+
+#==============================================================================
 class DebugGUI( wx.Frame, Remote ):
 
   #---------------------------------------------------------------------
   def __init__( self, parent, address, port, maxReceiveSize ) :
     wx.Frame.__init__( self, None )
 
-    time.sleep( 0.2 )
+    #time.sleep( 0.2 )
 
     self.remote = UI_ClientConnection( address, port, maxReceiveSize )
 
@@ -644,66 +879,25 @@ class DebugGUI( wx.Frame, Remote ):
     tab2 = APA_Tab( self.remote, notebook )
     tab3 = IO_Tab( self.remote, notebook )
     tab4 = PLC_Tab( self.remote, notebook )
+    tab5 = LogTab( self.remote, notebook )
 
     notebook.AddPage( tab1, "Jog" )
     notebook.AddPage( tab2, "APA" )
     notebook.AddPage( tab3, "I/O" )
     notebook.AddPage( tab4, "PLC" )
+    notebook.AddPage( tab5, "Log" )
+
     sizer = wx.BoxSizer()
     sizer.Add( notebook, 1, wx.EXPAND )
     panel.SetSizer( sizer )
 
-    #vbox = wx.FlexGridSizer( wx.VERTICAL )
-    #
-    #  #
-    #  # Time and basic inputs.
-    #  #
-    #  outer = wx.FlexGridSizer( 1, 2, 0, 0 )
-    #
-    #  grideSizer = wx.GridSizer( 3, 2, 5, 5 )
-    #  self.time  = wx.StaticText( panel, label='9999.99' )
-    #  self.estop = wx.StaticText( panel, label='' )
-    #  self.park  = wx.StaticText( panel, label='' )
-    #  grideSizer.AddMany(
-    #    [
-    #      ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ),
-    #      ( wx.StaticText( panel, label='Stop' ) ),  ( self.estop ),
-    #      ( wx.StaticText( panel, label='Park'  ) ), ( self.park  )
-    #    ]
-    #  )
-    #
-    #  outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
-    #  vbox.Add( outer )
-    #
-    #  self.motorStatus = MotorStatus( self.remote, panel, vbox )
-    #
-    #
-    #
-    #
-    #  panel.SetSizer( vbox )
-    #
-    #self.startTime = datetime.datetime.utcnow()
-    #
-    #self.timer = wx.Timer(self)
-    #self.Bind( wx.EVT_TIMER, self.update, self.timer )
-    #self.timer.Start( 100 )
-    #
-    #
+    self.timer = wx.Timer(self)
+    self.Bind( wx.EVT_TIMER, self.update, self.timer )
+    self.timer.Start( 100 )
 
     self.SetSize( (520, 600) )
     self.SetTitle( 'DUNE Winder Simulator' )
     self.Show( True )
-
-    #
-    #
-    #  #self.Bind( wx.EVT_CLOSE, self.onClose )
-
-  #---------------------------------------------------------------------
-  #def onClose( self, event ) :
-  #  # On close, signal all threads to shutdown.
-  #  PrimaryThread.stopAllThreads()
-  #  self.Destroy()
-
 
   #---------------------------------------------------------------------
   def update( self, event ) :
@@ -714,33 +908,12 @@ class DebugGUI( wx.Frame, Remote ):
     if not isRunning :
       self.Close()
 
-    # self.motorStatus.update()
-    #
-    #
-    # self.remote( "io.simulationTime.setLocal()" )
-    # currentTime = self.remote( "io.simulationTime.get()" )
-    # try:
-    #   currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
-    # except ValueError:
-    #   # Work around.  On some system (Windows) if the time 0 for microseconds,
-    #   # it does not append the ".0" at the end.  So on a value error, just
-    #   # try again with the .0 appended.
-    #   currentTime += ".0"
-    #   currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
-    #
-    # delta = currentTime - self.startTime
-    # self.time.SetLabel( "{:6.3f}".format( delta.total_seconds() ) )
-    #
-    # estop = ( "True" == self.remote( "io.estop.get()" ) )
-    #
-    # self.estop.SetLabel( self.remote( "io.estop" ) )
-    # self.park.SetLabel(  self.remote( "io.park" ) )
-
 # end class
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def test() :
   wxApplication = wx.App()
-  guiFrame = DebugGUI( None, "192.168.56.102", 6626, 1024 )
+  DebugGUI( None, "192.168.56.102", 6626, 1024 )
   #DebugGUI( None, "172.16.21.47", 6626 )
   wxApplication.MainLoop()

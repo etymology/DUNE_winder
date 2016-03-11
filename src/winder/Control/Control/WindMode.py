@@ -25,8 +25,6 @@ class WindMode( StateMachineState ) :
     StateMachineState.__init__( self, stateMachine, state )
     self.io = io
     self.log = log
-    self._PAUSE = 0         # $$$DEBUG
-    self._pauseCount = 0   # $$$DEBUG
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -38,7 +36,8 @@ class WindMode( StateMachineState ) :
     """
     isError = False
 
-    if None == self.stateMachine.gCodeHandler or None == self.stateMachine.gCodeHandler.gCode :
+    if None == self.stateMachine.gCodeHandler \
+     or not self.stateMachine.gCodeHandler.isG_CodeLoaded() :
       isError = True
       self.log.add(
         self.__class__.__name__,
@@ -68,8 +67,8 @@ class WindMode( StateMachineState ) :
         self.__class__.__name__,
         "WIND",
         "G-Code execution begins at line "
-          + str( self.stateMachine.gCodeHandler.gCode.getLine() ),
-        [ self.stateMachine.gCodeHandler.gCode.getLine() ]
+          + str( self.stateMachine.gCodeHandler.getLine() ),
+        [ self.stateMachine.gCodeHandler.getLine() ]
       )
 
     return isError
@@ -83,6 +82,7 @@ class WindMode( StateMachineState ) :
       True if there was an error, false if not.
     """
 
+    self.stateMachine.gCodeHandler.stop()
     return False
 
   #---------------------------------------------------------------------
@@ -113,7 +113,7 @@ class WindMode( StateMachineState ) :
 
         if self.stateMachine.loopMode :
           # Rewind.
-          self.stateMachine.gCodeHandler.setLine( 0 )
+          self.stateMachine.gCodeHandler.setLine( -1 )
         else :
           # Return to stopped state.
           self.changeState( self.stateMachine.States.STOP )

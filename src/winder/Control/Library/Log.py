@@ -12,7 +12,7 @@ import collections
 class Log:
 
   #---------------------------------------------------------------------
-  def getTimestamp( self ):
+  def _getTimestamp( self ):
     """
     Get a timestamp.
 
@@ -34,7 +34,7 @@ class Log:
 
     self._systemTime = systemTime
     self._lock = threading.Lock()
-    self._recent = collections.deque( maxlen = 20 )
+    self._recent = collections.deque( maxlen = 30 )
     self._outputFiles = []
     self._outputFileList = {}
     if outputFileName :
@@ -91,7 +91,10 @@ class Log:
     Returns:
       The most recent lines of the log file.
     """
-    return self._recent
+    self._lock.acquire()
+    result = list( self._recent )
+    self._lock.release()
+    return result
 
   #---------------------------------------------------------------------
   def add( self, module, typeName, message, parameters = [] ) :
@@ -105,7 +108,7 @@ class Log:
       parameters: A list of all data associated with entry.
     """
 
-    currentTime = self.getTimestamp()
+    currentTime = self._getTimestamp()
     line =                   \
       str( currentTime )     \
       + "\t"                 \

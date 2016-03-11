@@ -36,7 +36,20 @@ class UI_ClientConnection:
     """
 
     self._connection.send( command )
-    return self._connection.recv( self._maxReceiveSize )
+
+    # Read results.
+    # The maximum amount of data that can be read at once is
+    # self._maxReceiveSize.  If we receive that amount, assume there is more.
+    # Keep reading until the size of the received data is not
+    # self._maxReceiveSize.
+    result = ""
+    chunkSize = self._maxReceiveSize
+    while self._maxReceiveSize == chunkSize :
+      subString = self._connection.recv( self._maxReceiveSize )
+      chunkSize = len( subString )
+      result += subString
+
+    return result
 
   #---------------------------------------------------------------------
   def __call__( self, command ) :
