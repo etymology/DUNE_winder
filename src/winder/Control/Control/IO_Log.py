@@ -17,7 +17,8 @@ class IO_Log :
     """
     Constructor.
 
-    $$$DEBUG
+    Args:
+      outputFileName: Name of log file to create/append.
     """
 
     # Create the path if it does not exist.
@@ -29,7 +30,7 @@ class IO_Log :
     self._outputFile = open( outputFileName, 'a' )
 
     if needsHeader :
-      names = "Time\tDelta\t"
+      names = "Time\tLoop time\t"
       for ioPoint in IO_Point.list :
         names += ioPoint.getName() + "\t"
 
@@ -39,11 +40,15 @@ class IO_Log :
       self._outputFile.write( names + "\n" )
 
   #---------------------------------------------------------------------
-  def log( self, timeStamp, delta ) :
+  def log( self, timeStamp, loopTime ) :
     """
-    $$$DEBUG
+    Add to log the current state of all I/O.
+
+    Args:
+      timeStamp: The current time (any string).
+      loopTime: The time it took for the main-loop to run (in milliseconds).
     """
-    result = str( timeStamp ) + "\t" + str( delta ) + "\t"
+    result = str( timeStamp ) + "\t" + str( loopTime ) + "\t"
     for ioPoint in IO_Point.list :
       result += str( ioPoint.get() ) + "\t"
 

@@ -24,16 +24,6 @@ class MultiAxisMotor :
     self._motors = motors
 
   #---------------------------------------------------------------------
-  def stop( self ) :
-    """
-    Stop all motors.
-
-    """
-
-    for motor in self._motors :
-      motor.stop()
-
-  #---------------------------------------------------------------------
   def setEnable( self, isEnabled ) :
     """
     Enable/disable motors.

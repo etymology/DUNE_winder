@@ -1,6 +1,6 @@
 ###############################################################################
 # Name: Serializable.py
-# Uses: $$$DEBUG
+# Uses: Interface class to define an object that can be de/serialized into XML.
 # Date: 2016-03-01
 # Author(s):
 #   Andrew Que <aque@bb7.com>

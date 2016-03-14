@@ -37,31 +37,6 @@ class SoftwareMotor( Motor ) :
     self._maxVelocity     = 400
     self._startTime       = simulationTime.get()
     self._motion          = Motion()
-    #self._seekSemaphore   = None
-
-  #---------------------------------------------------------------------
-  def stop( self ) :
-    """
-    Stop the motor.
-
-    """
-
-    self._inMotion = False
-    self.poll()
-
-  # #---------------------------------------------------------------------
-  # def setEnable( self, isEnabled ) :
-  #   """
-  #   Enable/disable motor.
-  #
-  #   Args:
-  #     isEnabled: True if enabled, False if not.
-  #
-  #   """
-  #
-  #   self._inMotion = False
-  #   self._isEnabled = isEnabled
-  #   self.motionUpdate()
 
   #---------------------------------------------------------------------
   def isFunctional( self ) :
@@ -185,7 +160,7 @@ class SoftwareMotor( Motor ) :
       velocity: Desired velocity.  Negative velocity is reverse direction.
     """
 
-    # $$$DEBUG - Doesn't do much.
+    # $$$FUTURE - This doesn't work.
     self._velocity = velocity
 
   #---------------------------------------------------------------------

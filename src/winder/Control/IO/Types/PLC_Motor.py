@@ -8,7 +8,6 @@
 # $$$DEBUG - To-do:
 #  - Accelerations.
 #  - Torque.
-#  - Stop.
 #
 ###############################################################################
 
@@ -54,15 +53,6 @@ class PLC_Motor( Motor ) :
     # Motor status tag defaults to a faulted state in case read fails.
     attributes.defaultValue = True
     self._faulted = PLC.Tag( plc, tagBase + "_DATA.ModuleFault", attributes )
-
-  #---------------------------------------------------------------------
-  def stop( self ) :
-    """
-    Stop the motor.
-    """
-
-    # $$$DEBUG
-    pass
 
   #---------------------------------------------------------------------
   def isFunctional( self ) :
@@ -141,7 +131,7 @@ class PLC_Motor( Motor ) :
     """
 
     # $$$DEBUG
-    #return self._maxVelocity.get()
+
     return None
 
   #---------------------------------------------------------------------

@@ -37,29 +37,6 @@ class Motor( IO_Point ) :
 
   #---------------------------------------------------------------------
   @abstractmethod
-  def stop( self ) :
-    """
-    Stop the motor.
-
-    """
-
-    pass
-
-  # #---------------------------------------------------------------------
-  # @abstractmethod
-  # def setEnable( self, isEnabled ) :
-  #   """
-  #   Enable/disable motor.
-  #
-  #   Args:
-  #     isEnabled: True if enabled, False if not.
-  #
-  #   """
-  #
-  #   pass
-
-  #---------------------------------------------------------------------
-  @abstractmethod
   def setDesiredPosition( self, position ) :
     """
     Go to a location.

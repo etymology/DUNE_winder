@@ -12,9 +12,6 @@ from IO.Types.PLC_Input import PLC_Input
 from IO.Types.PLC_Output import PLC_Output
 from IO.Types.PLC_Motor import PLC_Motor
 
-#from IO.Types.SoftwareInput import SoftwareInput
-from IO.Types.SoftwareMotor import SoftwareMotor
-
 from IO.Systems.MultiAxisMotor import MultiAxisMotor
 from IO.Systems.PLC_Logic import PLC_Logic
 
@@ -95,14 +92,8 @@ class Test_IO:
 
     #
     # $$$DEBUG - All I/O below this line is temporary.
-    # $$$DEBUG - NOTE: There should be no reason to have tags in the I/O
-    #   map.  Tags should only be in used with-in the I/O package.
     #
 
     self.debugLight = PLC_Output( "BLINKY", self.plc, "BLINKY" )
-    PLC_Output( "Out1", self.plc, "BLINKY" )
-    PLC_Output( "Out2", self.plc, "BLINKY" )
-    PLC_Output( "Out3", self.plc, "BLINKY" )
-    PLC_Output( "Out4", self.plc, "BLINKY" )
 
 # end class
