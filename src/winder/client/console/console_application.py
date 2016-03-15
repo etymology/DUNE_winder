@@ -1,17 +1,14 @@
 from kivy.app import App
-from kivy.graphics import Color
+from kivy.lang import Builder
+from kivy.uix.floatlayout import FloatLayout
+from .ui.kivy_mixins import BackgroundColorMixin
 
-from .application_shared import AppShare
-from .ui.manual_movement import ManualMovementControl
+Builder.load_file( r"console_application.kv" )
 
+class RootWidget( BackgroundColorMixin, FloatLayout ):
+   pass
 
-class TestApp( App ):
-   def __init__( self, *args, **kwargs ):
-      super( TestApp, self ).__init__( *args, **kwargs )
-
+class ConsoleClientApplication( App ):
    def build( self ):
-      result = ManualMovementControl()
-      background_color = Color( AppShare.instance().settings.theme.control_color )
-      result.bg_color = background_color
-
+      result = RootWidget()
       return result

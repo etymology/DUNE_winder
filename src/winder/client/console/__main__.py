@@ -1,4 +1,4 @@
-from winder.client.console.console_application import TestApp
+from winder.client.console.console_application import ConsoleClientApplication
 
 if __name__ == "__main__":
-   TestApp().run()
+   ConsoleClientApplication().run()
