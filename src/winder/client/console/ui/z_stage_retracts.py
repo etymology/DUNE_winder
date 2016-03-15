@@ -1,10 +1,10 @@
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
+from .kivy_mixins import BackgroundColorMixin
 from .kivy_sparce_grid_layout import SparseGridLayout, GridLabel, GridCheckbox, GridEntry
 
-
-class ZStageRetracts( SparseGridLayout ):
+class ZStageRetracts( SparseGridLayout, BackgroundColorMixin ):
    def __init__( self, **kwargs ):
       super( ZStageRetracts, self ).__init__( **DictOps.dict_combine( kwargs, rows = 3, columns = 3 ) )
 
@@ -14,16 +14,18 @@ class ZStageRetracts( SparseGridLayout ):
       self.sw2_closed = False
 
    def _construct( self, **kwargs ):
+      self.bg_color = AppShare.instance().settings.theme.control_color_value
+
       self._sw1_open_indicator = GridCheckbox( **DictOps.dict_combine( kwargs, row = 1, column = 1 ) )
       self._sw1_closed_indicator = GridCheckbox( **DictOps.dict_combine( kwargs, row = 1, column = 2 ) )
       self._sw2_open_indicator = GridCheckbox( **DictOps.dict_combine( kwargs, row = 0, column = 1 ) )
       self._sw2_closed_indicator = GridCheckbox( **DictOps.dict_combine( kwargs, row = 0, column = 2 ) )
 
-      open_indicator_title = GridLabel( **DictOps.dict_combine( kwargs, row = 2, column = 1, text = "Open", color = AppShare.instance().settings.theme.text_color ) )
-      closed_indicator_title = GridLabel( **DictOps.dict_combine( kwargs, row = 2, column = 2, text = "Closed", color = AppShare.instance().settings.theme.text_color ) )
+      open_indicator_title = GridLabel( **DictOps.dict_combine( kwargs, row = 2, column = 1, text = "Open", color = AppShare.instance().settings.theme.text_color_value ) )
+      closed_indicator_title = GridLabel( **DictOps.dict_combine( kwargs, row = 2, column = 2, text = "Closed", color = AppShare.instance().settings.theme.text_color_value ) )
 
-      switch_1_title = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 0, text = "SW1", color = AppShare.instance().settings.theme.text_color ) )
-      switch_2_title = GridLabel( **DictOps.dict_combine( kwargs, row = 0, column = 0, text = "SW2", color = AppShare.instance().settings.theme.text_color ) )
+      switch_1_title = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 0, text = "SW1", color = AppShare.instance().settings.theme.text_color_value ) )
+      switch_2_title = GridLabel( **DictOps.dict_combine( kwargs, row = 0, column = 0, text = "SW2", color = AppShare.instance().settings.theme.text_color_value ) )
 
       self.add_widget( open_indicator_title )
       self.add_widget( closed_indicator_title )

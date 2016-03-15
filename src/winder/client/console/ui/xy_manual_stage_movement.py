@@ -1,5 +1,7 @@
 from kivy.clock import Clock
+
 from winder.utility.collections import DictOps
+
 from ..application_shared import AppShare
 from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridImageButton, GridLabel
 
@@ -63,9 +65,7 @@ class ManualXyStageMovement( SparseGridLayout ):
       negative_y_direction_control = _NegativeYDirectionControl( **DictOps.dict_combine( kwargs, row = 0, column = 1, source = AppShare.instance().settings.theme.neg_y_arrow ) )
       positive_y_direction_control = _PositiveYDirectionControl( **DictOps.dict_combine( kwargs, row = 2, column = 1, source = AppShare.instance().settings.theme.pos_y_arrow ) )
 
-      position_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 1 , text = "--", color = AppShare.instance().settings.theme.text_color ) )
-
-      self.position_label = position_label
+      self.position_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 1 , text = "--", color = AppShare.instance().settings.theme.text_color_value ) )
 
       self.add_widget( negative_x_direction_control )
       self.add_widget( positive_x_direction_control )

@@ -8,8 +8,9 @@ from kivy.uix.label import Label
 
 from .kivy_image_button import ImageButton
 from .kivy_labelled_checkbox import LabelledCheckbox
+from .kivy_mixins import BackgroundColorMixin
 
-class SparseGridLayout( FloatLayout ):
+class SparseGridLayout( BackgroundColorMixin, FloatLayout ):
    rows = NumericProperty( 1 )
    columns = NumericProperty( 1 )
    shape = ReferenceListProperty( rows, columns )
@@ -17,7 +18,7 @@ class SparseGridLayout( FloatLayout ):
    def __init__( self, **kwargs ):
       super( SparseGridLayout, self ).__init__( **kwargs )
 
-   def do_layout( self, *args ):
+   def do_layout( self, *args, **kwargs ):
       shape_hint = ( 1. / self.columns, 1. / self.rows )
       for child in self.children:
          child_size_hint = ( shape_hint[ 0 ] * child.column_span, shape_hint[ 1 ] * child.row_span )
@@ -30,9 +31,9 @@ class SparseGridLayout( FloatLayout ):
 
          child.pos_hint = { 'x': shape_hint[ 0 ] * child.column, 'y': shape_hint[ 1 ] * child.row }
 
-      super( SparseGridLayout, self ).do_layout( *args )
+      super( SparseGridLayout, self ).do_layout( *args, **kwargs )
 
-class GridEntry( EventDispatcher ):
+class GridEntry( BackgroundColorMixin, EventDispatcher ):
    class FieldNames:
       Row = "row"
       Column = "column"
@@ -46,20 +47,20 @@ class GridEntry( EventDispatcher ):
    row_span = NumericProperty( 1 )
    column_span = NumericProperty( 1 )
 
-class GridLabel( Label, GridEntry ):
+class GridLabel( GridEntry, Label ):
    pass
 
-class GridButton( Button, GridEntry ):
+class GridButton( GridEntry, Button ):
    pass
 
-class GridImage( Image, GridEntry ):
+class GridImage( GridEntry, Image ):
    pass
 
-class GridImageButton( ImageButton, GridEntry ):
+class GridImageButton( GridEntry, ImageButton ):
    pass
 
-class GridCheckbox( CheckBox, GridEntry ):
+class GridCheckbox( GridEntry, CheckBox ):
    pass
 
-class GridLabelledCheckbox( LabelledCheckbox, GridEntry ):
+class GridLabelledCheckbox( GridEntry, LabelledCheckbox ):
    pass
