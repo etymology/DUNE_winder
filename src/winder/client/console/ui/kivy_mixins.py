@@ -1,21 +1,46 @@
 from kivy.graphics import Color, Rectangle
-from kivy.properties import ObjectProperty
+from kivy.properties import ListProperty
 
 class BackgroundColorMixin( object ):
    def __init__( self, *args, **kwargs ):
       self.bind( bg_color = self._set_bg_color )
       super( BackgroundColorMixin, self ).__init__( *args, **kwargs )
 
-   def _set_bg_color( self, instance, value ):
+      self._initialized = False
+
+   def _initialize( self, initial_color ):
+      self._color = initial_color
       self._background_rectangle = Rectangle( size = self.size, pos = self.pos )
 
-      self.canvas.before.add( value )
+      self.canvas.before.add( self._color )
       self.canvas.before.add( self._background_rectangle )
-
       self.bind( size = self._update_bg_color, pos = self._update_bg_color )
+
+      self._initialized = True
+
+   def _set_bg_color( self, instance, value ):
+      color_components = len( value )
+
+      if color_components == 3:
+         color = Color( value[ 0 ], value[ 1 ], value[ 2 ] )
+      elif color_components == 4:
+         color = Color( value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] )
+      else:
+         raise Exception( "Invalid color: {}".format( str( value ) ) )
+
+      if not self._initialized:
+         self._initialize( color )
+      else:
+         self.canvas.before.clear()
+
+         self._color = color
+         self._background_rectangle = Rectangle( size = self.size, pos = self.pos )
+
+         self.canvas.before.add( self._color )
+         self.canvas.before.add( self._background_rectangle )
 
    def _update_bg_color( self, instance, value ):
       self._background_rectangle.pos = instance.pos
       self._background_rectangle.size = instance.size
 
-   bg_color = ObjectProperty( Color( 0, 0, 0, 1. ) )
+   bg_color = ListProperty( [ 0, 0, 0, 0 ] )
