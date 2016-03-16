@@ -3,16 +3,10 @@ from kivy.clock import Clock
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
+from ..command import Command
 from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridImageButton, GridLabel
 
-class _Command( object ):
-   def send_command( self, command ):
-      return AppShare.instance().client_connection.send_message( command )
-
-   def send_commands( self, commands ):
-      return AppShare.instance().client_connection.send_messages( commands )
-
-class _XyCommands( _Command ):
+class _XyCommands( Command ):
    def move_start( self, x, y ):
       command = "process.jogXY( %s, %s )" % ( x, y )
       return self.send_command( command )
@@ -20,7 +14,7 @@ class _XyCommands( _Command ):
    def move_stop( self ):
       return self.move_start( 0, 0 )
 
-class _XyCurrentPositionCommand( _Command ):
+class _XyCurrentPositionCommand( Command ):
    def get_current_position( self ):
       commands = [ "io.simulationTime.setLocal()", "io.xAxis.getPosition()", "io.yAxis.getPosition()" ]
       return self.send_commands( commands )[ 1 : ]
@@ -67,11 +61,8 @@ class ManualXyStageMovement( SparseGridLayout ):
 
       self.position_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 1 , text = "--", color = AppShare.instance().settings.theme.text_color_value ) )
 
-      self.add_widget( negative_x_direction_control )
-      self.add_widget( positive_x_direction_control )
-      self.add_widget( negative_y_direction_control )
-      self.add_widget( positive_y_direction_control )
-      self.add_widget( self.position_label )
+      for widget in [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label ]:
+         self.add_widget( widget )
 
    def _schedule_polling( self ):
       self.current_position_command = _XyCurrentPositionCommand()
