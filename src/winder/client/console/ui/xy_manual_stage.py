@@ -13,7 +13,7 @@ class XyStage( SparseGridLayout ):
       self._construct( **DictOps.dict_filter( kwargs, GridEntry.FieldNames.all ) )
 
    def _construct( self, **kwargs ):
-       self.bg_color = AppShare.instance().settings.theme.control_color_value
+      self.bg_color = AppShare.instance().settings.theme.control_color_value
 
       self.xy_movement_control = _GridManualXyStageMovement( **DictOps.dict_combine( kwargs, row = 1, column = 0, column_span = 2 ) )
 
