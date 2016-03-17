@@ -2,9 +2,9 @@ from kivy.graphics import Color, Rectangle
 from kivy.properties import ListProperty
 
 class BackgroundColorMixin( object ):
-   def __init__( self, *args, **kwargs ):
+   def __init__( self, **kwargs ):
       self.bind( bg_color = self._set_bg_color )
-      super( BackgroundColorMixin, self ).__init__( *args, **kwargs )
+      super( BackgroundColorMixin, self ).__init__( **kwargs )
 
       self._initialized = False
 
