@@ -2,6 +2,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from ..command import Command
+from .kivy_utilities import KivyUtilities
 
 class SoftwareStopCommand( Command ):
    def stop( self ):
@@ -27,5 +28,4 @@ class OperationBar( BoxLayout ):
 
       self.software_stop = _SoftwareStopButton( text = "Software stop" )
 
-      self.add_widget( placeholder )
-      self.add_widget( self.software_stop )
+      KivyUtilities.add_children_to_widget( self, [ self.software_stop, placeholder ] )
