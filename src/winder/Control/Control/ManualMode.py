@@ -50,7 +50,7 @@ class ManualMode( StateMachineState ) :
       if None == x :
         x = self._io.xAxis.getPosition()
 
-      y = self.stateMachine.seekX
+      y = self.stateMachine.seekY
       if None == y :
         y = self._io.yAxis.getPosition()
 
