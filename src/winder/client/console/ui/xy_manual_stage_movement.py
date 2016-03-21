@@ -142,7 +142,12 @@ class _XyPositionSeekButton( Button, _XyCommands ):
 
    def on_press( self ):
       if self.input_control.is_valid:
-         self.move_to( self.input_control.seek_x_position, self.input_control.seek_y_position )
+         if self.movement_rate_callback is not None:
+            rate = self.movement_rate_callback()
+         else:
+            rate = None
+
+         self.move_to( self.input_control.seek_x_position, self.input_control.seek_y_position, rate )
 
 class ManualXyStageMovement( SparseGridLayout ):
    def __init__( self, movement_rate_callback, **kwargs ):
@@ -165,7 +170,7 @@ class ManualXyStageMovement( SparseGridLayout ):
 
       seek_position_layout = GridBoxLayout( **DictOps.dict_combine( kwargs, orientation = "vertical", row = 0, column = 3, column_span = 3 ) )
       self.seek_xy_position_input = _XyPositionSeekInput( **kwargs )
-      self.seek_xy_position_button = _XyPositionSeekButton( input = self.seek_xy_position_input, text = "Go to...", color = AppShare.instance().settings.theme.text_color_value, **kwargs )
+      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, input = self.seek_xy_position_input, text = "Go to...", color = AppShare.instance().settings.theme.text_color_value ) )
 #       self.seek_xy_position_button.bind( disabled = self.seek_xy_position_input.is_invalid )
 
       KivyUtilities.add_children_to_widget( seek_position_layout, [ self.seek_xy_position_input, self.seek_xy_position_button ] )
