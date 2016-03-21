@@ -1,5 +1,6 @@
 from kivy.event import EventDispatcher
 from kivy.properties import NumericProperty, ReferenceListProperty
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.floatlayout import FloatLayout
@@ -63,4 +64,7 @@ class GridCheckbox( GridEntry, CheckBox ):
    pass
 
 class GridLabelledCheckbox( GridEntry, LabelledCheckbox ):
+   pass
+
+class GridBoxLayout( GridEntry, BoxLayout ):
    pass
