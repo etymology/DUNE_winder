@@ -19,12 +19,17 @@ class _NegativeZDirectionControl( GridImageButton ):
       print( "-Z released." )
 
 class ManualZStageMovement( SparseGridLayout, BackgroundColorMixin ):
-   def __init__( self, **kwargs ):
+   def __init__( self, movement_rate_callback, **kwargs ):
       super( ManualZStageMovement, self ).__init__( **DictOps.dict_combine( kwargs, rows = 2, columns = 5 ) )
+
+      self._movement_rate_callback = movement_rate_callback
+
       self._construct( **DictOps.dict_filter( kwargs, GridEntry.FieldNames.all ) )
 
    def _construct( self, **kwargs ):
       self.bg_color = AppShare.instance().settings.theme.control_color_value
+
+#       common_kwargs = { _XyCommands.Keys.MovementRateCallback : self._movement_rate_callback }
 
       to_back_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 0, text = "To Back", color = AppShare.instance().settings.theme.text_color_value ) )
       to_front_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 4, text = "To Front", color = AppShare.instance().settings.theme.text_color_value ) )
