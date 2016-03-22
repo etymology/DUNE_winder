@@ -3,10 +3,19 @@ from kivy.properties import ListProperty
 
 class BackgroundColorMixin( object ):
    def __init__( self, **kwargs ):
+      if "bg_color" in kwargs:
+         initial_color_value = kwargs[ "bg_color" ]
+         del kwargs[ "bg_color" ]
+      else:
+         initial_color_value = None
+
       self.bind( bg_color = self._set_bg_color )
       super( BackgroundColorMixin, self ).__init__( **kwargs )
 
       self._initialized = False
+
+      if initial_color_value is not None:
+         self.bg_color = initial_color_value
 
    def _initialize( self, initial_color ):
       self._color = initial_color

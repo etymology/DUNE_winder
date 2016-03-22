@@ -9,6 +9,7 @@ from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
 from ..command import Command
+from .kivy_mixins import BackgroundColorMixin
 from .kivy_sparce_grid_layout import GridBoxLayout
 from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridImageButton, GridLabel
 from .kivy_utilities import KivyUtilities
@@ -127,7 +128,7 @@ class _XyPositionSeekInput( TextInput ):
 
       return result
 
-class _XyPositionSeekButton( Button, _XyCommands ):
+class _XyPositionSeekButton( BackgroundColorMixin, Button, _XyCommands ):
    class Keys:
       InputControl = "input"
 
@@ -166,15 +167,18 @@ class ManualXyStageMovement( SparseGridLayout ):
       negative_y_direction_control = _NegativeYDirectionControl( **DictOps.dict_combine( kwargs, common_kwargs, row = 0, column = 1, source = AppShare.instance().settings.theme.neg_y_arrow ) )
       positive_y_direction_control = _PositiveYDirectionControl( **DictOps.dict_combine( kwargs, common_kwargs, row = 2, column = 1, source = AppShare.instance().settings.theme.pos_y_arrow ) )
 
+      negative_x_direction_label = GridLabel( **DictOps.dict_combine( kwargs, row = 0, column = 0, text = "Toward Tail End", color = AppShare.instance().settings.theme.text_color_value ) )
+      positive_x_direction_label = GridLabel( **DictOps.dict_combine( kwargs, row = 0, column = 2, text = "Toward Head End", color = AppShare.instance().settings.theme.text_color_value ) )
+
       self.position_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 1 , text = "--", color = AppShare.instance().settings.theme.text_color_value ) )
 
       seek_position_layout = GridBoxLayout( **DictOps.dict_combine( kwargs, orientation = "vertical", row = 0, column = 3, column_span = 3 ) )
       self.seek_xy_position_input = _XyPositionSeekInput( **kwargs )
-      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, input = self.seek_xy_position_input, text = "Go to...", color = AppShare.instance().settings.theme.text_color_value ) )
+      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, input = self.seek_xy_position_input, text = "Go to...", color = AppShare.instance().settings.theme.text_color_value, halign = "left", valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value ) )
 #       self.seek_xy_position_button.bind( disabled = self.seek_xy_position_input.is_invalid )
 
       KivyUtilities.add_children_to_widget( seek_position_layout, [ self.seek_xy_position_input, self.seek_xy_position_button ] )
-      KivyUtilities.add_children_to_widget( self, [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label, seek_position_layout ] )
+      KivyUtilities.add_children_to_widget( self, [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label, seek_position_layout, negative_x_direction_label, positive_x_direction_label ] )
 
    def _schedule_polling( self ):
       self.current_position_command = _XyCurrentPositionCommand()
@@ -189,7 +193,7 @@ class ManualXyStageMovement( SparseGridLayout ):
 
    def _update_xy_position( self, x_pos, y_pos ):
       if x_pos is not None and y_pos is not None:
-         text = "{:.2f}, {:.2f}".format( float( x_pos ), float( y_pos ) )
+         text = "{:.2f} mm, {:.2f} mm".format( float( x_pos ), float( y_pos ) )
       else:
          text = "--"
 
