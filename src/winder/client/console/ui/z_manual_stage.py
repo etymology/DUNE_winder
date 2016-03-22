@@ -18,12 +18,10 @@ class _GridManualZStageMovement( GridEntry, ManualZStageMovement ):
 
 class ZStage( SparseGridLayout ):
    def __init__( self, **kwargs ):
-      super( ZStage, self ).__init__( **DictOps.dict_combine( kwargs, rows = 2, columns = 2 ) )
+      super( ZStage, self ).__init__( **DictOps.dict_combine( kwargs, rows = 2, columns = 2, bg_color = AppShare.instance().settings.theme.control_color_value ) )
       self._construct( **DictOps.dict_filter( kwargs, GridEntry.FieldNames.all ) )
 
    def _construct( self, **kwargs ):
-      self.bg_color = AppShare.instance().settings.theme.control_color_value
-
       self.z_stage_movement_control = _GridManualZStageMovement( **DictOps.dict_combine( kwargs, row = 1, column = 0, column_span = 2 ) )
       self.z_stage_display = _GridZStageDisplay( **DictOps.dict_combine( kwargs, row = 0, column = 0 ) )
       self.z_fixed_display = _GridZFixedDisplay( **DictOps.dict_combine( kwargs, row = 0, column = 1 ) )
