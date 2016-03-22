@@ -29,6 +29,8 @@ class ManualMode( StateMachineState ) :
     self._jogY = 0
     self._jogZ = 0
     self._wasJoggingXY = False
+    #self._wasSeekingXY = False
+    self._noteSeekStop = False
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -42,6 +44,7 @@ class ManualMode( StateMachineState ) :
     isError = True
 
     self._wasJoggingXY = False
+    self._noteSeekStop = False
 
     # X/Y axis move?
     if None != self.stateMachine.seekX or None != self.stateMachine.seekY :
@@ -58,6 +61,7 @@ class ManualMode( StateMachineState ) :
       self.stateMachine.seekX = None
       self.stateMachine.seekY = None
       self.stateMachine.seekVelocity = None
+      #self._wasSeekingXY = True
       isError = False
 
     if self.stateMachine.isJogging :
@@ -78,9 +82,32 @@ class ManualMode( StateMachineState ) :
 
     """
 
+    # If stop requested...
+    if self.stateMachine.stopRequest :
+      # We didn't finish this line.  Run it again.
+      self._io.plcLogic.stopSeek()
+      self._log.add(
+        self.__class__.__name__,
+        "SEEK_STOP",
+        "Seek stop requested"
+      )
+      self._noteSeekStop = True
+      self.stateMachine.stopRequest = False
+
     # Is movement done?
     if self._io.plcLogic.isReady() \
       and not self.stateMachine.isJogging :
+
+      # If we were seeking X/Y axis, note where stopped.
+      if self._noteSeekStop :
+        x = self._io.xAxis.getPosition()
+        y = self._io.yAxis.getPosition()
+        self._log.add(
+          self.__class__.__name__,
+          "SEEK_STOP_LOCATION",
+          "X/Y seek stopped at (" + str( x ) + "," + str( y ) + ")",
+          [ x, y ]
+        )
 
       # If we were jogging X/Y axis, note where stopped.
       if self._wasJoggingXY :

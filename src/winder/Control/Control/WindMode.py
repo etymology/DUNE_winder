@@ -23,8 +23,8 @@ class WindMode( StateMachineState ) :
     """
 
     StateMachineState.__init__( self, stateMachine, state )
-    self.io = io
-    self.log = log
+    self._io = io
+    self._log = log
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -39,7 +39,7 @@ class WindMode( StateMachineState ) :
     if None == self.stateMachine.gCodeHandler \
      or not self.stateMachine.gCodeHandler.isG_CodeLoaded() :
       isError = True
-      self.log.add(
+      self._log.add(
         self.__class__.__name__,
         "WIND",
         "Wind cannot start because no there is no G-Code file loaded to execute."
@@ -47,7 +47,7 @@ class WindMode( StateMachineState ) :
 
     if not isError and self.stateMachine.gCodeHandler.isOutOfWire() :
       isError = True
-      self.log.add(
+      self._log.add(
         self.__class__.__name__,
         "WIND",
         "Wind cannot start because there isn't enough wire on spool."
@@ -55,7 +55,7 @@ class WindMode( StateMachineState ) :
 
     if not isError and self.stateMachine.gCodeHandler.isDone() :
       isError = True
-      self.log.add(
+      self._log.add(
         self.__class__.__name__,
         "WIND",
         "Wind cannot start because G-Code is finished."
@@ -63,7 +63,7 @@ class WindMode( StateMachineState ) :
 
     if not isError :
       self.stateMachine.stopRequest = False
-      self.log.add(
+      self._log.add(
         self.__class__.__name__,
         "WIND",
         "G-Code execution begins at line "
@@ -94,7 +94,7 @@ class WindMode( StateMachineState ) :
     # If stop requested...
     if self.stateMachine.stopRequest :
       # We didn't finish this line.  Run it again.
-      self.io.plcLogic.stopSeek()
+      self._io.plcLogic.stopSeek()
       self.changeState( self.stateMachine.States.STOP )
       self.stateMachine.stopRequest = False
     else:
@@ -105,7 +105,7 @@ class WindMode( StateMachineState ) :
       # Is G-Code execution complete?
       if isDone :
         # Log message that wind is complete.
-        self.log.add(
+        self._log.add(
           self.__class__.__name__,
           "WIND",
           "G-Code execution complete"
