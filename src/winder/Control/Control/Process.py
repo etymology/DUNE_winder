@@ -22,7 +22,7 @@ class Process :
     self._io = io
     self._log = log
     self._configuration = configuration
-    self.spool = Spool( 100, 50 )
+    self.spool = Spool( 27000000, 50 )
     self.gCodeHandler = GCodeHandler( io, self.spool )
     self.controlStateMachine = ControlStateMachine( io, log )
 

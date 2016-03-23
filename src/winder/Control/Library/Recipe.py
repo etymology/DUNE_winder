@@ -88,11 +88,12 @@ class Recipe :
       self._parentHash = self._headerHash
       self._headerHash = bodyHash
 
-    # If this file does not exist in the archive, copy it there.
-    archiveFile = archiveDirectory + "/" + bodyHash
-    if not os.path.isfile( archiveFile ) :
-      # Make an archive copy of the file.
-      shutil.copy2( fileName, archiveFile )
+    if archiveDirectory :
+      # If this file does not exist in the archive, copy it there.
+      archiveFile = archiveDirectory + "/" + bodyHash
+      if not os.path.isfile( archiveFile ) :
+        # Make an archive copy of the file.
+        shutil.copy2( fileName, archiveFile )
 
   #---------------------------------------------------------------------
   def getLines( self ) :
