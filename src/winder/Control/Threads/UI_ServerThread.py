@@ -10,7 +10,7 @@
 #   and returns results which are then sent back to the client.
 ###############################################################################
 from Threads.PrimaryThread import PrimaryThread
-from Control.Settings import Settings
+from Machine.Settings import Settings
 import select
 import socket
 import threading     # For additional threads.

@@ -17,6 +17,8 @@ class Line :
   2d line in the form of "m x + b" where m is the slope and b is the Y-Intercept.
   """
 
+  VERTICLE_SLOPE = float( "inf" )
+
   #---------------------------------------------------------------------
   @staticmethod
   def fromAngle( angle, intercept ) :

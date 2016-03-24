@@ -8,7 +8,7 @@
 
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
-from Control.Settings import Settings
+from Machine.Settings import Settings
 import xml.dom.minidom
 import os.path
 

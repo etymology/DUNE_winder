@@ -5,7 +5,7 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from Control.Settings import Settings
+from Machine.Settings import Settings
 from Control.IO_Log import IO_Log
 from Threads.PrimaryThread import PrimaryThread
 

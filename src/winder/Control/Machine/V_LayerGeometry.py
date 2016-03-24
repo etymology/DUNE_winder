@@ -1,31 +1,27 @@
 ###############################################################################
-# Name: LayerV_Layout
-# Uses: Layout settings for the V-layer.
+# Name: V_LayerGeometry.py
+# Uses: Geometry specific to the 2nd induction layer, V.
 # Date: 2016-03-23
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+
 import math
-from LayerLayout import LayerLayout
+from UV_LayerGeometry import UV_LayerGeometry
 
-class LayerV_Layout( LayerLayout ) :
-  """
-  Layout settings for the V-layer.
-  """
+class V_LayerGeometry( UV_LayerGeometry ) :
 
-  def __init__( self, divide = 1 ) :
+  #-------------------------------------------------------------------
+  def __init__( self ) :
     """
     Constructor.
-
-    Args:
-      divide: Scale factor to divide down layer (not functional).
     """
 
-    LayerLayout.__init__( self, divide )
+    UV_LayerGeometry.__init__( self )
 
     # Spacing between pins and front to back.
-    self.deltaX      = 8.0   * divide
-    self.deltaY      = 5.75  * divide
+    self.deltaX      = 8.0
+    self.deltaY      = 5.75
     self.depth       = 87.7
 
     # Distance from the layer to the head.
@@ -37,9 +33,6 @@ class LayerV_Layout( LayerLayout ) :
     # height.
     self.partialZ_Front = 0
     self.partialZ_Back  = self.depth
-
-    # The wing on the right is extra distance the wire must wrap around.
-    self.rightExtention = 304.29
 
     # Distance that must be traveled past a pin to ensure it will be hooked
     # by the wire when moving in an other direction.

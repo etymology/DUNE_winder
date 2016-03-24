@@ -8,10 +8,10 @@
 
 import os.path
 
-from Control.Settings import Settings
+from Machine.Settings import Settings
 from Library.Configuration import Configuration
 
-from RecipeGenerator.LayerV_Layout import LayerV_Layout
+from Machine.V_LayerGeometry import V_LayerGeometry
 from RecipeGenerator.LayerV_Recipe import LayerV_Recipe
 
 #------------------------------------------------------------------------------
@@ -29,10 +29,16 @@ if __name__ == "__main__":
 
   # Generate recipes for each layer.
   # $$$FUTURE - Add remaining layers.
-  layout = LayerV_Layout()
-  recipe = LayerV_Recipe( layout )
+  geometry = V_LayerGeometry()
+  recipe = LayerV_Recipe( geometry )
 
   # Save recipes for each layer to recipe directory.
   # $$$FUTURE - Add remaining layers.
-  #recipe.writeRubyCode( "V-Layer.rb" )
   recipe.writeG_Code( recipeDirectory + "/V-Layer.gc", "V Layer" )
+
+  #recipe.writeRubyAnimateCode( "V-LayerAnimation.rb", 20 )
+  #recipe.writeRubyCode( "V-Layer.rb", True, True, True )
+  recipe.printStats()
+
+# "If quantum mechanics hasn't profoundly shocked you, you haven't understood
+# it yet." -- Niels Bohr

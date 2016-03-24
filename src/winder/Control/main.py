@@ -6,24 +6,25 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Control.Settings import Settings
-from Control.LowLevelIO import LowLevelIO
-
-from Threads.PrimaryThread import PrimaryThread
-from Threads.UI_ServerThread import UI_ServerThread
-from Threads.ControlThread import ControlThread
-from Library.SystemTime import SystemTime
-from Library.Log import Log
-from Library.Configuration import Configuration
-
-from Simulator.PLC_Simulator import PLC_Simulator
-
-from Control.Process import Process
-
 import signal
 import sys
 import traceback
 import time
+
+from Library.SystemTime import SystemTime
+from Library.Log import Log
+from Library.Configuration import Configuration
+
+from Machine.Settings import Settings
+
+from Control.LowLevelIO import LowLevelIO
+from Control.Process import Process
+
+from Threads.PrimaryThread import PrimaryThread
+from Threads.UI_ServerThread import UI_ServerThread
+from Threads.ControlThread import ControlThread
+
+from Simulator.PLC_Simulator import PLC_Simulator
 
 #==============================================================================
 # Debug settings.

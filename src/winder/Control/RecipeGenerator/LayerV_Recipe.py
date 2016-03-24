@@ -1,5 +1,5 @@
 ###############################################################################
-# Name: LayerV_Recipe.py
+# Name: LayerU_Recipe.py
 # Uses: Recipe generation for V-layer.
 # Date: 2016-03-23
 # Author(s):
@@ -16,9 +16,9 @@ from Library.Geometry.Line import Line
 from RecipeGenerator import RecipeGenerator
 from Path3d import Path3d
 from G_CodePath import G_CodePath
-from WireLengthG_Code import WireLengthG_Code
-from SeekTransferG_Code import SeekTransferG_Code
-from LatchG_Code import LatchG_Code
+from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
+from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
+from G_CodeFunctions.LatchG_Code import LatchG_Code
 
 class LayerV_Recipe( RecipeGenerator ) :
   """
@@ -41,13 +41,15 @@ class LayerV_Recipe( RecipeGenerator ) :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, layout ) :
+  def __init__( self, geometry, windsOverride=None ) :
     """
     Constructor.  Does all calculations.
 
     Args:
-      layout: Instance of LayerV_Layout that specifies parameters for recipe
+      geometry: Instance of LayerV_Layout that specifies parameters for recipe
         generation.
+      windsOverride: Set to specify the number to winds to make before stopping.
+        Normally left to None.
     """
 
     self.nodesFront = []
@@ -60,7 +62,7 @@ class LayerV_Recipe( RecipeGenerator ) :
     #----------------------------------
     x = 0
     y = 0
-    for parameter in layout.gridParameters :
+    for parameter in geometry.gridParameters :
       count = parameter[ 0 ]
       xInc  = parameter[ 1 ]
       yInc  = parameter[ 2 ]
@@ -69,7 +71,7 @@ class LayerV_Recipe( RecipeGenerator ) :
 
       for position in range( 0, count ) :
         self.nodesFront.append( Location( x, y, 0 ) )
-        self.nodesBack.append( Location( x, y, layout.depth ) )
+        self.nodesBack.append( Location( x, y, geometry.depth ) )
 
         x += xInc
         y += yInc
@@ -88,19 +90,19 @@ class LayerV_Recipe( RecipeGenerator ) :
     # All following locations are just modifications of this initial set.
     self.net = \
     [
-      2 * layout.rows + layout.columns - 1,
-      layout.columns - 1,
+      2 * geometry.rows + geometry.columns - 1,
+      geometry.columns - 1,
       0,
-      2 * layout.rows + 2 * layout.columns - 2,
-      layout.columns,
-      2 * layout.rows + layout.columns - 2
+      2 * geometry.rows + 2 * geometry.columns - 2,
+      geometry.columns,
+      2 * geometry.rows + geometry.columns - 2
     ]
 
     # Number of items in above list.
     repeat = len( self.net )
 
     # Total number of pins.
-    pins = 2 * layout.rows + 2 * layout.columns + 1
+    pins = 2 * geometry.rows + 2 * geometry.columns + 1
 
     # Initial direction.
     direction = 1
@@ -117,10 +119,10 @@ class LayerV_Recipe( RecipeGenerator ) :
     # A wire can land in one of four locations along a pin: upper/lower
     # left/right.  The angle of these locations are defined here.
     _180 = math.radians( 180 )
-    ul = -layout.angle
-    ll = -layout.angle + _180
-    ur = layout.angle
-    lr = layout.angle + _180
+    ul = -geometry.angle
+    ll = -geometry.angle + _180
+    ur = geometry.angle
+    lr = geometry.angle + _180
 
     # G-Code path is the motions taken by the machine to wind the layer.
     self.gCodePath = G_CodePath()
@@ -132,18 +134,20 @@ class LayerV_Recipe( RecipeGenerator ) :
     #
     # Initial seek position.
     #
-    startLocation = Location( layout.deltaX * layout.columns, layout.wireSpacing / 2 )
+    startLocation = Location( geometry.deltaX * geometry.columns, geometry.wireSpacing / 2 )
 
     # Current net.
     net = 0
-    self.nodePath.pushOffset( self.location( net ), 0, layout.pinRadius, layout.angle )
-    self.gCodePath.push( startLocation.x, startLocation.y, layout.frontZ )
+    self.nodePath.pushOffset( self.location( net ), 0, geometry.pinRadius, geometry.angle )
+    self.gCodePath.push( startLocation.x, startLocation.y, geometry.frontZ )
     net += 1
 
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
-    totalCount = layout.pins / ( 2 * 6 )
-    #totalCount = 5     # $$$DEBUG
+    totalCount = geometry.pins / ( 2 * 6 )
+
+    if windsOverride :
+      totalCount = windsOverride
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
@@ -158,33 +162,33 @@ class LayerV_Recipe( RecipeGenerator ) :
       length1 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Front,
-          layout.pinRadius,
+          geometry.partialZ_Front,
+          geometry.pinRadius,
           lr
         )
 
       length2 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Back,
-          layout.pinRadius,
+          geometry.partialZ_Back,
+          geometry.pinRadius,
           ll
         )
 
       wireLine = Line.fromLocations( self.gCodePath.last, center )
-      destination = wireLine.intersection( layout.lineTop )
+      destination = wireLine.intersection( geometry.lineTop )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code( SeekTransferG_Code.TOP ) )
-      self.gCodePath.push( destination.x, destination.y, layout.frontZ )
-      self.gCodePath.push( destination.x, destination.y, layout.partialZ_Front ) # Partial Z
+      self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
+      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front ) # Partial Z
 
       center = self.center( net, +1 )
-      self.gCodePath.push( center.x, destination.y, layout.partialZ_Front )
+      self.gCodePath.push( center.x, destination.y, geometry.partialZ_Front )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
 
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-      self.gCodePath.push( center.x, destination.y, layout.backZ )
-      self.gCodePath.push( center.x, center.y - layout.overshoot, layout.backZ )
+      self.gCodePath.push( center.x, destination.y, geometry.backZ )
+      self.gCodePath.push( center.x, center.y - geometry.overshoot, geometry.backZ )
 
       net += 1
 
@@ -195,24 +199,24 @@ class LayerV_Recipe( RecipeGenerator ) :
       length1 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Back,
-          layout.pinRadius,
+          geometry.partialZ_Back,
+          geometry.pinRadius,
           ll
         )
 
       length2 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Front,
-          layout.pinRadius,
-          layout.angle
+          geometry.partialZ_Front,
+          geometry.pinRadius,
+          geometry.angle
         )
 
       # Pin on lower rear left.
       center = self.center( net, -1 )
       wireLine = Line.fromLocations( self.gCodePath.last, center )
-      destinationA = wireLine.intersection( layout.lineBottom )
-      destinationB = wireLine.intersection( layout.lineLeft )
+      destinationA = wireLine.intersection( geometry.lineBottom )
+      destinationB = wireLine.intersection( geometry.lineLeft )
 
       if destinationA.x > destinationB.x :
         destination = destinationA
@@ -221,26 +225,26 @@ class LayerV_Recipe( RecipeGenerator ) :
 
       self.gCodePath.pushG_Code( SeekTransferG_Code( SeekTransferG_Code.BOTTOM_LEFT ) )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.push( destination.x, destination.y, layout.backZ )
-      self.gCodePath.push( destination.x, destination.y, layout.partialZ_Back )  # Partial Z
+      self.gCodePath.push( destination.x, destination.y, geometry.backZ )
+      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Back )  # Partial Z
 
       # To second pin on lower front left.
       center = self.center( net, +1 )
       wireLine = Line.fromLocations( self.gCodePath.last, center )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, layout.partialZ_Back )
+      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.partialZ_Back )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, layout.frontZ )
+      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.frontZ )
       self.gCodePath.push(
-        center.x - layout.pinRadius + layout.overshoot,
+        center.x - geometry.pinRadius + geometry.overshoot,
         center.y,
-        layout.frontZ
+        geometry.frontZ
       )
 
       self.gCodePath.push(
-        center.x - layout.pinRadius + layout.overshoot,
-        layout.bottom,
-        layout.frontZ
+        center.x - geometry.pinRadius + geometry.overshoot,
+        geometry.bottom,
+        geometry.frontZ
       )
 
       net += 1
@@ -251,29 +255,29 @@ class LayerV_Recipe( RecipeGenerator ) :
       length1 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Front,
-          layout.pinRadius,
+          geometry.partialZ_Front,
+          geometry.pinRadius,
           ur
         )
 
       length2 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Back,
-          layout.pinRadius,
+          geometry.partialZ_Back,
+          geometry.pinRadius,
           ul
         )
 
       center = self.center( net, -1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, layout.frontZ )
+      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.frontZ )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, layout.backZ )
+      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.backZ )
 
       center = self.center( net, +1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, layout.backZ )
-      self.gCodePath.push( center.x, center.y + layout.overshoot, layout.backZ )
+      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.backZ )
+      self.gCodePath.push( center.x, center.y + geometry.overshoot, geometry.backZ )
 
       net += 1
 
@@ -283,16 +287,16 @@ class LayerV_Recipe( RecipeGenerator ) :
       length1 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Back,
-          layout.pinRadius,
+          geometry.partialZ_Back,
+          geometry.pinRadius,
           ll
         )
 
       length2 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Front,
-          layout.pinRadius,
+          geometry.partialZ_Front,
+          geometry.pinRadius,
           lr
         )
 
@@ -301,18 +305,18 @@ class LayerV_Recipe( RecipeGenerator ) :
 
       wireLine = Line.fromLocations( self.gCodePath.last, center )
 
-      destination = wireLine.intersection( layout.lineTop )
+      destination = wireLine.intersection( geometry.lineTop )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.push( destination.x, destination.y, layout.backZ )
-      self.gCodePath.push( destination.x, destination.y, layout.partialZ_Back ) # Partial Z
+      self.gCodePath.push( destination.x, destination.y, geometry.backZ )
+      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Back ) # Partial Z
 
       center = self.center( net, +1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( center.x, destination.y, layout.partialZ_Back )
+      self.gCodePath.push( center.x, destination.y, geometry.partialZ_Back )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-      self.gCodePath.push( center.x, destination.y, layout.frontZ )
+      self.gCodePath.push( center.x, destination.y, geometry.frontZ )
 
-      self.gCodePath.push( center.x, center.y - layout.overshoot, layout.frontZ )
+      self.gCodePath.push( center.x, center.y - geometry.overshoot, geometry.frontZ )
 
       net += 1
 
@@ -323,64 +327,64 @@ class LayerV_Recipe( RecipeGenerator ) :
       length1 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Front,
-          layout.pinRadius,
+          geometry.partialZ_Front,
+          geometry.pinRadius,
           lr
         )
       location = self.location( net )
-      location.x += layout.rightExtention + layout.pinRadius
+      location.x += geometry.rightExtention + geometry.pinRadius
       length2  = \
         self.nodePath.pushOffset(
           location,
-          layout.partialZ_Front,
-          layout.pinRadius,
+          geometry.partialZ_Front,
+          geometry.pinRadius,
           ll
         )
 
       length2 += \
-        self.nodePath.pushOffset( location, layout.partialZ_Back, layout.pinRadius, lr )
+        self.nodePath.pushOffset( location, geometry.partialZ_Back, geometry.pinRadius, lr )
       length2 += \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Back,
-          layout.pinRadius,
+          geometry.partialZ_Back,
+          geometry.pinRadius,
           ul
         )
 
       # Lower right front side.
       center = self.center( net, +1 )
       wireLine = Line.fromLocations( self.gCodePath.last, center )
-      destinationA = wireLine.intersection( layout.lineBottom )
-      destinationB = wireLine.intersection( layout.lineRight )
+      destinationA = wireLine.intersection( geometry.lineBottom )
+      destinationB = wireLine.intersection( geometry.lineRight )
 
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
       if destinationA.x < destinationB.x :
         destination = destinationA
-        self.gCodePath.push( destination.x, destination.y, layout.frontZ )
-        self.gCodePath.push( destination.x, destination.y, layout.partialZ_Front )
-        self.gCodePath.push( destinationB.x, destination.y, layout.partialZ_Front )
+        self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
+        self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front )
+        self.gCodePath.push( destinationB.x, destination.y, geometry.partialZ_Front )
       else :
         destination = destinationB
-        self.gCodePath.push( destination.x, destination.y, layout.frontZ )
-        self.gCodePath.push( destination.x, destination.y, layout.partialZ_Front )
+        self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
+        self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front )
 
       # Lower right backside.
       center = self.center( net, -1 )
       wireLine = Line.fromLocations( self.gCodePath.last, center )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, layout.partialZ_Front )
+      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.partialZ_Front )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, layout.backZ )
+      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.backZ )
       self.gCodePath.push(
-        center.x + layout.pinRadius - layout.overshoot,
+        center.x + geometry.pinRadius - geometry.overshoot,
         center.y,
-        layout.backZ
+        geometry.backZ
       )
 
       self.gCodePath.push(
-        center.x + layout.pinRadius - layout.overshoot,
-        layout.bottom,
-        layout.backZ
+        center.x + geometry.pinRadius - geometry.overshoot,
+        geometry.bottom,
+        geometry.backZ
       )
 
       net += 1
@@ -391,23 +395,23 @@ class LayerV_Recipe( RecipeGenerator ) :
       length1 = \
         self.nodePath.pushOffset(
           self.location( net ),
-          layout.partialZ_Back,
-          layout.pinRadius,
+          geometry.partialZ_Back,
+          geometry.pinRadius,
           ul
         )
 
-      length2 = self.nodePath.pushOffset( self.location( net ), 0, layout.pinRadius, ur )
+      length2 = self.nodePath.pushOffset( self.location( net ), 0, geometry.pinRadius, ur )
 
       center = self.center( net, +1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, layout.backZ )
+      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.backZ )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, layout.frontZ )
+      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.frontZ )
 
       center = self.center( net, -1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, layout.frontZ )
-      self.gCodePath.push( center.x, center.y + layout.overshoot, layout.frontZ )
+      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.frontZ )
+      self.gCodePath.push( center.x, center.y + geometry.overshoot, geometry.frontZ )
 
       net += 1
 

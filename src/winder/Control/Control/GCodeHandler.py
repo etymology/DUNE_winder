@@ -8,6 +8,9 @@
 ###############################################################################
 from Library.GCode import GCode, GCodeCallbacks
 
+from Library.Geometry.Segment import Segment
+from Library.Geometry.Line import Line
+
 class GCodeHandler :
   #---------------------------------------------------------------------
   def _setX( self, x ) :
@@ -111,6 +114,16 @@ class GCodeHandler :
       # going back onto the spool.
       length *= self._direction
       self._spool.subtract( length )
+    elif "102" == function[ 0 ] :
+
+      startLocation = Location( self._lastX, self._lastY, self._lastZ )
+      endLocation = Location( self._x, self._y, self._z )
+      segment = Segment( startLocation, endLocation )
+      line = Line.fromSegment( segment )
+
+      # $$$DEBUG - Intercept with boundaries.
+
+      pass
 
   #---------------------------------------------------------------------
   def isOutOfWire( self ) :
@@ -286,11 +299,11 @@ class GCodeHandler :
 
     # Reset all values so we know what has changed.
     self._line = None
-    lastX = self._x
-    lastY = self._y
-    lastZ = self._z
+    self._lastX = self._x
+    self._lastY = self._y
+    self._lastZ = self._z
     self._functions = []
-    lastVelocity = self._velocity
+    self._lastVelocity = self._velocity
 
     # Interpret the next line.
     self._gCode.executeNextLine( self._nextLine )
@@ -317,22 +330,22 @@ class GCodeHandler :
       line = ""
 
       #
-      # Only log what has changed since the last line.
+      # Only log what has changed since the self._last line.
       #
 
       if None != self._line :
         line += "N" + str( self._line ) + " "
 
-      if lastX != self._x :
+      if self._lastX != self._x :
         line += "X" + str( self._x ) + " "
 
-      if lastY != self._y :
+      if self._lastY != self._y :
         line += "Y" + str( self._y ) + " "
 
-      if lastZ != self._z :
+      if self._lastZ != self._z :
         line += "Z" + str( self._z ) + " "
 
-      if lastVelocity != self._velocity :
+      if self._lastVelocity != self._velocity :
         line += "F" + str( self._velocity ) + " "
 
       for function in self._functions :
@@ -441,6 +454,9 @@ class GCodeHandler :
 
     self._maxVelocity = float( "inf" )   # <- No limit.
     self._velocity = 1.0                 # <- $$$DEBUG
+    self._lastX = None
+    self._lastY = None
+    self._lastZ = None
     self._x = None
     self._y = None
     self._z = None

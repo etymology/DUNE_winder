@@ -99,3 +99,29 @@ class Path3d :
 
     output.write( "\r\n" )
 
+  #---------------------------------------------------------------------
+  def totalLength( self ) :
+    """
+    Get the total length of path.
+
+    Returns:
+      Total length of path.
+    """
+    length = 0
+    lastPoint = self.path[ 0 ]
+    for point in self.path[ 1: ] :
+      segment = Segment( lastPoint, point )
+      length += segment.length()
+      lastPoint = point
+
+    return length
+
+  #---------------------------------------------------------------------
+  def __len__( self ) :
+    """
+    Return number of nodes in path.
+
+    Returns:
+      Number of nodes in path.
+    """
+    return len( self.path )

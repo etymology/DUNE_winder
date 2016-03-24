@@ -7,7 +7,7 @@
 ###############################################################################
 from Threads.PrimaryThread import PrimaryThread
 from Debug.DebugGUI import DebugGUI
-from Control.Settings import Settings
+from Machine.Settings import Settings
 import wx
 
 #------------------------------------------------------------------------------
