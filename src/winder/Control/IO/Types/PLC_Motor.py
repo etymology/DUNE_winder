@@ -51,6 +51,7 @@ class PLC_Motor( Motor ) :
     self._movement     = PLC.Tag( plc, tagBase + "_DATA.CoordinatedMotionStatus", attributes )
 
     # Motor status tag defaults to a faulted state in case read fails.
+    attributes = PLC.Tag.Attributes()
     attributes.defaultValue = True
     self._faulted = PLC.Tag( plc, tagBase + "_DATA.ModuleFault", attributes )
 
