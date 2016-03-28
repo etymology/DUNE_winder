@@ -1,7 +1,5 @@
-from docutils.parsers.rst.directives import path
 import os.path
 import re
-
 
 class ThemeLoader( object ):
    """
