@@ -192,6 +192,12 @@ class ManualXyStageMovement( SparseGridLayout ):
       return True
 
    def _update_xy_position( self, x_pos, y_pos ):
+      # If the PLC is unavailable, the server returns "None" for both x_pos and y_pos.
+      if x_pos == "None":
+         x_pos = None
+      if y_pos == "None":
+         y_pos = None
+
       if x_pos is not None and y_pos is not None:
          text = "{:.2f} mm, {:.2f} mm".format( float( x_pos ), float( y_pos ) )
       else:
