@@ -13,6 +13,7 @@ from Library.Configuration import Configuration
 
 from Machine.V_LayerGeometry import V_LayerGeometry
 from RecipeGenerator.LayerV_Recipe import LayerV_Recipe
+from RecipeGenerator.G_CodeToPath import G_CodeToPath
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -36,9 +37,15 @@ if __name__ == "__main__":
   # $$$FUTURE - Add remaining layers.
   recipe.writeG_Code( recipeDirectory + "/V-Layer.gc", "V Layer" )
 
+  gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometry )
+  gCodePath.writeRubyCode( "V-Layer.rb", False )
+  #path = gCodeHandler.toPath()
+  #path.toSketchUpRuby( sys.stdout )
+
   #recipe.writeRubyAnimateCode( "V-LayerAnimation.rb", 20 )
-  #recipe.writeRubyCode( "V-Layer.rb", True, True, True )
-  recipe.printStats()
+  #recipe.writeRubyCode( "V-Layer.rb", False, False, True )
+  #recipe.printStats()
+
 
 # "If quantum mechanics hasn't profoundly shocked you, you haven't understood
 # it yet." -- Niels Bohr

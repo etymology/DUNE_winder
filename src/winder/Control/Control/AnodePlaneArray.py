@@ -44,7 +44,7 @@ class AnodePlaneArray( Serializable ) :
     Constructor.
 
     Args:
-      gCodeHandler: Instance of GCodeHandler.
+      gCodeHandler: Instance of G_CodeHandler.
       apaDirectory: Directory APA data is stored.
       recipeDirectory: Directory recipes are stored.
       recipeArchiveDirectory: Directory recipes are archived.
@@ -128,7 +128,7 @@ class AnodePlaneArray( Serializable ) :
   #---------------------------------------------------------------------
   def loadRecipe( self, layer=None, recipeFile=None, startingLine=None ) :
     """
-    Load a recipe file into GCodeHandler.
+    Load a recipe file into G_CodeHandler.
 
     Args:
       layer: The current working layer.
@@ -166,7 +166,7 @@ class AnodePlaneArray( Serializable ) :
 
     # Assign a G-Code log.
     gCodeLogName = self._getG_CodeLogName( self._layer )
-    self._gCodeHandler.setGCodeLog( gCodeLogName )
+    self._gCodeHandler.setG_CodeLog( gCodeLogName )
 
     if not isError :
       isError |= self._gCodeHandler.setLine( self._lineNumber )

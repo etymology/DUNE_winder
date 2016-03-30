@@ -15,26 +15,15 @@ class SeekTransferG_Code( G_CodeFunction ) :
   until it reaches a Z transfer area.
   """
 
-  # Various seek locations.  Bitmap.
-  TOP          = 1
-  BOTTOM       = 2
-  LEFT         = 4
-  RIGHT        = 8
-  TOP_LEFT     = 1 + 4
-  TOP_RIGHT    = 1 + 8
-  BOTTOM_LEFT  = 2 + 4
-  BOTTOM_RIGHT = 2 + 8
-
   #---------------------------------------------------------------------
-  def __init__( self, seekLocation ) :
+  def __init__( self ) :
     """
     Constructor.
 
     Args:
       seekLocation: One (or more) of the seek seek locations.
     """
-    G_CodeFunction.__init__( self, 102, [ seekLocation ] )
-    self._seekLocation = seekLocation
+    G_CodeFunction.__init__( self, 102, [] )
 
   def seekLocationName( self ) :
     """
@@ -42,19 +31,8 @@ class SeekTransferG_Code( G_CodeFunction ) :
 
     Returns:
       String of seek location.
+
+      $$$DEBUG - Remove function.
     """
     location = ""
-
-    if self._seekLocation & SeekTransferG_Code.TOP :
-      location += "top "
-
-    if self._seekLocation & SeekTransferG_Code.BOTTOM :
-      location += "bottom "
-
-    if self._seekLocation & SeekTransferG_Code.LEFT :
-      location += "left "
-
-    if self._seekLocation & SeekTransferG_Code.RIGHT :
-      location += "right "
-
     return location.strip()

@@ -1,5 +1,5 @@
 ###############################################################################
-# Name: GCode.py
+# Name: G_Code.py
 # Uses: A class for reading and following G-Code.
 # Date: 2016-02-09
 # Author(s):
@@ -14,7 +14,7 @@ import re
 #=============================================================================
 #
 #=============================================================================
-class GCodeClass :
+class G_CodeClass :
   #---------------------------------------------------------------------
   def __init__( self, parentLine ) :
     """
@@ -90,41 +90,44 @@ class GCodeClass :
 
 #=============================================================================
 # Implementations of the various G-Codes.
-# These are all simple children of 'GCodeClass' setup to handle information
+# These are all simple children of 'G_CodeClass' setup to handle information
 # specific to them.
 #=============================================================================
 
 #======================================
 # Feed rate (F)
 #======================================
-class GCodeFeedRate( GCodeClass ) :
+class G_CodeFeedRate( G_CodeClass ) :
   pass
 
 #======================================
 # Command (G)
 #======================================
-class GCodeCommand( GCodeClass ) :
+class G_CodeCommand( G_CodeClass ) :
   def addParameter( self, parameter ) :
     self.parameters.append( parameter )
+
+  def get( self ) :
+    return self.parameters
 
 #======================================
 # Function (M)
 #======================================
-class GCodeFunction( GCodeClass ) :
+class G_CodeFunction( G_CodeClass ) :
   def addParameter( self, parameter ) :
     self.parameters.append( int( parameter ) )
 
 #======================================
 # Line number (N)
 #======================================
-class GCodeLineNumber( GCodeClass ) :
+class G_CodeLineNumber( G_CodeClass ) :
   def addParameter( self, parameter ) :
     self.parameters.append( int( parameter ) )
 
 #======================================
 # Program name (O)
 #======================================
-class GCodeProgramName( GCodeClass ) :
+class G_CodeProgramName( G_CodeClass ) :
   def addParameter( self, parameter ) :
     self.parameters.append( parameter )
 
@@ -132,31 +135,31 @@ class GCodeProgramName( GCodeClass ) :
 # Parameter (P)
 # (Not actually used.)
 #======================================
-class GCodeParameter( GCodeClass ) :
+class G_CodeParameter( G_CodeClass ) :
   pass
 
 #======================================
 # X position (X)
 #======================================
-class GCodeSetX( GCodeClass ) :
+class G_CodeSetX( G_CodeClass ) :
   pass
 
 #======================================
 # Y position (Y)
 #======================================
-class GCodeSetY( GCodeClass ) :
+class G_CodeSetY( G_CodeClass ) :
   pass
 
 #======================================
 # Z position (Z)
 #======================================
-class GCodeSetZ( GCodeClass ) :
+class G_CodeSetZ( G_CodeClass ) :
   pass
 
 #=============================================================================
 # Table for holding callback functions run for each G-Code.
 #=============================================================================
-class GCodeCallbacks :
+class G_CodeCallbacks :
   callbacks = \
   {
     'F' : None,
@@ -197,20 +200,20 @@ class GCodeCallbacks :
 #=============================================================================
 # Breakdown of a single line of G-code.
 #=============================================================================
-class GCodeLine :
+class G_CodeLine :
 
   # A lookup table that will translate a code to a G-code object.
   FUNCTION_TABLE = \
   {
-    'F' : lambda parent: GCodeFeedRate(    parent ),
-    'G' : lambda parent: GCodeCommand(     parent ),
-    'M' : lambda parent: GCodeFunction(    parent ),
-    'N' : lambda parent: GCodeLineNumber(  parent ),
-    'O' : lambda parent: GCodeProgramName( parent ),
-    'P' : lambda parent: GCodeParameter(   parent ),
-    'X' : lambda parent: GCodeSetX(        parent ),
-    'Y' : lambda parent: GCodeSetY(        parent ),
-    'Z' : lambda parent: GCodeSetZ(        parent )
+    'F' : lambda parent: G_CodeFeedRate(    parent ),
+    'G' : lambda parent: G_CodeCommand(     parent ),
+    'M' : lambda parent: G_CodeFunction(    parent ),
+    'N' : lambda parent: G_CodeLineNumber(  parent ),
+    'O' : lambda parent: G_CodeProgramName( parent ),
+    'P' : lambda parent: G_CodeParameter(   parent ),
+    'X' : lambda parent: G_CodeSetX(        parent ),
+    'Y' : lambda parent: G_CodeSetY(        parent ),
+    'Z' : lambda parent: G_CodeSetZ(        parent )
   }
 
   #---------------------------------------------------------------------
@@ -219,7 +222,7 @@ class GCodeLine :
     Constructor.
 
     Args:
-      callbacks: Instance of GCodeCallbacks.
+      callbacks: Instance of G_CodeCallbacks.
       line: G-code text.
 
     """
@@ -250,7 +253,7 @@ class GCodeLine :
           raise Exception( 'Unassigned parameter', parameter )
       else:
         # Create an object to hold this command.
-        lastClass = GCodeLine.FUNCTION_TABLE[ code ]( self )
+        lastClass = G_CodeLine.FUNCTION_TABLE[ code ]( self )
 
         # Add first parameter (everything after the code).
         lastClass.addParameter( parameter )
@@ -291,7 +294,7 @@ class GCodeLine :
 #=============================================================================
 # Interpreter for a G-code file.
 #=============================================================================
-class GCode :
+class G_Code :
 
   #---------------------------------------------------------------------
   def __init__( self, lines, callbacks ) :
@@ -300,7 +303,7 @@ class GCode :
 
     Args:
       lines: List of G-Code lines.
-      callbacks: Instance of GCodeCallbacks.
+      callbacks: Instance of G_CodeCallbacks.
 
     Raises:
       Exception: Malformed header in G-Code file.
@@ -344,7 +347,7 @@ class GCode :
   #---------------------------------------------------------------------
   def getLineCount( self ) :
     """
-    Get the number of lines of GCode.
+    Get the number of lines of G_Code.
 
     Returns:
       Number of lines.
@@ -359,7 +362,7 @@ class GCode :
 
     """
     if lineNumber < len( self.lines ) :
-      gCodeLine = GCodeLine( self.callbacks, self.lines[ lineNumber ] )
+      gCodeLine = G_CodeLine( self.callbacks, self.lines[ lineNumber ] )
       gCodeLine.execute()
 
 #------------------------------------------------------------------------------
@@ -370,14 +373,14 @@ if __name__ == "__main__":
   def printf( text ):
     print text
 
-  callbacks = GCodeCallbacks()
+  callbacks = G_CodeCallbacks()
   callbacks.registerCallback( 'G', lambda parameter: printf( "Command: " + str( parameter ) ) )
   callbacks.registerCallback( 'M', lambda parameter: printf( "Function: " + str( parameter ) ) )
   callbacks.registerCallback( 'X', lambda parameter: printf( "Set X: " + str( parameter ) ) )
   callbacks.registerCallback( 'Y', lambda parameter: printf( "Set Y: " + str( parameter ) ) )
   callbacks.registerCallback( 'Z', lambda parameter: printf( "Set Z: " + str( parameter ) ) )
 
-  gCode = GCode( 'GCodeTest.txt', callbacks )
+  gCode = G_Code( 'G_CodeTest.txt', callbacks )
 
   #while not gCode.executeNextLine() :
   #  pass

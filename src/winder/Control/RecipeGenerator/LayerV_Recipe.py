@@ -157,7 +157,7 @@ class LayerV_Recipe( RecipeGenerator ) :
       #
 
       # Get the two pins we need to be between.
-      center = self.center( net, -1 )
+      destination = self.center( net, -1 )
 
       length1 = \
         self.nodePath.pushOffset(
@@ -175,10 +175,8 @@ class LayerV_Recipe( RecipeGenerator ) :
           ll
         )
 
-      wireLine = Line.fromLocations( self.gCodePath.last, center )
-      destination = wireLine.intersection( geometry.lineTop )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.pushG_Code( SeekTransferG_Code( SeekTransferG_Code.TOP ) )
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
       self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front ) # Partial Z
 
@@ -213,24 +211,21 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       # Pin on lower rear left.
-      center = self.center( net, -1 )
-      wireLine = Line.fromLocations( self.gCodePath.last, center )
-      destinationA = wireLine.intersection( geometry.lineBottom )
-      destinationB = wireLine.intersection( geometry.lineLeft )
+      destination = self.center( net, -1 )
 
-      if destinationA.x > destinationB.x :
-        destination = destinationA
-      else :
-        destination = destinationB
-
-      self.gCodePath.pushG_Code( SeekTransferG_Code( SeekTransferG_Code.BOTTOM_LEFT ) )
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
       self.gCodePath.push( destination.x, destination.y, geometry.backZ )
-      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Back )  # Partial Z
+
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
+      self.gCodePath.push( destination.x - 1000, destination.y, geometry.backZ )
+      self.gCodePath.pushSeekForce( False, True, False )
+      self.gCodePath.push( destination.x - 1000, destination.y, geometry.backZ )
+
+      self.gCodePath.push( destination.x - 1000, destination.y, geometry.partialZ_Back )  # Partial Z
 
       # To second pin on lower front left.
       center = self.center( net, +1 )
-      wireLine = Line.fromLocations( self.gCodePath.last, center )
       self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.partialZ_Back )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
@@ -301,18 +296,17 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       # Get the two pins we need to be between.
-      center = self.center( net, +1 )
-
-      wireLine = Line.fromLocations( self.gCodePath.last, center )
-
-      destination = wireLine.intersection( geometry.lineTop )
+      destination = self.center( net, +1 )
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
       self.gCodePath.push( destination.x, destination.y, geometry.backZ )
       self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Back ) # Partial Z
 
       center = self.center( net, +1 )
+      self.gCodePath.pushSeekForce( True, False, True )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
       self.gCodePath.push( center.x, destination.y, geometry.partialZ_Back )
+
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
       self.gCodePath.push( center.x, destination.y, geometry.frontZ )
 
@@ -331,19 +325,8 @@ class LayerV_Recipe( RecipeGenerator ) :
           geometry.pinRadius,
           lr
         )
-      location = self.location( net )
-      location.x += geometry.rightExtention + geometry.pinRadius
-      length2  = \
-        self.nodePath.pushOffset(
-          location,
-          geometry.partialZ_Front,
-          geometry.pinRadius,
-          ll
-        )
 
-      length2 += \
-        self.nodePath.pushOffset( location, geometry.partialZ_Back, geometry.pinRadius, lr )
-      length2 += \
+      length2 = \
         self.nodePath.pushOffset(
           self.location( net ),
           geometry.partialZ_Back,
@@ -352,25 +335,24 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       # Lower right front side.
-      center = self.center( net, +1 )
-      wireLine = Line.fromLocations( self.gCodePath.last, center )
-      destinationA = wireLine.intersection( geometry.lineBottom )
-      destinationB = wireLine.intersection( geometry.lineRight )
+      destination = self.center( net, +1 )
 
-      self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      if destinationA.x < destinationB.x :
-        destination = destinationA
-        self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
-        self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front )
-        self.gCodePath.push( destinationB.x, destination.y, geometry.partialZ_Front )
-      else :
-        destination = destinationB
-        self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
-        self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front )
+      # Seek what is likely the bottom.
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
+      self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
+
+      # Seek to right edge.
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
+      self.gCodePath.push( destination.x + 1000, destination.y, geometry.frontZ )
+
+      # Seek to correct Y.
+      self.gCodePath.pushSeekForce( False, True, False )
+      self.gCodePath.push( destination.x + 1000, destination.y, geometry.frontZ )
+
+      self.gCodePath.push( destination.x + 1000, destination.y, geometry.partialZ_Front )
 
       # Lower right backside.
       center = self.center( net, -1 )
-      wireLine = Line.fromLocations( self.gCodePath.last, center )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
       self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.partialZ_Front )
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )

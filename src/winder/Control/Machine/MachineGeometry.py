@@ -22,7 +22,7 @@ class MachineGeometry :
     self.top    = 2500
     self.bottom = -25
     self.left   = -250
-    self.right  = 6800
+    self.right  = 6450
 
     # How big the Z-transfer windows are.
     # The Z-transfer windows start at top/bottom/left/right locations.

@@ -9,7 +9,7 @@
 import os
 from Control.AnodePlaneArray import AnodePlaneArray
 from Library.Spool import Spool
-from Control.GCodeHandler import GCodeHandler
+from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
 
 class Process :
@@ -23,7 +23,7 @@ class Process :
     self._log = log
     self._configuration = configuration
     self.spool = Spool( 27000000, 50 )
-    self.gCodeHandler = GCodeHandler( io, self.spool )
+    self.gCodeHandler = G_CodeHandler( io, self.spool )
     self.controlStateMachine = ControlStateMachine( io, log )
 
     self.controlStateMachine.gCodeHandler = self.gCodeHandler

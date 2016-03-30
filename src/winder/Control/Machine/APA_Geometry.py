@@ -17,7 +17,3 @@ class APA_Geometry( MachineGeometry ) :
     """
 
     MachineGeometry.__init__( self )
-
-    # The wing on the right is extra distance the wire must wrap around.
-    self.rightExtention = 304.29
-

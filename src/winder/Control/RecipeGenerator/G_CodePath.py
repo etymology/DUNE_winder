@@ -17,10 +17,20 @@ class G_CodePath( Path3d ) :
   A specific path that includes G-Code instructions.
   """
 
-  # Dictionary of what G-Code functions are mapped to what path locations.
-  # The dictionary key is the index into self.path at which the G-Code functions
-  # occur.  Each dictionary entry contains a list of GCode objects.
-  _gCode = {}
+  #---------------------------------------------------------------------
+  def __init__( self ) :
+    """
+    Constructor.
+    """
+    Path3d.__init__( self )
+
+    # Dictionary of what G-Code functions are mapped to what path locations.
+    # The dictionary key is the index into self.path at which the G-Code functions
+    # occur.  Each dictionary entry contains a list of G_Code objects.
+    self._gCode = {}
+    self._seekForceX = []
+    self._seekForceY = []
+    self._seekForceZ = []
 
   #---------------------------------------------------------------------
   def pushG_Code( self, gCode ) :
@@ -36,6 +46,27 @@ class G_CodePath( Path3d ) :
       self._gCode[ index ].append( gCode )
     else :
       self._gCode[ index ] = [ gCode ]
+
+  #---------------------------------------------------------------------
+  def pushSeekForce( self, forceX=False, forceY=False, forceZ=False ) :
+    """
+    Force one or more of the axises to print their position.  Needed when an
+    edge seek has been done.
+
+    Args:
+      forceX - Cause X position is output.
+      forceY - Cause Y position is output.
+      forceZ - Cause Z position is output.
+    """
+    index = len( self.path )
+    if forceX :
+      self._seekForceX.append( index )
+
+    if forceY :
+      self._seekForceY.append( index )
+
+    if forceZ :
+      self._seekForceZ.append( index )
 
   #---------------------------------------------------------------------
   def toG_Code( self, output, name, isCommentOut=False ) :
@@ -62,6 +93,15 @@ class G_CodePath( Path3d ) :
         output.write( "# " )
 
       output.write( "N" + str( lineNumber ) )
+
+      if index in self._seekForceX :
+        lastX = None
+
+      if index in self._seekForceY :
+        lastY = None
+
+      if index in self._seekForceZ :
+        lastZ = None
 
       if lastX != point.x :
         output.write( " X" + str( point.x ) )
