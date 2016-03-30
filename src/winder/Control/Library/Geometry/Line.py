@@ -48,7 +48,13 @@ class Line :
     Returns:
       Instance of Line.
     """
-    return Line( segment.slope(), segment.intercept() )
+    slope = segment.slope()
+    if slope != float( "inf" ) :
+      intercept = segment.intercept()
+    else:
+      intercept = segment.start.x
+
+    return Line( slope, intercept )
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -116,14 +122,17 @@ class Line :
     x = float( "inf" )
     y = float( "inf" )
 
+    # Vertical lines?
     if float( "inf" ) == line.slope or float( "inf" ) == self.slope :
+      # If both lines are not vertical...
       if line.slope != self.slope :
+        # Calculate positions from the non-vertical line.
         if float( "inf" ) == line.slope :
           x = line.intercept
+          y = self.getY( x )
         else :
           x = self.intercept
-
-        y = self.getY( x )
+          y = line.getY( x )
     else :
       slopeDelta = line.slope - self.slope
 
@@ -172,4 +181,8 @@ class Line :
       String representation of object in form y = m x + b where m is the
       slope, and b is the intercept.
     """
-    return "y = " + str( self.slope ) + "x + " + str( self.intercept )
+    xTerm = str( self.slope ) + "x + "
+    if float( "inf" ) == self.slope :
+      xTerm = ""
+
+    return "y = " + xTerm + str( self.intercept )

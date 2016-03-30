@@ -6,11 +6,18 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+import xml.dom.minidom
+import os.path
+
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
 from Machine.Settings import Settings
-import xml.dom.minidom
-import os.path
+
+from Machine.LayerCalibration import LayerCalibration
+from Machine.G_LayerGeometry import G_LayerGeometry
+from Machine.U_LayerGeometry import U_LayerGeometry
+from Machine.V_LayerGeometry import V_LayerGeometry
+from Machine.X_LayerGeometry import X_LayerGeometry
 
 class AnodePlaneArray( Serializable ) :
 
@@ -64,6 +71,8 @@ class AnodePlaneArray( Serializable ) :
     self._recipeFile = None
     self._recipe = None
     self._layer = None
+    self._calibrationFile = None
+    self._calibration = None     # $$$DEBUG - Needed here?
 
     # Create directory if it doesn't exist.
     apaExists = os.path.exists( self._getPath() )
@@ -93,6 +102,8 @@ class AnodePlaneArray( Serializable ) :
             + ".  Active layer " + self._layer ,
           [ self._name, self._layer ]
         )
+
+        # $$$DEBUG - Do we want to crash when a file is not found?
         raise Exception( "APA not found" )
     else:
       self.load()
@@ -132,6 +143,17 @@ class AnodePlaneArray( Serializable ) :
     if None != layer :
       self._layer = layer
 
+    if "G" == self._layer :
+      geometry = G_LayerGeometry()
+    elif "U" == self._layer :
+      geometry = U_LayerGeometry()
+    elif "V" == self._layer :
+      geometry = V_LayerGeometry()
+    elif "X" == self._layer :
+      geometry = X_LayerGeometry()
+    else:
+      raise Exception( "Recipe has no layer for geometry." )
+
     if None != recipeFile :
       self._recipeFile = recipeFile
 
@@ -140,7 +162,7 @@ class AnodePlaneArray( Serializable ) :
 
     self._recipe = \
       Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
-    self._gCodeHandler.loadG_Code( self._recipe.getLines() )
+    self._gCodeHandler.loadG_Code( self._recipe.getLines(), geometry )
 
     # Assign a G-Code log.
     gCodeLogName = self._getG_CodeLogName( self._layer )
@@ -180,15 +202,6 @@ class AnodePlaneArray( Serializable ) :
 
     return isError
 
-  # MOVED #---------------------------------------------------------------------
-  # MOVED def start( self ) :
-  # MOVED   """
-  # MOVED   Begin executing recipe.
-  # MOVED
-  # MOVED   Returns:
-  # MOVED     True if recipe execution began, False if not.
-  # MOVED   """
-
   #---------------------------------------------------------------------
   def load( self ) :
     """
@@ -214,6 +227,30 @@ class AnodePlaneArray( Serializable ) :
 
       if self._recipeFile :
         self.loadRecipe( self._layer )
+
+      if self._calibrationFile :
+        self._calibration = LayerCalibration.load( self._getPath(), self._calibrationFile )
+
+        if not self._calibration :
+          isError = True
+          self._log.add(
+            self.__class__.__name__,
+            "LOAD",
+            "Unable to load calibration for " + self._calibrationFile + ".",
+            [ self._calibrationFile ]
+          )
+        else :
+          self._log.add(
+            self.__class__.__name__,
+            "LOAD",
+            "Loaded calibration file " + self._calibrationFile + ".",
+            [ self._calibrationFile, self._calibration._hash ]
+          )
+
+          self._gCodeHandler.useCalibration( self._calibration )
+
+        # $$$DEBUG - Pass calibration data to G-Code handler.
+
     else :
       isError = True
       self._log.add(
@@ -283,6 +320,7 @@ class AnodePlaneArray( Serializable ) :
     """
     node = xmlDocument.createElement( "APA_" + self._name )
 
+    node.setAttribute( "calibrationFile", self._calibrationFile )
     node.setAttribute( "recipeFile", self._recipeFile )
     node.setAttribute( "lineNumber", str( self._lineNumber ) )
     node.setAttribute( "layer", str( self._layer ) )
@@ -301,6 +339,12 @@ class AnodePlaneArray( Serializable ) :
       True if there was an error, False if not.
     """
     self._recipeFile = node.getAttribute( "recipeFile" )
+
+    calibrationFile = node.getAttribute( "calibrationFile" )
+    if "None" != calibrationFile :
+      self._calibrationFile = calibrationFile
+    else :
+      self._calibrationFile = None
 
     layer = node.getAttribute( "layer" )
     if "None" != layer :

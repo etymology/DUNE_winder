@@ -158,6 +158,12 @@ class Motion :
     acceleration = abs( acceleration )
     velocity     = abs( velocity     )
 
+    if None == endPosition :
+      endPosition = 0
+
+    if None == startPosition :
+      startPosition = 0
+
     position = endPosition - startPosition
     forwardJerk =  jerk
     reverseJerk = -jerk

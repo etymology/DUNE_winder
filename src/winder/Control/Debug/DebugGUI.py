@@ -535,7 +535,7 @@ class APA_Tab( wx.Panel, Remote, ActivatedTab ) :
     self.apaSelection = wx.ComboBox( self, -1, choices=apaList )
     self.apaSelection.Bind( wx.EVT_COMBOBOX, self.apaSelect )
 
-    self.layerSelection = wx.ComboBox( self, -1, "G", choices=[ "G", "U", "V", "W" ] )
+    self.layerSelection = wx.ComboBox( self, -1, "G", choices=[ "G", "U", "V", "X" ] )
 
     grideSizer.AddMany(
       [
@@ -911,8 +911,8 @@ class DebugGUI( wx.Frame, Remote ):
 # end class
 
 
-#if __name__ == "__main__":
-def test() :
+#def test() :
+if __name__ == "__main__":
   wxApplication = wx.App()
   DebugGUI( None, "192.168.56.102", 6626, 1024 )
   #DebugGUI( None, "172.16.21.47", 6626 )

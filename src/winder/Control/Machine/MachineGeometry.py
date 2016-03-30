@@ -7,6 +7,7 @@
 ###############################################################################
 
 from Library.Geometry.Line import Line
+from Library.Geometry.Box import Box
 
 class MachineGeometry :
 
@@ -34,3 +35,5 @@ class MachineGeometry :
     self.lineLeft   = Line( Line.VERTICLE_SLOPE, self.left )
     self.lineRight  = Line( Line.VERTICLE_SLOPE, self.right )
 
+    # Box that defines the Z hand-off edges.
+    self.edges = Box( self.left, self.top, self.right, self.bottom )

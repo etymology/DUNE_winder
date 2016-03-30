@@ -30,15 +30,17 @@ class LayerCalibration( Serializable ) :
     Constructor.
     """
 
-    # Offset of 0,0 on the APA to machine offset.
+    # Name of layer this calibration file applies.
     self._layer = layer
-    self._hash = None
-    self._offset = None
-    self._locations = {}
 
-  #-------------------------------------------------------------------
-  def _pinIndex( self, side, pinNumber ) :
-    return str( side ) + "." + str( pinNumber )
+    # Hash of calibration XML data used for modification detection.
+    self._hash = None
+
+    # Offset of 0,0 on the APA to machine offset.
+    self._offset = None
+
+    # Look-up table that correlates pin names to their locations.
+    self._locations = {}
 
   #-------------------------------------------------------------------
   def setOffset( self, offset ) :
@@ -63,31 +65,29 @@ class LayerCalibration( Serializable ) :
     return self._offset
 
   #-------------------------------------------------------------------
-  def setPinLocation( self, side, pinNumber, location ) :
+  def setPinLocation( self, pin, location ) :
     """
     Set the calibrated location of the specified pin.
 
     Args:
-      pinNumber: Which pin.
+      pin: Which pin.
       location: The location (relative to the APA) of this pin.
     """
-    index = self._pinIndex( side, pinNumber )
-    self._locations[ index ] = location
+    self._locations[ pin ] = location
 
   #-------------------------------------------------------------------
-  def getPinLocation( self, side, pinNumber ) :
+  def getPinLocation( self, pin ) :
     """
     Get the calibrated location of the specified pin.
 
     Args:
-      pinNumber: Which pin.
+      pin: Which pin.
 
     Returns:
       Instance of Location with the position of this pin.
     """
 
-    index = self._pinIndex( side, pinNumber )
-    return self._locations[ index ]
+    return self._locations[ pin ]
 
   #---------------------------------------------------------------------
   def serialize( self, xmlDocument ) :
@@ -145,6 +145,9 @@ class LayerCalibration( Serializable ) :
     lines = lines.replace( '\t', '' )
     lines = lines.replace( ' ', '' )
 
+    # Calculate a hash over the body of the calibration.
+    # This is used to prevent any modification to calibration once it has been
+    # established.
     body = re.search( '<Calibration.*?(hash="([a-zA-Z0-9=]*)").*?>(.+?)</Calibration>', lines )
     fileHash = body.group( 2 )
     bodyData = body.group( 3 )

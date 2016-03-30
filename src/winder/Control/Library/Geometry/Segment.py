@@ -99,6 +99,16 @@ class Segment :
     return self.start.y - self.slope() * self.start.x
 
   #---------------------------------------------------------------------
+  def isPoint( self ) :
+    """
+    Check to see if this segment is actual a single point.
+
+    Returns:
+      True if segment is a point rather than a line segment.
+    """
+    return ( self.start.x == self.finish.x ) and ( self.start.y == self.finish.y )
+
+  #---------------------------------------------------------------------
   def __str__( self ) :
     """
     Get a string representation of object.

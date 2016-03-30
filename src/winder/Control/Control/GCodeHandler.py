@@ -8,6 +8,7 @@
 ###############################################################################
 from Library.GCode import GCode, GCodeCallbacks
 
+from Library.Geometry.Location import Location
 from Library.Geometry.Segment import Segment
 from Library.Geometry.Line import Line
 
@@ -114,16 +115,32 @@ class GCodeHandler :
       # going back onto the spool.
       length *= self._direction
       self._spool.subtract( length )
+
+    # Seek to transfer area
     elif "102" == function[ 0 ] :
 
       startLocation = Location( self._lastX, self._lastY, self._lastZ )
       endLocation = Location( self._x, self._y, self._z )
       segment = Segment( startLocation, endLocation )
-      line = Line.fromSegment( segment )
 
-      # $$$DEBUG - Intercept with boundaries.
+      location = self._geometry.edges.intersectSegment( segment )
+      self._x = location.x
+      self._y = location.y
 
-      pass
+    # Seek between pins.
+    elif "103" == function[ 0 ] :
+      pinA = int( function[ 1 ] )
+      pinB = int( function[ 2 ] )
+
+      if not self._calibration :
+        raise Exception( "G-Code request for calibrated move, but no calibration to use." )
+
+      pinA = self._calibration.getPinLocation( pinA )
+      pinB = self._calibration.getPinLocation( pinB )
+      center = pinA.center( pinB )
+      self._x = center.x
+      self._y = center.y
+
 
   #---------------------------------------------------------------------
   def isOutOfWire( self ) :
@@ -162,8 +179,6 @@ class GCodeHandler :
     isDone |= 1 != self._direction and self._nextLine <= startLine
 
     return isDone
-
-    #return self._gCode.isEndOfList()
 
   #---------------------------------------------------------------------
   def getTotalLines( self ) :
@@ -206,7 +221,6 @@ class GCodeHandler :
     """
 
     isError = True
-    #line -= self._direction
     if line >= -1 and line < self._gCode.getLineCount() :
       isError = False
       self._nextLine = line
@@ -237,19 +251,6 @@ class GCodeHandler :
     """
     return 1 == self._direction
 
-  ##---------------------------------------------------------------------
-  #def setRunTo( self, line ) :
-  #  """
-  #  Set the min/max line number at which to stop execution.
-  #
-  #  Args:
-  #    line: Line at which to stop execution.  -1 for end/beginning.
-  #  """
-  #  if isForward :
-  #    self._direction = 1
-  #  else :
-  #    self._direction = -1
-
   #---------------------------------------------------------------------
   def stop( self ) :
     """
@@ -258,10 +259,7 @@ class GCodeHandler :
 
     # If we are interrupting a running line, set it as the next line to run.
     if not self._io.plcLogic.isReady() :
-      #self._currentLine -= self._direction
       self._nextLine -= self._direction
-      #self._nextLine = self._currentLine
-      #self._nextLine = self._currentLine
 
   #---------------------------------------------------------------------
   def poll( self ) :
@@ -286,7 +284,6 @@ class GCodeHandler :
         else :
           self._pauseCount = 0
           self._nextLine += self._direction
-          #self._currentLine = self._nextLine
           self.runNextLine()
 
     return isDone
@@ -307,6 +304,12 @@ class GCodeHandler :
 
     # Interpret the next line.
     self._gCode.executeNextLine( self._nextLine )
+
+    # Calibrate the position (if we have a calibration file.)
+    if self._calibration :
+      offset = self._calibration.getOffset()
+      self.x += offset.x
+      self.y += offset.y
 
     # If an X/Y coordinate change is needed...
     if self._xyChange :
@@ -363,7 +366,7 @@ class GCodeHandler :
       self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
-  def loadG_Code( self, lines ) :
+  def loadG_Code( self, lines, geometry ) :
     """
     Load G-Code file.
 
@@ -373,6 +376,7 @@ class GCodeHandler :
     self._gCode = GCode( lines, self._callbacks )
     self._currentLine = -1
     self._nextLine = -1
+    self._geometry = geometry
 
   #---------------------------------------------------------------------
   def isG_CodeLoaded( self ) :
@@ -429,6 +433,14 @@ class GCodeHandler :
     self._gCodeLog = open( gCodeLogFile, "a" )
 
   #---------------------------------------------------------------------
+  def useCalibration( self, calibration ) :
+    """
+    Give handler an instance of Calibration to use for pin locations.  Must
+    be called before running G-Code.
+    """
+    self._calibration = calibration
+
+  #---------------------------------------------------------------------
   def __init__( self, io, spool ):
     """
     Constructor.
@@ -453,7 +465,7 @@ class GCodeHandler :
     self._spool = spool
 
     self._maxVelocity = float( "inf" )   # <- No limit.
-    self._velocity = 1.0                 # <- $$$DEBUG
+    self._velocity = 500.0                 # <- $$$DEBUG
     self._lastX = None
     self._lastY = None
     self._lastZ = None
@@ -469,6 +481,8 @@ class GCodeHandler :
     self._nextLine = None
     self._gCodeLog = None
     self._functions = []
+    self._calibration = None
+    self._geometry = None
 
     # Add a pause between G-Code instructions by setting _PAUSE to non-zero value.
     self._PAUSE = 0
