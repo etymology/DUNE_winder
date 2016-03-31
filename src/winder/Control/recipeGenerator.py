@@ -31,14 +31,14 @@ if __name__ == "__main__":
   # Generate recipes for each layer.
   # $$$FUTURE - Add remaining layers.
   geometry = V_LayerGeometry()
-  recipe = LayerV_Recipe( geometry )
+  recipe = LayerV_Recipe( geometry, 55 )
 
   # Save recipes for each layer to recipe directory.
   # $$$FUTURE - Add remaining layers.
   recipe.writeG_Code( recipeDirectory + "/V-Layer.gc", "V Layer" )
 
   gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometry )
-  gCodePath.writeRubyCode( "V-Layer.rb", False )
+  gCodePath.writeRubyCode( "V-Layer.rb", True )
   #path = gCodeHandler.toPath()
   #path.toSketchUpRuby( sys.stdout )
 

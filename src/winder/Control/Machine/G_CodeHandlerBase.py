@@ -146,6 +146,13 @@ class G_CodeHandlerBase :
       self._x = center.x
       self._y = center.y
 
+    # Clip coordinates.
+    elif 104 == number :
+      self._y = max( self._y, self._geometry.bottom )
+      self._y = min( self._y, self._geometry.top )
+      self._x = max( self._x, self._geometry.left )
+      self._x = min( self._x, self._geometry.right )
+
   #---------------------------------------------------------------------
   def __init__( self ):
     """
