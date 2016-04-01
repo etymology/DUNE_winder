@@ -185,19 +185,20 @@ class LayerCalibration( Serializable ) :
 
       [ fileHash, bodyHash ] = LayerCalibration._calculateHash( fullName )
 
-      # Does the caclulated hash not match the hash from the header?
-      if bodyHash != fileHash :
-        print "Hash mismatch", fileHash, bodyHash
+      # Does the caclulated hash match the hash from the header?
+      if bodyHash == fileHash :
         layerCalibration = None
-      else :
-        print "Hash match", fileHash, bodyHash
 
         layerCalibration = LayerCalibration( layer )
         layerCalibration.unserialize( node[ 0 ] )
         layerCalibration._layer = node[ 0 ].getAttribute( "hash" )
         layerCalibration._hash  = bodyHash
+      else :
+        print "Hash mismatch"
+        print bodyHash
+        print fileHash
 
-      # $$$DEBUG
+      # $$$FUTURE
       ## Log message about AHA change.
       #self._log.add(
       #  self.__class__.__name__,
@@ -206,14 +207,15 @@ class LayerCalibration( Serializable ) :
       #  [ fileName ]
       #)
     else :
-      # $$$DEBUG
-      print "File not found"
+      # $$$FUTURE
+      print "File not found", fullName
       #self._log.add(
       #  self.__class__.__name__,
       #  "LOAD",
       #  "Unable to load calibration file " + fileName + ".  File not found.",
       #  [ fileName ]
       #)
+      pass
 
     return layerCalibration
 

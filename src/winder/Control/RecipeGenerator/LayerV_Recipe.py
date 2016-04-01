@@ -16,10 +16,12 @@ from Library.Geometry.Line import Line
 from RecipeGenerator import RecipeGenerator
 from Path3d import Path3d
 from G_CodePath import G_CodePath
+
 from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
 from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 from G_CodeFunctions.LatchG_Code import LatchG_Code
 from G_CodeFunctions.ClipG_Code import ClipG_Code
+from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
 
 class LayerV_Recipe( RecipeGenerator ) :
   """
@@ -177,6 +179,7 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, -1 ) ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
       self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front ) # Partial Z

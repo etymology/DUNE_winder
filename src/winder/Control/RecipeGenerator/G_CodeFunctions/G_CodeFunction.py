@@ -20,8 +20,31 @@ class G_CodeFunction :
       gCode: The G-Code function number (integer).
       parameters: A list of parameters for the function.
     """
-    self._gCode = gCode
+    self._gCode = int( gCode )
     self._parameters = parameters
+
+  #---------------------------------------------------------------------
+  def getParameter( self, index ) :
+    """
+    Return the parameter at the given index.
+
+    Args:
+      index: Which parameter to return.
+
+    Returns:
+      Parameter at the given index.
+    """
+    return self._parameters[ index ]
+
+  #---------------------------------------------------------------------
+  def getFunction( self ) :
+    """
+    Get the G-Code function number.
+
+    Returns:
+      G-Code function number.
+    """
+    return self._gCode
 
   #---------------------------------------------------------------------
   def toG_Code( self ) :

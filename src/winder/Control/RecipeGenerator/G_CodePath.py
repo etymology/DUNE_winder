@@ -9,8 +9,12 @@
 import random
 
 from Path3d import Path3d
+
+from Machine.G_Codes import G_Codes
+
 from G_CodeFunctions.LatchG_Code import LatchG_Code
 from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
+from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
 
 class G_CodePath( Path3d ) :
   """
@@ -123,7 +127,7 @@ class G_CodePath( Path3d ) :
       lineNumber += 1
 
   #---------------------------------------------------------------------
-  def _pointLabel( self, output, location, text ) :
+  def _pointLabel( self, output, location, text, layer=None ) :
     """
     Make a SketchUp label at specified location.
 
@@ -147,8 +151,11 @@ class G_CodePath( Path3d ) :
     y = random.uniform( -3, 3 )
 
     output.write( 'vector = Geom::Vector3d.new ' + str( x ) + ',0,' + str( y ) + "\r\n" )
-    output.write( 'Sketchup.active_model.entities.add_text "'
+    output.write( 'label = Sketchup.active_model.entities.add_text "'
       + text + '", point, vector' + "\r\n" )
+
+    if layer :
+      output.write( 'label.layer = ' + layer + "\r\n" )
 
   #---------------------------------------------------------------------
   def toSketchUpRuby( self, output, enableLables=True ) :
@@ -159,19 +166,25 @@ class G_CodePath( Path3d ) :
     Args:
       output: Open file for output.
     """
-    Path3d.toSketchUpRuby( self, output )
+    Path3d.toSketchUpRuby( self, output, "G-Code path" )
 
     if enableLables :
+      output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\r\n" )
       for index, gCodeList in self._gCode.iteritems() :
 
         location = self.path[ index ]
 
         for gCode in gCodeList :
-          if isinstance( gCode, LatchG_Code ) :
-            side = "front"
-            if LatchG_Code.BACK == gCode._parameters[ 0 ] :
-              side = "back"
-            self._pointLabel( output, location, "Z-latch " + side )
 
-          if isinstance( gCode, SeekTransferG_Code ) :
-            self._pointLabel( output, location, "Seek transfer" )
+          if G_Codes.LATCH == gCode.getFunction() :
+            side = "front"
+            if LatchG_Code.BACK == gCode.getParameter( 0 ) :
+              side = "back"
+
+            self._pointLabel( output, location, "Z-latch " + side, "layer" )
+
+          if G_Codes.SEEK_TRANSFER == gCode.getFunction() :
+            self._pointLabel( output, location, "Seek transfer", "layer" )
+
+          if G_Codes.PIN_CENTER == gCode.getFunction() :
+            self._pointLabel( output, location, "Center " + gCode.getParameter( 0 ) + "-" + gCode.getParameter( 1 ), "layer" )

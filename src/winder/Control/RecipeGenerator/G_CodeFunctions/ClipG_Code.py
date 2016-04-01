@@ -7,6 +7,7 @@
 ###############################################################################
 
 from G_CodeFunction import G_CodeFunction
+from Machine.G_Codes import G_Codes
 
 class ClipG_Code( G_CodeFunction ) :
   """
@@ -18,5 +19,5 @@ class ClipG_Code( G_CodeFunction ) :
     """
     Constructor.
     """
-    G_CodeFunction.__init__( self, 104, [] )
+    G_CodeFunction.__init__( self, G_Codes.CLIP, [] )
 

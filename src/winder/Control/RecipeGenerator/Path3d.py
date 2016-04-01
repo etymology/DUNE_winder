@@ -44,7 +44,7 @@ class Path3d :
     return self.push( location.x + offsetX, location.y + offsetY, z )
 
   #---------------------------------------------------------------------
-  def push( self, x, y, z ) :
+  def push( self, x, y, z=None ) :
     """
     Add an offset position to path.  Offset specified as a radius and angle.
 
@@ -56,6 +56,10 @@ class Path3d :
     Returns:
       The length between this new position and the previous position.
     """
+
+    if None == z :
+      z = self.last.z
+
     location = Location( x, y, z )
     self.path.append( location )
 
@@ -70,7 +74,7 @@ class Path3d :
     return length
 
   #---------------------------------------------------------------------
-  def toSketchUpRuby( self, output ) :
+  def toSketchUpRuby( self, output, name="Path" ) :
     """
     Turn path into Ruby code for use in SketchUp.  Useful for visualizing
     paths.
@@ -79,7 +83,10 @@ class Path3d :
       output: Open file for output.
     """
 
-    output.write( "Sketchup.active_model.entities.add_line " )
+    output.write( 'layer = Sketchup.active_model.layers.add "' + name + '"' + "\r\n" )
+    output.write( 'oldLayer = Sketchup.active_model.active_layer' + "\r\n" )
+    output.write( 'Sketchup.active_model.active_layer = layer' + "\r\n" )
+    output.write( "line = Sketchup.active_model.entities.add_line " )
 
     isFirst = True
     for point in self.path :
@@ -98,6 +105,7 @@ class Path3d :
       output.write( "[" + str( x ) + "," + str( z ) + "," + str( y ) + "]" )
 
     output.write( "\r\n" )
+    output.write( 'Sketchup.active_model.active_layer = oldLayer' + "\r\n" )
 
   #---------------------------------------------------------------------
   def totalLength( self ) :

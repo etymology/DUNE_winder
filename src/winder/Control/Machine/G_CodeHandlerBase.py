@@ -16,6 +16,8 @@ from Library.Geometry.Location import Location
 from Library.Geometry.Segment import Segment
 from Library.Geometry.Line import Line
 
+from G_Codes import G_Codes
+
 class G_CodeHandlerBase :
   #---------------------------------------------------------------------
   def _setX( self, x ) :
@@ -105,12 +107,12 @@ class G_CodeHandlerBase :
     self._functions.append( function )
 
     # Z-Latch.
-    if 100 == number :
+    if G_Codes.LATCH == number :
       # $$$DEBUG
       pass
 
     # Consumed wire for line.
-    elif 101 == number :
+    elif G_Codes.WIRE_LENGTH == number :
       # Get the length from the parameter.
       length = float( function[ 1 ] )
 
@@ -118,7 +120,7 @@ class G_CodeHandlerBase :
       self._wireLength = length
 
     # Seek to transfer area
-    elif 102 == number :
+    elif G_Codes.SEEK_TRANSFER == number :
 
       startLocation = Location( self._lastX, self._lastY, self._lastZ )
       endLocation = Location( self._x, self._y, self._z )
@@ -133,21 +135,21 @@ class G_CodeHandlerBase :
       self._y = location.y
 
     # Seek between pins.
-    elif 103 == number :
-      pinA = int( function[ 1 ] )
-      pinB = int( function[ 2 ] )
+    elif G_Codes.PIN_CENTER == number :
+      pinNumberA = function[ 1 ]
+      pinNumberB = function[ 2 ]
 
       if not self._calibration :
         raise Exception( "G-Code request for calibrated move, but no calibration to use." )
 
-      pinA = self._calibration.getPinLocation( pinA )
-      pinB = self._calibration.getPinLocation( pinB )
+      pinA = self._calibration.getPinLocation( pinNumberA )
+      pinB = self._calibration.getPinLocation( pinNumberB )
       center = pinA.center( pinB )
       self._x = center.x
       self._y = center.y
 
     # Clip coordinates.
-    elif 104 == number :
+    elif G_Codes.CLIP == number :
       self._y = max( self._y, self._geometry.bottom )
       self._y = min( self._y, self._geometry.top )
       self._x = max( self._x, self._geometry.left )

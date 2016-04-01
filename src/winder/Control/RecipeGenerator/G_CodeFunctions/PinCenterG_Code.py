@@ -1,7 +1,7 @@
 ###############################################################################
-# Name: WireLengthG_Code.py
-# Uses: G-Code to specify the amount of wire consumed by a move.
-# Date: 2016-03-23
+# Name: PinCenterG_Code.py
+# Uses: G-Code for seeking between two pins.
+# Date: 2016-03-31
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
@@ -9,17 +9,17 @@
 from G_CodeFunction import G_CodeFunction
 from Machine.G_Codes import G_Codes
 
-class WireLengthG_Code( G_CodeFunction ) :
+class PinCenterG_Code( G_CodeFunction ) :
   """
-  G-Code to specify the amount of wire consumed by a move.
+  G-Code for seeking between two pins.
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, length ) :
+  def __init__( self, pins ) :
     """
     Constructor.
 
     Args:
-      length: How much wire was consumed by this motion.
+      pins: List of two pins.
     """
-    G_CodeFunction.__init__( self, G_Codes.WIRE_LENGTH, [ length ] )
+    G_CodeFunction.__init__( self, G_Codes.PIN_CENTER, pins )
