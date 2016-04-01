@@ -2,32 +2,31 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 
-# from .application_shared import AppShare
+from winder.utility.collections import DictOps
+
 from .ui.kivy_mixins import BackgroundColorMixin
 from .ui.manual_movement import ManualMovementControl
 from .ui.operation_bar import OperationBar
 
 class RootWidget( BackgroundColorMixin, BoxLayout ):
    def __init__( self, **kwargs ):
-      super( RootWidget, self ).__init__( orientation = "vertical", **kwargs )
+      super( RootWidget, self ).__init__( **DictOps.dict_combine( kwargs, orientation = "vertical" ) )
       self._construct()
 
    def _construct( self, **kwargs ):
-#       self.bg_color = AppShare.instance().settings.theme.control_color_value
+      self.operation_bar = OperationBar( **DictOps.dict_combine( kwargs, size_hint = ( 1, .25 ) ) )
+      self.tabbed_layout = self._construct_tabbed_layout( **kwargs )
 
-      self.operation_bar = OperationBar( size_hint = ( 1, .25 ) )
-      self.tabbed_layout = self._construct_tabbed_layout()
-
-      for widget in [self.operation_bar, self.tabbed_layout]:
+      for widget in [ self.operation_bar, self.tabbed_layout ]:
          self.add_widget( widget )
 
    def _construct_tabbed_layout( self, **kwargs ):
-      self.main_tab = TabbedPanelItem( text = "Main", **kwargs )
-      self.apa_tab = TabbedPanelItem( text = "APA", **kwargs )
-      self.manual_movement_control = ManualMovementControl()
-      self.manual_movement_tab = TabbedPanelItem( text = "Manual", content = self.manual_movement_control, **kwargs )
+      self.main_tab = TabbedPanelItem( **DictOps.dict_combine( kwargs, text = "Main" ) )
+      self.apa_tab = TabbedPanelItem( **DictOps.dict_combine( kwargs, text = "APA" ) )
+      self.manual_movement_control = ManualMovementControl( **kwargs )
+      self.manual_movement_tab = TabbedPanelItem( **DictOps.dict_combine( kwargs, text = "Manual", content = self.manual_movement_control ) )
 
-      result = TabbedPanel( do_default_tab = False, **kwargs )
+      result = TabbedPanel( **DictOps.dict_combine( kwargs, do_default_tab = False ) )
 
       for widget in [ self.main_tab, self.apa_tab, self.manual_movement_tab ]:
          result.add_widget( widget )
@@ -35,6 +34,6 @@ class RootWidget( BackgroundColorMixin, BoxLayout ):
       return result
 
 class ConsoleClientApplication( App ):
-   def build( self ):
-      result = RootWidget()
+   def build( self, **kwargs ):
+      result = RootWidget( **kwargs )
       return result
