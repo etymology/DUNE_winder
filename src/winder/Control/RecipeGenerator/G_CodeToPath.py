@@ -6,18 +6,35 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+import random
 
 from Library.G_Code import G_Code
 from G_CodePath import G_CodePath
-from G_CodeFunctions.LatchG_Code import LatchG_Code
 
+from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
+from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
+from G_CodeFunctions.LatchG_Code import LatchG_Code
+from G_CodeFunctions.ClipG_Code import ClipG_Code
+from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
+from G_CodeFunctions.G_CodeFunction import G_CodeFunction
+
+from Machine.G_Codes import G_Codes
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 from Machine.LayerCalibration import LayerCalibration
 
 
 class G_CodeToPath( G_CodeHandlerBase ) :
 
-  def __init__( self, fileName, geometry ) :
+  #---------------------------------------------------------------------
+  def __init__( self, fileName, geometry, calibration ) :
+    """
+    Constructor.
+
+    Args:
+      fileName: G-Code file to use.
+      geometry: Layer/machine geometry.
+      calibration: Layer calibration.
+    """
 
     G_CodeHandlerBase.__init__( self )
 
@@ -30,11 +47,18 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       lines = inputFile.readlines()
 
     self._gCode = G_Code( lines, self._callbacks )
-    self._calibration = LayerCalibration( "" )
+    self._calibration = calibration
     self._geometry = geometry
 
+  #---------------------------------------------------------------------
   def toPath( self ) :
+    """
+    Convert the G-Code into a 3d path.
 
+    Returns:
+      Instance of G_CodePath that contains the motions of the head as specified
+      by G-Code.
+    """
     path = G_CodePath()
     totalLines = self._gCode.getLineCount()
     for line in range( 0, totalLines ) :
@@ -49,21 +73,53 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       self._gCode.executeNextLine( line )
 
       for function in self._functions :
-        #print function[ 0 ]
-        number = int( function[ 0 ] )
-        if 100 == number :
-          #print "Latch", function[ 1 ]
-          path.pushG_Code( LatchG_Code( int( function[ 1 ] ) ) )
+        path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
 
       path.push( self._x, self._y, self._z )
 
     return path
 
   #---------------------------------------------------------------------
+  def _pointLabel( self, output, location, text, layer=None, vary=False ) :
+    """
+    Make a SketchUp label at specified location.
+
+    Args:
+      output: Open file for output.
+      location: The location to label.
+      text: The text to place on this label.
+    """
+    x = location.x / 25.4
+    y = location.y / 25.4
+    z = location.z / 25.4
+
+    output.write(
+      'point = Geom::Point3d.new [ '
+        + str( x ) + ','
+        + str( z ) + ','
+        + str( y ) + ' ]'
+        + "\r\n" )
+
+    if vary :
+      random.uniform( -3, 3 )
+      random.uniform( -3, 3 )
+    else :
+      x = 0.1
+      y = 0.1
+
+    output.write( 'vector = Geom::Vector3d.new ' + str( x ) + ',0,' + str( y ) + "\r\n" )
+    output.write( 'label = Sketchup.active_model.entities.add_text "'
+      + text + '", point, vector' + "\r\n" )
+
+    if layer :
+      output.write( 'label.layer = ' + layer + "\r\n" )
+
+  #---------------------------------------------------------------------
   def writeRubyCode(
     self,
     outputFileName,
-    enablePathLabels=False
+    enablePathLabels=False,
+    enablePinLabels=False
   ) :
     """
     Export node paths to Ruby code for import into SketchUp for visual
@@ -76,6 +132,15 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     rubyFile = open( outputFileName, "w" )
 
     gCodePath = self.toPath()
+
+    rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
+    if enablePinLabels :
+      for pinName in self._calibration._locations :
+        location = self._calibration.getPinLocation( pinName )
+        if "B" == pinName[ 0 ] :
+          location.z = self._geometry.depth
+
+        self._pointLabel( rubyFile, location, pinName, 'layer' )
 
     gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
 

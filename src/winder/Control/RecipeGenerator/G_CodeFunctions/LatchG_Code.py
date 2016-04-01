@@ -7,6 +7,7 @@
 ###############################################################################
 
 from G_CodeFunction import G_CodeFunction
+from Machine.G_Codes import G_Codes
 
 class LatchG_Code( G_CodeFunction ) :
   """
@@ -25,4 +26,4 @@ class LatchG_Code( G_CodeFunction ) :
     Args:
       side: Which side (FRONT/BACK) to latch to.
     """
-    G_CodeFunction.__init__( self, 100, [ side ] )
+    G_CodeFunction.__init__( self, G_Codes.LATCH, [ side ] )

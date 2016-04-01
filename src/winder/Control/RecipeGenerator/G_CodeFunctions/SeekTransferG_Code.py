@@ -8,6 +8,7 @@
 ###############################################################################
 
 from G_CodeFunction import G_CodeFunction
+from Machine.G_Codes import G_Codes
 
 class SeekTransferG_Code( G_CodeFunction ) :
   """
@@ -23,16 +24,4 @@ class SeekTransferG_Code( G_CodeFunction ) :
     Args:
       seekLocation: One (or more) of the seek seek locations.
     """
-    G_CodeFunction.__init__( self, 102, [] )
-
-  def seekLocationName( self ) :
-    """
-    Return the seek location name for this object.
-
-    Returns:
-      String of seek location.
-
-      $$$DEBUG - Remove function.
-    """
-    location = ""
-    return location.strip()
+    G_CodeFunction.__init__( self, G_Codes.SEEK_TRANSFER, [] )

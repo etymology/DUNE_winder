@@ -1,7 +1,7 @@
 ###############################################################################
-# Name: WireLengthG_Code.py
-# Uses: G-Code to specify the amount of wire consumed by a move.
-# Date: 2016-03-23
+# Name: ClipG_Code.py
+# Uses: G-Code to clip the position based on Z-transfer location.
+# Date: 2016-03-31
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
@@ -9,17 +9,15 @@
 from G_CodeFunction import G_CodeFunction
 from Machine.G_Codes import G_Codes
 
-class WireLengthG_Code( G_CodeFunction ) :
+class ClipG_Code( G_CodeFunction ) :
   """
-  G-Code to specify the amount of wire consumed by a move.
+  G-Code to clip the position based on Z-transfer location.
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, length ) :
+  def __init__( self ) :
     """
     Constructor.
-
-    Args:
-      length: How much wire was consumed by this motion.
     """
-    G_CodeFunction.__init__( self, G_Codes.WIRE_LENGTH, [ length ] )
+    G_CodeFunction.__init__( self, G_Codes.CLIP, [] )
+

@@ -8,6 +8,7 @@
 
 from Library.Geometry.Location import Location
 from Library.Recipe import Recipe
+from Machine.LayerCalibration import LayerCalibration
 
 class RecipeGenerator :
   """
@@ -19,6 +20,37 @@ class RecipeGenerator :
   nodesBack = []
   gCodePath = None
   nodePath = None
+
+  #---------------------------------------------------------------------
+  def pinName( self, side, pin ) :
+    """
+    Turn the pin number and side into name.
+
+    Args:
+      side: 'F' for front, 'B' for back side.
+      pin: Pin number.
+
+    Returns:
+      Pin name in the format 'S####' where S is the side.
+    """
+    return str( side ) + str( pin + 1 )
+
+  #---------------------------------------------------------------------
+  def pinNames( self, side, startPin, direction ) :
+    """
+    Return a pair of pin names of two pins next to one an other.
+
+    Args:
+      side: 'F' for front, 'B' for back side.
+      startPin: First pin number.
+      direction: Either -1 or 1 to fetch the pin on either side.
+
+    Returns:
+      List of two pin name strings.
+    """
+    pinA = self.net[ startPin ]
+    pinB = ( pinA + direction ) % len( self.nodesFront )
+    return [ self.pinName( side, pinA ), self.pinName( side, pinB ) ]
 
   #---------------------------------------------------------------------
   def center( self, startPin, direction ) :
@@ -66,7 +98,8 @@ class RecipeGenerator :
     outputFileName,
     enablePath=True,
     enablePathLabels=False,
-    enableWire=True
+    enableWire=True,
+    isAppend=True
   ) :
     """
     Export node paths to Ruby code for import into SketchUp for visual
@@ -78,7 +111,12 @@ class RecipeGenerator :
       enablePathLabels: Label additional G-Code points.
       enableWire: Show the wire wound on the layer.
     """
-    rubyFile = open( outputFileName, "w" )
+
+    attributes = "w"
+    if isAppend :
+      attributes = "a"
+
+    rubyFile = open( outputFileName, attributes )
 
     if enablePath :
       self.gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
@@ -153,12 +191,30 @@ class RecipeGenerator :
     """
 
     # Safe G-Code instructions.
-    gCodeFile = open( outputFileName, "w" )
-    self.gCodePath.toG_Code( gCodeFile, layerName )
-    gCodeFile.close()
+    with open( outputFileName, "w" ) as gCodeFile :
+      self.gCodePath.toG_Code( gCodeFile, layerName )
 
     # Create an instance of Recipe to update the header with the correct hash.
     Recipe( outputFileName, None )
+
+  #---------------------------------------------------------------------
+  def writeDefaultCalibration( self, outputFilePath, outputFileName, layerName ) :
+    """
+    Export node list to calibration file.
+
+    Args:
+      outputFileName: File name to create.
+      layerName: Name of recipe.
+    """
+
+    calibration = LayerCalibration( layerName )
+    calibration.setOffset( Location( 0, 0 ) )
+
+    for index in range( 0, len( self.nodesFront ) ) :
+      calibration.setPinLocation( self.pinName( "F", index ), self.nodesFront[ index ] )
+      calibration.setPinLocation( self.pinName( "B", index ), self.nodesBack[ index ] )
+
+    calibration.save( outputFilePath, outputFileName )
 
   #---------------------------------------------------------------------
   def printStats( self ) :
@@ -166,6 +222,6 @@ class RecipeGenerator :
     Print some statistics about the layer.
     """
 
-    print "Wire consumed:", self.nodePath.totalLength()
+    print "Wire consumed:", "{:,.2f}mm".format( self.nodePath.totalLength() )
     print "G-Code lines:", len( self.gCodePath )
 

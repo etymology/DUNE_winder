@@ -145,6 +145,16 @@ class Line :
     return Location( x, y )
 
   #---------------------------------------------------------------------
+  def getAngle( self ) :
+    """
+    Get the angle of the line.
+
+    Returns:
+      Angle in radians.
+    """
+    return math.atan( self.slope )
+
+  #---------------------------------------------------------------------
   def getY( self, x ) :
     """
     From a given X, get Y.

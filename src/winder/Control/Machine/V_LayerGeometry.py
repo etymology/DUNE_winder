@@ -64,6 +64,10 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     # Primary angle (in radians) between wires.
     self.angle = math.atan( self.deltaY / self.deltaX )
 
+    # When crossing between pins, this is the minimum allowable angle.  Less
+    # than this the wire risks hitting the pins on either side.
+    self.minAngle = math.radians( 30 )
+
     # Distance between wires.
     self.wireSpacing = \
       self.deltaY / math.sqrt( self.deltaY**2 / self.deltaX**2 + 1 )
