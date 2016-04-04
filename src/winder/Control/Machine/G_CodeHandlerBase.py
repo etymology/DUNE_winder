@@ -138,6 +138,7 @@ class G_CodeHandlerBase :
     elif G_Codes.PIN_CENTER == number :
       pinNumberA = function[ 1 ]
       pinNumberB = function[ 2 ]
+      axies = function[ 3 ]
 
       if not self._calibration :
         raise Exception( "G-Code request for calibrated move, but no calibration to use." )
@@ -145,8 +146,12 @@ class G_CodeHandlerBase :
       pinA = self._calibration.getPinLocation( pinNumberA )
       pinB = self._calibration.getPinLocation( pinNumberB )
       center = pinA.center( pinB )
-      self._x = center.x
-      self._y = center.y
+
+      if "X" in axies :
+        self._x = center.x
+
+      if "Y" in axies :
+        self._y = center.y
 
     # Clip coordinates.
     elif G_Codes.CLIP == number :
@@ -154,6 +159,21 @@ class G_CodeHandlerBase :
       self._y = min( self._y, self._geometry.top )
       self._x = max( self._x, self._geometry.left )
       self._x = min( self._x, self._geometry.right )
+
+    # Offset coordinates.
+    elif G_Codes.OFFSET == number :
+      for parameter in function[ 1: ] :
+        axis = parameter[ 0 ]
+        offset = float( parameter[ 1: ] )
+
+        if "X" == axis :
+          self._x += offset
+
+        if "Y" == axis :
+          self._y += offset
+
+        if "Z" == axis :
+          self._z += offset
 
   #---------------------------------------------------------------------
   def __init__( self ):

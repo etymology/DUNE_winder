@@ -15,11 +15,12 @@ class PinCenterG_Code( G_CodeFunction ) :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, pins ) :
+  def __init__( self, pins, axises="XY" ) :
     """
     Constructor.
 
     Args:
       pins: List of two pins.
     """
+    pins.append( axises )
     G_CodeFunction.__init__( self, G_Codes.PIN_CENTER, pins )
