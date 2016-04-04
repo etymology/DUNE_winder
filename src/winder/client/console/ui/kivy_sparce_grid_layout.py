@@ -1,5 +1,5 @@
 from kivy.event import EventDispatcher
-from kivy.properties import NumericProperty, ReferenceListProperty
+from kivy.properties import ListProperty, NumericProperty, ReferenceListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox
@@ -10,19 +10,75 @@ from kivy.uix.label import Label
 from .kivy_image_button import ImageButton
 from .kivy_labelled_checkbox import LabelledCheckbox
 from .kivy_mixins import BackgroundColorMixin
+from .kivy_shape_widgets import EllipseWidget, RectangleWidget
+
 
 class SparseGridLayout( BackgroundColorMixin, FloatLayout ):
+   """
+   Cell Properties:
+   Cell properties are properties which describe a property which affects the sides of the grid layout. It is a list property which can have 1, 2, or 4 values:
+      1: value will be used as spacing for all sides
+      2: first value is horizontal spacing, second value is vertical spacing
+      4: [ left spacing, top spacing, right spacing, bottom spacing ]
+   Each value component has a range of [0, 1].
+
+   Properties:
+   'rows': number of rows in the grid, defaults to 1
+   'columns': number of columns in the grid, defaults to 1
+   'grid_size': ( 'rows', 'columns' )
+   'spacing': spacing between the children, it is a cell property
+   'padding': the grid's spacing in relation to its external components
+   """
+
    rows = NumericProperty( 1 )
    columns = NumericProperty( 1 )
-   shape = ReferenceListProperty( rows, columns )
+   grid_size = ReferenceListProperty( rows, columns )
+   spacing = ListProperty( [ 0 ] )
 
    def __init__( self, **kwargs ):
       super( SparseGridLayout, self ).__init__( **kwargs )
 
+   def _get_cell_property_values( self, prop ):
+      property_length = len( prop )
+      if property_length == 1:
+         value = prop[ 0 ]
+
+         result = [ value ] * 4
+      elif property_length == 2:
+         horizontal_value = prop[ 0 ]
+         vertical_value = prop[ 1 ]
+
+         result = [ horizontal_value, vertical_value ] * 2
+      elif property_length == 4:
+         left_value = prop[ 0 ]
+         top_value = prop[ 1 ]
+         right_value = prop[ 2 ]
+         bottom_value = prop[ 3 ]
+
+         result = [ left_value, top_value, right_value, bottom_value ]
+      else:
+         raise ValueError( "Property length is invalid." )
+
+      return result
+
    def do_layout( self, *args, **kwargs ):
-      shape_hint = ( 1. / self.columns, 1. / self.rows )
+      grid_spacing = self._get_cell_property_values( self.spacing )
+
+      left_spacing = grid_spacing[ 0 ]
+      top_spacing = grid_spacing[ 1 ]
+      right_spacing = grid_spacing[ 2 ]
+      bottom_spacing = grid_spacing[ 3 ]
+
+      vertical_spacing = top_spacing + bottom_spacing
+      horizontal_spacing = left_spacing + right_spacing
+
+      cell_width = 1. / self.columns
+      cell_height = 1. / self.rows
+
       for child in self.children:
-         child_size_hint = ( shape_hint[ 0 ] * child.column_span, shape_hint[ 1 ] * child.row_span )
+         width = cell_width * child.column_span - horizontal_spacing
+         height = cell_height * child.row_span - vertical_spacing
+         child_size_hint = ( width, height )
 
          child.size_hint = child_size_hint
          if not hasattr( child, 'row' ):
@@ -30,7 +86,10 @@ class SparseGridLayout( BackgroundColorMixin, FloatLayout ):
          if not hasattr( child, 'column' ):
             child.column = 0
 
-         child.pos_hint = { 'x': shape_hint[ 0 ] * child.column, 'y': shape_hint[ 1 ] * child.row }
+         # The row and column indicies are zero-based.
+         x_pos = cell_width * child.column + left_spacing
+         y_pos = cell_height * child.row + bottom_spacing
+         child.pos_hint = { 'x': x_pos, 'y': y_pos }
 
       super( SparseGridLayout, self ).do_layout( *args, **kwargs )
 
@@ -67,4 +126,10 @@ class GridLabelledCheckbox( GridEntry, LabelledCheckbox ):
    pass
 
 class GridBoxLayout( GridEntry, BoxLayout ):
+   pass
+
+class GridRectangle( GridEntry, RectangleWidget ):
+   pass
+
+class GridEllipse( GridEntry, EllipseWidget ):
    pass

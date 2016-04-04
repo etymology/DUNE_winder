@@ -2,6 +2,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.label import Label
 
+from .kivy_utilities import KivyUtilities
+
 class LabelledCheckbox( BoxLayout ):
    def __init__( self, **kwargs ):
       kwargs[ "orientation" ] = "horizontal"
@@ -12,8 +14,7 @@ class LabelledCheckbox( BoxLayout ):
       self.label = Label( **kwargs )
       self.checkbox = CheckBox( **kwargs )
 
-      self.add_widget( self.label )
-      self.add_widget( self.checkbox )
+      KivyUtilities.add_children_to_widget( self, [ self.label, self.checkbox ] )
 
    def get_value( self ):
       return self.checkbox.active

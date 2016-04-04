@@ -21,7 +21,7 @@ class _NegativeZDirectionControl( GridImageButton ):
 
 class ManualZStageMovement( SparseGridLayout, BackgroundColorMixin ):
    def __init__( self, movement_rate_callback, **kwargs ):
-      super( ManualZStageMovement, self ).__init__( **DictOps.dict_combine( kwargs, rows = 2, columns = 5, bg_color = AppShare.instance().settings.theme.control_color_value ) )
+      super( ManualZStageMovement, self ).__init__( **DictOps.dict_combine( kwargs, rows = 3, columns = 5, bg_color = AppShare.instance().settings.theme.control_color_value ) )
 
       self._movement_rate_callback = movement_rate_callback
 
@@ -39,6 +39,10 @@ class ManualZStageMovement( SparseGridLayout, BackgroundColorMixin ):
       KivyUtilities.add_children_to_widget( self, [ to_back_label, back_direction_control, forward_direction_control, to_front_label, self.position_label ] )
 
    def update_z_position( self, value ):
+      # If the PLC is unavailable, the server returns "None" for value.
+      if value == "None":
+         value = None
+
       if value is not None:
          text = "{:.2f} mm, {:.2f} mm".format( value[ 0 ], value[ 1 ] )
       else:
