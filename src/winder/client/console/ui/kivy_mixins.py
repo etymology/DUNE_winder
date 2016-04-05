@@ -113,25 +113,27 @@ class BackgroundShapeMixin( BackgroundColorMixin ):
 
       if horizontal_excess > 0:
          if self.shape_horizontal_orientation == "left":
-            x_pos = self.x
+            x_pos = 0
          elif self.shape_horizontal_orientation == "right":
-            x_pos = self.x + horizontal_excess
+            x_pos = float( horizontal_excess ) / self.width
          else: # if self.shape_horizontal_orientation == "center"
-            x_pos = self.x + horizontal_excess / 2
+            x_pos = ( float( horizontal_excess ) / self.width ) / 2
       else:
-         x_pos = self.x
+         x_pos = 0
 
       if vertical_excess > 0:
          if self.shape_vertical_orientation == "top":
-            y_pos = self.y + vertical_excess
+            y_pos = float( vertical_excess ) / self.height
          elif self.shape_vertical_orientation == "bottom":
-            y_pos = self.y
+            y_pos = 0
          else: # if self.shape_vertical_orientation == "center"
-            y_pos = self.y + vertical_excess / 2
+            y_pos = ( float( vertical_excess ) / self.height ) / 2
       else:
-         y_pos = self.y
+         y_pos = 0
 
-      result = ( size_hint, { 'x' : x_pos, 'y' : y_pos } )
+      pos_hint = { 'x' : x_pos, 'y' : y_pos }
+
+      result = ( size_hint, pos_hint )
       return result
 
    def __init__( self, **kwargs ):
@@ -141,7 +143,7 @@ class BackgroundShapeMixin( BackgroundColorMixin ):
       horizontal_orientation = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.HorizontalOrientation )
       shape_size = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.Size )
 
-      self.bind( shape_color = self._update_shape_properties, shape_vertical_orientation = self._update_shape_location, shape_horizontal_orientation = self._update_shape_location, shape_size = self._update_shape_properties )
+      self.bind( shape_color = self._update_shape_properties, shape_vertical_orientation = self._update_shape_location, shape_horizontal_orientation = self._update_shape_location, shape_size = self._update_shape_properties, size = self._update_shape_properties )
       super( BackgroundShapeMixin, self ).__init__( **kwargs )
 
       self._target_canvas = self._get_canvas( target_canvas_value )
@@ -222,8 +224,9 @@ class BackgroundEllipseMixin( BackgroundShapeMixin ):
 
    def _get_shape( self, *args, **kwargs ):
       size_hint, pos_hint = self._get_shape_location()
+      pos = [ pos_hint[ 'x' ], pos_hint[ 'y' ] ]
 
-      result = Ellipse( size_hint = size_hint, pos_hint = pos_hint, segments = self.ellipse_segments, angle_start = self.ellipse_angle_start, angle_end = self.ellipse_angle_end, **kwargs )
+      result = Ellipse( size_hint = size_hint, pos = pos, segments = self.ellipse_segments, angle_start = self.ellipse_angle_start, angle_end = self.ellipse_angle_end, **kwargs )
 
       return result
 
