@@ -44,7 +44,7 @@ class Path3d :
     return self.push( location.x + offsetX, location.y + offsetY, z )
 
   #---------------------------------------------------------------------
-  def push( self, x, y, z=None ) :
+  def push( self, x=None, y=None, z=None ) :
     """
     Add an offset position to path.  Offset specified as a radius and angle.
 
@@ -56,6 +56,12 @@ class Path3d :
     Returns:
       The length between this new position and the previous position.
     """
+
+    if None == x :
+      x = self.last.x
+
+    if None == y :
+      y = self.last.y
 
     if None == z :
       z = self.last.z

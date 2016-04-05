@@ -49,10 +49,10 @@ if __name__ == "__main__":
 
   # Convert G-Code to path.
   gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometry, calibration )
-  gCodePath.writeRubyCode( "V-Layer.rb", True, True )
+  gCodePath.writeRubyCode( "V-Layer.rb", False, False )
 
   # Add the resulting wire path.
-  recipe.writeRubyCode( "V-Layer.rb", False, False, True, True )
+  #recipe.writeRubyCode( "V-Layer.rb", False, False, True, True )
 
   #recipe.writeRubyAnimateCode( "V-LayerAnimation.rb", 20 )
   recipe.printStats()

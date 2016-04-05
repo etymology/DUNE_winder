@@ -176,15 +176,20 @@ class G_CodePath( Path3d ) :
 
         for gCode in gCodeList :
 
-          if G_Codes.LATCH == gCode.getFunction() :
+          function = int( gCode.getFunction() )
+
+          if G_Codes.LATCH == function :
             side = "front"
-            if LatchG_Code.BACK == gCode.getParameter( 0 ) :
+            if LatchG_Code.BACK == int( gCode.getParameter( 0 ) ) :
               side = "back"
 
             self._pointLabel( output, location, "Z-latch " + side, "layer" )
 
-          if G_Codes.SEEK_TRANSFER == gCode.getFunction() :
+          if G_Codes.SEEK_TRANSFER == function :
             self._pointLabel( output, location, "Seek transfer", "layer" )
 
-          if G_Codes.PIN_CENTER == gCode.getFunction() :
+          if G_Codes.PIN_CENTER == function :
             self._pointLabel( output, location, "Center " + gCode.getParameter( 0 ) + "-" + gCode.getParameter( 1 ), "layer" )
+
+          if G_Codes.OFFSET == function :
+            self._pointLabel( output, location, "Offset", "layer" )

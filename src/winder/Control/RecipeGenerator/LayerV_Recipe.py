@@ -22,6 +22,7 @@ from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 from G_CodeFunctions.LatchG_Code import LatchG_Code
 from G_CodeFunctions.ClipG_Code import ClipG_Code
 from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
+from G_CodeFunctions.OffsetG_Code import OffsetG_Code
 
 class LayerV_Recipe( RecipeGenerator ) :
   """
@@ -181,16 +182,19 @@ class LayerV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
       self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, -1 ) ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
-      self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
-      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front ) # Partial Z
+      self.gCodePath.push()
+      self.gCodePath.push( z=geometry.partialZ_Front ) # Partial Z
 
-      center = self.center( net, +1 )
-      self.gCodePath.push( center.x, destination.y, geometry.partialZ_Front )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "X" ) )
+      self.gCodePath.push()
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
 
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-      self.gCodePath.push( center.x, destination.y, geometry.backZ )
-      self.gCodePath.push( center.x, center.y - geometry.overshoot, geometry.backZ )
+      self.gCodePath.push( z=geometry.backZ )
+      self.gCodePath.push( z=geometry.frontZ )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "XY" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=-geometry.overshoot ) )
+      self.gCodePath.push()
 
       net += 1
 
@@ -215,42 +219,36 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       # Pin on lower rear left.
-      destination = self.center( net, -1 )
 
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, -1 ), "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.push( destination.x, destination.y, geometry.backZ )
+      self.gCodePath.push()
 
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, -1 ), "X" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( x=-1000 ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
-      self.gCodePath.push( destination.x - 1000, destination.y, geometry.backZ )
-      self.gCodePath.pushSeekForce( False, True, False )
-      self.gCodePath.push( self.gCodePath.last.x, destination.y, geometry.backZ )
-      self.gCodePath.push( self.gCodePath.last.x, destination.y, geometry.partialZ_Back )  # Partial Z
+      self.gCodePath.push()
+
+      self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
+      self.gCodePath.push( z=geometry.backZ )
+      self.gCodePath.push( z=geometry.partialZ_Back )  # Partial Z
 
       # To second pin on lower front left.
-      center = self.center( net, +1 )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.partialZ_Back )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, +1 ), "Y" ) )
+      self.gCodePath.push()
+
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.frontZ )
-      self.gCodePath.push(
-        center.x - geometry.pinRadius + geometry.overshoot,
-        center.y,
-        geometry.frontZ
-      )
+      self.gCodePath.push( z=geometry.frontZ )
 
+
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, +1 ), "X" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( x=geometry.overshoot - geometry.pinRadius ) )
+      self.gCodePath.push()
+
+      self.gCodePath.pushG_Code( OffsetG_Code( y=-geometry.overshoot ) )
       self.gCodePath.pushG_Code( ClipG_Code() )
-      self.gCodePath.push(
-        self.gCodePath.last.x,
-        self.gCodePath.last.y - geometry.overshoot,
-        geometry.frontZ
-      )
-
-      # Get the angle of the line going directly to the center of the destination
-      # pins.
-      segment = Segment( self.gCodePath.last, center )
-      line = Line.fromSegment( segment )
-
+      self.gCodePath.push()
 
       net += 1
 
@@ -273,34 +271,45 @@ class LayerV_Recipe( RecipeGenerator ) :
           ul
         )
 
-      center = self.center( net, -1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
 
       # Get the angle of the line going directly to the center of the destination
       # pins.
-      segment = Segment( self.gCodePath.last, center )
+      centerA = self.center( net - 1, +1 )
+      centerA.y -= geometry.overshoot
+      centerB = self.center( net, -1 )
+      segment = Segment( centerA, centerB )
       line = Line.fromSegment( segment )
 
       # If the angle isn't too steep, go directly to the destination.  Otherwise,
       # just go to the Z-transfer area in Y.
       # (We could always go to the Z-transfer area in Y, but this allows a
       # faster path as long as the angle is large enough).
-      if -line.getAngle() >= geometry.minAngle and self.gCodePath.last.y > center.y :
+      if -line.getAngle() >= geometry.minAngle and centerA.y > centerB.y :
+        self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, -1 ), "XY" ) )
         self.gCodePath.pushG_Code( SeekTransferG_Code() )
-        self.gCodePath.push( center.x, center.y, geometry.frontZ )
+        self.gCodePath.push()
       else:
-        self.gCodePath.pushG_Code( SeekTransferG_Code() )
-        self.gCodePath.push( self.gCodePath.last.x, self.gCodePath.last.y - 1000, geometry.frontZ )
+        self.gCodePath.pushG_Code( OffsetG_Code( y=-1000 ) )
+        self.gCodePath.pushG_Code( ClipG_Code() )
+        self.gCodePath.push()
 
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.frontZ )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.partialZ_Front )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, -1 ), "X" ) )
+      self.gCodePath.push()
+      self.gCodePath.push( z=geometry.partialZ_Front )
 
-      center = self.center( net, +1 )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "X" ) )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.partialZ_Front )
+      self.gCodePath.push()
+
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.backZ )
-      self.gCodePath.push( center.x, center.y + geometry.overshoot, geometry.backZ )
+      self.gCodePath.push( z=geometry.backZ )
+      self.gCodePath.push( z=geometry.frontZ )
+
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "Y" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=geometry.overshoot ) )
+      self.gCodePath.push()
+
 
       net += 1
 
@@ -324,21 +333,22 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       # Get the two pins we need to be between.
-      destination = self.center( net, +1 )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
-      self.gCodePath.push( destination.x, destination.y, geometry.backZ )
-      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Back ) # Partial Z
-
-      center = self.center( net, +1 )
-      self.gCodePath.pushSeekForce( True, False, True )
-      self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( center.x, destination.y, geometry.partialZ_Back )
+      self.gCodePath.push()
 
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-      self.gCodePath.push( center.x, destination.y, geometry.frontZ )
+      self.gCodePath.push( z=geometry.backZ )
+      self.gCodePath.push( z=geometry.partialZ_Back ) # Partial Z
 
-      self.gCodePath.push( center.x, center.y - geometry.overshoot, geometry.frontZ )
+      self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, +1 ), "X" ) )
+      self.gCodePath.push()
+      self.gCodePath.push( z=geometry.frontZ )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, +1 ), "Y" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=-geometry.overshoot ) )
+      self.gCodePath.push()
 
       net += 1
 
@@ -363,31 +373,32 @@ class LayerV_Recipe( RecipeGenerator ) :
         )
 
       # Lower right front side.
-      destination = self.center( net, +1 )
+      #destination = self.center( net, +1 )
 
       # Seek what is likely the bottom.
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, +1 ), "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
-      self.gCodePath.push( destination.x, destination.y, geometry.frontZ )
-      self.gCodePath.push( destination.x, destination.y, geometry.partialZ_Front )
+      self.gCodePath.push()
+
+      self.gCodePath.push( z=geometry.partialZ_Front )
 
       # Lower right backside.
-      center = self.center( net, -1 )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, -1 ), "Y" ) )
       self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.partialZ_Front )
-      self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-      self.gCodePath.push( self.gCodePath.last.x, center.y, geometry.backZ )
-      self.gCodePath.push(
-        center.x + geometry.pinRadius - geometry.overshoot,
-        center.y,
-        geometry.backZ
-      )
+      self.gCodePath.push()
 
+      self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
+      self.gCodePath.push( z=geometry.backZ )
+      self.gCodePath.push( z=geometry.frontZ )
+
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, -1 ), "X" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( x=geometry.pinRadius - geometry.overshoot ) )
+      self.gCodePath.push()
+
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, -1 ), "Y" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=-geometry.overshoot ) )
       self.gCodePath.pushG_Code( ClipG_Code() )
-      self.gCodePath.push(
-        center.x + geometry.pinRadius - geometry.overshoot,
-        center.y - geometry.overshoot,
-        geometry.backZ
-      )
+      self.gCodePath.push()
 
       net += 1
 
@@ -404,34 +415,43 @@ class LayerV_Recipe( RecipeGenerator ) :
 
       length2 = self.nodePath.pushOffset( self.location( net ), 0, geometry.pinRadius, ur )
 
-      center = self.center( net, +1 )
+      centerA = self.center( net - 1, -1 )
+      centerA.y -= geometry.overshoot
+      centerB = self.center( net,     +1 )
       self.gCodePath.pushG_Code( WireLengthG_Code( length1 ) )
 
       # Get the angle of the line going directly to the center of the destination
       # pins.
-      segment = Segment( self.gCodePath.last, center )
+      segment = Segment( centerA, centerB )
       line = Line.fromSegment( segment )
 
       # If the angle isn't too steep, go directly to the destination.  Otherwise,
       # just go to the Z-transfer area in Y.
       # (We could always go to the Z-transfer area in Y, but this allows a
       # faster path as long as the angle is large enough).
-      if line.getAngle() >= geometry.minAngle and self.gCodePath.last.y > center.y :
+      if line.getAngle() >= geometry.minAngle and centerA.y > centerB.y :
+         self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "XY" ) )
         self.gCodePath.pushG_Code( SeekTransferG_Code() )
-        self.gCodePath.push( center.x, center.y, geometry.backZ )
+        self.gCodePath.push()
       else:
-        self.gCodePath.pushG_Code( SeekTransferG_Code() )
-        self.gCodePath.push( self.gCodePath.last.x, self.gCodePath.last.y - 1000, geometry.backZ )
+        self.gCodePath.pushG_Code( OffsetG_Code( y=-1000 ) )
+        self.gCodePath.pushG_Code( ClipG_Code() )
+        self.gCodePath.push()
 
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.backZ )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.partialZ_Back )
-
-      center = self.center( net, -1 )
-      self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.partialZ_Back )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "B", net, +1 ), "X" ) )
+      self.gCodePath.push()
 
       self.gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-      self.gCodePath.push( center.x, self.gCodePath.last.y, geometry.frontZ )
-      self.gCodePath.push( center.x, center.y + geometry.overshoot, geometry.frontZ )
+      self.gCodePath.push( z=geometry.backZ )
+      self.gCodePath.push( z=geometry.partialZ_Back )
+
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, -1 ), "X" ) )
+      self.gCodePath.pushG_Code( WireLengthG_Code( length2 ) )
+      self.gCodePath.push()
+
+      self.gCodePath.push( z=geometry.frontZ )
+      self.gCodePath.pushG_Code( PinCenterG_Code( self.pinNames( "F", net, -1 ), "Y" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=geometry.overshoot ) )
+      self.gCodePath.push()
 
       net += 1

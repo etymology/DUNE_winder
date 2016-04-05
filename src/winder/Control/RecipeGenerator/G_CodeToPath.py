@@ -49,6 +49,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self._gCode = G_Code( lines, self._callbacks )
     self._calibration = calibration
     self._geometry = geometry
+    self._headZ = 0
 
   #---------------------------------------------------------------------
   def toPath( self ) :
@@ -61,6 +62,11 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     """
     path = G_CodePath()
     totalLines = self._gCode.getLineCount()
+
+    FRONT = 0
+    BACK = 1
+
+    latchSide = FRONT
     for line in range( 0, totalLines ) :
 
       # Reset all values so we know what has changed.
@@ -75,12 +81,19 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
 
-      path.push( self._x, self._y, self._z )
+        if G_Codes.LATCH == int( function[ 0 ] ) :
+          self._headZ = self._z
+          latchSide = int( function[ 1 ] )
+
+      if FRONT == latchSide :
+        self._headZ = self._z
+
+      path.push( self._x, self._y, self._headZ )
 
     return path
 
   #---------------------------------------------------------------------
-  def _pointLabel( self, output, location, text, layer=None, vary=False ) :
+  def _pointLabel( self, output, location, text, layer=None, offsetX=None, offsetY=None ) :
     """
     Make a SketchUp label at specified location.
 
@@ -100,14 +113,13 @@ class G_CodeToPath( G_CodeHandlerBase ) :
         + str( y ) + ' ]'
         + "\r\n" )
 
-    if vary :
-      random.uniform( -3, 3 )
-      random.uniform( -3, 3 )
-    else :
-      x = 0.1
-      y = 0.1
+    if None == offsetX :
+      offsetX = random.uniform( -3, 3 )
 
-    output.write( 'vector = Geom::Vector3d.new ' + str( x ) + ',0,' + str( y ) + "\r\n" )
+    if None == offsetY :
+      offsetY = random.uniform( -3, 3 )
+
+    output.write( 'vector = Geom::Vector3d.new ' + str( offsetX ) + ',0,' + str( offsetY ) + "\r\n" )
     output.write( 'label = Sketchup.active_model.entities.add_text "'
       + text + '", point, vector' + "\r\n" )
 
@@ -137,10 +149,13 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     if enablePinLabels :
       for pinName in self._calibration._locations :
         location = self._calibration.getPinLocation( pinName )
+
+        y = 0.1
         if "B" == pinName[ 0 ] :
           location.z = self._geometry.depth
+          y = -0.1
 
-        self._pointLabel( rubyFile, location, pinName, 'layer' )
+        self._pointLabel( rubyFile, location, pinName, 'layer', 0.1, y )
 
     gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
 

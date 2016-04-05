@@ -12,3 +12,4 @@ class G_Codes :
   SEEK_TRANSFER = 102
   PIN_CENTER    = 103
   CLIP          = 104
+  OFFSET        = 105
