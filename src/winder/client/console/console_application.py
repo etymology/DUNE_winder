@@ -4,16 +4,16 @@ from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 
 from winder.utility.collections import DictOps
 
+from .application_shared import AppShare
 from .ui.kivy_mixins import BackgroundColorMixin
 from .ui.kivy_utilities import KivyUtilities
 from .ui.manual_movement import ManualMovementControl
 from .ui.operation_bar import OperationBar
 from .ui.status_bar import StatusBar
 
-# from .application_shared import AppShare
 class RootWidget( BackgroundColorMixin, BoxLayout ):
    def __init__( self, **kwargs ):
-      super( RootWidget, self ).__init__( **DictOps.dict_combine( kwargs, orientation = "vertical" ) )
+      super( RootWidget, self ).__init__( **DictOps.dict_combine( kwargs, orientation = "vertical", bg_color = AppShare.instance().settings.theme.control_color_value ) )
       self._construct( **kwargs )
 
    def _construct( self, **kwargs ):
