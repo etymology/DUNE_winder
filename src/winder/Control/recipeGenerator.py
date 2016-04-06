@@ -12,8 +12,10 @@ from Machine.Settings import Settings
 from Library.Configuration import Configuration
 
 from Machine.V_LayerGeometry import V_LayerGeometry
+from Machine.U_LayerGeometry import U_LayerGeometry
 from Machine.LayerCalibration import LayerCalibration
 from RecipeGenerator.LayerV_Recipe import LayerV_Recipe
+from RecipeGenerator.LayerU_Recipe import LayerU_Recipe
 from RecipeGenerator.G_CodeToPath import G_CodeToPath
 
 #------------------------------------------------------------------------------
@@ -31,12 +33,18 @@ if __name__ == "__main__":
 
   # Generate recipes for each layer.
   # $$$FUTURE - Add remaining layers.
-  geometry = V_LayerGeometry()
-  recipe = LayerV_Recipe( geometry )
+  geometryV = V_LayerGeometry()
+  recipeV = LayerV_Recipe( geometryV )
+  geometryU = U_LayerGeometry()
+  recipeU = LayerU_Recipe( geometryU )
+
+  recipeV.printStats()
+  recipeU.printStats()
 
   # Save recipes for each layer to recipe directory.
   # $$$FUTURE - Add remaining layers.
-  recipe.writeG_Code( recipeDirectory + "/V-Layer.gc", "V Layer" )
+  #recipeV.writeG_Code( recipeDirectory + "/V-Layer.gc", "V Layer" )
+  recipeU.writeG_Code( recipeDirectory + "/U-Layer.gc", "U Layer" )
 
 
   #
@@ -44,18 +52,17 @@ if __name__ == "__main__":
   #
 
   # Generate an ideal calibration file for layer.
-  recipe.writeDefaultCalibration( "./", "V-Layer_Calibration.xml", "V Layer" )
-  calibration = LayerCalibration.load( "./", "V-Layer_Calibration.xml" )
+  recipeU.writeDefaultCalibration( "./", "U-Layer_Calibration.xml", "U Layer" )
+  calibrationU = LayerCalibration.load( "./", "U-Layer_Calibration.xml" )
 
   # Convert G-Code to path.
-  gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometry, calibration )
-  gCodePath.writeRubyCode( "V-Layer.rb", False, False )
+  gCodePath = G_CodeToPath( recipeDirectory + "/U-Layer.gc", geometryU, calibrationU )
+  gCodePath.writeRubyCode( "U-Layer.rb", True, True )
 
   # Add the resulting wire path.
-  #recipe.writeRubyCode( "V-Layer.rb", False, False, True, True )
+  recipeU.writeRubyCode( "U-Layer.rb", False, False, True, True )
 
   #recipe.writeRubyAnimateCode( "V-LayerAnimation.rb", 20 )
-  recipe.printStats()
 
 
 # "If quantum mechanics hasn't profoundly shocked you, you haven't understood
