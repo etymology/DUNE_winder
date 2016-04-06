@@ -15,28 +15,31 @@ class RecipeGenerator :
   Base recipe class.
   """
 
-  net = []
-  nodesFront = []
-  nodesBack = []
-  gCodePath = None
-  nodePath = None
+  #---------------------------------------------------------------------
+  def __init__( self ) :
+    """
+    $$$DEBUG
+    """
+    self.net = []
+    self.nodes = {}
+    self.totalPins = None
+    self.gCodePath = None
+    self.nodePath = None
 
   #---------------------------------------------------------------------
-  def pinName( self, side, pin ) :
+  def offsetPin( self, pin, offset ) :
     """
-    Turn the pin number and side into name.
-
-    Args:
-      side: 'F' for front, 'B' for back side.
-      pin: Pin number.
-
-    Returns:
-      Pin name in the format 'S####' where S is the side.
+    $$$DEBUG
     """
-    return str( side ) + str( pin + 1 )
+    side = pin[ 0 ]
+    pinNumber  = int( pin[ 1: ] ) - 1
+    pinNumber += offset
+    pinNumber %= self.totalPins
+    pinNumber += 1
+    return side + str( pinNumber )
 
   #---------------------------------------------------------------------
-  def pinNames( self, side, startPin, direction ) :
+  def pinNames( self, startPin, direction ) :
     """
     Return a pair of pin names of two pins next to one an other.
 
@@ -49,8 +52,8 @@ class RecipeGenerator :
       List of two pin name strings.
     """
     pinA = self.net[ startPin ]
-    pinB = ( pinA + direction ) % len( self.nodesFront )
-    return [ self.pinName( side, pinA ), self.pinName( side, pinB ) ]
+    pinB = self.offsetPin( pinA, direction )
+    return [ pinA, pinB ]
 
   #---------------------------------------------------------------------
   def center( self, startPin, direction ) :
@@ -65,14 +68,10 @@ class RecipeGenerator :
       Location instance with the center point between these two pins.
     """
     pin = self.net[ startPin ]
-    x = self.nodesFront[ pin ].x
-    y = self.nodesFront[ pin ].y
-    pinA = Location( x, y )
+    pinA = self.nodes[ pin ]
 
-    netOffset = ( pin + direction ) % len( self.nodesFront )
-    x = self.nodesFront[ netOffset ].x
-    y = self.nodesFront[ netOffset ].y
-    pinB = Location( x, y )
+    pin = self.offsetPin( pin, direction )
+    pinB = self.nodes[ pin ]
 
     return pinA.center( pinB )
 
@@ -88,9 +87,7 @@ class RecipeGenerator :
       Location instance of the net.
     """
     pin = self.net[ net ]
-    location = self.nodesFront[ pin ]
-    result = Location( location.x, location.y, location.z )
-    return result
+    return self.nodes[ pin ]
 
   #---------------------------------------------------------------------
   def writeRubyCode(
@@ -210,9 +207,8 @@ class RecipeGenerator :
     calibration = LayerCalibration( layerName )
     calibration.setOffset( Location( 0, 0 ) )
 
-    for index in range( 0, len( self.nodesFront ) ) :
-      calibration.setPinLocation( self.pinName( "F", index ), self.nodesFront[ index ] )
-      calibration.setPinLocation( self.pinName( "B", index ), self.nodesBack[ index ] )
+    for node in self.nodes :
+      calibration.setPinLocation( node, self.nodes[ node ] )
 
     calibration.save( outputFilePath, outputFileName )
 

@@ -49,7 +49,7 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     #   dy - Change in y each iteration.
     #   off.x - Starting x offset for initial position of first pin in this set.
     #   off.y - Starting y offset for initial position of first pin in this set.
-    self.gridParameters = \
+    self.gridFront = \
     [
       # Count                    dx            dy   off.x   off.y
       [ self.rows,                0,  self.deltaY,      0,  4.463 ],
@@ -57,6 +57,9 @@ class V_LayerGeometry( UV_LayerGeometry ) :
       [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336 ],
       [ self.columns,  -self.deltaX,            0, -2.209, -7.339 ]
     ]
+
+    # Back is identical to front.
+    self.gridBack = self.gridFront
 
     # Typical slope of lines.
     self.slope = self.deltaY / self.deltaX

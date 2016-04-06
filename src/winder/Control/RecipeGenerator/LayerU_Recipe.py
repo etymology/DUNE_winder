@@ -1,7 +1,7 @@
 ###############################################################################
-# Name: LayerV_Recipe.py
-# Uses: Recipe generation for V-layer.
-# Date: 2016-03-23
+# Name:
+# Uses:
+# Date: 2016-04-05
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
@@ -24,7 +24,7 @@ from G_CodeFunctions.ClipG_Code import ClipG_Code
 from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
 from G_CodeFunctions.OffsetG_Code import OffsetG_Code
 
-class LayerV_Recipe( RecipeGenerator ) :
+class LayerU_Recipe( RecipeGenerator ) :
   """
 
     *  *  *  *  *  *  *  *
@@ -44,25 +44,25 @@ class LayerV_Recipe( RecipeGenerator ) :
   pin on the bottom, one pin right of center, and the second from the bottom
   """
 
-  # $$$ #---------------------------------------------------------------------
-  # $$$ @staticmethod
-  # $$$ def pinCompare( pinA, pinB ) :
-  # $$$   pinA_Side = pinA[ 0 ]
-  # $$$   pinB_Side = pinB[ 0 ]
-  # $$$   pinA_Number = int( pinA[ 1: ] )
-  # $$$   pinB_Number = int( pinB[ 1: ] )
-  # $$$
-  # $$$   result = 0
-  # $$$   if pinA_Side < pinB_Side :
-  # $$$     result = 1
-  # $$$   elif pinA_Side > pinB_Side :
-  # $$$     result = -1
-  # $$$   elif pinA_Number < pinB_Number :
-  # $$$     result = -1
-  # $$$   elif pinA_Number > pinB_Number :
-  # $$$     result = 1
-  # $$$
-  # $$$   return result
+  #---------------------------------------------------------------------
+  @staticmethod
+  def pinCompare( pinA, pinB ) :
+    pinA_Side = pinA[ 0 ]
+    pinB_Side = pinB[ 0 ]
+    pinA_Number = int( pinA[ 1: ] )
+    pinB_Number = int( pinB[ 1: ] )
+
+    result = 0
+    if pinA_Side < pinB_Side :
+      result = 1
+    elif pinA_Side > pinB_Side :
+      result = -1
+    elif pinA_Number < pinB_Number :
+      result = -1
+    elif pinA_Number > pinB_Number :
+      result = 1
+
+    return result
 
   #---------------------------------------------------------------------
   def __init__( self, geometry, windsOverride=None ) :
@@ -99,10 +99,6 @@ class LayerV_Recipe( RecipeGenerator ) :
         location = Location( round( x, 5 ), round( y, 5 ), 0 )
         self.nodes[ "F" + str( pinNumber ) ] = location
 
-        location = Location( round( x, 5 ), round( y, 5 ), geometry.depth )
-        backPin = ( ( geometry.rows - pinNumber ) % geometry.pins ) + 1
-        self.nodes[ "B" + str( backPin ) ] = location
-
         pinNumber += 1
 
         x += xInc
@@ -112,13 +108,35 @@ class LayerV_Recipe( RecipeGenerator ) :
       x -= xInc
       y -= yInc
 
-    #for node in sorted( self.nodes, cmp=LayerV_Recipe.pinCompare ) :
-    #  side = node[ 0 ]
-    #  pin = node[ 1: ]
-    #  location = str( self.nodes[ node ] )[ 1:-1 ].replace( ' ', '' )
-    #  print side + "," + pin + "," + location
-    #
-    #return
+
+
+
+
+    x = 0
+    y = 0
+    pinNumber = 401
+    for parameter in geometry.gridBack :
+      count = parameter[ 0 ]
+      xInc  = parameter[ 1 ]
+      yInc  = parameter[ 2 ]
+      x += parameter[ 3 ]
+      y += parameter[ 4 ]
+
+      for position in range( 0, count ) :
+
+        location = Location( round( x, 8 ), round( y, 8 ), geometry.depth )
+        self.nodes[ "B" + str( pinNumber ) ] = location
+
+        pinNumber -= 1
+        if 0 == pinNumber :
+          pinNumber = geometry.pins
+
+        x += xInc
+        y += yInc
+
+      # Backup for last position.
+      x -= xInc
+      y -= yInc
 
     #----------------------------------
     # Create net list.
@@ -130,18 +148,18 @@ class LayerV_Recipe( RecipeGenerator ) :
     # All following locations are just modifications of this initial set.
     self.net = \
     [
-      "F" + str( 2 * geometry.rows + geometry.columns ),
-      "F" + str( geometry.columns ),
-      "B" + str( geometry.rows + 2 * geometry.columns ),
-      "B" + str( geometry.rows ),
       "F" + str( 1 ),
-      "F" + str( 2 * geometry.rows + 2 * geometry.columns - 1 ),
-      "B" + str( geometry.rows + 1 ),
-      "B" + str( geometry.rows + 2 * geometry.columns - 1 ),
       "F" + str( geometry.columns + 1 ),
-      "F" + str( 2 * geometry.rows + geometry.columns - 1 ),
-      "B" + str( geometry.rows + geometry.columns + 1 ),
-      "B" + str( geometry.rows + geometry.columns - 1 ),
+      "B" + str( 2 * geometry.columns + geometry.rows + 2 ),
+      "B" + str( geometry.columns + geometry.rows + 1 ),
+      "F" + str( 2 * geometry.columns + 2 ),
+      "F" + str( 2 * geometry.columns + 1 ),
+      "B" + str( geometry.columns + geometry.rows + 2 ),
+      "B" + str( 2 * geometry.columns + geometry.rows + 1 ),
+      "F" + str( geometry.columns + 2 ),
+      "F" + str( 2 * geometry.columns + 2 * geometry.rows + 1 ),
+      "B" + str( geometry.rows + 2 ),
+      "B" + str( geometry.rows ),
     ]
 
     # Number of items in above list.
