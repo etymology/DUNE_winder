@@ -37,7 +37,6 @@ class PLC_Motor( Motor ) :
 
     # Write tags.
     self._setPosition  = PLC.Tag( plc, tagBase + "_POSITION", tagType="REAL" )
-    #self._maxVelocity  = PLC.Tag( plc, tagBase + "_DATA.CommandVelocity", tagType="REAL" )
     self._jogSpeed     = PLC.Tag( plc, tagBase + "_SPEED", tagType="REAL" )
     self._jogDirection = PLC.Tag( plc, tagBase + "_DIR", tagType="DINT" )
 

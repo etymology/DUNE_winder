@@ -11,6 +11,7 @@ from LayerGeometry import LayerGeometry
 
 class UV_LayerGeometry( LayerGeometry ) :
 
+
   #-------------------------------------------------------------------
   def __init__( self ) :
     """
@@ -19,17 +20,13 @@ class UV_LayerGeometry( LayerGeometry ) :
 
     LayerGeometry.__init__( self )
 
-    self.rows        = 400
-    self.columns     = 2 * self.rows
-    self.pins        = 2 * self.rows + 2 * self.columns - 1
+    self.rows    = 400
+    self.columns = 2 * self.rows
 
     # Data about the pins.
     self.pinDiameter = 2.43
     self.pinRadius   = self.pinDiameter / 2
     self.pinHeight   = 2
-
-
-
 
     # Spacing between pins and front to back.
     self.deltaX      = 8.0

@@ -6,9 +6,55 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from Path3d import Path3d
 from Library.Geometry.Location import Location
 from Library.Recipe import Recipe
 from Machine.LayerCalibration import LayerCalibration
+from G_CodeFunctions.LatchG_Code import LatchG_Code
+
+# $$$DEBUG - Move
+class Z_Axis :
+
+  FRONT = 0
+  PARTIAL_FRONT = 1
+  PARTIAL_BACK  = 2
+  BACK = 3
+
+  #---------------------------------------------------------------------
+  def __init__( self, gCodePath, geometry, initialPosition ) :
+    """
+    $$$DEBUG
+    """
+    self._gCodePath = gCodePath
+    self._geometry = geometry
+    self._currentPostion = initialPosition
+
+  #---------------------------------------------------------------------
+  def set( self, location ) :
+
+    if self._currentPostion != location :
+
+      # Latch needed?
+      if Z_Axis.BACK == self._currentPostion or Z_Axis.BACK == location :
+        # Latch to front or back?
+        if self._currentPostion == Z_Axis.BACK :
+          self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
+        else :
+          self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
+
+        # Get/set it from/to back.
+        self._gCodePath.push( z=self._geometry.backZ )
+
+      # Front and back are both in front.  This is because is the destination
+      # is the back, we leave the head at the back and return to the front.
+      if Z_Axis.BACK == location or Z_Axis.FRONT == location :
+        self._gCodePath.push( z=self._geometry.frontZ )
+      elif Z_Axis.PARTIAL_FRONT == location :
+        self._gCodePath.push( z=self._geometry.partialZ_Front )
+      elif Z_Axis.PARTIAL_BACK == location :
+        self._gCodePath.push( z=self._geometry.partialZ_Back )
+
+      self._currentPostion = location
 
 class RecipeGenerator :
   """
@@ -25,6 +71,9 @@ class RecipeGenerator :
     self.totalPins = None
     self.gCodePath = None
     self.nodePath = None
+
+    self.geometry = None
+    self.headZ = 0
 
   #---------------------------------------------------------------------
   def offsetPin( self, pin, offset ) :
@@ -88,6 +137,36 @@ class RecipeGenerator :
     """
     pin = self.net[ net ]
     return self.nodes[ pin ]
+
+  #---------------------------------------------------------------------
+  def writeRubyBasePath(
+    self,
+    outputFileName,
+    isAppend=True
+  ) :
+    """
+    Make the basic wire path.  This is pin-center to pin-center without
+    considering diameter of pin.
+
+    Args:
+      outputFileName: File name to create.
+      enableWire: Show the wire wound on the layer.
+    """
+    attributes = "w"
+    if isAppend :
+      attributes = "a"
+
+    rubyFile = open( outputFileName, attributes )
+
+    path3d = Path3d()
+    for net in self.net :
+      node = self.nodes[ net ]
+      print node
+      path3d.push( node.x, node.y, node.z )
+
+    path3d.toSketchUpRuby( rubyFile )
+
+    rubyFile.close()
 
   #---------------------------------------------------------------------
   def writeRubyCode(

@@ -25,7 +25,7 @@ class Path3d :
     self.last = None
 
   #---------------------------------------------------------------------
-  def pushOffset( self, location, z, radius=0, angle=0 ) :
+  def pushOffset( self, location, radius=0, angle=0 ) :
     """
     Add an offset position to path.  Offset specified as a radius and angle.
 
@@ -41,7 +41,7 @@ class Path3d :
     offsetX = radius * math.sin( angle )
     offsetY = radius * math.cos( angle )
 
-    return self.push( location.x + offsetX, location.y + offsetY, z )
+    return self.push( location.x + offsetX, location.y + offsetY, location.z )
 
   #---------------------------------------------------------------------
   def push( self, x=None, y=None, z=None ) :

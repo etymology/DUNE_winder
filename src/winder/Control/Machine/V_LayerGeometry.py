@@ -19,15 +19,16 @@ class V_LayerGeometry( UV_LayerGeometry ) :
 
     UV_LayerGeometry.__init__( self )
 
+    # Total number of pins.
+    self.pins = 2 * self.rows + 2 * self.columns - 1
+
     # Spacing between pins and front to back.
-    self.deltaX      = 8.0
-    self.deltaY      = 5.75
-    self.depth       = 87.7
+    self.depth = 87.7
 
     # Distance from the layer to the head.
     self.zClearance = 25
     self.frontZ = -self.zClearance
-    self.backZ   = self.depth + self.zClearance
+    self.backZ  = self.depth + self.zClearance
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
@@ -60,17 +61,3 @@ class V_LayerGeometry( UV_LayerGeometry ) :
 
     # Back is identical to front.
     self.gridBack = self.gridFront
-
-    # Typical slope of lines.
-    self.slope = self.deltaY / self.deltaX
-
-    # Primary angle (in radians) between wires.
-    self.angle = math.atan( self.deltaY / self.deltaX )
-
-    # When crossing between pins, this is the minimum allowable angle.  Less
-    # than this the wire risks hitting the pins on either side.
-    self.minAngle = math.radians( 30 )
-
-    # Distance between wires.
-    self.wireSpacing = \
-      self.deltaY / math.sqrt( self.deltaY**2 / self.deltaX**2 + 1 )
