@@ -288,6 +288,12 @@ class MotorStatus( Remote ) :
 #==============================================================================
 class JogTab( wx.Panel, Remote, ActivatedTab ) :
   #---------------------------------------------------------------------
+  def jogZ_Start( self, direction ) :
+    velocity = self.slider.GetValue() / 100.0
+    velocity *= direction
+    self.remote( "process.jogZ(" + str( velocity ) + ")" )
+
+  #---------------------------------------------------------------------
   def jogStart( self, x, y ) :
 
     velocity = self.slider.GetValue() / 100.0
@@ -312,14 +318,25 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
 
   #---------------------------------------------------------------------
   def jogStop( self ) :
-    self.remote( "io.plcLogic.jogXY( 0, 0 )" )
+    #self.remote( "io.plcLogic.jogXY( 0, 0 )" )
     self.remote( "process.jogXY( 0, 0 )" )
+
+  #---------------------------------------------------------------------
+  def jogZ_Stop( self ) :
+    #self.remote( "io.plcLogic.jogZ( 0 )" )
+    self.remote( "process.jogZ( 0 )" )
 
   #---------------------------------------------------------------------
   def setPosition( self, event ) :
     event = event
     velocity = self.slider.GetValue() / 100.0
     self.remote( "process.manualSeekXY( 0, 0, " + str( velocity ) + " )" )
+
+  #---------------------------------------------------------------------
+  def setZ_Position( self, event ) :
+    event = event
+    velocity = self.slider.GetValue() / 100.0
+    self.remote( "process.manualSeekZ( 0, " + str( velocity ) + " )" )
 
   #---------------------------------------------------------------------
   def __init__( self, remote, panel ):
@@ -383,6 +400,24 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
         ( jogXY_RD ), ( jogXY_ZD ), ( jogXY_FD )
       ]
     )
+    outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
+
+
+
+    grideSizer = wx.GridSizer( 1, 3, 5, 5 )
+    jogZ_E = wx.Button( self, label='<-' )
+    jogZ_Z = wx.Button( self, label='*' )
+    jogZ_R = wx.Button( self, label='->' )
+
+    jogZ_E.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogZ_Start( 1 ) )
+    jogZ_Z.Bind( wx.EVT_LEFT_DOWN, self.setZ_Position )
+    jogZ_R.Bind( wx.EVT_LEFT_DOWN, lambda e: self.jogZ_Start( -1 ) )
+
+    jogZ_E.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogZ_Stop() )
+    #jogZ_Z.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogZ_Stop() )
+    jogZ_R.Bind( wx.EVT_LEFT_UP,   lambda e: self.jogZ_Stop() )
+
+    grideSizer.AddMany( [ ( jogZ_E ), ( jogZ_Z ), ( jogZ_R )  ] )
     outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
 
     vbox.Add( outer )

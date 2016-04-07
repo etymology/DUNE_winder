@@ -25,11 +25,11 @@ class ManualMode( StateMachineState ) :
     StateMachineState.__init__( self, stateMachine, state )
     self._io   = io
     self._log  = log
-    self._jogX = 0
-    self._jogY = 0
-    self._jogZ = 0
-    self._wasJoggingXY = False
-    #self._wasSeekingXY = False
+    # $$$ self._jogX = 0
+    # $$$ self._jogY = 0
+    # $$$ self._jogZ = 0
+    self._wasJogging = False
+    self._wasSeekingZ  = False
     self._noteSeekStop = False
 
   #---------------------------------------------------------------------
@@ -43,7 +43,7 @@ class ManualMode( StateMachineState ) :
     """
     isError = True
 
-    self._wasJoggingXY = False
+    self._wasJogging = False
     self._noteSeekStop = False
 
     # X/Y axis move?
@@ -58,18 +58,19 @@ class ManualMode( StateMachineState ) :
         y = self._io.yAxis.getPosition()
 
       self._io.plcLogic.setXY_Position( x, y, self.stateMachine.seekVelocity )
+
       self.stateMachine.seekX = None
       self.stateMachine.seekY = None
       self.stateMachine.seekVelocity = None
-      #self._wasSeekingXY = True
       isError = False
 
     if self.stateMachine.isJogging :
-      self._wasJoggingXY = True
+      self._wasJogging = True
       isError = False
 
     if None != self.stateMachine.seekZ :
-      self._io.zAxis.setDesiredPosition( self.stateMachine.seekZ )
+      #self._io.zAxis.setDesiredPosition( self.stateMachine.seekZ )
+      self._io.plcLogic.setZ_Position( self.stateMachine.seekZ )
       self.stateMachine.seekZ = None
       isError = False
 
@@ -98,26 +99,28 @@ class ManualMode( StateMachineState ) :
     if self._io.plcLogic.isReady() \
       and not self.stateMachine.isJogging :
 
-      # If we were seeking X/Y axis, note where stopped.
+      # If we were seeking and stopped pre-maturely, note where.
       if self._noteSeekStop :
         x = self._io.xAxis.getPosition()
         y = self._io.yAxis.getPosition()
+        z = self._io.zAxis.getPosition()
         self._log.add(
           self.__class__.__name__,
           "SEEK_STOP_LOCATION",
-          "X/Y seek stopped at (" + str( x ) + "," + str( y ) + ")",
-          [ x, y ]
+          "Seek stopped at (" + str( x ) + "," + str( y ) + "," + str( z ) + ")",
+          [ x, y, z ]
         )
 
-      # If we were jogging X/Y axis, note where stopped.
-      if self._wasJoggingXY :
+      # If we were jogging, note where it stopped.
+      if self._wasJogging :
         x = self._io.xAxis.getPosition()
         y = self._io.yAxis.getPosition()
+        z = self._io.zAxis.getPosition()
         self._log.add(
           self.__class__.__name__,
           "JOG_STOP",
-          "X/Y jog stopped at (" + str( x ) + "," + str( y ) + ")",
-          [ x, y ]
+          "Jog stopped at (" + str( x ) + "," + str( y ) + "," + str( z ) + ")",
+          [ x, y, z ]
         )
 
       self.changeState( self.stateMachine.States.STOP )

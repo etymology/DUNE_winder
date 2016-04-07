@@ -329,11 +329,12 @@ class Process :
       self._log.add(
         self.__class__.__name__,
         "JOG",
-        "Jog request ignored.",
+        "Jog X/Y request ignored.",
         [ xVelocity, yVelocity ]
       )
 
     return isError
+
   #---------------------------------------------------------------------
   def manualSeekXY( self, xPosition, yPosition, velocity=None ) :
     """
@@ -361,6 +362,75 @@ class Process :
       self.controlStateMachine.seekY = yPosition
       self.controlStateMachine.seekVelocity = velocity
       self.controlStateMachine.manualRequest = True
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def manualSeekZ( self, position, velocity=None ) :
+    """
+    Seek an Z location.
+
+    Args:
+      position: New position in meters of z.
+      velocity: Maximum velocity.  None for last velocity used.
+    Returns:
+      True if there was an error, False if not.
+    """
+
+    isError = True
+    if self.controlStateMachine.isMovementReady() :
+      isError = False
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Manual move Z to " + str( position ) + " at " + str( velocity ) + ".",
+        [ position, velocity ]
+      )
+      self.controlStateMachine.seekZ = position
+      self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.manualRequest = True
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def jogZ( self, velocity ) :
+    """
+    Jog the Z axis at a given velocity.
+
+    Args:
+      velocity: Speed of z axis in m/s.  Allows negative for reverse, 0 to stop.
+
+    Returns:
+      True if there was an error, False if not.
+    """
+
+    isError = False
+    if 0 != velocity and self.controlStateMachine.isMovementReady() :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Jog Z at " + str( velocity ) + ".",
+        [ velocity ]
+      )
+      self.controlStateMachine.manualRequest = True
+      self.controlStateMachine.isJogging = True
+      self._io.plcLogic.jogZ( velocity )
+    elif 0 == velocity and self.controlStateMachine.isJogging :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Jog Z stop."
+      )
+      self.controlStateMachine.isJogging = False
+      self._io.plcLogic.jogZ( velocity )
+    else:
+      isError = True
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Jog Z request ignored.",
+        [ velocity ]
+      )
 
     return isError
 
