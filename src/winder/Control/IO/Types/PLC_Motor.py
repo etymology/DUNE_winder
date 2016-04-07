@@ -52,6 +52,8 @@ class PLC_Motor( Motor ) :
 
     # Motor status tag defaults to a faulted state in case read fails.
     attributes = PLC.Tag.Attributes()
+    attributes.isPolled = True
+    attributes.canWrite = False
     attributes.defaultValue = True
     self._faulted = PLC.Tag( plc, tagBase + "_DATA.ModuleFault", attributes )
 
