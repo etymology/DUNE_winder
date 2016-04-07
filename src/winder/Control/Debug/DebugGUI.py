@@ -945,10 +945,15 @@ class DebugGUI( wx.Frame, Remote ):
 
 # end class
 
-
-#def test() :
 if __name__ == "__main__":
-  wxApplication = wx.App()
-  DebugGUI( None, "192.168.56.102", 6626, 1024 )
-  #DebugGUI( None, "172.16.21.47", 6626 )
-  wxApplication.MainLoop()
+
+  import sys
+  from Machine.Settings import Settings
+
+  if len( sys.argv ) < 2 :
+    print "Need to specify IP address for DebugGUI"
+  else:
+    wxApplication = wx.App()
+    ip = sys.argv[ 1 ]
+    DebugGUI( None, ip, Settings.SERVER_PORT , Settings.SERVER_MAX_DATA_SIZE )
+    wxApplication.MainLoop()
