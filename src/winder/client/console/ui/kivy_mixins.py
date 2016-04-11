@@ -1,17 +1,24 @@
-from kivy.graphics import Color, Ellipse, Rectangle
+from kivy.graphics import Ellipse, Rectangle
 from kivy.properties import BoundedNumericProperty, ListProperty, NumericProperty, OptionProperty
 from winder.utility.collections import DictOps
+
+from .kivy_utilities import KivyUtilities
 
 class BackgroundColorMixin( object ):
    class Keys:
       Color = "bg_color"
       Canvas = "bg_canvas"
 
+   class CanvasTargets:
+      Before = "before"
+      Normal = "normal"
+      After = "after"
+
    bg_color = ListProperty( [ 0, 0, 0, 0 ] )
 
    def __init__( self, **kwargs ):
       initial_color_value = DictOps.extract_optional_value( kwargs, BackgroundColorMixin.Keys.Color )
-      target_canvas_value = DictOps.extract_optional_value( kwargs, BackgroundColorMixin.Keys.Canvas, default_value = "before" )
+      target_canvas_value = DictOps.extract_optional_value( kwargs, BackgroundColorMixin.Keys.Canvas, default_value = BackgroundColorMixin.CanvasTargets.Before )
 
       self.bind( bg_color = self._set_bg_color )
       super( BackgroundColorMixin, self ).__init__( **kwargs )
@@ -27,26 +34,14 @@ class BackgroundColorMixin( object ):
    def _get_canvas( self, value ):
       if value is None:
          raise ValueError( "Canvas value cannot be None." )
-      elif value == "before":
+      elif value == BackgroundColorMixin.CanvasTargets.Before:
          result = self.canvas.before
-      elif value == "normal":
+      elif value == BackgroundColorMixin.CanvasTargets.Normal:
          result = self.canvas
-      elif value == "after":
+      elif value == BackgroundColorMixin.CanvasTargets.After:
          result = self.canvas.after
       else:
          raise ValueError( "Canvas value '{}' is not valid.".format( value ) )
-
-      return result
-
-   def _get_color( self, value ):
-      color_component_count = len( value )
-
-      if color_component_count == 3:
-         result = Color( value[ 0 ], value[ 1 ], value[ 2 ] )
-      elif color_component_count == 4:
-         result = Color( value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] )
-      else:
-         raise Exception( "Invalid color: {}".format( str( value ) ) )
 
       return result
 
@@ -61,7 +56,7 @@ class BackgroundColorMixin( object ):
       self._initialized = True
 
    def _set_bg_color( self, instance, value ):
-      color = self._get_color( value )
+      color = KivyUtilities.get_color_from_value( value )
 
       if not self._initialized:
          self._initialize( color )
@@ -86,9 +81,19 @@ class BackgroundShapeMixin( BackgroundColorMixin ):
       HorizontalOrientation = "horizontal_orientation"
       Size = "shape_size"
 
+   class VerticalOrientations:
+      Bottom = "bottom"
+      Center = "center"
+      Top = "top"
+
+   class HorizontalOrientations:
+      Left = "left"
+      Center = "center"
+      Right = "right"
+
    shape_color = ListProperty( [ 0, 0, 0, 1 ] )
-   shape_vertical_orientation = OptionProperty( "center", options = [ "top", "center", "bottom" ] )
-   shape_horizontal_orientation = OptionProperty( "center", options = [ "left", "center", "right" ] )
+   shape_vertical_orientation = OptionProperty( VerticalOrientations.Center, options = [ VerticalOrientations.Top, VerticalOrientations.Center, VerticalOrientations.Bottom ] )
+   shape_horizontal_orientation = OptionProperty( HorizontalOrientations.Center, options = [ HorizontalOrientations.Left, HorizontalOrientations.Center, HorizontalOrientations.Right ] )
    shape_size = ListProperty( [ None, None ] )
 
    def _get_shape_size( self ):
@@ -112,21 +117,21 @@ class BackgroundShapeMixin( BackgroundColorMixin ):
       horizontal_excess, vertical_excess = self._get_shape_orientation_excess()
 
       if horizontal_excess > 0:
-         if self.shape_horizontal_orientation == "left":
+         if self.shape_horizontal_orientation == BackgroundShapeMixin.HorizontalOrientations.Left:
             x_pos = 0
-         elif self.shape_horizontal_orientation == "right":
+         elif self.shape_horizontal_orientation == BackgroundShapeMixin.HorizontalOrientations.Right:
             x_pos = float( horizontal_excess ) / self.width
-         else: # if self.shape_horizontal_orientation == "center"
+         else: # if self.shape_horizontal_orientation == BackgroundShapeMixin.HorizontalOrientations.Center
             x_pos = ( float( horizontal_excess ) / self.width ) / 2
       else:
          x_pos = 0
 
       if vertical_excess > 0:
-         if self.shape_vertical_orientation == "top":
+         if self.shape_vertical_orientation == BackgroundShapeMixin.VerticalOrientations.Top:
             y_pos = float( vertical_excess ) / self.height
-         elif self.shape_vertical_orientation == "bottom":
+         elif self.shape_vertical_orientation == BackgroundShapeMixin.VerticalOrientations.Bottom:
             y_pos = 0
-         else: # if self.shape_vertical_orientation == "center"
+         else: # if self.shape_vertical_orientation == BackgroundShapeMixin.VerticalOrientations.Center
             y_pos = ( float( vertical_excess ) / self.height ) / 2
       else:
          y_pos = 0
@@ -137,7 +142,7 @@ class BackgroundShapeMixin( BackgroundColorMixin ):
       return result
 
    def __init__( self, **kwargs ):
-      target_canvas_value = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.Canvas, default_value = "normal" )
+      target_canvas_value = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.Canvas, default_value = BackgroundColorMixin.CanvasTargets.Normal )
       initial_shape_color = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.Color )
       vertical_orientation = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.VerticalOrientation )
       horizontal_orientation = DictOps.extract_optional_value( kwargs, BackgroundShapeMixin.Keys.HorizontalOrientation )
@@ -176,7 +181,7 @@ class BackgroundShapeMixin( BackgroundColorMixin ):
       self._initialized = True
 
    def _render_canvas( self ):
-      color = self._get_color( self.shape_color )
+      color = KivyUtilities.get_color_from_value( self.shape_color )
 
       if not self._initialized:
          self._initialize_shape( color )
