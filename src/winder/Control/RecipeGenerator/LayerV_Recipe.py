@@ -46,9 +46,7 @@ class LayerV_Recipe( LayerUV_Recipe ) :
     LayerUV_Recipe.__init__( self, geometry )
 
     # Setup node list.
-    self._createNode(
-      geometry.gridFront, True, "F", geometry.partialZ_Front, 1, 1 )
-
+    self._createNode( geometry.gridFront, True, "F", geometry.partialZ_Front, 1, 1 )
     self._createNode(
       geometry.gridBack, True, "B", geometry.partialZ_Back, self.geometry.rows, -1 )
 

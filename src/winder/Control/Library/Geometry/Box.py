@@ -114,7 +114,8 @@ class Box :
     Get a string representation of object.
 
     Returns:
-      $$$DEBUG
+      String with the four corners of the box starting on the bottom left
+      and moving clockwise.
     """
     return "[ " + str( self._left )      \
       + ", " + str( self._top )          \

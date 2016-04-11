@@ -16,7 +16,6 @@ from Machine.U_LayerGeometry import U_LayerGeometry
 from Machine.LayerCalibration import LayerCalibration
 from RecipeGenerator.LayerV_Recipe import LayerV_Recipe
 from RecipeGenerator.LayerU_Recipe import LayerU_Recipe
-from RecipeGenerator.G_CodeToPath import G_CodeToPath
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":

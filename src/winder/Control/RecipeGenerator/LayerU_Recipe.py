@@ -48,7 +48,7 @@ class LayerU_Recipe( LayerUV_Recipe ) :
     # Setup node list.
     self._createNode( geometry.gridFront, False, "F", geometry.partialZ_Front, 1, 1 )
     self._createNode(
-      geometry.gridBack,  False, "B", geometry.partialZ_Back, self.geometry.rows + 1, -1 )
+      geometry.gridBack, False, "B", geometry.partialZ_Back, self.geometry.rows + 1, -1 )
 
     # Define the first few net locations.
     # All following locations are just modifications of this initial set.

@@ -19,7 +19,8 @@ from G_CodeFunctions.ClipG_Code import ClipG_Code
 from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
 from G_CodeFunctions.OffsetG_Code import OffsetG_Code
 
-from RecipeGenerator import RecipeGenerator, Z_Axis
+from RecipeGenerator import RecipeGenerator
+from HeadPosition import HeadPosition
 from Path3d import Path3d
 from G_CodePath import G_CodePath
 
@@ -46,7 +47,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     # the amount of wire actually dispensed.
     self.nodePath = Path3d()
 
-    self.z = Z_Axis( self.gCodePath, self.geometry, Z_Axis.FRONT )
+    self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -263,7 +264,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.push()
-      self.z.set( Z_Axis.PARTIAL )
+      self.z.set( HeadPosition.PARTIAL )
 
 
     if self._nextNet() :
@@ -272,7 +273,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
 
       # Go to other side and seek past pin so it is hooked with next move.
-      self.z.set( Z_Axis.OTHER_SIDE )
+      self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=-self.geometry.overshoot ) )
       self.gCodePath.push()
@@ -290,12 +291,12 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.push()
-      self.z.set( Z_Axis.PARTIAL )
+      self.z.set( HeadPosition.PARTIAL )
 
     if self._nextNet() :
       self.gCodePath.pushG_Code( self._pinCenterTarget( "Y" ) )
       self.gCodePath.push()
-      self.z.set( Z_Axis.OTHER_SIDE )
+      self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
       offset = ( self.geometry.pinRadius - self.geometry.overshoot ) * direction
       self.gCodePath.pushG_Code( OffsetG_Code( x=offset ) )
@@ -330,12 +331,12 @@ class LayerUV_Recipe( RecipeGenerator ) :
         self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
         self.gCodePath.push()
 
-      self.z.set( Z_Axis.PARTIAL )
+      self.z.set( HeadPosition.PARTIAL )
 
     if self._nextNet() :
       self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
       self.gCodePath.push()
-      self.z.set( Z_Axis.OTHER_SIDE )
+      self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self._pinCenterTarget( "Y" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=self.geometry.overshoot ) )
       self.gCodePath.push()
@@ -373,10 +374,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
     totalCount = self.geometry.pins / 12
-
-    # # $$$DEBUG - Temp--this will wind the entire layer.
-    # totalCount *= 2
-    # totalCount += 10
 
     if windsOverride :
       totalCount = windsOverride

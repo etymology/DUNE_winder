@@ -10,77 +10,6 @@ from Path3d import Path3d
 from Library.Geometry.Location import Location
 from Library.Recipe import Recipe
 from Machine.LayerCalibration import LayerCalibration
-from G_CodeFunctions.LatchG_Code import LatchG_Code
-
-# $$$DEBUG - Move
-class Z_Axis :
-
-  FRONT = 0
-  PARTIAL_FRONT = 1
-  PARTIAL_BACK  = 2
-  BACK = 3
-
-  PARTIAL = 4
-  OTHER_SIDE = 5
-
-  #---------------------------------------------------------------------
-  def __init__( self, gCodePath, geometry, initialPosition ) :
-    """
-    $$$DEBUG
-    """
-    self._gCodePath = gCodePath
-    self._geometry = geometry
-    self._currentPostion = initialPosition
-
-  #---------------------------------------------------------------------
-  def get( self ) :
-    """$$$DEBUG"""
-    return self._currentPostion
-
-  #---------------------------------------------------------------------
-  def set( self, location ) :
-    """$$$DEBUG"""
-
-    # Partial for the current side.
-    if Z_Axis.PARTIAL == location :
-      if Z_Axis.BACK == self._currentPostion :
-        location = Z_Axis.PARTIAL_BACK
-      elif Z_Axis.FRONT == self._currentPostion :
-        location = Z_Axis.PARTIAL_FRONT
-      else :
-        print location, self._currentPostion
-        raise Exception()
-
-    # Switch to other side.
-    if Z_Axis.OTHER_SIDE == location :
-      if Z_Axis.BACK == self._currentPostion or Z_Axis.PARTIAL_BACK == self._currentPostion :
-        location = Z_Axis.FRONT
-      elif Z_Axis.FRONT == self._currentPostion or Z_Axis.PARTIAL_FRONT == self._currentPostion :
-        location = Z_Axis.BACK
-
-    if self._currentPostion != location :
-
-      # Latch needed?
-      if Z_Axis.BACK == self._currentPostion or Z_Axis.BACK == location :
-        # Latch to front or back?
-        if self._currentPostion == Z_Axis.BACK :
-          self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-        else :
-          self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
-
-        # Get/set it from/to back.
-        self._gCodePath.push( z=self._geometry.backZ )
-
-      # Front and back are both in front.  This is because is the destination
-      # is the back, we leave the head at the back and return to the front.
-      if Z_Axis.BACK == location or Z_Axis.FRONT == location :
-        self._gCodePath.push( z=self._geometry.frontZ )
-      elif Z_Axis.PARTIAL_FRONT == location :
-        self._gCodePath.push( z=self._geometry.partialZ_Front )
-      elif Z_Axis.PARTIAL_BACK == location :
-        self._gCodePath.push( z=self._geometry.partialZ_Back )
-
-      self._currentPostion = location
 
 class RecipeGenerator :
   """
@@ -90,11 +19,13 @@ class RecipeGenerator :
   #---------------------------------------------------------------------
   def __init__( self, geometry ) :
     """
-    $$$DEBUG
+    Constructor.
+
+    Args:
+      geometry: Instance of LayerGeometry (specifically one of its children).
     """
     self.net = []
     self.nodes = {}
-    #$$$ self.totalPins = None
     self.gCodePath = None
     self.nodePath = None
 
@@ -104,12 +35,20 @@ class RecipeGenerator :
   #---------------------------------------------------------------------
   def offsetPin( self, pin, offset ) :
     """
-    $$$DEBUG
+    Offset to a pin number.  Useful for finding the pin names on either side
+    of some pin.
+
+    Args:
+      pin: Pin name to offset.
+      offset: Amount to offset pin.
+
+    Returns:
+      Pin name of offset pin.
     """
     side = pin[ 0 ]
     pinNumber  = int( pin[ 1: ] ) - 1
     pinNumber += offset
-    pinNumber %= self.geometry.pins #self.totalPins
+    pinNumber %= self.geometry.pins
     pinNumber += 1
     return side + str( pinNumber )
 
