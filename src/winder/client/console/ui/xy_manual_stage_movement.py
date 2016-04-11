@@ -1,32 +1,19 @@
-import re
-
-from kivy.clock import Clock
 from kivy.properties import BooleanProperty
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
+import re
 
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
-from ..command import Command
+from ..movement_command import MovementCommand
 from .kivy_mixins import BackgroundColorMixin
 from .kivy_sparce_grid_layout import GridBoxLayout
 from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridImageButton, GridLabel
 from .kivy_utilities import KivyUtilities
 
-class _XyCommands( Command ):
-   class Keys:
-      MovementRateCallback = "movement_rate_callback"
 
-   def __init__( self, **kwargs ):
-      if _XyCommands.Keys.MovementRateCallback in kwargs:
-         self.movement_rate_callback = kwargs[ _XyCommands.Keys.MovementRateCallback ]
-         del kwargs[ _XyCommands.Keys.MovementRateCallback ]
-      else:
-         self.movement_rate_callback = None
-
-      super( _XyCommands, self ).__init__( **kwargs )
-
+class _XyCommands( MovementCommand ):
    def move_start( self, x, y ):
       command = "process.jogXY( %s, %s )" % ( x, y )
       return self.send_command( command )
@@ -38,35 +25,34 @@ class _XyCommands( Command ):
       command = "process.manualSeekXY( {:f}, {:f}, {} )".format( x, y, maximum_velocity )
       return self.send_command( command )
 
-class _XyCurrentPositionCommand( Command ):
-   def get_current_position( self ):
-      commands = [ "io.simulationTime.setLocal()", "io.xAxis.getPosition()", "io.yAxis.getPosition()" ]
-      return self.send_commands( commands )[ 1 : ]
-
 class _PositiveXDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-      self.move_start( self.movement_rate_callback(), 0 )
+      rate = self.movement_rate_callback()
+      self.move_start( rate, 0 )
 
    def on_release( self ):
       self.move_stop()
 
 class _NegativeXDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-      self.move_start( -self.movement_rate_callback(), 0 )
+      rate = self.movement_rate_callback()
+      self.move_start( -rate, 0 )
 
    def on_release( self ):
       self.move_stop()
 
 class _PositiveYDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-      self.move_start( 0, self.movement_rate_callback() )
+      rate = self.movement_rate_callback()
+      self.move_start( 0, rate )
 
    def on_release( self ):
       self.move_stop()
 
 class _NegativeYDirectionControl( GridImageButton, _XyCommands ):
    def on_press( self ):
-      self.move_start( 0, -self.movement_rate_callback() )
+      rate = self.movement_rate_callback()
+      self.move_start( 0, -rate )
 
    def on_release( self ):
       self.move_stop()
@@ -152,15 +138,14 @@ class _XyPositionSeekButton( BackgroundColorMixin, Button, _XyCommands ):
 
 class ManualXyStageMovement( SparseGridLayout ):
    def __init__( self, movement_rate_callback, **kwargs ):
-      super( ManualXyStageMovement, self ).__init__( rows = 3, columns = 4, **kwargs )
+      super( ManualXyStageMovement, self ).__init__( **DictOps.dict_combine( kwargs, rows = 3, columns = 4 ) )
 
       self._movement_rate_callback = movement_rate_callback
 
-      self._construct( **DictOps.dict_filter( kwargs, GridEntry.FieldNames.all ) )
-      self._schedule_polling()
+      self._construct( **DictOps.dict_filter( kwargs, GridEntry.FieldNames.all, "size_hint" ) )
 
    def _construct( self, **kwargs ):
-      common_kwargs = { _XyCommands.Keys.MovementRateCallback : self._movement_rate_callback }
+      common_kwargs = { MovementCommand.Keys.MovementRateCallback : self._movement_rate_callback }
 
       negative_x_direction_control = _NegativeXDirectionControl( **DictOps.dict_combine( kwargs, common_kwargs, row = 1, column = 0, source = AppShare.instance().settings.theme.neg_x_arrow ) )
       positive_x_direction_control = _PositiveXDirectionControl( **DictOps.dict_combine( kwargs, common_kwargs, row = 1, column = 2, source = AppShare.instance().settings.theme.pos_x_arrow ) )
@@ -173,31 +158,15 @@ class ManualXyStageMovement( SparseGridLayout ):
       self.position_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 1 , text = "--", color = AppShare.instance().settings.theme.text_color_value ) )
 
       seek_position_layout = GridBoxLayout( **DictOps.dict_combine( kwargs, orientation = "vertical", row = 0, column = 3, column_span = 3 ) )
-      self.seek_xy_position_input = _XyPositionSeekInput( **kwargs )
-      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, input = self.seek_xy_position_input, text = "Go to...", color = AppShare.instance().settings.theme.text_color_value, halign = "left", valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value ) )
+      self.seek_xy_position_input = _XyPositionSeekInput( size_hint = ( None, 1 ), **kwargs )
+      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, input = self.seek_xy_position_input, text = "Go to Position", color = AppShare.instance().settings.theme.text_color_value, valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value, size_hint = ( None, 1 ), ) )
 #       self.seek_xy_position_button.bind( disabled = self.seek_xy_position_input.is_invalid )
 
       KivyUtilities.add_children_to_widget( seek_position_layout, [ self.seek_xy_position_input, self.seek_xy_position_button ] )
       KivyUtilities.add_children_to_widget( self, [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label, seek_position_layout, negative_x_direction_label, positive_x_direction_label ] )
 
-   def _schedule_polling( self ):
-      self.current_position_command = _XyCurrentPositionCommand()
-
-      Clock.schedule_interval( self._clock_interval_expiration, .25 )
-
-   def _clock_interval_expiration( self, dt ):
-      positions = self.current_position_command.get_current_position()
-      self._update_xy_position( positions[ 0 ], positions[ 1 ] )
-
-      return True
-
-   def _update_xy_position( self, x_pos, y_pos ):
-      # If the PLC is unavailable, the server returns "None" for both x_pos and y_pos.
-      if x_pos == "None":
-         x_pos = None
-      if y_pos == "None":
-         y_pos = None
-
+   def update_xy_position( self, x_pos, y_pos ):
+      # If the PLC is unavailable, both x_pos and y_pos are None.
       if x_pos is not None and y_pos is not None:
          text = "{:.2f} mm, {:.2f} mm".format( float( x_pos ), float( y_pos ) )
       else:

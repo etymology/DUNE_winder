@@ -9,7 +9,7 @@ from .switch import WinderSwitch
 
 class LabelledWinderSwitch( BoxLayout ):
    def __init__( self, **kwargs ):
-      super( LabelledWinderSwitch, self ).__init__( **DictOps.dict_combine( kwargs, orientation = "horizontal" ) )
+      super( LabelledWinderSwitch, self ).__init__( **DictOps.dict_combine( kwargs, orientation = "horizontal", spacing = 10 ) )
       self._construct( **kwargs )
 
    def _construct( self, **kwargs ):
