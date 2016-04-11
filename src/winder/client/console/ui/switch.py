@@ -19,6 +19,7 @@ class WinderSwitch( EllipseWidget ):
 
    def __init__( self, **kwargs ):
       self._construct_color_table()
+      self.shape_color = self._get_current_color()
 
       initial_state = DictOps.extract_optional_value( kwargs, WinderSwitch.Keys.State )
 
@@ -33,10 +34,18 @@ class WinderSwitch( EllipseWidget ):
 
       self._color_tables[ WinderSwitchStates.Off ] = [ 0, 0, 1 ]
       self._color_tables[ WinderSwitchStates.On ] = [ 0, 1, 0 ]
-      self._color_tables[ WinderSwitchStates.Error] = [ 1, 0, 0 ]
+      self._color_tables[ WinderSwitchStates.Error ] = [ 1, 0, 0 ]
+
+   def _get_current_color( self, value = None ):
+      if value is not None:
+         key = value
+      else:
+         key = self.state
+
+      return self._color_tables[ key ]
 
    def _update_state( self, instance, value ):
-      self.shape_color = self._color_tables[ self.state ]
+      self.shape_color = self._get_current_color()
 
 class GridWinderSwitch( GridEntry, WinderSwitch ):
    pass
