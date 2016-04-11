@@ -20,6 +20,9 @@ class Z_Axis :
   PARTIAL_BACK  = 2
   BACK = 3
 
+  PARTIAL = 4
+  OTHER_SIDE = 5
+
   #---------------------------------------------------------------------
   def __init__( self, gCodePath, geometry, initialPosition ) :
     """
@@ -30,7 +33,30 @@ class Z_Axis :
     self._currentPostion = initialPosition
 
   #---------------------------------------------------------------------
+  def get( self ) :
+    """$$$DEBUG"""
+    return self._currentPostion
+
+  #---------------------------------------------------------------------
   def set( self, location ) :
+    """$$$DEBUG"""
+
+    # Partial for the current side.
+    if Z_Axis.PARTIAL == location :
+      if Z_Axis.BACK == self._currentPostion :
+        location = Z_Axis.PARTIAL_BACK
+      elif Z_Axis.FRONT == self._currentPostion :
+        location = Z_Axis.PARTIAL_FRONT
+      else :
+        print location, self._currentPostion
+        raise Exception()
+
+    # Switch to other side.
+    if Z_Axis.OTHER_SIDE == location :
+      if Z_Axis.BACK == self._currentPostion or Z_Axis.PARTIAL_BACK == self._currentPostion :
+        location = Z_Axis.FRONT
+      elif Z_Axis.FRONT == self._currentPostion or Z_Axis.PARTIAL_FRONT == self._currentPostion :
+        location = Z_Axis.BACK
 
     if self._currentPostion != location :
 
@@ -62,17 +88,17 @@ class RecipeGenerator :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self ) :
+  def __init__( self, geometry ) :
     """
     $$$DEBUG
     """
     self.net = []
     self.nodes = {}
-    self.totalPins = None
+    #$$$ self.totalPins = None
     self.gCodePath = None
     self.nodePath = None
 
-    self.geometry = None
+    self.geometry = geometry
     self.headZ = 0
 
   #---------------------------------------------------------------------
@@ -83,7 +109,7 @@ class RecipeGenerator :
     side = pin[ 0 ]
     pinNumber  = int( pin[ 1: ] ) - 1
     pinNumber += offset
-    pinNumber %= self.totalPins
+    pinNumber %= self.geometry.pins #self.totalPins
     pinNumber += 1
     return side + str( pinNumber )
 
@@ -161,7 +187,6 @@ class RecipeGenerator :
     path3d = Path3d()
     for net in self.net :
       node = self.nodes[ net ]
-      print node
       path3d.push( node.x, node.y, node.z )
 
     path3d.toSketchUpRuby( rubyFile )

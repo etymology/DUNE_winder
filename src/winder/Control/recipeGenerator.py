@@ -36,7 +36,7 @@ if __name__ == "__main__":
   geometryV = V_LayerGeometry()
   recipeV = LayerV_Recipe( geometryV )
   geometryU = U_LayerGeometry()
-  recipeU = LayerU_Recipe( geometryU, 1 )
+  recipeU = LayerU_Recipe( geometryU )
 
   recipeV.printStats()
   recipeU.printStats()
@@ -56,14 +56,13 @@ if __name__ == "__main__":
   recipeV.writeDefaultCalibration( "./", "V-Layer_Calibration.xml", "V Layer" )
   calibrationV = LayerCalibration.load( "./", "V-Layer_Calibration.xml" )
   gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometryV, calibrationV )
-  gCodePath.writeRubyCode( "V-Layer.rb", True, False )
+  gCodePath.writeRubyCode( "V-Layer.rb", True, True )
   recipeV.writeRubyCode( "V-Layer.rb", False, False, True, True )
-
 
   recipeU.writeDefaultCalibration( "./", "U-Layer_Calibration.xml", "U Layer" )
   calibrationU = LayerCalibration.load( "./", "U-Layer_Calibration.xml" )
   gCodePath = G_CodeToPath( recipeDirectory + "/U-Layer.gc", geometryU, calibrationU )
-  gCodePath.writeRubyCode( "U-Layer.rb", True, False )
+  gCodePath.writeRubyCode( "U-Layer.rb", enablePathLabels=True, enablePinLabels=True )
   recipeU.writeRubyCode( "U-Layer.rb", False, False, True, True )
 
   #recipeU.writeRubyCode( "U-Layer.rb", False, False, True, False )

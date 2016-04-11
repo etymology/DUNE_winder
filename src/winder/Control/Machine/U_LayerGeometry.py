@@ -23,10 +23,10 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     self.pins = 2 * self.rows + 2 * self.columns + 1
 
     # Spacing between pins and front to back.
-    self.depth = 104.7
+    self.depth = 104.7  / self.scale
 
     # Distance from the layer to the head.
-    self.zClearance = 25
+    self.zClearance = 25 / self.scale
     self.frontZ = -self.zClearance
     self.backZ  = self.depth + self.zClearance
 

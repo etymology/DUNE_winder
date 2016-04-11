@@ -9,4 +9,10 @@
 from APA_Geometry import APA_Geometry
 
 class LayerGeometry( APA_Geometry ) :
-  pass
+  #-------------------------------------------------------------------
+  def __init__( self ) :
+    """
+    Constructor.
+    """
+
+    APA_Geometry.__init__( self )

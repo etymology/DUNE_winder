@@ -17,12 +17,16 @@ class MachineGeometry :
     Constructor.
     """
 
+    # Scale down factor for geometry.
+    # Debug only.  Set to 1 for production.
+    self.scale = 1
+
     # Location of Z-Transfer areas.
     # Top/bottom for Y, left/right for X.
-    self.top    = 2500
-    self.bottom = -25
-    self.left   = -250
-    self.right  = 6450
+    self.top    = 2500  / self.scale
+    self.bottom = -25   / self.scale
+    self.left   = -250  / self.scale
+    self.right  = 7000  / self.scale
 
     # How big the Z-transfer windows are.
     # The Z-transfer windows start at top/bottom/left/right locations.

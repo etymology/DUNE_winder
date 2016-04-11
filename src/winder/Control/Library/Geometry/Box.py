@@ -107,3 +107,16 @@ class Box :
     self._top    = top
     self._right  = right
     self._bottom = bottom
+
+  #---------------------------------------------------------------------
+  def __str__( self ) :
+    """
+    Get a string representation of object.
+
+    Returns:
+      $$$DEBUG
+    """
+    return "[ " + str( self._left )      \
+      + ", " + str( self._top )          \
+      + ", " + str( self._right )        \
+      + ", " + str( self._bottom ) + "]"

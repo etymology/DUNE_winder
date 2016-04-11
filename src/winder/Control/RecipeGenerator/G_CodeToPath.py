@@ -76,7 +76,11 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       self._functions = []
 
       # Interpret the next line.
-      self._gCode.executeNextLine( line )
+      try :
+        self._gCode.executeNextLine( line )
+      except Exception as exception :
+        print "Error on line ", line
+        raise exception
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )

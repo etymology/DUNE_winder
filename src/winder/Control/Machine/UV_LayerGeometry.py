@@ -20,7 +20,7 @@ class UV_LayerGeometry( LayerGeometry ) :
 
     LayerGeometry.__init__( self )
 
-    self.rows    = 400
+    self.rows    = 400 / self.scale
     self.columns = 2 * self.rows
 
     # Data about the pins.
