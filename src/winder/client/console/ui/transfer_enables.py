@@ -1,14 +1,14 @@
-from threading import Lock
-
 from kivy.clock import Clock
 from kivy.graphics import Color, Ellipse, Rectangle
 from kivy.uix.widget import Widget
+from threading import Lock
 
 from winder.client.console.ui.kivy_mixins import BackgroundColorMixin
 from winder.utility.collections import DictOps
 from winder.utility.machine_dimensions import WinderMachineDimensions, WinderMachinePositions
 
 from .kivy_utilities import KivyUtilities
+
 
 class _Positions( object ):
    _DomainStart_x = 0
@@ -35,6 +35,9 @@ class _Positions( object ):
    Apa_start = ( TransferLeft_end[ 0 ], TransferBottom_end[ 1 ] )
    Apa_end = ( MountRight_start[ 0 ], MountRight_end[ 1 ] )
 
+   _DomainStart = ( _DomainStart_x, _DomainStart_y )
+   _DomainEnd = ( _DomainEnd_x, _DomainEnd_y )
+
    @staticmethod
    def get_size( start_pos, end_pos ):
       return ( end_pos[ 0 ] - start_pos[ 0 ], end_pos[ 1 ] - start_pos[ 1 ] )
@@ -48,10 +51,12 @@ class _Sizes( object ):
    MountRight = _Positions.get_size( _Positions.MountRight_start, _Positions.MountRight_end )
    Apa = _Positions.get_size( _Positions.Apa_start, _Positions.Apa_end )
 
-   Location = ( .01, .01 )
+   Location = ( .1, .1 )
+
+   _Domain = _Positions.get_size( _Positions._DomainStart, _Positions._DomainEnd )
 
 class _Colors( object ):
-   LocationColor = [ 0, 0, 1 ]
+   LocationColor = [ 0, 0, 1, .5 ]
    ApaColor = [ .75, 0, .75, .5 ]
    TransferAllowed = [ 0, .75, 0, .5 ]
    TransferDisallowed = [ .5, .5, .5, .5 ]
@@ -106,36 +111,18 @@ class _TransferRegionRectangle( object ):
          Rectangle( pos = position, size = size )
 
    def draw_location( self, canvas, canvas_offset, canvas_size, represented_position, indicator_color, shape_class = None, **kwargs ):
-      display_position = self.get_display_position( represented_position )
-      if self.is_point_in_rectangle( display_position, self.get_rectangle( canvas_size ) ):
+      canvas_position = ( float( represented_position[ 0 ] ) / WinderMachineDimensions.Width_abs_mm * canvas_size[ 0 ], float( represented_position[ 1 ] / WinderMachineDimensions.VerticalHeadSpace_abs_mm * canvas_size[ 1 ] ) )
+
+      if self.is_point_in_rectangle( canvas_position, self.get_rectangle( canvas_size ) ):
          if shape_class is None:
             shape_class = Ellipse
 
-         region_canvas_offset = ( canvas_offset[ 0 ] + self.displayed_start_x * canvas_size[ 0 ], canvas_offset[ 1 ] + self.displayed_start_y * canvas_size[ 1 ] )
-         region_canvas_size = ( self.displayed_width * canvas_size[ 0 ], self.displayed_height * canvas_size[ 1 ] )
-
-         position = [ display_position[ 0 ] * canvas_size[ 0 ] + canvas_offset[ 0 ], display_position[ 1 ] * canvas_size[ 1 ] + canvas_offset[ 1 ] ]
-#          indicator_size = ( target_display_size[ 0 ] * canvas_size[ 0 ], target_display_size[ 1 ] * canvas_size[ 1 ] )
-         indicator_size = ( _Sizes.Location[ 0 ] * region_canvas_size[ 0 ], _Sizes.Location[ 1 ] * region_canvas_size[ 1 ] )
+         indicator_canvas_size = [ _Sizes.Location[ 0 ] * canvas_size[ 0 ], _Sizes.Location[ 1 ] * canvas_size[ 1 ] ]
+         position = [ canvas_offset[ 0 ] + canvas_position[ 0 ] - indicator_canvas_size[ 0 ] / 2, canvas_offset[ 1 ] + canvas_position[ 1 ] - indicator_canvas_size[ 1 ] / 2 ]
 
          with canvas:
             indicator_color
-            shape_class( size_hint = indicator_size, pos = position )
-
-   def _transform_position( self, position, current_domain_size, new_domain_size ):
-      domain_width_scale_factor = float( new_domain_size[ 0 ] ) / current_domain_size[ 0 ]
-      domain_height_scale_factor = float( new_domain_size[ 1 ] ) / current_domain_size[ 1 ]
-
-      new_pos_x = float( position[ 0 ] ) * domain_width_scale_factor
-      new_pos_y = float( position[ 1 ] ) * domain_height_scale_factor
-
-      return ( new_pos_x, new_pos_y )
-
-   def get_display_position( self, represented_position ):
-      return self._transform_position( represented_position, self.represented_size, self.displayed_size )
-
-   def get_represented_position( self, displayed_position ):
-      return self._transform_position( displayed_position, self.displayed_size, self.represented_size )
+            shape_class( size = indicator_canvas_size, pos = position )
 
    def _get_displayed_width( self ):
       return self.displayed_size[ 0 ]
@@ -345,7 +332,8 @@ class TransferEnables( BackgroundColorMixin, Widget ):
          region.draw( target_canvas, self.pos, self.size, current_location )
 
       with self._locations_lock:
-         self._draw_locations( self._locations, target_canvas, self.pos, self.size )
+         current_locations = self._locations
+      self._draw_locations( current_locations, target_canvas, self.pos, self.size )
 
       self._locations_changed = False
 
@@ -362,27 +350,30 @@ class TransferEnables( BackgroundColorMixin, Widget ):
       return result
 
    def _draw_locations( self, locations, canvas, canvas_offset, canvas_size ):
-      if self._locations_changed and len( locations ) > 0:
+      if len( locations ) > 0:
          opacity_increment = 1. / len( locations )
 
          current_opacity = opacity_increment
          for location in locations:
-               region = self._locate_region( location )
-               if region is not None:
-                  location_color = _Colors.apply_opacity( _Colors.LocationColor, current_opacity )
-                  region.draw_location( canvas, canvas_offset, canvas_size, location, location_color )
+            region = self._locate_region( location )
+            if region is not None:
+               location_color = _Colors.apply_opacity( _Colors.LocationColor, current_opacity )
+               region.draw_location( canvas, canvas_offset, canvas_size, location, location_color )
 
-               current_opacity += opacity_increment
+            current_opacity += opacity_increment
 
    def update_position( self, position ):
       # If the PLC is unavailable, the position is None.
       if position is not None:
          with self._locations_lock:
-            while len( self._locations ) >= self.LocationBufferSize:
-               self._locations.pop( 0 )
+            if len( self._locations ) == 0 or position != self._locations[ -1 ]: # `self._locations[ -1 ]` is used instead of `self.current_location` to avoid deadlock.
+               while len( self._locations ) >= self.LocationBufferSize:
+                  self._locations.pop( 0 )
 
-            self._locations.append( position )
-            self._locations_changed = True
+               self._locations.append( position )
+               self._locations_changed = True
+            elif len( self._locations ) > 1: # and position == self._locations[ -1 ]: # `self._locations[ -1 ]` is used instead of `self.current_location` to avoid deadlock.
+               self._locations.pop( 0 ) # Incrementally expire the point history.
 
    def _update_display( self, instance, value ):
       self._draw()
