@@ -12,7 +12,6 @@ from .kivy_sparce_grid_layout import GridBoxLayout
 from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridImageButton, GridLabel
 from .kivy_utilities import KivyUtilities
 
-
 class _XyCommands( MovementCommand ):
    def move_start( self, x, y ):
       command = "process.jogXY( %s, %s )" % ( x, y )
@@ -70,7 +69,7 @@ class _XyPositionSeekInput( TextInput ):
       self._set_seek_x_position( None )
       self._set_seek_y_position( None )
 
-      super( _XyPositionSeekInput, self ).__init__( **kwargs )
+      super( _XyPositionSeekInput, self ).__init__( **DictOps.dict_combine( kwargs, multiline = False ) )
 
    def _set_validity( self ):
       self.is_valid = self.valid_expression.match( self.text ) is not None
