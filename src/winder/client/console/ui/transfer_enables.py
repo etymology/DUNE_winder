@@ -244,6 +244,38 @@ class _TransferRegionRectangle( object ):
 
       return result
 
+   def convert_displayed_into_represented_point( self, displayed_point, input_is_global = True, output_is_global = True ):
+      if input_is_global:
+         point = ( displayed_point[ 0 ] - self.displayed_start_x, displayed_point[ 1 ] - self.displayed_start_y )
+      else:
+         point = displayed_point
+
+      local_represented_x = point[ 0 ] / self.displayed_width * self.represented_width
+      local_represented_y = point[ 1 ] / self.displayed_height * self.represented_height
+
+      if output_is_global:
+         result = ( local_represented_x + self.represented_start_x, local_represented_y + self.represented_start_y )
+      else:
+         result = ( local_represented_x, local_represented_y )
+
+      return result
+
+   def convert_represented_into_displayed_point( self, represented_point, input_is_global = True, output_is_global = True ):
+      if input_is_global:
+         point = ( represented_point[ 0 ] - self.represented_start_x, represented_point[ 1 ] - self.represented_start_y )
+      else:
+         point = represented_point
+
+      local_displayed_x = point[ 0 ] / self.represented_width * self.displayed_width
+      local_displayed_y = point[ 1 ] / self.represented_height * self.displayed_height
+
+      if output_is_global:
+         result = ( local_displayed_x + self.displayed_start_x, local_displayed_y + self.displayed_start_y )
+      else:
+         result = ( local_displayed_x, local_displayed_y )
+
+      return result
+
 class _ImmutableTransferRegionRectangle( _TransferRegionRectangle ):
    def __init__( self, color, displayed_position, displayed_size, represented_position, represented_size, region_name = None, **kwargs ):
       self.color = color
@@ -291,6 +323,8 @@ class TransferEnables( BackgroundColorMixin, Widget ):
       self._schedule_polling( **kwargs )
 
    def _construct( self, **kwargs ):
+      self._initialize_listeners( **kwargs )
+
       self.apa_area = _ImmutableTransferRegionRectangle( _Colors.ApaColor, _Positions.Apa_start, _Sizes.Apa, WinderMachinePositions.Apa_start_abs_mm, WinderMachineDimensions.ApaSpace_abs_mm, "APA" )
       self.transfer_bottom = _MutableTransferRegionRectangle( _Colors.TransferAllowed, _Colors.TransferDisallowed, _Positions.TransferBottom_start, _Sizes.TransferBottom, WinderMachinePositions.BottomTransfer_start_abs_mm, WinderMachineDimensions.BottomTransferSize_abs_mm, "Bottom Transfer" )
       self.transfer_top = _MutableTransferRegionRectangle( _Colors.TransferAllowed, _Colors.TransferDisallowed, _Positions.TransferTop_start, _Sizes.TransferTop, WinderMachinePositions.TopTransfer_start_abs_mm, WinderMachineDimensions.TopTransferSize_abs_mm, "Top Transfer" )
@@ -305,6 +339,10 @@ class TransferEnables( BackgroundColorMixin, Widget ):
       self._locations_lock = Lock()
       self._locations = []
       self._locations_changed = False
+
+   def _initialize_listeners( self, **kwargs ):
+      self._touch_listeners_lock = Lock()
+      self._set_touch_listeners( [] )
 
    def _schedule_polling( self, **kwargs ):
       polling_period_sec = DictOps.extract_optional_value( kwargs, "polling_period", float, .75 )
@@ -383,3 +421,44 @@ class TransferEnables( BackgroundColorMixin, Widget ):
 
    def _update_display( self, instance, value ):
       self._draw()
+
+   def _get_touch_listeners( self ):
+      with self._touch_listeners_lock:
+         return self._touch_listeners
+
+   def _set_touch_listeners( self, value ):
+      with self._touch_listeners_lock:
+         self._touch_listeners = value
+
+   touch_listeners = property( fget = _get_touch_listeners )
+
+   def _notify_listeners( self, touch, represented_position ):
+      if represented_position is not None:
+         with self._touch_listeners_lock:
+            for listener in self._touch_listeners:
+               listener( self, touch, represented_position )
+
+   def on_touch_down( self, touch ):
+      result = False
+      if self.collide_point( *touch.pos ):
+         represented_position = self._get_represented_position( touch )
+         if represented_position is not None: # if the touch point was in this instance
+            self._notify_listeners( touch, represented_position )
+            result = True # Signal the event should not be propagated.
+
+      if not result:
+         result = super( TransferEnables, self ).on_touch_down( touch )
+
+      return result
+
+   def _get_represented_position( self, touch ):
+      raw_touched_position = touch.pos[ : 2 ]
+      touched_position = [ ( raw_touched_position[ 0 ] - self.x ) / self.width, ( raw_touched_position[ 1 ] - self.y ) / self.height ]
+
+      result = None
+      for region in self.regions:
+         if region.contains_displayed_point( touched_position ):
+            result = region.convert_displayed_into_represented_point( touched_position )
+            break
+
+      return result

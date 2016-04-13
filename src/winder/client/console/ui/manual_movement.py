@@ -76,9 +76,13 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
 
       return result
 
+   def _transfer_enables_touch_callback( self, sender, touch, represented_position ):
+      self.xy_movement.seek_xy_position_input.set_text( "{:0.2f}, {:0.2f}".format( represented_position[ 0 ], represented_position[ 1 ] ) )
+
    def _construct_xy_layout( self, **kwargs ):
       self.xy_movement = ManualXyStageMovement( self._get_current_rate__mmps, **kwargs )
       self.transfer_enables = TransferEnables()
+      self.transfer_enables.touch_listeners.append( self._transfer_enables_touch_callback )
 
       result = BoxLayout( **DictOps.dict_combine( kwargs, orientation = "vertical" ) )
 

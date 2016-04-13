@@ -1,7 +1,8 @@
+import re
+
 from kivy.properties import BooleanProperty
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-import re
 
 from winder.utility.collections import DictOps
 
@@ -94,9 +95,7 @@ class _XyPositionSeekInput( TextInput ):
 
    seek_y_position = property( fget = _get_seek_y_position )
 
-   def insert_text( self, substring, from_undo = False ):
-      result = super( _XyPositionSeekInput, self ).insert_text( substring, from_undo )
-
+   def _process_text( self ):
       self._set_validity()
       if self.is_valid:
          match = self.valid_expression.match( self.text ) # match will not be None
@@ -111,7 +110,16 @@ class _XyPositionSeekInput( TextInput ):
       self._set_seek_x_position( x_pos )
       self._set_seek_y_position( y_pos )
 
+   def insert_text( self, substring, from_undo = False ):
+      result = super( _XyPositionSeekInput, self ).insert_text( substring, from_undo )
+
+      self._process_text()
+
       return result
+
+   def set_text( self, new_text ):
+      self.text = new_text
+      self._process_text()
 
 class _XyPositionSeekButton( BackgroundColorMixin, Button, _XyCommands ):
    class Keys:
@@ -119,7 +127,7 @@ class _XyPositionSeekButton( BackgroundColorMixin, Button, _XyCommands ):
 
    def __init__( self, **kwargs ):
       if _XyPositionSeekButton.Keys.InputControl in kwargs:
-         self.input_control = kwargs[ _XyPositionSeekButton.Keys.InputControl]
+         self.input_control = kwargs[ _XyPositionSeekButton.Keys.InputControl ]
          del kwargs[ _XyPositionSeekButton.Keys.InputControl ]
       else:
          raise ValueError( "Missing the input control." )
