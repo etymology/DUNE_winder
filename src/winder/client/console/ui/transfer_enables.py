@@ -1,5 +1,5 @@
 from kivy.clock import Clock
-from kivy.graphics import Color, Ellipse, Rectangle
+from kivy.graphics import Ellipse, Rectangle
 from kivy.uix.widget import Widget
 from threading import Lock
 
@@ -8,7 +8,6 @@ from winder.utility.collections import DictOps
 from winder.utility.machine_dimensions import WinderMachineDimensions, WinderMachinePositions
 
 from .kivy_utilities import KivyUtilities
-
 
 class _Positions( object ):
    _DomainStart_x = 0
@@ -25,8 +24,8 @@ class _Positions( object ):
    TransferTop_start = ( TransferBottom_start[ 0 ], _DomainEnd_y - TransferBottom_end[ 1 ] )
    TransferTop_end = ( TransferBottom_end[ 0 ], _DomainEnd_y )
    TransferLeft_start = ( TransferBottom_start[ 0 ], TransferBottom_end[ 1 ] )
-   TransferLeft_end = ( _SideArea_width, _SideArea_height )
-   TransferRight_start = ( _DomainEnd_x - TransferLeft_end[ 0 ], TransferLeft_start[ 1 ] )
+   TransferLeft_end = ( _SideArea_width, _SideArea_height + TransferLeft_start[ 1 ] )
+   TransferRight_start = ( _DomainEnd_x - _SideArea_width, TransferLeft_start[ 1 ] )
    TransferRight_end = ( _DomainEnd_x, TransferLeft_end[ 1 ] )
    MountLeft_start = ( TransferLeft_start[ 0 ], TransferLeft_end[ 1 ] )
    MountLeft_end = ( TransferLeft_end[ 0 ], TransferTop_start[ 1 ] )
@@ -56,7 +55,7 @@ class _Sizes( object ):
    _Domain = _Positions.get_size( _Positions._DomainStart, _Positions._DomainEnd )
 
 class _Colors( object ):
-   LocationColor = [ 0, 0, 1, .5 ]
+   LocationColor = [ 0, 0, 1 ]
    ApaColor = [ .75, 0, .75, .5 ]
    TransferAllowed = [ 0, .75, 0, .5 ]
    TransferDisallowed = [ .5, .5, .5, .5 ]
@@ -72,7 +71,7 @@ class _Colors( object ):
       else:
          alpha = opacity
 
-      return Color( red, green, blue, alpha )
+      return [ red, green, blue, alpha ]
 
 class _TransferRegionRectangle( object ):
    def __init__( self, displayed_position, displayed_size, represented_position, represented_size, region_name = None, **kwargs ):
@@ -111,17 +110,24 @@ class _TransferRegionRectangle( object ):
          Rectangle( pos = position, size = size )
 
    def draw_location( self, canvas, canvas_offset, canvas_size, represented_position, indicator_color, shape_class = None, **kwargs ):
-      canvas_position = ( float( represented_position[ 0 ] ) / WinderMachineDimensions.Width_abs_mm * canvas_size[ 0 ], float( represented_position[ 1 ] / WinderMachineDimensions.VerticalHeadSpace_abs_mm * canvas_size[ 1 ] ) )
+      indicator_radius = min( [ _Sizes.Location[ 0 ] * canvas_size[ 0 ], _Sizes.Location[ 1 ] * canvas_size[ 1 ] ] )
 
-      if self.is_point_in_rectangle( canvas_position, self.get_rectangle( canvas_size ) ):
+      global_represented_position_ratio = ( float( represented_position[ 0 ] ) / WinderMachineDimensions.Width_abs_mm, float( represented_position[ 1 ] ) / WinderMachineDimensions.VerticalHeadSpace_abs_mm )
+      canvas_position = ( global_represented_position_ratio[ 0 ] * canvas_size[ 0 ], global_represented_position_ratio[ 1 ] * canvas_size[ 1 ] )
+      display_canvas_size = ( canvas_size[ 0 ] + 2 * indicator_radius, canvas_size[ 1 ] + 2 * indicator_radius )
+      if self.is_point_in_rectangle( canvas_position, self.get_rectangle( display_canvas_size, ( -indicator_radius, -indicator_radius ) ) ):
          if shape_class is None:
             shape_class = Ellipse
 
-         indicator_canvas_size = [ _Sizes.Location[ 0 ] * canvas_size[ 0 ], _Sizes.Location[ 1 ] * canvas_size[ 1 ] ]
-         position = [ canvas_offset[ 0 ] + canvas_position[ 0 ] - indicator_canvas_size[ 0 ] / 2, canvas_offset[ 1 ] + canvas_position[ 1 ] - indicator_canvas_size[ 1 ] / 2 ]
+         local_display_position = ( ( global_represented_position_ratio[ 0 ] - self.displayed_start_x ) / self.displayed_width, ( global_represented_position_ratio[ 1 ] - self.displayed_start_y ) / self.displayed_height )
+         global_display_position = ( local_display_position[ 0 ] * self.displayed_width + self.displayed_start_x, local_display_position[ 1 ] * self.displayed_height + self.displayed_start_y )
+         global_canvas_position = ( global_display_position[ 0 ] * canvas_size[ 0 ] + canvas_offset[ 0 ], global_display_position[ 1 ] * canvas_size[ 1 ] + canvas_offset[ 1 ] )
+
+         indicator_canvas_size = [ indicator_radius ] * 2
+         position = [ global_canvas_position[ 0 ] - indicator_canvas_size[ 0 ] / 2, global_canvas_position[ 1 ] - indicator_canvas_size[ 1 ] / 2 ]
 
          with canvas:
-            indicator_color
+            KivyUtilities.get_color_from_value( indicator_color )
             shape_class( size = indicator_canvas_size, pos = position )
 
    def _get_displayed_width( self ):
@@ -301,14 +307,14 @@ class TransferEnables( BackgroundColorMixin, Widget ):
       self._locations_changed = False
 
    def _schedule_polling( self, **kwargs ):
-      polling_period = DictOps.extract_optional_value( kwargs, "polling_period", float, .75 )
+      polling_period_sec = DictOps.extract_optional_value( kwargs, "polling_period", float, .75 )
 
-      Clock.schedule_interval( self._clock_interval_expiration, polling_period )
+      Clock.schedule_interval( self._clock_interval_expiration, polling_period_sec )
 
    def _clock_interval_expiration( self, dt ):
       self._update_display( None, None )
 
-      return True
+      return True # reschedule the timer event
 
    def _get_current_location( self ):
       with self._locations_lock:
@@ -357,8 +363,8 @@ class TransferEnables( BackgroundColorMixin, Widget ):
          for location in locations:
             region = self._locate_region( location )
             if region is not None:
-               location_color = _Colors.apply_opacity( _Colors.LocationColor, current_opacity )
-               region.draw_location( canvas, canvas_offset, canvas_size, location, location_color )
+               location_color_value = _Colors.apply_opacity( _Colors.LocationColor, current_opacity )
+               region.draw_location( canvas, canvas_offset, canvas_size, location, location_color_value )
 
             current_opacity += opacity_increment
 
