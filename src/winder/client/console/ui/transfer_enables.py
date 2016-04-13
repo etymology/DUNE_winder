@@ -1,13 +1,16 @@
+from threading import Lock
+
 from kivy.clock import Clock
 from kivy.graphics import Ellipse, Rectangle
+from kivy.properties import BooleanProperty
 from kivy.uix.widget import Widget
-from threading import Lock
 
 from winder.client.console.ui.kivy_mixins import BackgroundColorMixin
 from winder.utility.collections import DictOps
 from winder.utility.machine_dimensions import WinderMachineDimensions, WinderMachinePositions
 
 from .kivy_utilities import KivyUtilities
+
 
 class _Positions( object ):
    _DomainStart_x = 0
@@ -438,9 +441,11 @@ class TransferEnables( BackgroundColorMixin, Widget ):
             for listener in self._touch_listeners:
                listener( self, touch, represented_position )
 
+   touch_handling_enabled = BooleanProperty( False )
+
    def on_touch_down( self, touch ):
       result = False
-      if self.collide_point( *touch.pos ):
+      if self.touch_handling_enabled and self.collide_point( *touch.pos ):
          represented_position = self._get_represented_position( touch )
          if represented_position is not None: # if the touch point was in this instance
             self._notify_listeners( touch, represented_position )
