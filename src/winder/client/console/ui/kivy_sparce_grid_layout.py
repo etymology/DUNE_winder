@@ -6,6 +6,7 @@ from kivy.uix.checkbox import CheckBox
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 
 from .kivy_image_button import ImageButton
 from .kivy_labelled_checkbox import LabelledCheckbox
@@ -132,4 +133,7 @@ class GridRectangle( GridEntry, RectangleWidget ):
    pass
 
 class GridEllipse( GridEntry, EllipseWidget ):
+   pass
+
+class GridTextInput( GridEntry, TextInput ):
    pass
