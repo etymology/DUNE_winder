@@ -22,11 +22,13 @@ class WinderMachineDimensions:
    BracketSize_abs_mm = ( SideTransferWidth_abs_mm, SideTransferHeight_abs_mm )
 
 class WinderMachinePositions:
-   BottomTransfer_start_abs_mm = ( 0, 0 )
+   Origin = ( 0, 0 )
+
+   BottomTransfer_start_abs_mm = Origin
    BottomTransfer_end_abs_mm = ( BottomTransfer_start_abs_mm[ 0 ] + WinderMachineDimensions.Width_abs_mm, BottomTransfer_start_abs_mm[ 1 ] + WinderMachineDimensions.BottomHeadClearance_abs_mm )
    LeftTransfer_start_abs_mm = ( BottomTransfer_start_abs_mm[ 0 ], BottomTransfer_end_abs_mm[ 1 ] )
    LeftTransfer_end_abs_mm = ( LeftTransfer_start_abs_mm[ 0 ] + WinderMachineDimensions.SideTransferWidth_abs_mm, LeftTransfer_start_abs_mm[ 1 ] + WinderMachineDimensions.SideTransferHeight_abs_mm )
-   RightTransfer_start_abs_mm = ( BottomTransfer_end_abs_mm[ 0 ] - WinderMachineDimensions.SideTransferWidth_abs_mm, LeftTransfer_start_abs_mm[ 0 ] )
+   RightTransfer_start_abs_mm = ( BottomTransfer_end_abs_mm[ 0 ] - WinderMachineDimensions.SideTransferWidth_abs_mm, LeftTransfer_start_abs_mm[ 1 ] )
    RightTransfer_end_abs_mm = ( BottomTransfer_end_abs_mm[ 0 ], LeftTransfer_end_abs_mm[ 1 ] )
    LeftBracket_start_abs_mm = ( LeftTransfer_start_abs_mm[ 0 ], LeftTransfer_end_abs_mm[ 1 ] )
    LeftBracket_end_abs_mm = ( LeftTransfer_end_abs_mm[ 0 ], LeftBracket_start_abs_mm[ 1 ] + WinderMachineDimensions.BracketHeight_abs_mm )
