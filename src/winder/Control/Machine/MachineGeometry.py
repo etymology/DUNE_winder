@@ -26,7 +26,7 @@ class MachineGeometry :
     self.top    = 2500  / self.scale
     self.bottom = -25   / self.scale
     self.left   = -250  / self.scale
-    self.right  = 7000  / self.scale
+    self.right  = 6500  / self.scale
 
     # How big the Z-transfer windows are.
     # The Z-transfer windows start at top/bottom/left/right locations.

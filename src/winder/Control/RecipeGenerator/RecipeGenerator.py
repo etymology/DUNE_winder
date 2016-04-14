@@ -6,10 +6,19 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Path3d import Path3d
 from Library.Geometry.Location import Location
 from Library.Recipe import Recipe
+
+from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
+from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
+from G_CodeFunctions.LatchG_Code import LatchG_Code
+from G_CodeFunctions.ClipG_Code import ClipG_Code
+from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
+from G_CodeFunctions.OffsetG_Code import OffsetG_Code
+
 from Machine.LayerCalibration import LayerCalibration
+
+from Path3d import Path3d
 
 class RecipeGenerator :
   """
@@ -104,6 +113,24 @@ class RecipeGenerator :
     return self.nodes[ pin ]
 
   #---------------------------------------------------------------------
+  def pinCenterTarget( self, axis="XY" ) :
+    """
+    Setup the G-Code function class for targeting the left/right of the next
+    pin in the net.  Based on the pin this will figure out which side of the
+    pin the wire should target.
+
+    Args:
+      axis: Either "X", "Y" or "XY" for which coordinates will be used in the
+            targeting.
+    Returns:
+      An instance of PinCenterG_Code (G_CodeFunction).
+    """
+    net = self.net[ self.netIndex ]
+    direction = self.centering[ net ]
+    pinNames = self.pinNames( self.netIndex, direction )
+    return PinCenterG_Code( pinNames, axis )
+
+  #---------------------------------------------------------------------
   def writeRubyBasePath(
     self,
     outputFileName,
@@ -111,7 +138,7 @@ class RecipeGenerator :
   ) :
     """
     Make the basic wire path.  This is pin-center to pin-center without
-    considering diameter of pin.
+    considering diameter of pin.  Debug function.
 
     Args:
       outputFileName: File name to create.
@@ -143,13 +170,14 @@ class RecipeGenerator :
   ) :
     """
     Export node paths to Ruby code for import into SketchUp for visual
-    verification.
+    verification.  Debug function.
 
     Args:
       outputFileName: File name to create.
       enablePath: Show the path taken to wind the layer.
       enablePathLabels: Label additional G-Code points.
       enableWire: Show the wire wound on the layer.
+      isAppend: True to append the ruby file rather than overwrite it.
     """
 
     attributes = "w"
@@ -174,7 +202,7 @@ class RecipeGenerator :
   ) :
     """
     Create SketchUp ruby code to have an animation with one new path displayed
-    in each scene.
+    in each scene.  Debug function.
 
     Args:
       outputFileName: Where to write this data.
@@ -240,7 +268,7 @@ class RecipeGenerator :
   #---------------------------------------------------------------------
   def writeDefaultCalibration( self, outputFilePath, outputFileName, layerName ) :
     """
-    Export node list to calibration file.
+    Export node list to calibration file.  Debug function.
 
     Args:
       outputFileName: File name to create.
@@ -264,3 +292,53 @@ class RecipeGenerator :
     print "Wire consumed:", "{:,.2f}mm".format( self.nodePath.totalLength() )
     print "G-Code lines:", len( self.gCodePath )
 
+  #---------------------------------------------------------------------
+  @staticmethod
+  def _pinCompare( pinA, pinB ) :
+    """
+    Compare two pin numbers.  Used for sorting a list of pin names.
+    Debug function.
+
+    Args:
+      pinA: First pin.
+      pinB: Second pin.
+
+    Returns:
+      0 = pins are identical, 1 = pinA < pinB, -1 = pinA > pinB.
+    """
+    pinA_Side = pinA[ 0 ]
+    pinB_Side = pinB[ 0 ]
+    pinA_Number = int( pinA[ 1: ] )
+    pinB_Number = int( pinB[ 1: ] )
+
+    result = 0
+    if pinA_Side < pinB_Side :
+      result = 1
+    elif pinA_Side > pinB_Side :
+      result = -1
+    elif pinA_Number < pinB_Number :
+      result = -1
+    elif pinA_Number > pinB_Number :
+      result = 1
+
+    return result
+
+  #---------------------------------------------------------------------
+  def printNodes( self ) :
+    """
+    Print a sorted list of all the pin names.  Debug function.
+    """
+    for node in sorted( self.nodes, cmp=RecipeGenerator._pinCompare ) :
+      side = node[ 0 ]
+      pin = node[ 1: ]
+      location = str( self.nodes[ node ] )[ 1:-1 ].replace( ' ', '' )
+      print side + "," + pin + "," + location
+
+  #---------------------------------------------------------------------
+  def printNet( self ) :
+    """
+    Print the net list (which pin is connected to which) and the location of
+    these pins.
+    """
+    for net in self.net :
+      print net, self.nodes[ net ]

@@ -1,6 +1,6 @@
 ###############################################################################
 # Name: U_LayerGeometry.py
-# Uses: Geometry specific to the 1st induction layer, U.
+# Uses: Geometry specific to the 2nd induction layer, U.
 # Date: 2016-03-23
 # Author(s):
 #   Andrew Que <aque@bb7.com>
@@ -8,6 +8,8 @@
 
 import math
 from UV_LayerGeometry import UV_LayerGeometry
+
+from Library.Geometry.Location import Location
 
 class U_LayerGeometry( UV_LayerGeometry ) :
 
@@ -25,8 +27,15 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     # Spacing between pins and front to back.
     self.depth = 104.7  / self.scale
 
+    # Offset from APA's (0,0,0) position.
+    self.apaOffsetX = -8.29
+    self.apaOffsetY = -4.94
+    self.apaOffsetZ = ( self.apaThickness - self.depth ) / 2
+
+    self.apaOffset = Location( self.apaOffsetX, self.apaOffsetY, self.apaOffsetZ )
+
     # Distance from the layer to the head.
-    self.zClearance = 25 / self.scale
+    self.zClearance = ( self.apaToHead - self.depth ) / self.scale
     self.frontZ = -self.zClearance
     self.backZ  = self.depth + self.zClearance
 
@@ -53,10 +62,10 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     self.gridFront = \
     [
       # Count                    dx            dy   off.x     off.y
-      [ self.rows + 1,            0,  self.deltaY,  0,        5.4048  ],
-      [ self.columns,   self.deltaX,            0,  14.2196,  4.4702  ],
-      [ self.rows,                0, -self.deltaY,  0.8979,   -8.2797 ],
-      [ self.columns,  -self.deltaX,            0,  -10.2197, -7.3453 ]
+      [ self.rows + 1,            0,  self.deltaY,  0,        5.4048   ],
+      [ self.columns,   self.deltaX,            0,  14.2196,  4.4702   ],
+      [ self.rows,                0, -self.deltaY,  0.8979,   -8.2797  ],
+      [ self.columns,  -self.deltaX,            0,  -10.2197, -7.3453  ]
     ]
 
     # For back side.

@@ -9,6 +9,8 @@
 import math
 from UV_LayerGeometry import UV_LayerGeometry
 
+from Library.Geometry.Location import Location
+
 class V_LayerGeometry( UV_LayerGeometry ) :
 
   #-------------------------------------------------------------------
@@ -23,10 +25,17 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     self.pins = 2 * self.rows + 2 * self.columns - 1
 
     # Spacing between pins and front to back.
-    self.depth = 87.7 / self.scale
+    self.depth = 95.2 / self.scale
+
+    # Offset from APA's (0,0,0) position.
+    self.apaOffsetX = -4.94
+    self.apaOffsetY = -1.59
+    self.apaOffsetZ = ( self.apaThickness - self.depth ) / 2
+
+    self.apaOffset = Location( self.apaOffsetX, self.apaOffsetY, self.apaOffsetZ )
 
     # Distance from the layer to the head.
-    self.zClearance = 25 / self.scale
+    self.zClearance = ( self.apaToHead - self.depth ) / self.scale
     self.frontZ = -self.zClearance
     self.backZ  = self.depth + self.zClearance
 

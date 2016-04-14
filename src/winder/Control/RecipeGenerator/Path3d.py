@@ -17,12 +17,13 @@ class Path3d :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self ) :
+  def __init__( self, baseOffset=Location() ) :
     """
     Constructor.
     """
     self.path = []
     self.last = None
+    self.baseOffset = baseOffset
 
   #---------------------------------------------------------------------
   def pushOffset( self, location, radius=0, angle=0 ) :
@@ -58,13 +59,17 @@ class Path3d :
     """
 
     if None == x :
-      x = self.last.x
+      x = self.last.x - self.baseOffset.x
 
     if None == y :
-      y = self.last.y
+      y = self.last.y - self.baseOffset.y
 
     if None == z :
-      z = self.last.z
+      z = self.last.z - self.baseOffset.z
+
+    x += self.baseOffset.x
+    y += self.baseOffset.y
+    z += self.baseOffset.z
 
     location = Location( x, y, z )
     self.path.append( location )

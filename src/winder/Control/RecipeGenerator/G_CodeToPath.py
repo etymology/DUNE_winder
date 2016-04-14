@@ -11,6 +11,8 @@ import random
 from Library.G_Code import G_Code
 from G_CodePath import G_CodePath
 
+from Library.Geometry.Location import Location
+
 from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
 from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 from G_CodeFunctions.LatchG_Code import LatchG_Code
@@ -66,6 +68,8 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     FRONT = 0
     BACK = 1
 
+    offset = self._calibration.getOffset()
+
     latchSide = FRONT
     for line in range( 0, totalLines ) :
 
@@ -92,7 +96,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       if FRONT == latchSide :
         self._headZ = self._z
 
-      path.push( self._x, self._y, self._headZ )
+      path.push( self._x + offset.x, self._y + offset.y, self._headZ + offset.z )
 
     return path
 
@@ -149,17 +153,23 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
     gCodePath = self.toPath()
 
+    layerOffset = \
+      Location( self._geometry.apaOffsetX, self._geometry.apaOffsetY, self._geometry.apaOffsetZ )
+
     rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
     if enablePinLabels :
       for pinName in self._calibration._locations :
         location = self._calibration.getPinLocation( pinName )
+        location = location.add( layerOffset )
 
         y = 0.1
+        x = 0.1
         if "B" == pinName[ 0 ] :
           location.z = self._geometry.depth
-          y = -0.1
+          y = -y
+          x = -x
 
-        self._pointLabel( rubyFile, location, pinName, 'layer', 0.1, y )
+        self._pointLabel( rubyFile, location, pinName, 'layer', x, y )
 
     gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
 

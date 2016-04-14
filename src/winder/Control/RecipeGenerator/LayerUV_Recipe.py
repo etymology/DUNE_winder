@@ -36,6 +36,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
     """
     RecipeGenerator.__init__( self, geometry )
 
+    frameOffset = \
+      Location( geometry.apaOffsetX, geometry.apaOffsetY, geometry.apaOffsetZ )
+
     self.basePath = Path3d()
     self.orientations = {}
     self.centering = {}
@@ -45,110 +48,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     # The node path is a path of points that are connect together.  Used to calculate
     # the amount of wire actually dispensed.
-    self.nodePath = Path3d()
+    self.nodePath = Path3d( frameOffset )
 
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
-
-  #---------------------------------------------------------------------
-  @staticmethod
-  def _pinCompare( pinA, pinB ) :
-    """
-    Compare two pin numbers.  Used for sorting a list of pin names.
-    Debug function.
-
-    Args:
-      pinA: First pin.
-      pinB: Second pin.
-
-    Returns:
-      0 = pins are identical, 1 = pinA < pinB, -1 = pinA > pinB.
-    """
-    pinA_Side = pinA[ 0 ]
-    pinB_Side = pinB[ 0 ]
-    pinA_Number = int( pinA[ 1: ] )
-    pinB_Number = int( pinB[ 1: ] )
-
-    result = 0
-    if pinA_Side < pinB_Side :
-      result = 1
-    elif pinA_Side > pinB_Side :
-      result = -1
-    elif pinA_Number < pinB_Number :
-      result = -1
-    elif pinA_Number > pinB_Number :
-      result = 1
-
-    return result
-
-  #---------------------------------------------------------------------
-  def _printNodes( self ) :
-    """
-    Print a sorted list of all the pin names.  Debug function.
-    """
-    for node in sorted( self.nodes, cmp=LayerUV_Recipe._pinCompare ) :
-      side = node[ 0 ]
-      pin = node[ 1: ]
-      location = str( self.nodes[ node ] )[ 1:-1 ].replace( ' ', '' )
-      print side + "," + pin + "," + location
-
-  #---------------------------------------------------------------------
-  def _nextNet( self ) :
-    """
-    Advance to the next net in list.  Pushes length calculation to next G-Code
-    and builds the path node list.
-
-    Returns:
-      True if there is an other net, False net list if finished.
-    """
-
-    result = False
-
-    # Get the next net.
-    self.netIndex += 1
-
-    if self.netIndex < len( self.net ) :
-
-      # The orientation specifies one of four points on the pin the wire will
-      # contact: upper/lower left/right.  This comes from the orientation
-      # look-up table.
-      net = self.net[ self.netIndex ]
-      orientation = self.orientations[ net ]
-
-      # Location of the the next pin.
-      location = self.location( self.netIndex )
-
-      # Add the pin location to the base path.
-      self.basePath.push( location.x, location.y, location.z )
-
-      # Add the offset pin location to the node path and get the length of this
-      # piece of wire.
-      length = self.nodePath.pushOffset( location, self.geometry.pinRadius, orientation )
-
-      # Push a G-Code length function to the next G-Code command to specify the
-      # amount of wire consumed by this move.
-      self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
-
-      result = True
-
-    return result
-
-  #---------------------------------------------------------------------
-  def _pinCenterTarget( self, axis="XY" ) :
-    """
-    Setup the G-Code function class for targeting the left/right of the next
-    pin in the net.  Based on the pin this will figure out which side of the
-    pin the wire should target.
-
-    Args:
-      axis: Either "X", "Y" or "XY" for which coordinates will be used in the
-            targeting.
-    Returns:
-      An instance of PinCenterG_Code (G_CodeFunction).
-    """
-    net = self.net[ self.netIndex ]
-    direction = self.centering[ net ]
-    pinNames = self.pinNames( self.netIndex, direction )
-    return PinCenterG_Code( pinNames, axis )
 
   #-------------------------------------------------------------------
   def _createNode( self, grid, orientation, side, depth, startPin, direction ) :
@@ -254,6 +156,47 @@ class LayerUV_Recipe( RecipeGenerator ) :
       direction = -direction
 
   #---------------------------------------------------------------------
+  def _nextNet( self ) :
+    """
+    Advance to the next net in list.  Pushes length calculation to next G-Code
+    and builds the path node list.
+
+    Returns:
+      True if there is an other net, False net list if finished.
+    """
+
+    result = False
+
+    # Get the next net.
+    self.netIndex += 1
+
+    if self.netIndex < len( self.net ) :
+
+      # The orientation specifies one of four points on the pin the wire will
+      # contact: upper/lower left/right.  This comes from the orientation
+      # look-up table.
+      net = self.net[ self.netIndex ]
+      orientation = self.orientations[ net ]
+
+      # Location of the the next pin.
+      location = self.location( self.netIndex )
+
+      # Add the pin location to the base path.
+      self.basePath.push( location.x, location.y, location.z )
+
+      # Add the offset pin location to the node path and get the length of this
+      # piece of wire.
+      length = self.nodePath.pushOffset( location, self.geometry.pinRadius, orientation )
+
+      # Push a G-Code length function to the next G-Code command to specify the
+      # amount of wire consumed by this move.
+      self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
+
+      result = True
+
+    return result
+
+  #---------------------------------------------------------------------
   def _wrapCenter( self ) :
     """
     Sequence for wrapping around the top in the center.
@@ -261,7 +204,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     # To center pin.
     if self._nextNet() :
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
@@ -269,12 +212,12 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     if self._nextNet() :
       # Hook pin and line up with next pin on other side.
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.push()
 
       # Go to other side and seek past pin so it is hooked with next move.
       self.z.set( HeadPosition.OTHER_SIDE )
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=-self.geometry.overshoot ) )
       self.gCodePath.push()
 
@@ -288,16 +231,16 @@ class LayerUV_Recipe( RecipeGenerator ) :
     """
 
     if self._nextNet() :
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
     if self._nextNet() :
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "Y" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       offset = ( self.geometry.pinRadius - self.geometry.overshoot ) * direction
       self.gCodePath.pushG_Code( OffsetG_Code( x=offset ) )
       self.gCodePath.push()
@@ -321,23 +264,23 @@ class LayerUV_Recipe( RecipeGenerator ) :
       # faster path as long as the angle is large enough).
       angle = direction * line.getAngle()
       if angle >= self.geometry.minAngle and centerA.y > centerB.y :
-        self.gCodePath.pushG_Code( self._pinCenterTarget( "XY" ) )
+        self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
         self.gCodePath.pushG_Code( SeekTransferG_Code() )
         self.gCodePath.push()
       else:
         self.gCodePath.pushG_Code( OffsetG_Code( y=-1000 ) )
         self.gCodePath.pushG_Code( ClipG_Code() )
         self.gCodePath.push()
-        self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
+        self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
         self.gCodePath.push()
 
       self.z.set( HeadPosition.PARTIAL )
 
     if self._nextNet() :
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "X" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
-      self.gCodePath.pushG_Code( self._pinCenterTarget( "Y" ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=self.geometry.overshoot ) )
       self.gCodePath.push()
 
