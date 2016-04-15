@@ -6,62 +6,17 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-import math
-
 from Library.Geometry.Location import Location
-from Library.Geometry.Segment import Segment
-from Library.Geometry.Line import Line
 
-from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
-from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
-from G_CodeFunctions.LatchG_Code import LatchG_Code
-from G_CodeFunctions.ClipG_Code import ClipG_Code
-from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
-from G_CodeFunctions.OffsetG_Code import OffsetG_Code
+from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
+from .G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 
-from RecipeGenerator import RecipeGenerator
-from HeadPosition import HeadPosition
-from Path3d import Path3d
-from G_CodePath import G_CodePath
+from .RecipeGenerator import RecipeGenerator
+from .HeadPosition import HeadPosition
+from .Path3d import Path3d
+from .G_CodePath import G_CodePath
 
 class LayerGX_Recipe( RecipeGenerator ) :
-
-  #---------------------------------------------------------------------
-  def _nextNet( self ) :
-    """
-    Advance to the next net in list.  Pushes length calculation to next G-Code
-    and builds the path node list.
-
-    Returns:
-      True if there is an other net, False net list if finished.
-    """
-
-    result = False
-
-    self.netIndex += 1
-    if self.netIndex < len( self.net ) :
-      # The orientation specifies one of four points on the pin the wire will
-      # contact: upper/lower left/right.  This comes from the orientation
-      # look-up table.
-      net = self.net[ self.netIndex ]
-
-      # Location of the the next pin.
-      location = self.location( self.netIndex )
-
-      # Add the pin location to the base path.
-      self.basePath.push( location.x, location.y, location.z )
-
-      # Add the offset pin location to the node path and get the length of this
-      # piece of wire.
-      length = self.nodePath.push( location.x, location.y, location.z )
-
-      # Push a G-Code length function to the next G-Code command to specify the
-      # amount of wire consumed by this move.
-      self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
-
-      result = True
-
-    return result
 
   #---------------------------------------------------------------------
   def __init__( self, geometry, windsOverride=None, firstPinScale=1.0/2 ) :
@@ -173,12 +128,10 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for count in range( 1, totalCount + 1 ) :
+    for _ in range( 1, totalCount + 1 ) :
 
       self.netIndex += 1
       if self.netIndex < len( self.net ) :
-
-        net = self.net[ self.netIndex ]
 
         # Location of the the next pin.
         location = self.location( self.netIndex )

@@ -137,6 +137,10 @@ try:
     from IO.Maps.Test_IO import Test_IO
     io = Test_IO( configuration.get( "plcAddress" ) )
 
+  # Use low-level I/O to avoid warning.
+  # (Low-level I/O is needed by remote commands.)
+  LowLevelIO.getTags()
+
   # Primary control process.
   process = Process( io, log, configuration )
 

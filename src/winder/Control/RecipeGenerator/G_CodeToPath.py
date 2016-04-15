@@ -9,21 +9,14 @@
 import random
 
 from Library.G_Code import G_Code
-from G_CodePath import G_CodePath
 
 from Library.Geometry.Location import Location
 
-from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
-from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
-from G_CodeFunctions.LatchG_Code import LatchG_Code
-from G_CodeFunctions.ClipG_Code import ClipG_Code
-from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
-from G_CodeFunctions.G_CodeFunction import G_CodeFunction
-
 from Machine.G_Codes import G_Codes
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
-from Machine.LayerCalibration import LayerCalibration
 
+from .G_CodePath import G_CodePath
+from .G_CodeFunctions.G_CodeFunction import G_CodeFunction
 
 class G_CodeToPath( G_CodeHandlerBase ) :
 
@@ -43,7 +36,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     # Read input file.
     with open( fileName ) as inputFile :
       # Read file header.
-      header = inputFile.readline()
+      inputFile.readline()
 
       # Get the rest of the lines.
       lines = inputFile.readlines()
@@ -66,7 +59,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     totalLines = self._gCode.getLineCount()
 
     FRONT = 0
-    BACK = 1
+    #BACK = 1
 
     offset = self._calibration.getOffset()
 
@@ -158,7 +151,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
     rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
     if enablePinLabels :
-      for pinName in self._calibration._locations :
+      for pinName in self._calibration.getPinNames() :
         location = self._calibration.getPinLocation( pinName )
         location = location.add( layerOffset )
 

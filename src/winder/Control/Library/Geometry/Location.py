@@ -40,7 +40,7 @@ class Location :
 
     x = deltaX / 2 + min( self.x, location.x )
     y = deltaY / 2 + min( self.y, location.y )
-    z = deltaY / 2 + min( self.z, location.z )
+    z = deltaZ / 2 + min( self.z, location.z )
 
     return Location( x, y, z )
 

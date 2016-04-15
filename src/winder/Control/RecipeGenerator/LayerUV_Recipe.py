@@ -12,17 +12,15 @@ from Library.Geometry.Location import Location
 from Library.Geometry.Segment import Segment
 from Library.Geometry.Line import Line
 
-from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
-from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
-from G_CodeFunctions.LatchG_Code import LatchG_Code
-from G_CodeFunctions.ClipG_Code import ClipG_Code
-from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
-from G_CodeFunctions.OffsetG_Code import OffsetG_Code
+from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
+from .G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
+from .G_CodeFunctions.ClipG_Code import ClipG_Code
+from .G_CodeFunctions.OffsetG_Code import OffsetG_Code
 
-from RecipeGenerator import RecipeGenerator
-from HeadPosition import HeadPosition
-from Path3d import Path3d
-from G_CodePath import G_CodePath
+from .RecipeGenerator import RecipeGenerator
+from .HeadPosition import HeadPosition
+from .Path3d import Path3d
+from .G_CodePath import G_CodePath
 
 class LayerUV_Recipe( RecipeGenerator ) :
 
@@ -109,7 +107,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       x += parameter[ 3 ]
       y += parameter[ 4 ]
 
-      for position in range( 0, count ) :
+      for _ in range( 0, count ) :
         location = Location( round( x, 5 ), round( y, 5 ), depth )
         pin = side + str( pinNumber )
         self.nodes[ pin ] = location
@@ -303,7 +301,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
     self.netIndex = 0
 
     net = self.net[ self.netIndex ]
-    orientation = self.orientations[ net ]
 
     self.nodePath.pushOffset(
       self.location( self.netIndex ),
@@ -323,7 +320,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for count in range( 1, totalCount + 1 ) :
+    for _ in range( 1, totalCount + 1 ) :
       self._wrapCenter()
       self._wrapEdge( direction )
       self._wrapCenter()

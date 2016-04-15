@@ -8,16 +8,14 @@
 
 import os.path
 
-from Machine.Settings import Settings
 from Library.Configuration import Configuration
-from Library.Geometry.Location import Location
 
+from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
 from Machine.X_LayerGeometry import X_LayerGeometry
 from Machine.V_LayerGeometry import V_LayerGeometry
 from Machine.U_LayerGeometry import U_LayerGeometry
 from Machine.G_LayerGeometry import G_LayerGeometry
-
 
 from RecipeGenerator.LayerX_Recipe import LayerX_Recipe
 from RecipeGenerator.LayerV_Recipe import LayerV_Recipe

@@ -9,16 +9,11 @@
 from Library.Geometry.Location import Location
 from Library.Recipe import Recipe
 
-from G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
-from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
-from G_CodeFunctions.LatchG_Code import LatchG_Code
-from G_CodeFunctions.ClipG_Code import ClipG_Code
-from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
-from G_CodeFunctions.OffsetG_Code import OffsetG_Code
+from .G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
+from .Path3d import Path3d
 
 from Machine.LayerCalibration import LayerCalibration
 
-from Path3d import Path3d
 
 class RecipeGenerator :
   """
@@ -40,6 +35,8 @@ class RecipeGenerator :
 
     self.geometry = geometry
     self.headZ = 0
+    self.netIndex = 0
+    self.centering = {}
 
   #---------------------------------------------------------------------
   def offsetPin( self, pin, offset ) :

@@ -90,6 +90,16 @@ class LayerCalibration( Serializable ) :
     return self._locations[ pin ]
 
   #---------------------------------------------------------------------
+  def getPinNames( self ) :
+    """
+    Return a list of pin names.
+    
+    Returns:
+      List of pin names.
+    """
+    return self._locations.keys()
+
+  #---------------------------------------------------------------------
   def serialize( self, xmlDocument ) :
     """
     Turn this object into an XML node.
@@ -140,6 +150,9 @@ class LayerCalibration( Serializable ) :
   #-------------------------------------------------------------------
   @staticmethod
   def _calculateStringHash( lines ) :
+    """
+    $$$DEBUG
+    """
     lines = lines.replace( '\n', '' )
     lines = lines.replace( '\r', '' )
     lines = lines.replace( '\t', '' )
@@ -164,16 +177,29 @@ class LayerCalibration( Serializable ) :
   #-------------------------------------------------------------------
   @staticmethod
   def _calculateHash( fileName ) :
+    """
+    $$$DEBUG
+    """
 
     with open( fileName ) as inputFile :
       lines = inputFile.read()
 
     return LayerCalibration._calculateStringHash( lines )
 
-
+  #-------------------------------------------------------------------
+  def internalSet( self, layer, hashValue ):
+    """
+    $$$DEBUG
+    """
+    self._layer = layer
+    self._hash  = hashValue
+    
   #-------------------------------------------------------------------
   @staticmethod
   def load( filePath, fileName ) :
+    """
+    $$$DEBUG
+    """
 
     layerCalibration = None
 
@@ -185,14 +211,13 @@ class LayerCalibration( Serializable ) :
 
       [ fileHash, bodyHash ] = LayerCalibration._calculateHash( fullName )
 
-      # Does the caclulated hash match the hash from the header?
+      # Does the calculated hash match the hash from the header?
       if bodyHash == fileHash :
         layerCalibration = None
 
         layerCalibration = LayerCalibration( layer )
         layerCalibration.unserialize( node[ 0 ] )
-        layerCalibration._layer = node[ 0 ].getAttribute( "hash" )
-        layerCalibration._hash  = bodyHash
+        layerCalibration.internalSet( layer, bodyHash )
       else :
         print "Hash mismatch"
         print bodyHash
@@ -215,12 +240,16 @@ class LayerCalibration( Serializable ) :
       #  "Unable to load calibration file " + fileName + ".  File not found.",
       #  [ fileName ]
       #)
-      pass
+      #pass
 
     return layerCalibration
 
   #-------------------------------------------------------------------
   def save( self, filePath, fileName ) :
+    """
+    $$$DEBUG
+    """
+
     # Serialize data into XML.
     xmlDocument = xml.dom.minidom.parseString( '<CalibrationFile/>' )
     node = self.serialize( xmlDocument )
@@ -233,7 +262,7 @@ class LayerCalibration( Serializable ) :
     outputText = \
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
-    fileHash, bodyHash = LayerCalibration._calculateStringHash( outputText )
+    _, bodyHash = LayerCalibration._calculateStringHash( outputText )
     outputText = outputText.replace( 'hash=""', 'hash="' + bodyHash + '"' )
 
     fullName = filePath + "/" + fileName

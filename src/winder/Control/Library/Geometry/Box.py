@@ -7,7 +7,6 @@
 ###############################################################################
 
 from Library.Geometry.Location import Location
-from Library.Geometry.Segment import Segment
 from Library.Geometry.Line import Line
 
 class Box :
@@ -40,8 +39,8 @@ class Box :
       and destination.x != float( "inf" ) \
       and destination.y != float( "inf" ) :
 
-        start = destination
-        limits[ limit ] = limitValue
+      start = destination
+      limits[ limit ] = limitValue
 
     return start
 

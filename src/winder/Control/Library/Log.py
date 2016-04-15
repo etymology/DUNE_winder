@@ -97,7 +97,7 @@ class Log:
     return result
 
   #---------------------------------------------------------------------
-  def add( self, module, typeName, message, parameters = [] ) :
+  def add( self, module, typeName, message, parameters = None ) :
     """
     Add a message to log file.
 
@@ -117,7 +117,10 @@ class Log:
       + str( typeName )      \
       + "\t"                 \
       + message
-
+    
+    if None == parameters :
+      parameters = []
+    
     for parameter in parameters:
       line += "\t" + str( parameter )
 

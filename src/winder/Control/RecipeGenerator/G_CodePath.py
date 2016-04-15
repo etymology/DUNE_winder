@@ -8,13 +8,11 @@
 
 import random
 
-from Path3d import Path3d
+from .Path3d import Path3d
 
 from Machine.G_Codes import G_Codes
 
-from G_CodeFunctions.LatchG_Code import LatchG_Code
-from G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
-from G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
+from .G_CodeFunctions.LatchG_Code import LatchG_Code
 
 class G_CodePath( Path3d ) :
   """

@@ -14,9 +14,8 @@ from Library.G_Code import G_CodeCallbacks
 
 from Library.Geometry.Location import Location
 from Library.Geometry.Segment import Segment
-from Library.Geometry.Line import Line
 
-from G_Codes import G_Codes
+from .G_Codes import G_Codes
 
 class G_CodeHandlerBase :
   #---------------------------------------------------------------------
