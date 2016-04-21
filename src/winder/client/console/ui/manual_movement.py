@@ -8,6 +8,7 @@ from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
 from ..command import Command
+from .kivy_labelled_checkbox import LabelledCheckbox
 from .kivy_mixins import BackgroundColorMixin
 from .kivy_utilities import KivyUtilities
 from .transfer_enables import TransferEnables
@@ -52,6 +53,20 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
 
       KivyUtilities.add_children_to_widget( self, [ global_control_layout, movement_layout ] )
 
+   def _construct_movement_control_selection( self, **kwargs ):
+      group_name = "manual movement mode selection"
+
+      self.jog_control_selection = LabelledCheckbox( **DictOps.dict_combine( kwargs, text = "Jog", group = group_name, active = True, color = AppShare.instance().settings.theme.text_color_value ) )
+      self.jog_control_selection.checkbox.bind( active = self._movement_mode_updated )
+
+      self.seek_position_control_selection = LabelledCheckbox( **DictOps.dict_combine( kwargs, text = "Seek", group = group_name, color = AppShare.instance().settings.theme.text_color_value ) )
+      self.seek_position_control_selection.checkbox.bind( active = self._movement_mode_updated )
+
+      result = BoxLayout( **DictOps.dict_combine( kwargs, orientation = "horizontal" ) )
+      KivyUtilities.add_children_to_widget( result, [ self.jog_control_selection, self.seek_position_control_selection ] )
+
+      return result
+
    def _construct_rate_selection( self, **kwargs ):
       self._slider_scale_values = [ .125, .25, .5, 1. ]
       self._slider_scale_value_labels = [ "Very Slow", "Slow", "Moderate", "Normal" ]
@@ -68,13 +83,16 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
       return result
 
    def _construct_global_layout( self, **kwargs ):
-      slider_layout = self._construct_rate_selection()
+      mode_selection = self._construct_movement_control_selection( **kwargs )
+      slider_layout = self._construct_rate_selection( **kwargs )
 
       result = BoxLayout( **DictOps.dict_combine( kwargs, orientation = "horizontal", size_hint = ( 1, .2 ) ) )
-
-      KivyUtilities.add_children_to_widget( result, [ Label( **DictOps.dict_combine( kwargs, text = "Mode selection" ) ), slider_layout, Label( **DictOps.dict_combine( kwargs, text = "Placeholder" ) ) ] )
+      KivyUtilities.add_children_to_widget( result, [ mode_selection, slider_layout, Label( **DictOps.dict_combine( kwargs, text = "Placeholder" ) ) ] )
 
       return result
+
+   def _movement_mode_updated( self, instance, value ):
+      self.xy_movement.select_movement_type( self.jog_control_selection.value )
 
    def _transfer_enables_touch_callback( self, sender, touch, represented_position ):
       self.xy_movement.seek_xy_position_input.set_text( "{:0.2f}, {:0.2f}".format( represented_position[ 0 ], represented_position[ 1 ] ) )

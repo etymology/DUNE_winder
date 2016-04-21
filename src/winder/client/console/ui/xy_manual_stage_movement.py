@@ -1,16 +1,13 @@
 import re
 
 from kivy.properties import BooleanProperty
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
 
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
 from ..movement_command import MovementCommand
-from .kivy_mixins import BackgroundColorMixin
-from .kivy_sparce_grid_layout import GridBoxLayout
-from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridImageButton, GridLabel
+from .display_selection_layout import DisplaySelectionLayout
+from .kivy_sparce_grid_layout import SparseGridLayout, GridButton, GridEntry, GridImageButton, GridLabel, GridTextInput
 from .kivy_utilities import KivyUtilities
 
 class _XyCommands( MovementCommand ):
@@ -57,7 +54,7 @@ class _NegativeYDirectionControl( GridImageButton, _XyCommands ):
    def on_release( self ):
       self.move_stop()
 
-class _XyPositionSeekInput( TextInput ):
+class _XyPositionSeekInput( GridTextInput ):
    class Keys:
       XValue = "x"
       YValue = "y"
@@ -121,7 +118,7 @@ class _XyPositionSeekInput( TextInput ):
       self.text = new_text
       self._process_text()
 
-class _XyPositionSeekButton( BackgroundColorMixin, Button, _XyCommands ):
+class _XyPositionSeekButton( GridButton, _XyCommands ):
    class Keys:
       InputControl = "input"
 
@@ -143,9 +140,9 @@ class _XyPositionSeekButton( BackgroundColorMixin, Button, _XyCommands ):
 
          self.move_to( self.input_control.seek_x_position, self.input_control.seek_y_position, rate )
 
-class ManualXyStageMovement( SparseGridLayout ):
+class _ManualXyStageMovement_Jog( SparseGridLayout ):
    def __init__( self, movement_rate_callback, **kwargs ):
-      super( ManualXyStageMovement, self ).__init__( **DictOps.dict_combine( kwargs, rows = 3, columns = 4 ) )
+      super( _ManualXyStageMovement_Jog, self ).__init__( **DictOps.dict_combine( kwargs, rows = 3, columns = 3 ) )
 
       self._movement_rate_callback = movement_rate_callback
 
@@ -164,13 +161,7 @@ class ManualXyStageMovement( SparseGridLayout ):
 
       self.position_label = GridLabel( **DictOps.dict_combine( kwargs, row = 1, column = 1 , text = "--", color = AppShare.instance().settings.theme.text_color_value ) )
 
-      seek_position_layout = GridBoxLayout( **DictOps.dict_combine( kwargs, orientation = "vertical", row = 0, column = 3, column_span = 3 ) )
-      self.seek_xy_position_input = _XyPositionSeekInput( size_hint = ( None, 1 ), **kwargs )
-      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, input = self.seek_xy_position_input, text = "Go to Position", color = AppShare.instance().settings.theme.text_color_value, valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value, size_hint = ( None, 1 ), ) )
-#       self.seek_xy_position_button.bind( disabled = self.seek_xy_position_input.is_invalid )
-
-      KivyUtilities.add_children_to_widget( seek_position_layout, [ self.seek_xy_position_input, self.seek_xy_position_button ] )
-      KivyUtilities.add_children_to_widget( self, [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label, seek_position_layout, negative_x_direction_label, positive_x_direction_label ] )
+      KivyUtilities.add_children_to_widget( self, [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label, negative_x_direction_label, positive_x_direction_label ] )
 
    def update_xy_position( self, x_pos, y_pos ):
       # If the PLC is unavailable, both x_pos and y_pos are None.
@@ -180,3 +171,60 @@ class ManualXyStageMovement( SparseGridLayout ):
          text = "--"
 
       self.position_label.text = text
+
+class _ManualXyStageMovement_Seek( SparseGridLayout ):
+   def __init__( self, movement_rate_callback, **kwargs ):
+      super( _ManualXyStageMovement_Seek, self ).__init__( **DictOps.dict_combine( kwargs, rows = 2, columns = 3 ) )
+
+      self._movement_rate_callback = movement_rate_callback
+
+      self._construct( **DictOps.dict_filter( kwargs, GridEntry.FieldNames.all, "size_hint" ) )
+
+   def _construct( self, **kwargs ):
+      common_kwargs = { MovementCommand.Keys.MovementRateCallback : self._movement_rate_callback }
+
+      self.seek_xy_position_input = _XyPositionSeekInput( **DictOps.dict_combine( kwargs, row = 1, column = 0, column_span = 3 ) ) # size_hint = ( None, 1 )
+      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, row = 0, column = 1, input = self.seek_xy_position_input, text = "Go to Position", color = AppShare.instance().settings.theme.text_color_value, valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value ) ) # size_hint = ( None, 1 )
+
+      KivyUtilities.add_children_to_widget( self, [ self.seek_xy_position_input, self.seek_xy_position_button ] )
+
+   def update_xy_position( self, x_pos, y_pos ):
+      # If the PLC is unavailable, both x_pos and y_pos are None.
+      if x_pos is not None and y_pos is not None:
+         text = "{:.2f} mm, {:.2f} mm".format( float( x_pos ), float( y_pos ) )
+      else:
+         text = "--"
+
+#       self.position_label.text = text
+
+class ManualXyStageMovement( DisplaySelectionLayout ):
+   class Ids:
+      Jog = "jog"
+      Seek = "seek"
+
+   def __init__( self, movement_rate_callback, initial_children = None, **kwargs ):
+      super( ManualXyStageMovement, self ).__init__( initial_children, **kwargs )
+
+      self._movement_rate_callback = movement_rate_callback
+
+      self._construct( **kwargs )
+
+   def _construct( self, **kwargs ):
+      common_kwargs = { MovementCommand.Keys.MovementRateCallback : self._movement_rate_callback }
+
+      self.jog_movement = _ManualXyStageMovement_Jog( **DictOps.dict_combine( kwargs, common_kwargs ) )
+      self.seek_movement = _ManualXyStageMovement_Seek( **DictOps.dict_combine( kwargs, common_kwargs ) )
+
+      self.add_widget( self.jog_movement, self.Ids.Jog )
+      self.add_widget( self.seek_movement, self.Ids.Seek )
+
+   def select_movement_type( self, is_jog_mode_selected ):
+      if is_jog_mode_selected:
+         selected_id = self.Ids.Jog
+      else:
+         selected_id = self.Ids.Seek
+
+      self.selected_id = selected_id
+
+   def update_xy_position( self, x_pos, y_pos ):
+      return self.selected_item.update_xy_position( x_pos, y_pos )
