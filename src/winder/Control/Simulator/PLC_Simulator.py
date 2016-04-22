@@ -79,7 +79,7 @@ class PLC_Simulator :
     self._simulationTime = SimulationTime()
 
     # Add self to I/O polling callback list.
-    io.pollCallbacks.append( self.poll )
+    io.pollCallbacks.insert( 0, self.poll )
 
     # Simulated motors.
     self._xAxis = SimulatedMotor( io.plc, "X", self._simulationTime )
@@ -95,7 +95,6 @@ class PLC_Simulator :
     self._maxVelocityTag     = io.plc.setupTag( "XY_VELOCITY", 0.0 )
     self._maxAccelerationTag = io.plc.setupTag( "XY_ACCELERATION", 0.0 )
     self._maxDecelerationTag = io.plc.setupTag( "XY_DECELERATION", 0.0 )
-    self._blinky             = io.plc.setupTag( "BLINKY", 0.0 )
 
     # Initial states of PLC state machine.
     self._lastState = io.plcLogic.States.READY
