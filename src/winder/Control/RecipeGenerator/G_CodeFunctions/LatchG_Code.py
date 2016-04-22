@@ -14,9 +14,11 @@ class LatchG_Code( G_CodeFunction ) :
   G-Code to set the Z latch position.
   """
 
-  # Sides of the machine.
+  # Locations.
   FRONT = 0
-  BACK  = 1
+  PARTIAL_FRONT = 1
+  PARTIAL_BACK  = 2
+  BACK = 3
 
   #---------------------------------------------------------------------
   def __init__( self, side ) :
@@ -24,6 +26,6 @@ class LatchG_Code( G_CodeFunction ) :
     Constructor.
 
     Args:
-      side: Which side (FRONT/BACK) to latch to.
+      side: Which side (FRONT/PARTIAL_FRONT/PARTIAL_BACK/BACK) to latch to.
     """
     G_CodeFunction.__init__( self, G_Codes.LATCH, [ side ] )

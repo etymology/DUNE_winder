@@ -25,5 +25,5 @@ class APA_Geometry( MachineGeometry ) :
 
     # Distance the head is from the APA frame.
     # Based on the fact the head is 25 mm from the tallest point, on the pin
-    # height of the G-layer.
+    # height (2 mm) of the G-layer.
     self.apaToHead = 114.2 + 2 + 25 - self.apaThickness

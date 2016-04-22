@@ -44,17 +44,17 @@ class PLC_Motor( Motor ) :
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     attributes.canWrite = False
-    self._position     = PLC.Tag( plc, tagBase + "_DATA.ActualPosition", attributes )
-    self._velocity     = PLC.Tag( plc, tagBase + "_DATA.ActualVelocity", attributes )
-    self._acceleration = PLC.Tag( plc, tagBase + "_DATA.ActualAcceleration", attributes )
-    self._movement     = PLC.Tag( plc, tagBase + "_DATA.CoordinatedMotionStatus", attributes )
+    self._position     = PLC.Tag( plc, tagBase + "_Axis.ActualPosition", attributes )
+    self._velocity     = PLC.Tag( plc, tagBase + "_Axis.ActualVelocity", attributes )
+    self._acceleration = PLC.Tag( plc, tagBase + "_Axis.ActualAcceleration", attributes )
+    self._movement     = PLC.Tag( plc, tagBase + "_Axis.CoordinatedMotionStatus", attributes )
 
     # Motor status tag defaults to a faulted state in case read fails.
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     attributes.canWrite = False
     attributes.defaultValue = True
-    self._faulted = PLC.Tag( plc, tagBase + "_DATA.ModuleFault", attributes )
+    self._faulted = PLC.Tag( plc, tagBase + "_Axis.ModuleFault", attributes )
 
   #---------------------------------------------------------------------
   def isFunctional( self ) :

@@ -30,7 +30,7 @@ class PLC_Tab( wx.Panel, Remote, ActivatedTab ) :
     #
     # Tags.
     #
-    grideSizer = wx.FlexGridSizer( 1, 2, 0, 40 )
+    grideSizer = wx.FlexGridSizer( 100, 2, 0, 40 )
 
     self._tagList = self.remote.get( "LowLevelIO.getTags()" )
     self._tagList = ast.literal_eval( self._tagList )

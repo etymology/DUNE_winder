@@ -13,7 +13,7 @@ class SystemTime( Remote ) :
 
   #---------------------------------------------------------------------
   def convertTimeString( self, currentTime ) :
-    #currentTime = self.remote( "io.simulationTime.get()" )
+    currentTime = self.remote( "systemTime.get()" )
     try:
       currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
     except ValueError:
@@ -28,17 +28,7 @@ class SystemTime( Remote ) :
 
   #---------------------------------------------------------------------
   def readTime( self ) :
-    self.remote( "io.simulationTime.setLocal()" )
-    currentTime = self.remote( "io.simulationTime.get()" )
-    #try:
-    #  currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
-    #except ValueError:
-    #  if "None" != currentTime :
-    #    # Work around.  On some system (Windows) if the time 0 for microseconds,
-    #    # it does not append the ".0" at the end.  So on a value error, just
-    #    # try again with the .0 appended.
-    #    currentTime += ".0"
-    #    currentTime = datetime.datetime.strptime( currentTime, "%Y-%m-%d %H:%M:%S.%f" )
+    currentTime = self.remote( "systemTime.get()" )
     currentTime = self.convertTimeString( currentTime )
 
     return currentTime

@@ -24,8 +24,6 @@ from Threads.PrimaryThread import PrimaryThread
 from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
 
-from Simulator.PLC_Simulator import PLC_Simulator
-
 #==============================================================================
 # Debug settings.
 # These should all be set to False for production.
@@ -51,6 +49,7 @@ isIO_Logged = False
 def commandHandler( command ) :
   """
   Handle a remote command.
+  This is define in main so that is has the most global access possible.
 
   Args:
     command: A command to evaluate.
@@ -65,6 +64,10 @@ def commandHandler( command ) :
     result = "Invalid request"
 
     exceptionTypeName, exceptionValues, tracebackValue = sys.exc_info()
+
+    if debugInterface :
+      traceback.print_tb( tracebackValue )
+
     tracebackAsString = repr( traceback.format_tb( tracebackValue ) )
     log.add(
       "Main",
@@ -83,7 +86,6 @@ def signalHandler( signalNumber, frame ):
   Args:
     signal: Ignored.
     frame: Ignored.
-
   """
   signalNumber = signalNumber
   frame = frame
@@ -130,12 +132,13 @@ log.add( "Main", "START", "Control system starts." )
 try:
   # Create I/O map.
   if isSimulated :
+    from Simulator.PLC_Simulator import PLC_Simulator
     from IO.Maps.SimulatedIO import SimulatedIO
     io = SimulatedIO()
     plcSimulator = PLC_Simulator( io )
   else:
-    from IO.Maps.Test_IO import Test_IO
-    io = Test_IO( configuration.get( "plcAddress" ) )
+    from IO.Maps.ProductionIO import ProductionIO
+    io = ProductionIO( configuration.get( "plcAddress" ) )
 
   # Use low-level I/O to avoid warning.
   # (Low-level I/O is needed by remote commands.)
@@ -181,11 +184,12 @@ try:
 
 except Exception as exception:
   PrimaryThread.stopAllThreads()
+  exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+  tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
   if debugInterface :
+    traceback.print_tb( exceptionTraceback )
     raise exception
   else :
-    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-    tracebackString = repr( traceback.format_tb( exceptionTraceback ) )
     log.add(
       "Main",
       "FAILURE",

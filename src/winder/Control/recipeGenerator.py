@@ -69,7 +69,8 @@ if __name__ == "__main__":
 
   # Generate an ideal calibration file for layer.
   recipeX.writeDefaultCalibration( "./", "X-Layer_Calibration.xml", "X Layer" )
-  calibrationX = LayerCalibration.load( "./", "X-Layer_Calibration.xml" )
+  calibrationX = LayerCalibration()
+  calibrationX.load( "./", "X-Layer_Calibration.xml" )
   calibrationX.setOffset( geometryX.apaOffset )
   gCodePath = G_CodeToPath( recipeDirectory + "/X-Layer.gc", geometryX, calibrationX )
   gCodePath.writeRubyCode( "X-Layer.rb", enablePathLabels=False, enablePinLabels=True )
@@ -83,7 +84,8 @@ if __name__ == "__main__":
 
 
   recipeV.writeDefaultCalibration( "./", "V-Layer_Calibration.xml", "V Layer" )
-  calibrationV = LayerCalibration.load( "./", "V-Layer_Calibration.xml" )
+  calibrationV = LayerCalibration()
+  calibrationV.load( "./", "V-Layer_Calibration.xml" )
   calibrationV.setOffset( geometryV.apaOffset )
   gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometryV, calibrationV )
   gCodePath.writeRubyCode( "V-Layer.rb", enablePathLabels=False, enablePinLabels=False )
@@ -96,7 +98,8 @@ if __name__ == "__main__":
   )
 
   recipeU.writeDefaultCalibration( "./", "U-Layer_Calibration.xml", "U Layer" )
-  calibrationU = LayerCalibration.load( "./", "U-Layer_Calibration.xml" )
+  calibrationU = LayerCalibration()
+  calibrationU.load( "./", "U-Layer_Calibration.xml" )
   calibrationU.setOffset( geometryU.apaOffset )
   gCodePath = G_CodeToPath( recipeDirectory + "/U-Layer.gc", geometryU, calibrationU )
   gCodePath.writeRubyCode( "U-Layer.rb", enablePathLabels=False, enablePinLabels=True )
@@ -110,7 +113,8 @@ if __name__ == "__main__":
 
 
   recipeG.writeDefaultCalibration( "./", "G-Layer_Calibration.xml", "G Layer" )
-  calibrationG = LayerCalibration.load( "./", "G-Layer_Calibration.xml" )
+  calibrationG = LayerCalibration()
+  calibrationG.load( "./", "G-Layer_Calibration.xml" )
   calibrationG.setOffset( geometryG.apaOffset )
   gCodePath = G_CodeToPath( recipeDirectory + "/G-Layer.gc", geometryG, calibrationG )
   gCodePath.writeRubyCode( "G-Layer.rb", enablePathLabels=False, enablePinLabels=True )

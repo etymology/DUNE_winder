@@ -6,6 +6,7 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+from .Head import Head
 from Library.G_Code import G_Code
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 
@@ -142,7 +143,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     isDone = False
 
-    if self._io.plcLogic.isReady() :
+    if self._io.plcLogic.isReady() and self._head.isIdle() :
       self._currentLine = self._nextLine
 
       isDone = self.isDone() or self.isOutOfWire()
@@ -177,8 +178,8 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     # Calibrate the position (if we have a calibration file.)
     if self._calibration :
       offset = self._calibration.getOffset()
-      self.x += offset.x
-      self.y += offset.y
+      self._x += offset.x
+      self._y += offset.y
 
     # If an X/Y coordinate change is needed...
     if self._xyChange :
@@ -195,6 +196,11 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
       # Reset change flag.
       self._zChange = False
+
+    # Head movement...
+    if self._headPositionChange :
+      self._head.setPosition( self._headPosition, self._velocity )
+      self._headPositionChange = False
 
     # Account for wire used.
     if self._wireLength :
@@ -252,6 +258,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._currentLine = -1
     self._nextLine = -1
     self._geometry = geometry
+
+    # $$$DEBUG
+    self._head._geometry = geometry
 
     # Use current X/Y/Z position as starting points.
     # (These will be moved to self.lastN when the next line is executed.)
@@ -322,13 +331,14 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._calibration = calibration
 
   #---------------------------------------------------------------------
-  def __init__( self, io, spool ):
+  def __init__( self, io, spool, geometry=None ):
     """
     Constructor.
 
     Args:
       io: Instance of I/O map.
       spool: Instance of Spool.
+      geometry: Machine geometry.
     """
     G_CodeHandlerBase.__init__( self )
 
@@ -336,6 +346,8 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     self._io = io
     self._spool = spool
+
+    self._head = Head( io, geometry )
 
     self._direction = 1
     self.runToLine = -1

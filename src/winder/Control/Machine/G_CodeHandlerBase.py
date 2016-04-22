@@ -105,10 +105,10 @@ class G_CodeHandlerBase :
     number = int( function[ 0 ] )
     self._functions.append( function )
 
-    # Z-Latch.
+    # Head position.
     if G_Codes.LATCH == number :
-      # $$$DEBUG
-      pass
+      self._headPosition = int( function[ 1 ] )
+      self._headPositionChange = True
 
     # Consumed wire for line.
     elif G_Codes.WIRE_LENGTH == number :
@@ -132,6 +132,7 @@ class G_CodeHandlerBase :
 
       self._x = location.x
       self._y = location.y
+      self._xyChange = True
 
     # Seek between pins.
     elif G_Codes.PIN_CENTER == number :
@@ -148,16 +149,23 @@ class G_CodeHandlerBase :
 
       if "X" in axies :
         self._x = center.x
+        self._xyChange = True
 
       if "Y" in axies :
         self._y = center.y
+        self._xyChange = True
 
     # Clip coordinates.
     elif G_Codes.CLIP == number :
+      oldX = self._x
+      oldY = self._y
+
       self._y = max( self._y, self._geometry.bottom )
       self._y = min( self._y, self._geometry.top )
       self._x = max( self._x, self._geometry.left )
       self._x = min( self._x, self._geometry.right )
+
+      self._xyChange = ( oldX != self._x ) or ( oldY != self._y )
 
     # Offset coordinates.
     elif G_Codes.OFFSET == number :
@@ -167,12 +175,15 @@ class G_CodeHandlerBase :
 
         if "X" == axis :
           self._x += offset
+          self._xyChange = True
 
         if "Y" == axis :
           self._y += offset
+          self._xyChange = True
 
         if "Z" == axis :
           self._z += offset
+          self._xyChange = True
 
   #---------------------------------------------------------------------
   def __init__( self ):
@@ -193,6 +204,7 @@ class G_CodeHandlerBase :
     self._x = None
     self._y = None
     self._z = None
+    self._headPosition = None
 
     self._lastX = None
     self._lastY = None
@@ -200,6 +212,7 @@ class G_CodeHandlerBase :
 
     self._xyChange = False
     self._zChange = False
+    self._headPositionChange = False
 
     # Current line number.
     self._line = 0

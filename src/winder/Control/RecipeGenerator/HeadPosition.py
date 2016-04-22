@@ -70,24 +70,29 @@ class HeadPosition :
 
     if self._currentPostion != location :
 
-      # Latch needed?
-      if HeadPosition.BACK == self._currentPostion or HeadPosition.BACK == location :
-        # Latch to front or back?
-        if self._currentPostion == HeadPosition.BACK :
-          self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
-        else :
-          self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
+      # $$$DEBUG - Evaluate and clean-up.
+      # # Latch needed?
+      # if HeadPosition.BACK == self._currentPostion or HeadPosition.BACK == location :
+      #   # Latch to front or back?
+      #   if self._currentPostion == HeadPosition.BACK :
+      #     self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.FRONT ) )
+      #   else :
+      #     self._gCodePath.pushG_Code( LatchG_Code( LatchG_Code.BACK ) )
+      #
+      #   # Get/set it from/to back.
+      #   #self._gCodePath.push( z=self._geometry.backZ )
 
-        # Get/set it from/to back.
-        self._gCodePath.push( z=self._geometry.backZ )
+      # # Front and back are both in front.  This is because is the destination
+      # # is the back, we leave the head at the back and return to the front.
+      # if HeadPosition.BACK == location or HeadPosition.FRONT == location :
+      #   self._gCodePath.push( z=self._geometry.frontZ )
+      # elif HeadPosition.PARTIAL_FRONT == location :
+      #   self._gCodePath.push( z=self._geometry.partialZ_Front )
+      # elif HeadPosition.PARTIAL_BACK == location :
+      #   self._gCodePath.push( z=self._geometry.partialZ_Back )
+      # #self._gCodePath.push()
 
-      # Front and back are both in front.  This is because is the destination
-      # is the back, we leave the head at the back and return to the front.
-      if HeadPosition.BACK == location or HeadPosition.FRONT == location :
-        self._gCodePath.push( z=self._geometry.frontZ )
-      elif HeadPosition.PARTIAL_FRONT == location :
-        self._gCodePath.push( z=self._geometry.partialZ_Front )
-      elif HeadPosition.PARTIAL_BACK == location :
-        self._gCodePath.push( z=self._geometry.partialZ_Back )
+      self._gCodePath.pushG_Code( LatchG_Code( location ) )
+      self._gCodePath.push()
 
       self._currentPostion = location

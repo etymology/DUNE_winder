@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Library.Geometry.Location import Location
+from Library.SerializableLocation import SerializableLocation
 from Library.Recipe import Recipe
 
 from .G_CodeFunctions.PinCenterG_Code import PinCenterG_Code
@@ -273,10 +273,12 @@ class RecipeGenerator :
     """
 
     calibration = LayerCalibration( layerName )
-    calibration.setOffset( Location( 0, 0 ) )
+    calibration.setOffset( SerializableLocation( 0, 0 ) )
 
     for node in self.nodes :
-      calibration.setPinLocation( node, self.nodes[ node ] )
+      location = self.nodes[ node ]
+      newLocation = SerializableLocation( location.x, location.y )
+      calibration.setPinLocation( node, location )
 
     calibration.save( outputFilePath, outputFileName )
 

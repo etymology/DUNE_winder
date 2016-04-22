@@ -34,7 +34,7 @@ class IO_Tab( wx.Panel, Remote, ActivatedTab ) :
     #
     # Inputs.
     #
-    grideSizer = wx.FlexGridSizer( 1, 2, 0, 20 )
+    grideSizer = wx.FlexGridSizer( 100, 2, 0, 20 )
 
     self._inputList = self.remote.get( "LowLevelIO.getInputs()" )
     self._inputList = ast.literal_eval( self._inputList )

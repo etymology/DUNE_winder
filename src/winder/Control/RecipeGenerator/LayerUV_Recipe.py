@@ -108,7 +108,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       y += parameter[ 4 ]
 
       for _ in range( 0, count ) :
-        location = Location( round( x, 5 ), round( y, 5 ), depth )
+        location = Location( round( x, 5 ) + 0, round( y, 5 ) + 0, depth )
         pin = side + str( pinNumber )
         self.nodes[ pin ] = location
         self.orientations[ pin ] = orientations[ side ][ setIndex ]

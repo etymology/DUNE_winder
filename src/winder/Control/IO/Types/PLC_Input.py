@@ -14,18 +14,24 @@ class PLC_Input( DigitalInput ) :
   list = []
 
   #---------------------------------------------------------------------
-  def __init__( self, name, plc, tagName, bit, defaultState = False ) :
+  def __init__( self, name, plc, tagName=None, bit=0, defaultState = False ) :
     """
     Constructor.
 
     Args:
       name: Name of output.
       plc: Instance of IO_Device.PLC.
-      tagName: Which PLC tag this input is assigned.
+      tagName: Which PLC tag this input is assigned.  Default is None for when
+        the tag and name are the same.
+      bit: Which bit of the tag.  Defaults to bit 0.
       defaultState: Default state if input is unreadable.
     """
     DigitalInput.__init__( self, name )
     PLC_Input.list.append( self )
+
+    # Just use the name for the tag?
+    if None == tagName :
+      tagName = name
 
     self._plc = plc
     attributes = PLC.Tag.Attributes()

@@ -6,16 +6,10 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-import xml.dom.minidom
-import os.path
-import re
-import hashlib
-import base64
+from Library.HashedSerializable import HashedSerializable
+from Library.SerializableLocation import SerializableLocation
 
-from Library.Serializable import Serializable
-from Library.Geometry.Location import Location
-
-class LayerCalibration( Serializable ) :
+class LayerCalibration( HashedSerializable ) :
   """
   Layer calibration is just a map that has an adjusted location for each
   pin on a layer.  The pins are addressed by side and pin number.  Each
@@ -25,16 +19,15 @@ class LayerCalibration( Serializable ) :
   """
 
   #-------------------------------------------------------------------
-  def __init__( self, layer ) :
+  def __init__( self, layer=None ) :
     """
     Constructor.
     """
 
+    HashedSerializable.__init__( self )
+
     # Name of layer this calibration file applies.
     self._layer = layer
-
-    # Hash of calibration XML data used for modification detection.
-    self._hash = None
 
     # Offset of 0,0 on the APA to machine offset.
     self._offset = None
@@ -49,9 +42,10 @@ class LayerCalibration( Serializable ) :
     from a calibration routine.
 
     Args:
-      offset: Instance of Location with absolute machine position.
+      offset: Instance of SerializableLocation with absolute machine position.
     """
-    self._offset = offset
+
+    self._offset = SerializableLocation( offset.x, offset.y, offset.z )
 
   #-------------------------------------------------------------------
   def getOffset( self ) :
@@ -60,7 +54,7 @@ class LayerCalibration( Serializable ) :
     the raw position to get the APA position.
 
     Returns:
-      Location of pin 1 in raw machine position.
+      SerializableLocation of pin 1 in raw machine position.
     """
     return self._offset
 
@@ -73,7 +67,8 @@ class LayerCalibration( Serializable ) :
       pin: Which pin.
       location: The location (relative to the APA) of this pin.
     """
-    self._locations[ pin ] = location
+    newLocation = SerializableLocation( location.x, location.y, location.z )
+    self._locations[ pin ] = newLocation
 
   #-------------------------------------------------------------------
   def getPinLocation( self, pin ) :
@@ -84,7 +79,7 @@ class LayerCalibration( Serializable ) :
       pin: Which pin.
 
     Returns:
-      Instance of Location with the position of this pin.
+      Instance of SerializableLocation with the position of this pin.
     """
 
     return self._locations[ pin ]
@@ -93,14 +88,14 @@ class LayerCalibration( Serializable ) :
   def getPinNames( self ) :
     """
     Return a list of pin names.
-    
+
     Returns:
       List of pin names.
     """
     return self._locations.keys()
 
   #---------------------------------------------------------------------
-  def serialize( self, xmlDocument ) :
+  def serialize( self, xmlDocument, nameOverride=None ) :
     """
     Turn this object into an XML node.
 
@@ -110,19 +105,19 @@ class LayerCalibration( Serializable ) :
     Returns:
       Must return an XML node with the data from this object.
     """
-    node = xmlDocument.createElement( "Calibration" )
+    node = xmlDocument.createElement( "LayerCalibration" )
     node.setAttribute( "layer", str( self._layer ) )
-    node.setAttribute( "hash", "" )
+
+    offsetNode = self.serializeObject( xmlDocument, "Offset", self._offset )
+    node.appendChild( offsetNode )
 
     for pin in self._locations :
-
       location = self._locations[ pin ]
-
-      pinNode = xmlDocument.createElement( "Pin" )
-      pinNode.setAttribute( "number", str( pin ) )
-      pinNode.setAttribute( "x", str( location.x ) )
-      pinNode.setAttribute( "y", str( location.y ) )
+      pinNode = self.serializeObject( xmlDocument, pin, location )
       node.appendChild( pinNode )
+
+    hashNode = self.serializeObject( xmlDocument, "hashValue", self.hashValue )
+    node.appendChild( hashNode )
 
     return node
 
@@ -137,136 +132,48 @@ class LayerCalibration( Serializable ) :
     Returns:
       True if there was an error, False if not.
     """
+
     self._layer = node.getAttribute( "layer" )
-    self._hash = node.getAttribute( "layer" )
-    pinNodes = node.getElementsByTagName( "Pin" )
 
-    for pinNode in pinNodes :
-      pin = pinNode.getAttribute( "number" )
-      x = pinNode.getAttribute( "x" )
-      y = pinNode.getAttribute( "y" )
-      self._locations[ pin ] = Location( x, y )
+    nodes = node.getElementsByTagName( "SerializableLocation" )
+    for node in nodes :
+      location = SerializableLocation()
+      location.unserialize( node )
 
-  #-------------------------------------------------------------------
-  @staticmethod
-  def _calculateStringHash( lines ) :
-    """
-    $$$DEBUG
-    """
-    lines = lines.replace( '\n', '' )
-    lines = lines.replace( '\r', '' )
-    lines = lines.replace( '\t', '' )
-    lines = lines.replace( ' ', '' )
+      name = node.getAttribute( "name" )
+      if "Offset" == name :
+        self.setOffset( location )
+      else:
+        self._locations[ name ] = location
 
-    # Calculate a hash over the body of the calibration.
-    # This is used to prevent any modification to calibration once it has been
-    # established.
-    body = re.search( '<Calibration.*?(hash="([a-zA-Z0-9=]*)").*?>(.+?)</Calibration>', lines )
-    fileHash = body.group( 2 )
-    bodyData = body.group( 3 )
+# Unit test.
+if __name__ == "__main__":
 
-    # Create hash of G-Code, including description.
-    bodyHash = hashlib.sha256()
-    bodyHash.update( bodyData )
+  def compare( a, b ) :
+    return ( a.x == b.x ) and ( a.y == b.y ) and ( a.z == b.z )
 
-    # Turn hash into base 32 encoding.
-    bodyHash = base64.b32encode( bodyHash.digest() )
+  layerCalibration = LayerCalibration( "V" )
+  layerCalibration.setOffset( SerializableLocation( 1, 2 ) )
+  layerCalibration.setPinLocation( "F1", SerializableLocation( 0, 0, 0 ) )
+  layerCalibration.setPinLocation( "F2", SerializableLocation( 1, 0, 0 ) )
+  layerCalibration.setPinLocation( "F3", SerializableLocation( 1, 1, 0 ) )
+  layerCalibration.setPinLocation( "F4", SerializableLocation( 0, 1, 0 ) )
+  layerCalibration.setPinLocation( "B1", SerializableLocation( 0, 0, 1 ) )
+  layerCalibration.setPinLocation( "B2", SerializableLocation( 1, 0, 1 ) )
+  layerCalibration.setPinLocation( "B3", SerializableLocation( 1, 1, 1 ) )
+  layerCalibration.setPinLocation( "B4", SerializableLocation( 0, 1, 1 ) )
+  layerCalibration.save( ".", "layerCalibrationTest.xml" )
 
-    return [ fileHash, bodyHash ]
+  layerCopy = LayerCalibration( "V" )
+  layerCopy.load( ".", "layerCalibrationTest.xml" )
 
-  #-------------------------------------------------------------------
-  @staticmethod
-  def _calculateHash( fileName ) :
-    """
-    $$$DEBUG
-    """
-
-    with open( fileName ) as inputFile :
-      lines = inputFile.read()
-
-    return LayerCalibration._calculateStringHash( lines )
-
-  #-------------------------------------------------------------------
-  def internalSet( self, layer, hashValue ):
-    """
-    $$$DEBUG
-    """
-    self._layer = layer
-    self._hash  = hashValue
-    
-  #-------------------------------------------------------------------
-  @staticmethod
-  def load( filePath, fileName ) :
-    """
-    $$$DEBUG
-    """
-
-    layerCalibration = None
-
-    fullName = filePath + "/" + fileName
-    if os.path.isfile( fullName ) :
-      xmlDocument = xml.dom.minidom.parse( fullName )
-      node = xmlDocument.getElementsByTagName( "CalibrationFile" )
-      layer = node[ 0 ].getAttribute( "layer" )
-
-      [ fileHash, bodyHash ] = LayerCalibration._calculateHash( fullName )
-
-      # Does the calculated hash match the hash from the header?
-      if bodyHash == fileHash :
-        layerCalibration = None
-
-        layerCalibration = LayerCalibration( layer )
-        layerCalibration.unserialize( node[ 0 ] )
-        layerCalibration.internalSet( layer, bodyHash )
-      else :
-        print "Hash mismatch"
-        print bodyHash
-        print fileHash
-
-      # $$$FUTURE
-      ## Log message about AHA change.
-      #self._log.add(
-      #  self.__class__.__name__,
-      #  "LOAD",
-      #  "Loaded calibration file " + fileName,
-      #  [ fileName ]
-      #)
-    else :
-      # $$$FUTURE
-      print "File not found", fullName
-      #self._log.add(
-      #  self.__class__.__name__,
-      #  "LOAD",
-      #  "Unable to load calibration file " + fileName + ".  File not found.",
-      #  [ fileName ]
-      #)
-      #pass
-
-    return layerCalibration
-
-  #-------------------------------------------------------------------
-  def save( self, filePath, fileName ) :
-    """
-    $$$DEBUG
-    """
-
-    # Serialize data into XML.
-    xmlDocument = xml.dom.minidom.parseString( '<CalibrationFile/>' )
-    node = self.serialize( xmlDocument )
-    xmlDocument.childNodes[ 0 ].appendChild( node )
-
-    # Create text from XML data.
-    outputText = xmlDocument.toprettyxml()
-
-    # Strip off extraneous line feeds.
-    outputText = \
-      '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
-
-    _, bodyHash = LayerCalibration._calculateStringHash( outputText )
-    outputText = outputText.replace( 'hash=""', 'hash="' + bodyHash + '"' )
-
-    fullName = filePath + "/" + fileName
-
-    # Write XML data to file.
-    with open( fullName, "wb" ) as outputFile :
-      outputFile.write( outputText )
+  assert( layerCopy._layer == layerCalibration._layer )
+  assert( compare( layerCopy._offset, layerCalibration._offset ) )
+  assert( compare( layerCopy._locations[ "F1" ], layerCalibration._locations[ "F1" ] ) )
+  assert( compare( layerCopy._locations[ "F2" ], layerCalibration._locations[ "F2" ] ) )
+  assert( compare( layerCopy._locations[ "F3" ], layerCalibration._locations[ "F3" ] ) )
+  assert( compare( layerCopy._locations[ "F4" ], layerCalibration._locations[ "F4" ] ) )
+  assert( compare( layerCopy._locations[ "B1" ], layerCalibration._locations[ "B1" ] ) )
+  assert( compare( layerCopy._locations[ "B2" ], layerCalibration._locations[ "B2" ] ) )
+  assert( compare( layerCopy._locations[ "B3" ], layerCalibration._locations[ "B3" ] ) )
+  assert( compare( layerCopy._locations[ "B4" ], layerCalibration._locations[ "B4" ] ) )

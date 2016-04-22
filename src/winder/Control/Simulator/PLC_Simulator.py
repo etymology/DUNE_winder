@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
 
 class PLC_Simulator :
@@ -15,6 +16,7 @@ class PLC_Simulator :
     """
     Update simulator.  Call periodically.
     """
+    self._simulationTime.setLocal()
     moveType = self._io.plc.getTag( self._moveTypeTag )
 
     if self._lastMoveType != moveType :
@@ -63,17 +65,6 @@ class PLC_Simulator :
       self._lastMoveType = None
 
   #---------------------------------------------------------------------
-  #def _writeCallback( self, tag, data ) :
-  #  """
-  #  Callback run whenever a tag is written.
-  #
-  #  Args:
-  #    tag: Ignored.
-  #    data: Ignored.
-  #  """
-  #  self.poll()
-
-  #---------------------------------------------------------------------
   def __init__( self, io ) :
     """
     Construct.
@@ -83,13 +74,17 @@ class PLC_Simulator :
     """
     self._io = io
 
+    # Simulation time.
+    # (So we could run at speeds other than real-time.)
+    self._simulationTime = SimulationTime()
+
     # Add self to I/O polling callback list.
     io.pollCallbacks.append( self.poll )
 
     # Simulated motors.
-    self._xAxis = SimulatedMotor( io.plc, "X", io.simulationTime )
-    self._yAxis = SimulatedMotor( io.plc, "Y", io.simulationTime )
-    self._zAxis = SimulatedMotor( io.plc, "Z", io.simulationTime )
+    self._xAxis = SimulatedMotor( io.plc, "X", self._simulationTime )
+    self._yAxis = SimulatedMotor( io.plc, "Y", self._simulationTime )
+    self._zAxis = SimulatedMotor( io.plc, "Z", self._simulationTime )
 
     # Simulated I/O points.
     io.plc.setupTag( "Point_IO:1:I", 0 )

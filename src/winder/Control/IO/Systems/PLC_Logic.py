@@ -18,23 +18,25 @@ class PLC_Logic :
 
   # States for primary state machine.
   class States :
-    INIT      = 0
-    READY     = 1
-    XY_JOG    = 2
-    XY_SEEK   = 3
-    Z_JOG     = 4
-    Z_SEEK    = 5
-    LATCHING  = 6
+    INIT          = 0
+    READY         = 1
+    XY_JOG        = 2
+    XY_SEEK       = 3
+    Z_JOG         = 4
+    Z_SEEK        = 5
+    LATCHING      = 6
+    LATCH_HOMEING = 7
   # end class
 
   # States for move type state machine.
   class MoveTypes :
-    IDLE    = 0
-    JOG_XY  = 1
-    SEEK_XY = 2
-    JOG_Z   = 3
-    SEEK_Z  = 4
-    LATCH   = 5
+    IDLE       = 0
+    JOG_XY     = 1
+    SEEK_XY    = 2
+    JOG_Z      = 3
+    SEEK_Z     = 4
+    LATCH      = 5
+    HOME_LATCH = 6
   # end class
 
   #---------------------------------------------------------------------

@@ -76,7 +76,7 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
 
     self.systemTime = SystemTime( remote, self, vbox )
 
-    outer = wx.FlexGridSizer( 1, 1, 0, 0 )
+    outer = wx.FlexGridSizer( 2, 1, 0, 0 )
     #
     # Jog buttons.
     #

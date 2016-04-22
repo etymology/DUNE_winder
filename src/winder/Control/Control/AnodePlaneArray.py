@@ -9,6 +9,9 @@
 import xml.dom.minidom
 import os.path
 
+# $$$DEBUG - Temporary.
+from Debug.DefaultCalibration import DefaultCalibration
+
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
 from Machine.Settings import Settings
@@ -53,6 +56,9 @@ class AnodePlaneArray( Serializable ) :
       createNew: True if this APA should be created should it not already exist.
     """
 
+    includeOnly = [ '_name', "_calibrationFile", "_recipeFile", "_lineNumber", "_layer" ]
+    Serializable.__init__( self, includeOnly=includeOnly )
+
     # If there was an APA previously active, save it.
     if AnodePlaneArray.activeAPA :
       AnodePlaneArray.activeAPA.close()
@@ -72,7 +78,7 @@ class AnodePlaneArray( Serializable ) :
     self._recipe = None
     self._layer = None
     self._calibrationFile = None
-    self._calibration = None     # $$$DEBUG - Needed here?
+    self._calibration = None
 
     # Create directory if it doesn't exist.
     apaExists = os.path.exists( self._getPath() )
@@ -154,6 +160,11 @@ class AnodePlaneArray( Serializable ) :
     else:
       raise Exception( "Recipe has no layer for geometry." )
 
+    # $$$DEBUG - Temporary.
+    self._calibrationFile = self._layer + "_Calibration.xml"
+    self._calibration = \
+      DefaultCalibration( self._getPath(), self._calibrationFile, self._layer )
+
     if None != recipeFile :
       self._recipeFile = recipeFile
 
@@ -211,81 +222,44 @@ class AnodePlaneArray( Serializable ) :
       True if there was an error, False if not.
     """
 
-    isError = False
-    fileName = self._getPath() + AnodePlaneArray.FILE_NAME
-    if os.path.isfile( fileName ) :
-      # Log message about AHA change.
-      self._log.add(
-        self.__class__.__name__,
-        "LOAD",
-        "Loaded APA called " + self._name,
-        [ self._name ]
-      )
-      xmlDocument = xml.dom.minidom.parse( fileName )
-      node = xmlDocument.getElementsByTagName( "APA_" + self._name )
-      self.unserialize( node[ 0 ] )
+    # Log message about AHA change.
+    self._log.add(
+      self.__class__.__name__,
+      "LOAD",
+      "Loaded APA called " + self._name,
+      [ self._name ]
+    )
 
-      if self._recipeFile :
-        self.loadRecipe( self._layer )
+    Serializable.load( self, self._getPath(), AnodePlaneArray.FILE_NAME )
 
-      if self._calibrationFile :
-        self._calibration = LayerCalibration.load( self._getPath(), self._calibrationFile )
+    if self._recipeFile :
+      self.loadRecipe( self._layer )
 
-        if not self._calibration :
-          isError = True
-          self._log.add(
-            self.__class__.__name__,
-            "LOAD",
-            "Unable to load calibration for " + self._calibrationFile + ".",
-            [ self._calibrationFile ]
-          )
-        else :
-          self._log.add(
-            self.__class__.__name__,
-            "LOAD",
-            "Loaded calibration file " + self._calibrationFile + ".",
-            [ self._calibrationFile, self._calibration._hash ]
-          )
+    if self._calibrationFile :
+      self._calibration = LayerCalibration()
+      self._calibration.load( self._getPath(), self._calibrationFile )
 
-          self._gCodeHandler.useCalibration( self._calibration )
+      if not self._calibration :
+        isError = True
+        self._log.add(
+          self.__class__.__name__,
+          "LOAD",
+          "Unable to load calibration for " + self._calibrationFile + ".",
+          [ self._calibrationFile ]
+        )
+      else :
+        self._log.add(
+          self.__class__.__name__,
+          "LOAD",
+          "Loaded calibration file " + self._calibrationFile + ".",
+          [ self._calibrationFile, self._calibration.hashValue ]
+        )
 
-        # $$$DEBUG - Pass calibration data to G-Code handler.
-
-    else :
-      isError = True
-      self._log.add(
-        self.__class__.__name__,
-        "LOAD",
-        "Unable to load APA called " + self._name + ".  File not found.",
-        [ self._name ]
-      )
-
-    return isError
+        self._gCodeHandler.useCalibration( self._calibration )
 
   #---------------------------------------------------------------------
   def save( self ) :
-    """
-    Save state of APA to disk.
-    """
-
-    # Get the current line in G-Code.
-    self._lineNumber = self._gCodeHandler.getLine()
-
-    # Serialize data into XML.
-    xmlDocument = xml.dom.minidom.parseString( '<AnodePlaneArray/>' )
-    node = self.serialize( xmlDocument )
-    xmlDocument.childNodes[ 0 ].appendChild( node )
-
-    # Create text from XML data.
-    outputText = xmlDocument.toprettyxml()
-
-    # Strip off extraneous line feeds.
-    outputText = \
-      '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
-
-    # Write XML data to file.
-    with open( self._getPath() + AnodePlaneArray.FILE_NAME, "wb" ) as outputFile :
-      outputFile.write( outputText )
+    Serializable.save( self, self._getPath(), AnodePlaneArray.FILE_NAME )
 
   #---------------------------------------------------------------------
   def close( self ) :
@@ -307,58 +281,31 @@ class AnodePlaneArray( Serializable ) :
     )
     self._log.detach( self._getPath() + AnodePlaneArray.LOG_FILE )
 
-  #---------------------------------------------------------------------
-  def serialize( self, xmlDocument ) :
-    """
-    Turn this object into an XML node.
-
-    Args:
-      xmlDocument: Instance of xml.dom.minidom.Document.
-
-    Returns:
-      Must return an XML node with the data from this object.
-    """
-    node = xmlDocument.createElement( "APA_" + self._name )
-
-    node.setAttribute( "calibrationFile", self._calibrationFile )
-    node.setAttribute( "recipeFile", self._recipeFile )
-    node.setAttribute( "lineNumber", str( self._lineNumber ) )
-    node.setAttribute( "layer", str( self._layer ) )
-
-    return node
-
-  #---------------------------------------------------------------------
-  def unserialize( self, node ) :
-    """
-    Take an XML node and load values into this object.
-
-    Args:
-      node: Instance of xml.dom.minidom.Node.
-
-    Returns:
-      True if there was an error, False if not.
-    """
-    self._recipeFile = node.getAttribute( "recipeFile" )
-
-    calibrationFile = node.getAttribute( "calibrationFile" )
-    if "None" != calibrationFile :
-      self._calibrationFile = calibrationFile
-    else :
-      self._calibrationFile = None
-
-    layer = node.getAttribute( "layer" )
-    if "None" != layer :
-      self._layer = layer
-    else :
-      self._layer = None
-
-    lineNumberString = node.getAttribute( "lineNumber" )
-    if "None" != lineNumberString :
-      self._lineNumber = int( lineNumberString )
-    else :
-      self._lineNumber = None
-
-    return False
-
-
 # end class
+
+
+if __name__ == "__main__":
+
+  from Library.Log import Log
+  from Library.SystemTime import SystemTime
+
+  systemTime = SystemTime()
+  log = Log( systemTime )
+  log.add( "Main", "START", "Control system starts." )
+
+
+  from Machine.G_CodeHandlerBase import G_CodeHandlerBase
+
+  gCodeHandler = G_CodeHandlerBase()
+
+  apa = AnodePlaneArray(
+    gCodeHandler,
+    ".",
+    ".",
+    ".",
+    "TestAPA",
+    log,
+    True )
+
+  apa.save()
+  apa.load()
