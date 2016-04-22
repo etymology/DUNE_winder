@@ -2,9 +2,9 @@ from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
 from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry
-from .xy_manual_stage_movement import ManualXyStageMovement
+from .xy_manual_stage_movement import ManualXyStageMovement_Jog
 
-class _GridManualXyStageMovement( GridEntry, ManualXyStageMovement ):
+class _GridManualXyStageMovement( GridEntry, ManualXyStageMovement_Jog ):
    pass
 
 class XyStage( SparseGridLayout ):

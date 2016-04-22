@@ -35,6 +35,7 @@ class SparseGridLayout( BackgroundColorMixin, FloatLayout ):
    columns = NumericProperty( 1 )
    grid_size = ReferenceListProperty( rows, columns )
    spacing = ListProperty( [ 0 ] )
+   padding = ListProperty( [ 0 ] )
 
    def __init__( self, **kwargs ):
       super( SparseGridLayout, self ).__init__( **kwargs )
@@ -63,6 +64,19 @@ class SparseGridLayout( BackgroundColorMixin, FloatLayout ):
       return result
 
    def do_layout( self, *args, **kwargs ):
+      grid_padding = self._get_cell_property_values( self.padding )
+
+      left_padding = grid_padding[ 0 ]
+      top_padding = grid_padding[ 1 ]
+      right_padding = grid_padding[ 2 ]
+      bottom_padding = grid_padding[ 3 ]
+
+      horizontal_padding = left_padding + right_padding
+      vertical_padding = top_padding + bottom_padding
+
+      inner_width = 1. - horizontal_padding
+      inner_height = 1. - vertical_padding
+
       grid_spacing = self._get_cell_property_values( self.spacing )
 
       left_spacing = grid_spacing[ 0 ]
@@ -77,19 +91,25 @@ class SparseGridLayout( BackgroundColorMixin, FloatLayout ):
       cell_height = 1. / self.rows
 
       for child in self.children:
-         width = cell_width * child.column_span - horizontal_spacing
-         height = cell_height * child.row_span - vertical_spacing
+         if not hasattr( child, GridEntry.FieldNames.Row ):
+            child.row = 0
+         if not hasattr( child, GridEntry.FieldNames.Column ):
+            child.column = 0
+         if not hasattr( child, GridEntry.FieldNames.ColumnSpan ):
+            child.column_span = 1
+         if not hasattr( child, GridEntry.FieldNames.RowSpan ):
+            child.row_span = 1
+
+         # The children sizes are scaled by the inner width and inner height as influenced by the padding.
+         width = ( cell_width * child.column_span - horizontal_spacing ) * inner_width
+         height = ( cell_height * child.row_span - vertical_spacing ) * inner_height
          child_size_hint = ( width, height )
 
          child.size_hint = child_size_hint
-         if not hasattr( child, 'row' ):
-            child.row = 0
-         if not hasattr( child, 'column' ):
-            child.column = 0
 
          # The row and column indicies are zero-based.
-         x_pos = cell_width * child.column + left_spacing
-         y_pos = cell_height * child.row + bottom_spacing
+         x_pos = ( cell_width * child.column + left_spacing ) * inner_width + left_padding
+         y_pos = ( cell_height * child.row + bottom_spacing ) * inner_height + bottom_padding
          child.pos_hint = { 'x': x_pos, 'y': y_pos }
 
       super( SparseGridLayout, self ).do_layout( *args, **kwargs )
