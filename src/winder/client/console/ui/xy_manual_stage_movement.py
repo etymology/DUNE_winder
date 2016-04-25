@@ -1,13 +1,14 @@
 import re
 
 from kivy.properties import BooleanProperty
+from kivy.uix.label import Label
 
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
 from ..movement_command import MovementCommand
 from .display_selection_layout import DisplaySelectionLayout
-from .kivy_sparce_grid_layout import SparseGridLayout, GridButton, GridEntry, GridImageButton, GridLabel, GridTextInput
+from .kivy_sparce_grid_layout import SparseGridLayout, GridBoxLayout, GridButton, GridEntry, GridImageButton, GridLabel, GridTextInput
 from .kivy_utilities import KivyUtilities
 
 class _XyCommands( MovementCommand ):
@@ -174,7 +175,7 @@ class _ManualXyStageMovement_Jog( SparseGridLayout ):
 
 class _ManualXyStageMovement_Seek( SparseGridLayout ):
    def __init__( self, movement_rate_callback, **kwargs ):
-      super( _ManualXyStageMovement_Seek, self ).__init__( **DictOps.dict_combine( kwargs, rows = 2, columns = 3 ) )
+      super( _ManualXyStageMovement_Seek, self ).__init__( **DictOps.dict_combine( kwargs, rows = 3, columns = 3 ) )
 
       self._movement_rate_callback = movement_rate_callback
 
@@ -183,19 +184,25 @@ class _ManualXyStageMovement_Seek( SparseGridLayout ):
    def _construct( self, **kwargs ):
       common_kwargs = { MovementCommand.Keys.MovementRateCallback : self._movement_rate_callback }
 
+      position_title = Label( text = "Position: ", color = AppShare.instance().settings.theme.text_color_value )
+      self.position_label = Label( text = "--", color = AppShare.instance().settings.theme.text_color_value )
+
+      position_layout = GridBoxLayout( **DictOps.dict_combine( kwargs, row = 2, column = 1, orientation = "horizontal" ) )
+      KivyUtilities.add_children_to_widget( position_layout, [ position_title, self.position_label ] )
+
       self.seek_xy_position_input = _XyPositionSeekInput( **DictOps.dict_combine( kwargs, row = 1, column = 0, column_span = 3 ) ) # size_hint = ( None, 1 )
       self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, row = 0, column = 1, input = self.seek_xy_position_input, text = "Go to Position", color = AppShare.instance().settings.theme.text_color_value, valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value ) ) # size_hint = ( None, 1 )
 
-      KivyUtilities.add_children_to_widget( self, [ self.seek_xy_position_input, self.seek_xy_position_button ] )
+      KivyUtilities.add_children_to_widget( self, [ position_layout, self.seek_xy_position_input, self.seek_xy_position_button ] )
 
    def update_xy_position( self, x_pos, y_pos ):
       # If the PLC is unavailable, both x_pos and y_pos are None.
       if x_pos is not None and y_pos is not None:
-         text = "{:.2f} mm, {:.2f} mm".format( float( x_pos ), float( y_pos ) )
+         text = "{:0.2f} mm, {:0.2f} mm".format( float( x_pos ), float( y_pos ) )
       else:
          text = "--"
 
-#       self.position_label.text = text
+      self.position_label.text = text
 
 class ManualXyStageMovement( DisplaySelectionLayout ):
    class Ids:
