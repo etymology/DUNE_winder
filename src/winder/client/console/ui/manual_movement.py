@@ -92,7 +92,8 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
       return result
 
    def _movement_mode_updated( self, instance, value ):
-      self.xy_movement.select_movement_type( self.jog_control_selection.value )
+      for item in [ self.xy_movement, self.z_movement ]:
+         item.select_movement_type( self.jog_control_selection.value )
 
    def _transfer_enables_touch_callback( self, sender, touch, represented_position ):
       self.xy_movement.seek_xy_position_input.set_text( "{:0.2f}, {:0.2f}".format( represented_position[ 0 ], represented_position[ 1 ] ) )
@@ -148,8 +149,8 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
 
    def _clock_interval_expiration( self, dt ):
       positions = self.current_position_command.get_current_position()
-      self.xy_movement.update_xy_position( positions[ 0 ], positions[ 1 ] )
-      self.z_movement.update_z_position( positions[ 2 ] )
+      self.xy_movement.update_position( positions[ 0 ], positions[ 1 ], positions[ 2 ] )
+      self.z_movement.update_position( positions[ 0 ], positions[ 1 ], positions[ 2 ] )
       self.transfer_enables.update_position( positions[ 0 : 2 ] )
 
       return True

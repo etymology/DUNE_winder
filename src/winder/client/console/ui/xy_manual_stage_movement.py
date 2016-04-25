@@ -55,7 +55,7 @@ class _NegativeYDirectionControl( GridImageButton, _XyCommands ):
    def on_release( self ):
       self.move_stop()
 
-class _XyPositionSeekInput( GridTextInput ):
+class _ZPositionSeekInput( GridTextInput ):
    class Keys:
       XValue = "x"
       YValue = "y"
@@ -68,7 +68,7 @@ class _XyPositionSeekInput( GridTextInput ):
       self._set_seek_x_position( None )
       self._set_seek_y_position( None )
 
-      super( _XyPositionSeekInput, self ).__init__( **DictOps.dict_combine( kwargs, multiline = False ) )
+      super( _ZPositionSeekInput, self ).__init__( **DictOps.dict_combine( kwargs, multiline = False ) )
 
    def _set_validity( self ):
       self.is_valid = self.valid_expression.match( self.text ) is not None
@@ -97,8 +97,8 @@ class _XyPositionSeekInput( GridTextInput ):
       self._set_validity()
       if self.is_valid:
          match = self.valid_expression.match( self.text ) # match will not be None
-         x_pos_str = match.groupdict()[ _XyPositionSeekInput.Keys.XValue ]
-         y_pos_str = match.groupdict()[ _XyPositionSeekInput.Keys.YValue ]
+         x_pos_str = match.groupdict()[ _ZPositionSeekInput.Keys.XValue ]
+         y_pos_str = match.groupdict()[ _ZPositionSeekInput.Keys.YValue ]
 
          x_pos = float( x_pos_str )
          y_pos = float( y_pos_str )
@@ -109,7 +109,7 @@ class _XyPositionSeekInput( GridTextInput ):
       self._set_seek_y_position( y_pos )
 
    def insert_text( self, substring, from_undo = False ):
-      result = super( _XyPositionSeekInput, self ).insert_text( substring, from_undo )
+      result = super( _ZPositionSeekInput, self ).insert_text( substring, from_undo )
 
       self._process_text()
 
@@ -119,18 +119,18 @@ class _XyPositionSeekInput( GridTextInput ):
       self.text = new_text
       self._process_text()
 
-class _XyPositionSeekButton( GridButton, _XyCommands ):
+class _ZPositionSeekButton( GridButton, _XyCommands ):
    class Keys:
       InputControl = "input"
 
    def __init__( self, **kwargs ):
-      if _XyPositionSeekButton.Keys.InputControl in kwargs:
-         self.input_control = kwargs[ _XyPositionSeekButton.Keys.InputControl ]
-         del kwargs[ _XyPositionSeekButton.Keys.InputControl ]
+      if _ZPositionSeekButton.Keys.InputControl in kwargs:
+         self.input_control = kwargs[ _ZPositionSeekButton.Keys.InputControl ]
+         del kwargs[ _ZPositionSeekButton.Keys.InputControl ]
       else:
          raise ValueError( "Missing the input control." )
 
-      super( _XyPositionSeekButton, self ).__init__( **kwargs )
+      super( _ZPositionSeekButton, self ).__init__( **kwargs )
 
    def on_press( self ):
       if self.input_control.is_valid:
@@ -164,10 +164,10 @@ class _ManualXyStageMovement_Jog( SparseGridLayout ):
 
       KivyUtilities.add_children_to_widget( self, [ negative_x_direction_control, positive_x_direction_control, negative_y_direction_control, positive_y_direction_control, self.position_label, negative_x_direction_label, positive_x_direction_label ] )
 
-   def update_xy_position( self, x_pos, y_pos ):
+   def update_position( self, x_pos, y_pos, z_pos ):
       # If the PLC is unavailable, both x_pos and y_pos are None.
       if x_pos is not None and y_pos is not None:
-         text = "{:.2f} mm, {:.2f} mm".format( float( x_pos ), float( y_pos ) )
+         text = "{:0.2f} mm, {:0.2f} mm".format( float( x_pos ), float( y_pos ) )
       else:
          text = "--"
 
@@ -190,12 +190,12 @@ class _ManualXyStageMovement_Seek( SparseGridLayout ):
       position_layout = GridBoxLayout( **DictOps.dict_combine( kwargs, row = 2, column = 1, orientation = "horizontal" ) )
       KivyUtilities.add_children_to_widget( position_layout, [ position_title, self.position_label ] )
 
-      self.seek_xy_position_input = _XyPositionSeekInput( **DictOps.dict_combine( kwargs, row = 1, column = 0, column_span = 3 ) ) # size_hint = ( None, 1 )
-      self.seek_xy_position_button = _XyPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, row = 0, column = 1, input = self.seek_xy_position_input, text = "Go to Position", color = AppShare.instance().settings.theme.text_color_value, valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value ) ) # size_hint = ( None, 1 )
+      self.seek_xy_position_input = _ZPositionSeekInput( **DictOps.dict_combine( kwargs, row = 1, column = 0, column_span = 3 ) ) # size_hint = ( None, 1 )
+      self.seek_xy_position_button = _ZPositionSeekButton( **DictOps.dict_combine( kwargs, common_kwargs, row = 0, column = 1, input = self.seek_xy_position_input, text = "Go to Position", color = AppShare.instance().settings.theme.text_color_value, valign = "middle", bg_color = AppShare.instance().settings.theme.control_color_value ) ) # size_hint = ( None, 1 )
 
       KivyUtilities.add_children_to_widget( self, [ position_layout, self.seek_xy_position_input, self.seek_xy_position_button ] )
 
-   def update_xy_position( self, x_pos, y_pos ):
+   def update_position( self, x_pos, y_pos, z_pos ):
       # If the PLC is unavailable, both x_pos and y_pos are None.
       if x_pos is not None and y_pos is not None:
          text = "{:0.2f} mm, {:0.2f} mm".format( float( x_pos ), float( y_pos ) )
@@ -233,5 +233,5 @@ class ManualXyStageMovement( DisplaySelectionLayout ):
 
       self.selected_id = selected_id
 
-   def update_xy_position( self, x_pos, y_pos ):
-      return self.selected_item.update_xy_position( x_pos, y_pos )
+   def update_position( self, x_pos, y_pos, z_pos ):
+      return self.selected_item.update_position( x_pos, y_pos, z_pos )
