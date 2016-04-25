@@ -49,9 +49,14 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
       z_layout = self._construct_z_layout()
 
       movement_layout = BoxLayout( **DictOps.dict_combine( kwargs, orientation = "horizontal" ) )
+      movement_layout.bind( size = self._update_movement_layout_spacing )
+
       KivyUtilities.add_children_to_widget( movement_layout, [ xy_layout, z_layout ] )
 
       KivyUtilities.add_children_to_widget( self, [ global_control_layout, movement_layout ] )
+
+   def _update_movement_layout_spacing( self, instance, value ):
+      instance.spacing = instance.width / 50
 
    def _construct_movement_control_selection( self, **kwargs ):
       group_name = "manual movement mode selection"
