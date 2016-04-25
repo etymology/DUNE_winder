@@ -26,8 +26,8 @@ class _CurrentPositionCommand( Command ):
       return result
 
    def get_current_position( self ):
-      commands = [ "io.simulationTime.setLocal()", "io.xAxis.getPosition()", "io.yAxis.getPosition()", "io.zAxis.getPosition()" ]
-      values = self.send_commands( commands )[ 1 : ]
+      commands = [ "io.xAxis.getPosition()", "io.yAxis.getPosition()", "io.zAxis.getPosition()" ]
+      values = self.send_commands( commands )
 
       result = map( self._position_value_conversion, values )
 
