@@ -1,7 +1,7 @@
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
-from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry, GridLabel
+from .kivy_sparse_grid_layout import SparseGridLayout, GridEntry, GridLabel
 from .kivy_utilities import KivyUtilities
 from .labelled_switch import GridLabelledWinderSwitch
 from .switch import WinderSwitchStates

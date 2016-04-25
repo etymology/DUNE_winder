@@ -8,7 +8,7 @@ from winder.utility.collections import DictOps
 from ..application_shared import AppShare
 from ..movement_command import MovementCommand
 from .display_selection_layout import DisplaySelectionLayout
-from .kivy_sparce_grid_layout import SparseGridLayout, GridBoxLayout, GridButton, GridEntry, GridImageButton, GridLabel, GridTextInput
+from .kivy_sparse_grid_layout import SparseGridLayout, GridBoxLayout, GridButton, GridEntry, GridImageButton, GridLabel, GridTextInput
 from .kivy_utilities import KivyUtilities
 
 class _XyCommands( MovementCommand ):
