@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from G_CodeFunctions.LatchG_Code import LatchG_Code
+from G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
 
 class HeadPosition :
 
@@ -92,7 +92,7 @@ class HeadPosition :
       #   self._gCodePath.push( z=self._geometry.partialZ_Back )
       # #self._gCodePath.push()
 
-      self._gCodePath.pushG_Code( LatchG_Code( location ) )
+      self._gCodePath.pushG_Code( HeadLocationG_Code( location ) )
       self._gCodePath.push()
 
       self._currentPostion = location

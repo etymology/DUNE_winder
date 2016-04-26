@@ -12,7 +12,7 @@ from .Path3d import Path3d
 
 from Machine.G_Codes import G_Codes
 
-from .G_CodeFunctions.LatchG_Code import LatchG_Code
+from .G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
 
 class G_CodePath( Path3d ) :
   """
@@ -178,7 +178,7 @@ class G_CodePath( Path3d ) :
 
           if G_Codes.LATCH == function :
             side = "front"
-            if LatchG_Code.BACK == int( gCode.getParameter( 0 ) ) :
+            if HeadLocationG_Code.BACK == int( gCode.getParameter( 0 ) ) :
               side = "back"
 
             self._pointLabel( output, location, "Z-latch " + side, "layer" )

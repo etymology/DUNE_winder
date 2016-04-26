@@ -22,8 +22,6 @@ class DebugGUI( wx.Frame, Remote ):
   def __init__( self, parent, address, port, maxReceiveSize ) :
     wx.Frame.__init__( self, None )
 
-    #time.sleep( 0.2 )
-
     self.remote = UI_ClientConnection( address, port, maxReceiveSize )
 
     Remote.__init__( self, self.remote )
@@ -49,13 +47,17 @@ class DebugGUI( wx.Frame, Remote ):
     sizer.Add( notebook, 1, wx.EXPAND )
     panel.SetSizer( sizer )
 
-    self.timer = wx.Timer(self)
+    self.timer = wx.Timer( self )
     self.Bind( wx.EVT_TIMER, self.update, self.timer )
     self.timer.Start( 100 )
 
     self.SetSize( (520, 600) )
     self.SetTitle( 'DUNE Winder Simulator' )
     self.Show( True )
+
+    #notebook.SetSelection( 1 )
+    #notebook.SetSelection( 0 )
+    tab1.activate( None )
 
   #---------------------------------------------------------------------
   def update( self, event ) :

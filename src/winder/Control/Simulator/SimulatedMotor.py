@@ -144,3 +144,13 @@ class SimulatedMotor :
     self._accelerationTag = plc.setupTag( tagBase + "_Axis.ActualAcceleration", 0      )
     self._motionTag       = plc.setupTag( tagBase + "_Axis.CoordinatedMotionStatus", 0 )
     self._faultTag        = plc.setupTag( tagBase + "_Axis.ModuleFault", 0             )
+
+  #---------------------------------------------------------------------
+  def getSpeedTag( self ) :
+    """
+    Return the desired velocity tag.
+
+    Returns:
+      Desired velocity tag.
+    """
+    return self._plc.getTag( self._speedTag )

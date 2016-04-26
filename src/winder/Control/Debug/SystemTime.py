@@ -38,19 +38,21 @@ class SystemTime( Remote ) :
 
     Remote.__init__( self, remote )
 
-    #grideSizer = wx.FlexGridSizer( 1, 3, 5, 5 )
-    grideSizer = wx.BoxSizer()
+    staticBox   = wx.StaticBox( panel, wx.ID_ANY, "Time" )
+    staticSizer = wx.StaticBoxSizer( staticBox, wx.VERTICAL )
+    grideSizer = wx.GridSizer( 1, 2, 5, 5 )
     self.time  = wx.StaticText( panel, label='2000-01-01 12:00:00.000000' )
-    self.timeDelta  = wx.StaticText( panel, label='00000.000' )
+    self.timeDelta  = wx.StaticText( panel, label='000d 00h 00m 00.000s' )
     grideSizer.AddMany(
       [
-        ( wx.StaticText( panel, label='Time'  ) ), ( self.time  ), ( self.timeDelta  )
+        ( self.time  ), ( self.timeDelta, 0, wx.ALIGN_RIGHT )
       ]
     )
 
     self.startTime = self.readTime()
 
-    vbox.Add( grideSizer )
+    staticSizer.Add( grideSizer )
+    vbox.Add( staticSizer )
 
   #---------------------------------------------------------------------
   def deltaString( self, endTime ) :

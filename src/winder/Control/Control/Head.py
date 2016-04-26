@@ -54,7 +54,7 @@ class Head :
     # Start latching?
     elif self.States.START_LATCH == self._state :
       # Begin latch and setup state machine for second seek when latch finishes.
-      self._io.plcLogic.initiateLatch()
+      self._io.plcLogic.latch()
       self._nextState = self.States.SECOND_SEEK
       self._state = self.States.LATCH
 

@@ -105,10 +105,9 @@ class G_CodeHandlerBase :
     number = int( function[ 0 ] )
     self._functions.append( function )
 
-    # Head position.
+    # Toggle spool latch.
     if G_Codes.LATCH == number :
-      self._headPosition = int( function[ 1 ] )
-      self._headPositionChange = True
+      self._latchRequest = True
 
     # Consumed wire for line.
     elif G_Codes.WIRE_LENGTH == number :
@@ -185,6 +184,12 @@ class G_CodeHandlerBase :
           self._z += offset
           self._xyChange = True
 
+    # Head position.
+    elif G_Codes.HEAD_LOCATION == number :
+      self._headPosition = int( function[ 1 ] )
+      self._headPositionChange = True
+
+
   #---------------------------------------------------------------------
   def __init__( self ):
     """
@@ -213,6 +218,8 @@ class G_CodeHandlerBase :
     self._xyChange = False
     self._zChange = False
     self._headPositionChange = False
+
+    self._latchRequest = False
 
     # Current line number.
     self._line = 0
