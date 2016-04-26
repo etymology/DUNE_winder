@@ -1,7 +1,7 @@
 from winder.utility.collections import DictOps
 
 from ..application_shared import AppShare
-from .kivy_sparce_grid_layout import SparseGridLayout, GridEntry
+from .kivy_sparse_grid_layout import SparseGridLayout, GridEntry
 from .z_fixed_display import ZFixedDisplay
 from .z_manual_stage_movement import ManualZStageMovement
 from .z_stage_display import ZStageDisplay

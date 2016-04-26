@@ -3,7 +3,7 @@ from kivy.uix.label import Label
 
 from winder.utility.collections import DictOps
 
-from .kivy_sparce_grid_layout import GridEntry
+from .kivy_sparse_grid_layout import GridEntry
 from .kivy_utilities import KivyUtilities
 from .switch import WinderSwitch
 

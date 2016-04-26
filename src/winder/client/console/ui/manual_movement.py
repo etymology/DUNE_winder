@@ -26,8 +26,8 @@ class _CurrentPositionCommand( Command ):
       return result
 
    def get_current_position( self ):
-      commands = [ "io.simulationTime.setLocal()", "io.xAxis.getPosition()", "io.yAxis.getPosition()", "io.zAxis.getPosition()" ]
-      values = self.send_commands( commands )[ 1 : ]
+      commands = [ "io.xAxis.getPosition()", "io.yAxis.getPosition()", "io.zAxis.getPosition()" ]
+      values = self.send_commands( commands )
 
       result = map( self._position_value_conversion, values )
 
@@ -49,9 +49,14 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
       z_layout = self._construct_z_layout()
 
       movement_layout = BoxLayout( **DictOps.dict_combine( kwargs, orientation = "horizontal" ) )
+      movement_layout.bind( size = self._update_movement_layout_spacing )
+
       KivyUtilities.add_children_to_widget( movement_layout, [ xy_layout, z_layout ] )
 
       KivyUtilities.add_children_to_widget( self, [ global_control_layout, movement_layout ] )
+
+   def _update_movement_layout_spacing( self, instance, value ):
+      instance.spacing = instance.width / 50
 
    def _construct_movement_control_selection( self, **kwargs ):
       group_name = "manual movement mode selection"
@@ -92,7 +97,8 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
       return result
 
    def _movement_mode_updated( self, instance, value ):
-      self.xy_movement.select_movement_type( self.jog_control_selection.value )
+      for item in [ self.xy_movement, self.z_movement ]:
+         item.select_movement_type( self.jog_control_selection.value )
 
    def _transfer_enables_touch_callback( self, sender, touch, represented_position ):
       self.xy_movement.seek_xy_position_input.set_text( "{:0.2f}, {:0.2f}".format( represented_position[ 0 ], represented_position[ 1 ] ) )
@@ -148,8 +154,8 @@ class ManualMovementControl( BackgroundColorMixin, BoxLayout ):
 
    def _clock_interval_expiration( self, dt ):
       positions = self.current_position_command.get_current_position()
-      self.xy_movement.update_xy_position( positions[ 0 ], positions[ 1 ] )
-      self.z_movement.update_z_position( positions[ 2 ] )
+      self.xy_movement.update_position( positions[ 0 ], positions[ 1 ], positions[ 2 ] )
+      self.z_movement.update_position( positions[ 0 ], positions[ 1 ], positions[ 2 ] )
       self.transfer_enables.update_position( positions[ 0 : 2 ] )
 
       return True
