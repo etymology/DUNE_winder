@@ -11,21 +11,15 @@ from Machine.G_Codes import G_Codes
 
 class LatchG_Code( G_CodeFunction ) :
   """
-  G-Code to set the Z latch position.
+  G-Code to toggle the latch.
   """
 
-  # Locations.
-  FRONT = 0
-  PARTIAL_FRONT = 1
-  PARTIAL_BACK  = 2
-  BACK = 3
-
   #---------------------------------------------------------------------
-  def __init__( self, side ) :
+  def __init__( self ) :
     """
     Constructor.
 
     Args:
       side: Which side (FRONT/PARTIAL_FRONT/PARTIAL_BACK/BACK) to latch to.
     """
-    G_CodeFunction.__init__( self, G_Codes.LATCH, [ side ] )
+    G_CodeFunction.__init__( self, G_Codes.LATCH, [] )

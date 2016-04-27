@@ -176,6 +176,7 @@ class Motion :
 
     # We must either not be moving or have a jerk term.
     assert ( 0 == position or not 0 == jerk ), "Cannot move without a jerk term"
+    assert ( 0 == position or 0 != velocity ), "Cannot move without a velocity term"
 
     # If actually moving...
     if not 0 == position :

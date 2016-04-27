@@ -69,8 +69,7 @@ class ManualMode( StateMachineState ) :
       isError = False
 
     if None != self.stateMachine.seekZ :
-      #self._io.zAxis.setDesiredPosition( self.stateMachine.seekZ )
-      self._io.plcLogic.setZ_Position( self.stateMachine.seekZ )
+      self._io.plcLogic.setZ_Position( self.stateMachine.seekZ, self.stateMachine.seekVelocity )
       self.stateMachine.seekZ = None
       isError = False
 

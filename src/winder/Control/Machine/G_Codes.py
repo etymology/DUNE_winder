@@ -13,3 +13,4 @@ class G_Codes :
   PIN_CENTER    = 103
   CLIP          = 104
   OFFSET        = 105
+  HEAD_LOCATION = 106

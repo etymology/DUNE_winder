@@ -29,5 +29,6 @@ class ActivatedTab :
     except Exception:
       pass
 
-    event.Skip()
+    if None != event :
+      event.Skip()
 

@@ -63,68 +63,68 @@ if __name__ == "__main__":
   recipeG.writeG_Code( recipeDirectory + "/G-Layer.gc", "G Layer" )
 
 
+  #  #
+  #  # Export SketchUp Ruby code.
+  #  #
   #
-  # Export SketchUp Ruby code.
+  #  # Generate an ideal calibration file for layer.
+  #  recipeX.writeDefaultCalibration( "./", "X-Layer_Calibration.xml", "X Layer" )
+  #  calibrationX = LayerCalibration()
+  #  calibrationX.load( "./", "X-Layer_Calibration.xml" )
+  #  calibrationX.setOffset( geometryX.apaOffset )
+  #  gCodePath = G_CodeToPath( recipeDirectory + "/X-Layer.gc", geometryX, calibrationX )
+  #  gCodePath.writeRubyCode( "X-Layer.rb", enablePathLabels=False, enablePinLabels=True )
+  #  recipeX.writeRubyCode(
+  #    "X-Layer.rb",
+  #    enablePath=False,
+  #    enablePathLabels=False,
+  #    enableWire=True,
+  #    isAppend=False
+  #  )
   #
-
-  # Generate an ideal calibration file for layer.
-  recipeX.writeDefaultCalibration( "./", "X-Layer_Calibration.xml", "X Layer" )
-  calibrationX = LayerCalibration()
-  calibrationX.load( "./", "X-Layer_Calibration.xml" )
-  calibrationX.setOffset( geometryX.apaOffset )
-  gCodePath = G_CodeToPath( recipeDirectory + "/X-Layer.gc", geometryX, calibrationX )
-  gCodePath.writeRubyCode( "X-Layer.rb", enablePathLabels=False, enablePinLabels=True )
-  recipeX.writeRubyCode(
-    "X-Layer.rb",
-    enablePath=False,
-    enablePathLabels=False,
-    enableWire=True,
-    isAppend=False
-  )
-
-
-  recipeV.writeDefaultCalibration( "./", "V-Layer_Calibration.xml", "V Layer" )
-  calibrationV = LayerCalibration()
-  calibrationV.load( "./", "V-Layer_Calibration.xml" )
-  calibrationV.setOffset( geometryV.apaOffset )
-  gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometryV, calibrationV )
-  gCodePath.writeRubyCode( "V-Layer.rb", enablePathLabels=False, enablePinLabels=False )
-  recipeV.writeRubyCode(
-    "V-Layer.rb",
-    enablePath=False,
-    enablePathLabels=False,
-    enableWire=True,
-    isAppend=False
-  )
-
-  recipeU.writeDefaultCalibration( "./", "U-Layer_Calibration.xml", "U Layer" )
-  calibrationU = LayerCalibration()
-  calibrationU.load( "./", "U-Layer_Calibration.xml" )
-  calibrationU.setOffset( geometryU.apaOffset )
-  gCodePath = G_CodeToPath( recipeDirectory + "/U-Layer.gc", geometryU, calibrationU )
-  gCodePath.writeRubyCode( "U-Layer.rb", enablePathLabels=False, enablePinLabels=True )
-  recipeU.writeRubyCode(
-    "U-Layer.rb",
-    enablePath=True,
-    enablePathLabels=False,
-    enableWire=True,
-    isAppend=False
-  )
-
-
-  recipeG.writeDefaultCalibration( "./", "G-Layer_Calibration.xml", "G Layer" )
-  calibrationG = LayerCalibration()
-  calibrationG.load( "./", "G-Layer_Calibration.xml" )
-  calibrationG.setOffset( geometryG.apaOffset )
-  gCodePath = G_CodeToPath( recipeDirectory + "/G-Layer.gc", geometryG, calibrationG )
-  gCodePath.writeRubyCode( "G-Layer.rb", enablePathLabels=False, enablePinLabels=True )
-  recipeG.writeRubyCode(
-    "G-Layer.rb",
-    enablePath=False,
-    enablePathLabels=False,
-    enableWire=True,
-    isAppend=False
-  )
+  #
+  #  recipeV.writeDefaultCalibration( "./", "V-Layer_Calibration.xml", "V Layer" )
+  #  calibrationV = LayerCalibration()
+  #  calibrationV.load( "./", "V-Layer_Calibration.xml" )
+  #  calibrationV.setOffset( geometryV.apaOffset )
+  #  gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometryV, calibrationV )
+  #  gCodePath.writeRubyCode( "V-Layer.rb", enablePathLabels=False, enablePinLabels=False )
+  #  recipeV.writeRubyCode(
+  #    "V-Layer.rb",
+  #    enablePath=False,
+  #    enablePathLabels=False,
+  #    enableWire=True,
+  #    isAppend=False
+  #  )
+  #
+  #  recipeU.writeDefaultCalibration( "./", "U-Layer_Calibration.xml", "U Layer" )
+  #  calibrationU = LayerCalibration()
+  #  calibrationU.load( "./", "U-Layer_Calibration.xml" )
+  #  calibrationU.setOffset( geometryU.apaOffset )
+  #  gCodePath = G_CodeToPath( recipeDirectory + "/U-Layer.gc", geometryU, calibrationU )
+  #  gCodePath.writeRubyCode( "U-Layer.rb", enablePathLabels=False, enablePinLabels=True )
+  #  recipeU.writeRubyCode(
+  #    "U-Layer.rb",
+  #    enablePath=True,
+  #    enablePathLabels=False,
+  #    enableWire=True,
+  #    isAppend=False
+  #  )
+  #
+  #
+  #  recipeG.writeDefaultCalibration( "./", "G-Layer_Calibration.xml", "G Layer" )
+  #  calibrationG = LayerCalibration()
+  #  calibrationG.load( "./", "G-Layer_Calibration.xml" )
+  #  calibrationG.setOffset( geometryG.apaOffset )
+  #  gCodePath = G_CodeToPath( recipeDirectory + "/G-Layer.gc", geometryG, calibrationG )
+  #  gCodePath.writeRubyCode( "G-Layer.rb", enablePathLabels=False, enablePinLabels=True )
+  #  recipeG.writeRubyCode(
+  #    "G-Layer.rb",
+  #    enablePath=False,
+  #    enablePathLabels=False,
+  #    enableWire=True,
+  #    isAppend=False
+  #  )
 
 
   #recipeU.writeRubyCode( "U-Layer.rb", False, False, True, False )

@@ -362,6 +362,13 @@ class Process :
       self.controlStateMachine.seekY = yPosition
       self.controlStateMachine.seekVelocity = velocity
       self.controlStateMachine.manualRequest = True
+    else :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Manual move X/Y ignored.",
+        [ xPosition, yPosition, velocity ]
+      )
 
     return isError
 
@@ -389,6 +396,13 @@ class Process :
       self.controlStateMachine.seekZ = position
       self.controlStateMachine.seekVelocity = velocity
       self.controlStateMachine.manualRequest = True
+    else :
+      self._log.add(
+        self.__class__.__name__,
+        "JOG",
+        "Manual move Z ignored.",
+        [ position, velocity ]
+      )
 
     return isError
 

@@ -10,6 +10,10 @@ from Remote import Remote
 
 class MotorStatus( Remote ) :
   #---------------------------------------------------------------------
+  def reset( self, _ ) :
+    self.remote.get( "io.plcLogic.reset()" )
+
+  #---------------------------------------------------------------------
   def __init__( self, remote, panel, vbox ) :
 
     Remote.__init__( self, remote )
@@ -17,6 +21,8 @@ class MotorStatus( Remote ) :
     #
     # Motor status.
     #
+    statusBox   = wx.StaticBox( panel, wx.ID_ANY, "Motor status" )
+    statusSizer = wx.StaticBoxSizer( statusBox, wx.VERTICAL )
     grideSizer = wx.FlexGridSizer( 4, 6, 5, 5 )
 
     self.empty = wx.StaticText( panel, -1, '')
@@ -53,7 +59,26 @@ class MotorStatus( Remote ) :
       ]
      )
 
-    vbox.Add( grideSizer )
+    statusSizer.Add( grideSizer )
+
+    grideSizer = wx.FlexGridSizer( 1, 5, 5, 5 )
+    self.state    = wx.StaticText( panel, label='0'  )
+    self.moveType = wx.StaticText( panel, label='0'  )
+
+    resetButton = wx.Button( panel, label='Reset' )
+    resetButton.Bind( wx.EVT_LEFT_DOWN, self.reset )
+
+    grideSizer.AddMany(
+      [
+        resetButton,
+        ( wx.StaticText( panel, label='State' ), 0, wx.ALIGN_CENTER_VERTICAL ), ( self.state, 0, wx.ALIGN_CENTER_VERTICAL ),
+        ( wx.StaticText( panel, label='Move type' ), 0, wx.ALIGN_CENTER_VERTICAL ), ( self.moveType, 0, wx.ALIGN_CENTER_VERTICAL ),
+      ]
+     )
+
+    statusSizer.Add( grideSizer )
+
+    vbox.Add( statusSizer )
 
   #---------------------------------------------------------------------
   def update( self ) :
@@ -98,4 +123,8 @@ class MotorStatus( Remote ) :
     self.zAxisP.SetLabel( zAxisPosition     )
     self.zAxisV.SetLabel( zAxisVelocity     )
     self.zAxisA.SetLabel( zAxisAcceleration )
+
+    self.state.SetLabel( self.remote.get( "io.plcLogic.getState()" ) )
+    self.moveType.SetLabel( self.remote.get( "io.plcLogic.getMoveType()" ) )
+
 # end class

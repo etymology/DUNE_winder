@@ -202,6 +202,11 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._head.setPosition( self._headPosition, self._velocity )
       self._headPositionChange = False
 
+    # Toggle the latch.
+    if self._latchRequest :
+      self._io.plcLogic.latch()
+      self._latchRequest = False
+
     # Account for wire used.
     if self._wireLength :
       self._spool.subtract( self._wireLength )

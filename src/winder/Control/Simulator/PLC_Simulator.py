@@ -11,6 +11,12 @@ from Simulator.SimulatedMotor import SimulatedMotor
 
 class PLC_Simulator :
 
+  class LatchPosition :
+    TOP    = 0
+    MIDDLE = 1
+    BOTTOM = 2
+  # end class
+
   #---------------------------------------------------------------------
   def poll( self ) :
     """
@@ -20,10 +26,12 @@ class PLC_Simulator :
     moveType = self._io.plc.getTag( self._moveTypeTag )
 
     if self._lastMoveType != moveType :
-      # Stop?
-      if self._io.plcLogic.MoveTypes.IDLE == moveType :
+      # Reset?
+      if self._io.plcLogic.MoveTypes.RESET == moveType :
         self._xAxis.stop()
         self._yAxis.stop()
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
+
       # Seek in X/Y?
       elif self._io.plcLogic.MoveTypes.SEEK_XY == moveType :
         velocity = self._io.plc.getTag( self._maxVelocityTag )
@@ -36,15 +44,35 @@ class PLC_Simulator :
         self._xAxis.startJog()
         self._yAxis.startJog()
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_JOG )
+
       # Seek in Z?
       elif self._io.plcLogic.MoveTypes.SEEK_Z == moveType :
-        velocity = self._io.plc.getTag( self._maxVelocityTag )
+        velocity = self._zAxis.getSpeedTag()
         self._zAxis.startSeek( velocity )
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_SEEK )
+
       # Jog in Z?
       elif self._io.plcLogic.MoveTypes.JOG_Z == moveType :
         self._zAxis.startJog()
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_JOG )
+
+      # Change latch?
+      elif self._io.plcLogic.MoveTypes.LATCH == moveType :
+        # Change latch position.
+        # (Currently change is instantaneous.)
+        self._latchPosition += 1
+        if self._latchPosition > self.LatchPosition.BOTTOM :
+          self._latchPosition = 0
+
+      # Re-home latch?
+      # (Does nothing.)
+      elif self._io.plcLogic.MoveTypes.HOME_LATCH == moveType :
+        pass
+
+      # Unlock latch?
+      elif self._io.plcLogic.MoveTypes.LATCH_UNLOCK == moveType :
+        # Just stay in this mode until reset.
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCH_RELEASE )
 
       self._lastMoveType = moveType
 
@@ -56,7 +84,7 @@ class PLC_Simulator :
       and not self._yAxis.isInMotion() \
       and not self._zAxis.isInMotion() :
 
-      self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.IDLE )
+      self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.RESET )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
 
       # Force an update of move state machine.
@@ -90,7 +118,7 @@ class PLC_Simulator :
     io.plc.setupTag( "Point_IO:1:I", 0 )
 
     # Tags for top-level PLC control.
-    self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.IDLE )
+    self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
     self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
     self._maxVelocityTag     = io.plc.setupTag( "XY_VELOCITY", 0.0 )
     self._maxAccelerationTag = io.plc.setupTag( "XY_ACCELERATION", 0.0 )
@@ -98,4 +126,6 @@ class PLC_Simulator :
 
     # Initial states of PLC state machine.
     self._lastState = io.plcLogic.States.READY
-    self._lastMoveType = io.plcLogic.MoveTypes.IDLE
+    self._lastMoveType = io.plcLogic.MoveTypes.RESET
+
+    self._latchPosition = PLC_Simulator.LatchPosition.TOP
