@@ -8,6 +8,7 @@
 
 from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
+from Simulator.Delay import Delay
 
 class PLC_Simulator :
 
@@ -64,10 +65,20 @@ class PLC_Simulator :
         if self._latchPosition > self.LatchPosition.BOTTOM :
           self._latchPosition = 0
 
+        # State is now homing.
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCHING )
+
+        # Wait 2 seconds for transition.
+        self._latchDelay.set( 2000 )
+
       # Re-home latch?
       # (Does nothing.)
       elif self._io.plcLogic.MoveTypes.HOME_LATCH == moveType :
-        pass
+        # State is now homing.
+        self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCH_HOMEING )
+
+        # Wait 2 seconds for transition.
+        self._latchDelay.set( 2000 )
 
       # Unlock latch?
       elif self._io.plcLogic.MoveTypes.LATCH_UNLOCK == moveType :
@@ -80,9 +91,13 @@ class PLC_Simulator :
     self._yAxis.poll()
     self._zAxis.poll()
 
+    state = self._io.plc.getTag( self._stateTag )
+    # All motions and delays finished?
     if not self._xAxis.isInMotion() \
       and not self._yAxis.isInMotion() \
-      and not self._zAxis.isInMotion() :
+      and not self._zAxis.isInMotion() \
+      and self._latchDelay.hasExpired() \
+      and self._io.plcLogic.States.LATCH_RELEASE != state :
 
       self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.RESET )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
@@ -128,4 +143,5 @@ class PLC_Simulator :
     self._lastState = io.plcLogic.States.READY
     self._lastMoveType = io.plcLogic.MoveTypes.RESET
 
+    self._latchDelay = Delay( self._simulationTime )
     self._latchPosition = PLC_Simulator.LatchPosition.TOP
