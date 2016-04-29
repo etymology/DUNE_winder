@@ -51,6 +51,10 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
     self.remote( "process.jogZ( 0 )" )
 
   #---------------------------------------------------------------------
+  def xySeek( self, x, y, velocity ) :
+    self.remote( "process.manualSeekXY( " + str( x ) + ", " + str( y ) + ", " + str( velocity ) + " )" )
+
+  #---------------------------------------------------------------------
   def setPosition( self, event ) :
     event = event
     velocity = self.slider.GetValue()
@@ -63,10 +67,14 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
     self.remote( "process.manualSeekZ( 0, " + str( velocity ) + " )" )
 
   #---------------------------------------------------------------------
-  def setZ_Extend( self, event ) :
-    event = event
+  def zSeek( self, position, velocity ) :
+    self.remote( "process.manualSeekZ( " + str( position ) + ", " + str( velocity ) + " )" )
+
+  #---------------------------------------------------------------------
+  def setZ_Extend( self, _ ) :
     velocity = self.slider.GetValue()
-    self.remote( "process.manualSeekZ( 422, " + str( velocity ) + " )" )
+    position = self.zPosition.GetValue()
+    self.remote( "process.manualSeekZ( " + str( position ) + ", " + str( velocity ) + " )" )
 
   #---------------------------------------------------------------------
   def latch( self, event ) :
@@ -147,6 +155,31 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
     )
     #outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
     xyControlsSizer.Add( grideSizer )
+
+
+    grideSizer = wx.GridSizer( 1, 3, 5, 5 )
+    self.xSeekPosition = wx.TextCtrl( self, -1, "100", size=(50, -1) )
+    self.ySeekPosition = wx.TextCtrl( self, -1, "100", size=(50, -1) )
+
+    xySeekButton = wx.Button( self, label='X/Y Seek' )
+    xySeekButton.Bind(
+      wx.EVT_BUTTON,
+      lambda e: self.xySeek(
+        self.xSeekPosition.GetValue(),
+        self.ySeekPosition.GetValue(),
+        self.slider.GetValue()
+      )
+    )
+
+    grideSizer.AddMany(
+      [
+        ( self.xSeekPosition ), ( self.ySeekPosition ), ( xySeekButton )
+      ]
+    )
+
+    xyControlsSizer.Add( grideSizer, flag=wx.ALL|wx.EXPAND, border=5  )
+
+
     outer.Add( xyControlsSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
 
 
@@ -167,6 +200,25 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
 
     grideSizer.AddMany( [ ( jogZ_E ), ( jogZ_Z ), ( jogZ_R )  ] )
     zControlsSizer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
+
+
+    grideSizer = wx.GridSizer( 1, 3, 5, 5 )
+    self.zSeekPosition = wx.TextCtrl( self, -1, "100", size=(50, -1) )
+
+    zSeekButton = wx.Button( self, label='Z Seek' )
+    zSeekButton.Bind(
+      wx.EVT_BUTTON,
+      lambda e: self.zSeek( self.zSeekPosition.GetValue(), self.slider.GetValue() )
+    )
+
+    grideSizer.AddMany(
+      [
+        wx.StaticText( self, -1, "Seek position:" ), ( self.zSeekPosition ), ( zSeekButton )
+      ]
+    )
+
+    zControlsSizer.Add( grideSizer, flag=wx.ALL|wx.EXPAND, border=5  )
+
 
 
 
@@ -191,7 +243,22 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
         ( jogZ_Home ),    ( jogZ_Idle )
       ]
     )
+
+
     zControlsSizer.Add( grideSizer )
+
+
+    grideSizer = wx.GridSizer( 1, 3, 5, 5 )
+    self.zPosition = wx.TextCtrl( self, -1, "422.5", size=(50, -1) )
+
+    grideSizer.AddMany(
+      [
+        wx.StaticText( self, -1, "Extend position:" ), ( self.zPosition )
+      ]
+    )
+
+    zControlsSizer.Add( grideSizer, flag=wx.ALL|wx.EXPAND, border=5  )
+
     outer.Add( zControlsSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
 
     vbox.Add( outer )
@@ -200,6 +267,9 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
     #
     # Velocity bar.
     #
+    sliderBox      = wx.StaticBox( self, wx.ID_ANY, "Velocity" )
+    sliderBoxSizer = wx.StaticBoxSizer( sliderBox, wx.VERTICAL )
+
     grideSizer = wx.GridSizer( 1, 1, 5, 5 )
     self.slider = \
       wx.Slider(
@@ -208,7 +278,7 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
         100,
         1, 500,
         wx.DefaultPosition,
-        (500, -1),
+        (450, -1),
         wx.SL_AUTOTICKS | wx.SL_HORIZONTAL | wx.SL_LABELS
       )
     self.slider.Bind( wx.EVT_SCROLL, lambda e: self.remote( "process.gCodeHandler.setLimitVelocity( " + str( self.slider.GetValue() ) + ")" ) )
@@ -219,7 +289,8 @@ class JogTab( wx.Panel, Remote, ActivatedTab ) :
       ]
     )
     #outer.Add( grideSizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=5 )
-    vbox.Add( grideSizer )
+    sliderBoxSizer.Add( grideSizer )
+    vbox.Add( sliderBoxSizer )
 
 
     self.SetSizer( vbox )
