@@ -149,7 +149,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       isDone = self.isDone() or self.isOutOfWire()
 
       if not isDone :
-        if self._pauseCount < self._PAUSE :
+        if self._delay > 0 :
+          self._delay -= 1
+        elif self._pauseCount < self._PAUSE :
           self._pauseCount += 1
         else :
           self._pauseCount = 0
@@ -178,8 +180,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     # Calibrate the position (if we have a calibration file.)
     if self._calibration :
       offset = self._calibration.getOffset()
-      self._x += offset.x
-      self._y += offset.y
+      if offset :
+        self._x += offset.x
+        self._y += offset.y
 
     # If an X/Y coordinate change is needed...
     if self._xyChange :
@@ -363,3 +366,5 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     # Add a pause between G-Code instructions by setting _PAUSE to non-zero value.
     self._PAUSE = 0
     self._pauseCount = 0
+
+    self._delay = 0

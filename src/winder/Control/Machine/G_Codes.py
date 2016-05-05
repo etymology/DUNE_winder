@@ -14,3 +14,5 @@ class G_Codes :
   CLIP          = 104
   OFFSET        = 105
   HEAD_LOCATION = 106
+  DELAY         = 107
+  

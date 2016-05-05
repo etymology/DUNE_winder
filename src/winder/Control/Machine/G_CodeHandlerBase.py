@@ -189,6 +189,10 @@ class G_CodeHandlerBase :
       self._headPosition = int( function[ 1 ] )
       self._headPositionChange = True
 
+    # Delay.
+    elif G_Codes.DELAY == number :
+      self._delay = int( function[ 1 ] )
+
 
   #---------------------------------------------------------------------
   def __init__( self ):
