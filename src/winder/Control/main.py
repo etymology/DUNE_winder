@@ -23,6 +23,7 @@ from Control.Process import Process
 from Threads.PrimaryThread import PrimaryThread
 from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
+from Threads.WebServerThread import WebServerThread
 
 #==============================================================================
 # Debug settings.
@@ -46,7 +47,7 @@ isIO_Logged = False
 #==============================================================================
 
 #-----------------------------------------------------------------------
-def commandHandler( command ) :
+def commandHandler( _, command ) :
   """
   Handle a remote command.
   This is define in main so that is has the most global access possible.
@@ -150,7 +151,10 @@ try:
   #
   # Initialize threads.
   #
+
   uiServer = UI_ServerThread( commandHandler, log )
+  webServerThread = WebServerThread( commandHandler, log )
+
   controlThread = ControlThread( io, log, process.controlStateMachine, systemTime, isIO_Logged )
 
   # Setup debug interface (if enabled).

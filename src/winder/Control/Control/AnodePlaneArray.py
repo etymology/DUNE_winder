@@ -165,6 +165,9 @@ class AnodePlaneArray( Serializable ) :
     self._calibration = \
       DefaultCalibration( self._getPath(), self._calibrationFile, self._layer )
 
+    # $$$DEBUG - Temporary.
+    self._gCodeHandler.useCalibration( self._calibration )
+
     if None != recipeFile :
       self._recipeFile = recipeFile
 
@@ -258,7 +261,20 @@ class AnodePlaneArray( Serializable ) :
         self._gCodeHandler.useCalibration( self._calibration )
 
   #---------------------------------------------------------------------
+  def getName( self ) :
+    """
+    Return the name of the APA.
+
+    Returns:
+      String name of the APA.
+    """
+    return self._name
+
+  #---------------------------------------------------------------------
   def save( self ) :
+    """
+    Save current APA state to file.
+    """
     Serializable.save( self, self._getPath(), AnodePlaneArray.FILE_NAME )
 
   #---------------------------------------------------------------------

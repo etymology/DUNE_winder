@@ -67,7 +67,7 @@ class _Client( threading.Thread ):
       if isRunning and not '' == data :
 
         # Process the request.
-        dataString = str( self._callback( data ) )
+        dataString = str( self._callback( None, data ) )
 
         # Break sting into chunks that are no larger than
         # Settings.SERVER_MAX_DATA_SIZE characters.

@@ -53,7 +53,18 @@ class PrimaryThread( threading.Thread ):
     Stop all threads. Call at end of program.
     """
     PrimaryThread.isRunning = False
+
+    for instance in PrimaryThread.list:
+      instance.stop()
+
     SystemSemaphore.releaseAll()
+
+  #---------------------------------------------------------------------
+  def stop( self ) :
+    """
+    Stop this thread. Can be overloaded for custom shutdown.
+    """
+    pass
 
   #---------------------------------------------------------------------
   def run( self ) :

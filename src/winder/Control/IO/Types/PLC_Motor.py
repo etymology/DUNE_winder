@@ -36,9 +36,11 @@ class PLC_Motor( Motor ) :
     self._tagBase = tagBase
 
     # Write tags.
-    self._setPosition  = PLC.Tag( plc, tagBase + "_POSITION", tagType="REAL" )
-    self._jogSpeed     = PLC.Tag( plc, tagBase + "_SPEED", tagType="REAL" )
-    self._jogDirection = PLC.Tag( plc, tagBase + "_DIR", tagType="DINT" )
+    attributes = PLC.Tag.Attributes()
+    attributes.defaultValue = 0
+    self._setPosition  = PLC.Tag( plc, tagBase + "_POSITION", attributes, "REAL" )
+    self._jogSpeed     = PLC.Tag( plc, tagBase + "_SPEED", attributes, "REAL" )
+    self._jogDirection = PLC.Tag( plc, tagBase + "_DIR", attributes, "DINT" )
 
     # Read-only attributes tags.
     attributes = PLC.Tag.Attributes()

@@ -87,12 +87,14 @@ class Process :
     Request that the winding process begin.
     """
     self.controlStateMachine.startRequest = True
+    self.controlStateMachine.stopRequest = False
 
   #---------------------------------------------------------------------
   def stop( self ) :
     """
     Request that the winding process stop.
     """
+    self.controlStateMachine.startRequest = False
     self.controlStateMachine.stopRequest = True
 
   #---------------------------------------------------------------------
@@ -129,8 +131,22 @@ class Process :
 
   #---------------------------------------------------------------------
   def getG_CodeList( self, center, delta ) :
+    """
+    Fetch a sub-set of the loaded G-Code self.lines.  Useful for showing what
+    has recently executed, and what is to come.
+
+    Args:
+      center: Where to center the list.
+      delta: Number of entries to read +/- center.
+
+    Returns:
+      List of G-Code lines, or empty list of no G-Code is loaded.
+    """
     result = []
     if self.gCodeHandler.isG_CodeLoaded() :
+      if None == center :
+        center = self.gCodeHandler.getLine()
+
       result = self.gCodeHandler.fetchLines( center, delta )
 
     return result
@@ -263,6 +279,20 @@ class Process :
     """
     apaList = os.listdir( self._configuration.get( "APA_LogDirectory" ) )
     return apaList
+
+  #---------------------------------------------------------------------
+  def getLoadedAPA_Name( self ) :
+    """
+    Get the name of the loaded APA.
+
+    Returns:
+      Name of the loaded APA or an empty string if no APA is loaded.
+    """
+    result = ""
+    if self.apa :
+      result = self.apa.getName()
+
+    return result
 
   #---------------------------------------------------------------------
   def switchAPA( self, apaName ) :
