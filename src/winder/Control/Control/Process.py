@@ -42,6 +42,19 @@ class Process :
     if not os.path.exists( path ) :
       raise Exception( "Recipe directory (" + path + ") does not exist." )
 
+    maxVelocity = float( configuration.get( "maxVelocity" ) )
+
+    # Setup initial limits on velocity and acceleration.
+    io.plcLogic.setupLimits(
+      maxVelocity,
+      float( configuration.get( "maxAcceleration" ) ),
+      float( configuration.get( "maxDeceleration" ) )
+    )
+
+    # By default, the G-Code handler will use maximum velocity.
+    self.gCodeHandler.setLimitVelocity( maxVelocity )
+    self.gCodeHandler.setVelocity( maxVelocity )
+
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
     """

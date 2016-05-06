@@ -22,11 +22,9 @@ class WebServerThread( PrimaryThread ):
 
     Args:
       callback: Function to send data from client.
-
     """
 
-    # $$$DEBUG - Configure path correctly.
-    os.chdir( "../WebUI" )
+    os.chdir( Settings.WEB_DIRECTORY )
 
     PrimaryThread.__init__( self, "WebServerThread", log )
     self._callback = commandCallback
@@ -43,7 +41,7 @@ class WebServerThread( PrimaryThread ):
       pass
 
     WebServerInterface.callback = self._callback
-    server_address = ( '', 80 )
+    server_address = ( '', Settings.WEB_SERVER_PORT )
     httpd = ThreadedHTTPServer( server_address, WebServerInterface )
 
     while PrimaryThread.isRunning :

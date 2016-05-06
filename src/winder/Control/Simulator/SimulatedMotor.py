@@ -11,7 +11,7 @@ from Simulator.Motion import Motion
 class SimulatedMotor :
 
   #---------------------------------------------------------------------
-  def startSeek( self, velocity ) :
+  def startSeek( self, velocity, acceleration, deceleration ) :
     """
     Begin moving to a new position.
 
@@ -20,7 +20,6 @@ class SimulatedMotor :
     """
     self._inMotion = True
     self._seekPosition = self._plc.getTag( self._desiredPositionTag )
-    self._maxVelocity = velocity
     self._isSeek = True
 
     self._startTime = self._simulationTime.get()
@@ -28,8 +27,8 @@ class SimulatedMotor :
       Motion                                                \
       (                                                     \
         self._jerk,                                         \
-        self._maxAcceleration,                              \
-        self._maxVelocity,                                  \
+        acceleration,                                       \
+        velocity,                                           \
         self._position,                                     \
         self._seekPosition                                  \
       )
@@ -130,8 +129,8 @@ class SimulatedMotor :
     self._velocity        = 0
     self._acceleration    = 0
     self._jerk            = 200
-    self._maxAcceleration = 200
-    self._maxVelocity     = 400
+    self._maxAcceleration = 0
+    self._maxVelocity     = 0
     self._startTime       = simulationTime.get()
     self._motion          = Motion()
 

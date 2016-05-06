@@ -184,10 +184,13 @@ class G_CodeHandler( G_CodeHandlerBase ) :
         self._x += offset.x
         self._y += offset.y
 
+    velocity = min( self._velocity, self._maxVelocity )
     # If an X/Y coordinate change is needed...
     if self._xyChange :
+
+
       # Make the move.
-      self._io.plcLogic.setXY_Position( self._x, self._y, self._velocity )
+      self._io.plcLogic.setXY_Position( self._x, self._y, velocity )
 
       # Reset change flag.
       self._xyChange = False
@@ -195,14 +198,14 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     # If Z move...
     if self._zChange :
       # Make the move.
-      self._io.plcLogic.setZ_Position( self._z, self._velocity )
+      self._io.plcLogic.setZ_Position( self._z, velocity )
 
       # Reset change flag.
       self._zChange = False
 
     # Head movement...
     if self._headPositionChange :
-      self._head.setPosition( self._headPosition, self._velocity )
+      self._head.setPosition( self._headPosition, velocity )
       self._headPositionChange = False
 
     # Toggle the latch.
@@ -307,20 +310,6 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     return result
 
   #---------------------------------------------------------------------
-  def setLimitVelocity( self, maxVelocity ) :
-    """
-    Set the maximum velocity at which any axis can move.  Useful to slow
-    down operations.
-
-    Args:
-      maxVelocity: New maximum velocity.
-
-    Note:
-      Does not effect the whatever the motors are currently doing.
-    """
-    self._maxVelocity = maxVelocity
-
-  #---------------------------------------------------------------------
   def setG_CodeLog( self, gCodeLogFile ) :
     """
     Set a file to output resulting G-Code.
@@ -363,8 +352,10 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._nextLine = None
     self._gCodeLog = None
 
-    # Add a pause between G-Code instructions by setting _PAUSE to non-zero value.
+    # Add a pause between every G-Code instructions by setting _PAUSE to
+    # non-zero value.
     self._PAUSE = 0
     self._pauseCount = 0
 
+    # Delay from G-Code file.
     self._delay = 0

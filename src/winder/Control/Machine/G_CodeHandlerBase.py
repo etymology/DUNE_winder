@@ -195,6 +195,30 @@ class G_CodeHandlerBase :
 
 
   #---------------------------------------------------------------------
+  def setLimitVelocity( self, maxVelocity ) :
+    """
+    Set the maximum velocity at which any axis can move.  Useful to slow
+    down operations.
+
+    Args:
+      maxVelocity: New maximum velocity.
+
+    Note:
+      Does not effect the whatever the motors are currently doing.
+    """
+    self._maxVelocity = maxVelocity
+
+  #---------------------------------------------------------------------
+  def setVelocity( self, velocity ) :
+    """
+    Set the velocity (override the commanded velocity until next command).
+
+    Args:
+      velocity: New velocity.
+    """
+    self._velocity = velocity
+
+  #---------------------------------------------------------------------
   def __init__( self ):
     """
     Constructor.
@@ -233,7 +257,7 @@ class G_CodeHandlerBase :
 
     # Velocity.
     self._maxVelocity = float( "inf" )   # <- No limit.
-    self._velocity = 500.0               # <- $$$DEBUG
+    self._velocity = 0                   # <- $$$DEBUG
 
     self._geometry = None
     self._calibration = None

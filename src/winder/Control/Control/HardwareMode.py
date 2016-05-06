@@ -29,6 +29,20 @@ class HardwareMode( StateMachineState ) :
     self.isZ_AxisWorking = True
 
   #---------------------------------------------------------------------
+  def exit( self ) :
+    """
+    Function called when exiting this state.
+
+    Returns:
+      True if there was an error, false if not.
+    """
+
+    # Setup the limits.
+    self.io.plcLogic.setupLimits()
+
+    return False
+
+  #---------------------------------------------------------------------
   def update( self ):
     """
     Update function that is called periodically.

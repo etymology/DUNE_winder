@@ -36,8 +36,10 @@ class PLC_Simulator :
       # Seek in X/Y?
       elif self._io.plcLogic.MoveTypes.SEEK_XY == moveType :
         velocity = self._io.plc.getTag( self._maxVelocityTag )
-        self._xAxis.startSeek( velocity )
-        self._yAxis.startSeek( velocity )
+        acceleration = self._io.plc.getTag( self._maxXY_AccelerationTag )
+        deceleration = self._io.plc.getTag( self._maxXY_DecelerationTag )
+        self._xAxis.startSeek( velocity, acceleration, deceleration )
+        self._yAxis.startSeek( velocity, acceleration, deceleration )
 
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_SEEK )
       # Jog in X/Y?
@@ -49,7 +51,9 @@ class PLC_Simulator :
       # Seek in Z?
       elif self._io.plcLogic.MoveTypes.SEEK_Z == moveType :
         velocity = self._zAxis.getSpeedTag()
-        self._zAxis.startSeek( velocity )
+        acceleration = self._io.plc.getTag( self._maxZ_AccelerationTag )
+        deceleration = self._io.plc.getTag( self._maxZ_DecelerationTag )
+        self._zAxis.startSeek( velocity, acceleration, deceleration )
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_SEEK )
 
       # Jog in Z?
@@ -136,8 +140,10 @@ class PLC_Simulator :
     self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
     self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
     self._maxVelocityTag     = io.plc.setupTag( "XY_VELOCITY", 0.0 )
-    self._maxAccelerationTag = io.plc.setupTag( "XY_ACCELERATION", 0.0 )
-    self._maxDecelerationTag = io.plc.setupTag( "XY_DECELERATION", 0.0 )
+    self._maxXY_AccelerationTag = io.plc.setupTag( "XY_ACCELERATION", 0.0 )
+    self._maxXY_DecelerationTag = io.plc.setupTag( "XY_DECELERATION", 0.0 )
+    self._maxZ_AccelerationTag  = io.plc.setupTag( "Z_ACCELERATION", 0.0 )
+    self._maxZ_DecelerationTag  = io.plc.setupTag( "Z_DECELLERATION", 0.0 )
 
     # Initial states of PLC state machine.
     self._lastState = io.plcLogic.States.READY

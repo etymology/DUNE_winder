@@ -115,8 +115,6 @@ class PLC_Logic :
 
     self._zAxis.setVelocity( self._velocity )
     self._zAxis.setDesiredPosition( position )
-    self._maxZ_Acceleration.set( 100 )
-    self._maxZ_Deceleration.set( 100 )
     self._moveType.set( self.MoveTypes.SEEK_Z )
 
   #---------------------------------------------------------------------
@@ -130,8 +128,6 @@ class PLC_Logic :
     """
 
     self._zAxis.setVelocity( velocity )
-    self._maxZ_Acceleration.set( 100 )
-    self._maxZ_Deceleration.set( 100 )
     self._moveType.set( self.MoveTypes.JOG_Z )
 
   #---------------------------------------------------------------------
@@ -191,6 +187,31 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.LATCH_UNLOCK )
 
   #---------------------------------------------------------------------
+  def setupLimits( self, maxVelocity=None, maxAcceleration=None, maxDeceleration=None ) :
+    """
+    Setup the velocity and acceleration limits.
+
+    Args:
+      maxVelocity: Maximum velocity.
+      maxAcceleration: Maximum positive acceleration.
+      maxDeceleration: Maximum negative acceleration.
+    """
+    if None != maxVelocity :
+      self._velocity = maxVelocity
+
+    if None != maxAcceleration :
+      self._maxAcceleration = maxAcceleration
+
+    if None != maxDeceleration :
+      self._maxDeceleration = maxDeceleration
+
+    self._maxXY_Velocity.set( self._velocity )
+    self._maxXY_Acceleration.set( self._maxAcceleration )
+    self._maxXY_Deceleration.set( self._maxDeceleration )
+    self._maxZ_Acceleration.set( self._maxAcceleration )
+    self._maxZ_Deceleration.set( self._maxDeceleration )
+
+  #---------------------------------------------------------------------
   def __init__( self, plc, xyAxis, zAxis ) :
     """
     Constructor.
@@ -214,6 +235,8 @@ class PLC_Logic :
     self._maxZ_Acceleration  = PLC.Tag( plc, "Z_ACCELERATION", tagType="DINT" )
     self._maxZ_Deceleration  = PLC.Tag( plc, "Z_DECELLERATION", tagType="DINT" )
 
-    self._velocity = 100.0
+    self._velocity = 0.0
+    self._maxAcceleration = 0
+    self._maxDeceleration = 0
 
 # end class
