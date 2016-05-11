@@ -271,10 +271,25 @@ class AnodePlaneArray( Serializable ) :
     return self._name
 
   #---------------------------------------------------------------------
+  def getRecipe( self ) :
+    """
+    Return the name of the loaded recipe.
+
+    Returns:
+      String name of the loaded recipe.  Empty string if no recipe loaded.
+    """
+    result = self._recipeFile
+    if None == result :
+      result = ""
+
+    return result
+
+  #---------------------------------------------------------------------
   def save( self ) :
     """
     Save current APA state to file.
     """
+    self._lineNumber = self._gCodeHandler.getLine()
     Serializable.save( self, self._getPath(), AnodePlaneArray.FILE_NAME )
 
   #---------------------------------------------------------------------

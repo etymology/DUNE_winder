@@ -97,6 +97,78 @@ class Log:
     return result
 
   #---------------------------------------------------------------------
+  def _tail( self, inputFile, lines ) :
+    """
+    Return the last n lines from an open file.
+
+    Args:
+      inputFile - File to read from.  Must be open and readable.
+      lines - Number of lines to read.
+    Returns:
+      Array of lines.
+    Notes:
+      Function copied from comment at stackoverflow.com.
+    """
+    total_lines_wanted = lines
+
+    BLOCK_SIZE = 1024
+    inputFile.seek( 0, 2 )
+    block_end_byte = inputFile.tell()
+    lines_to_go = total_lines_wanted
+    block_number = -1
+
+    # Blocks of size BLOCK_SIZE, in reverse order starting
+    # from the end of the file.
+    blocks = []
+
+    while lines_to_go > 0 and block_end_byte > 0:
+      if ( block_end_byte - BLOCK_SIZE > 0 ):
+        # Read the last block we haven't yet read
+        inputFile.seek( block_number * BLOCK_SIZE, 2 )
+        blocks.append( inputFile.read( BLOCK_SIZE ) )
+      else:
+        # File too small, start from beginning.
+        inputFile.seek( 0, 0 )
+
+        # Only read what was not read
+        blocks.append( inputFile.read( block_end_byte ) )
+      lines_found = blocks[ -1 ].count( '\n' )
+      lines_to_go -= lines_found
+      block_end_byte -= BLOCK_SIZE
+      block_number -= 1
+    all_read_text = ''.join( reversed( blocks ) )
+    return all_read_text.splitlines()[ -total_lines_wanted: ]
+    #return '\n'.join(all_read_text.splitlines()[-total_lines_wanted:])
+
+  #---------------------------------------------------------------------
+  def getAll( self, numberOfLines=-1 ) :
+    """
+    Get the entire log file.
+
+    Return:
+      An array of each line of the log file.
+    """
+
+    fileName = self._outputFileList.keys()[ 0 ]
+
+    if -1 == numberOfLines :
+      with open( fileName ) as inputFile :
+        # Red and ignore header.
+        inputFile.readline()
+
+        # Read remaining lines.
+        lines = inputFile.readlines()
+
+      # Remove line feeds.
+      for index, line in enumerate( lines ) :
+        lines[ index ] = line.replace( "\n", "" )
+    else:
+      with open( fileName ) as inputFile :
+        lines = self._tail( inputFile, numberOfLines )
+
+    return lines
+
+  #---------------------------------------------------------------------
   def add( self, module, typeName, message, parameters = None ) :
     """
     Add a message to log file.
@@ -117,10 +189,10 @@ class Log:
       + str( typeName )      \
       + "\t"                 \
       + message
-    
+
     if None == parameters :
       parameters = []
-    
+
     for parameter in parameters:
       line += "\t" + str( parameter )
 

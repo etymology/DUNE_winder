@@ -199,6 +199,21 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
+  def getG_CodeDirection( self ) :
+    """
+    Get the direction of G-Code execution.
+
+    Returns:
+      True for normal direction, False to run in reverse.  True if no G-Code
+      is loaded.
+    """
+    result = True
+    if self.gCodeHandler.isG_CodeLoaded() :
+      result = self.gCodeHandler.getDirection()
+
+    return result
+
+  #---------------------------------------------------------------------
   def setG_CodeDirection( self, isForward ) :
     """
     Set the direction of G-Code execution.
@@ -262,6 +277,16 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
+  def getG_CodeLoop( self ) :
+    """
+    See if G-Code should loop continuously.
+
+    Returns:
+      True if G-Code should loop.
+    """
+    return self.controlStateMachine.loopMode
+
+  #---------------------------------------------------------------------
   def setG_CodeLoop( self, isLoopMode ) :
     """
     Specify if the G-Code should loop continuously.  Useful for testing
@@ -304,6 +329,20 @@ class Process :
     result = ""
     if self.apa :
       result = self.apa.getName()
+
+    return result
+
+  #---------------------------------------------------------------------
+  def getRecipeName( self ) :
+    """
+    Return the name of the loaded recipe.
+
+    Returns:
+      String name of the loaded recipe.  Empty string if no recipe loaded.
+    """
+    result = ""
+    if self.apa :
+      result = self.apa.getRecipe()
 
     return result
 
