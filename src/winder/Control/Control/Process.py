@@ -99,16 +99,18 @@ class Process :
     """
     Request that the winding process begin.
     """
-    self.controlStateMachine.startRequest = True
-    self.controlStateMachine.stopRequest = False
+    if self.controlStateMachine.isMovementReady() :
+      self.controlStateMachine.startRequest = True
+      self.controlStateMachine.stopRequest = False
 
   #---------------------------------------------------------------------
   def stop( self ) :
     """
     Request that the winding process stop.
     """
-    self.controlStateMachine.startRequest = False
-    self.controlStateMachine.stopRequest = True
+    if self.controlStateMachine.isInMotion() :
+      self.controlStateMachine.startRequest = False
+      self.controlStateMachine.stopRequest = True
 
   #---------------------------------------------------------------------
   def createAPA( self, apaName ) :

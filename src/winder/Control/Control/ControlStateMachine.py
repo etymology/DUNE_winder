@@ -56,6 +56,16 @@ class ControlStateMachine( LoggedStateMachine ) :
     return self.States.STOP == self.getState()
 
   #---------------------------------------------------------------------
+  def isInMotion( self ) :
+    """
+    Check to see if the machine is in motion.
+
+    Returns:
+      True if machine is in motion, False if not.
+    """
+    return self.States.HARDWARE != self.getState() or self.States.STOP != self.getState()
+
+  #---------------------------------------------------------------------
   def isMovementReady( self ) :
     """
     Check to see if the state machine is in a state suitable for starting

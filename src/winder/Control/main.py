@@ -10,6 +10,7 @@ import signal
 import sys
 import traceback
 import time
+import json
 
 from Library.SystemTime import SystemTime
 from Library.Log import Log
@@ -76,6 +77,13 @@ def commandHandler( _, command ) :
       "Invalid command issued from UI.",
       [ command, exception, exceptionTypeName, exceptionValues, tracebackAsString ]
     )
+
+  # Try and make JSON object of result.
+  try:
+    result = json.dumps( result )
+  except TypeError :
+    # If it cannot be made JSON, just make it a string.
+    result = json.dumps( str( result ) )
 
   return result
 
