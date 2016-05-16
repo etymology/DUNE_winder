@@ -1,0 +1,45 @@
+
+article.jog
+{
+  border: none;
+  background: none;
+  width: 175px;
+}
+
+button.jog
+{
+  height: 50px;
+  width:  50px;
+  font-size: 200%;
+  margin: 2px;
+  float: left;
+}
+
+#velocitySliderBox
+{
+  margin-left: 10px;
+  margin-bottom: 10px;
+  width: 500px;
+}
+
+#velocitySlider
+{
+  width: 85%;
+}
+
+#seekX, #seekY, #seekZ, #extendedPosition
+{
+  width: 3em;
+}
+
+#headControlDiv
+{
+  width: 250Px;
+}
+
+#headControlDiv button
+{
+  width: 75px;
+  margin: 2px;
+  float: left;
+}

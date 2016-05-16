@@ -1,0 +1,99 @@
+     <section id="column1">
+      <article>
+        <h2>G-Code Control</h2>
+        <p>Current line: <span id="currentLine">-</span> of <span id="totalLines">-</span></p>
+        <button id="startButton" onclick="setRunningState( true )" type="button">Start</button>
+        <button id="stopButton" onclick="setRunningState( false )" type="button">Stop</button>
+      </article>
+
+      <article>
+        <h2>APA Selection</h2>
+        <article>
+          <h3>APA load</h3>
+          <label for="apaSelection">APA selection</label>
+          <select onchange="selectAPA()" id="apaSelection">
+            <option value=""></option>
+          </select>
+        </article>
+
+        <article>
+          <h3>Layer assignment</h3>
+          <label for="layerSelection">Layer</label>
+          <select id="layerSelection">
+            <option value="G">G</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="X">X</option>
+          </select>
+        </article>
+
+        <article>
+          <h3>G-Code selection</h3>
+          <label for="gCodeSelection">G-Code selection</label>
+          <select onchange="selectG_Code()" id="gCodeSelection">
+            <option value=""></option>
+          </select>
+        </article>
+        <p id="loading">&nbsp;</p>
+
+      </article>
+
+      <article>
+        <h2>APA Creation</h2>
+        <label for="apaName">New APA name</label>
+        <input type="text" id="apaName" />
+        <button id="apaNewButton" onclick="newAPA()" type="button">Create</button>
+      </article>
+
+      <article>
+        <h2>Recipe control</h2>
+        <article>
+          <h3>Line Seek</h3>
+          <label for="apaLine">Goto line</label>
+          <input type="text" id="apaLine" />
+          <button onclick="gotoLine()">Go</button>
+        </article>
+
+        <article>
+          <h3>Breakpoint</h3>
+          <label for="apaBreakLine">Run to line</label>
+          <input type="text" id="apaBreakLine" value="-1" />
+          <button onclick="runToLine()">Set</button>
+        </article>
+
+        <article>
+          <h3>Flow</h3>
+          <button id="reverseButton" class="toggle">Forward</button>
+          <button id="loopButton" class="toggle">Loop</button>
+        </article>
+      </article>
+
+      <article>
+        <h2>Spool</h2>
+        <p>Wire remaining: <span id="spoolAmount">--</span></p>
+        <label for="apaBreakLine">Set spool wire</label>
+        <input type="text" id="setSpool" />
+        <button onclick="setSpool()">Set</button>
+      </article>
+
+     </section>
+
+     <section id="column2">
+      <article>
+        <h2>Running G-Code</h2>
+        <table id="gCodeTable">
+          <tr><td>&nbsp</td></tr>
+          <tr><td>&nbsp</td></tr>
+          <tr><td>&nbsp</td></tr>
+          <tr class="gCodeCurrentLine"><td>&nbsp</td></tr>
+          <tr class="gCodeNextLine"><td>&nbsp</td></tr>
+          <tr><td>&nbsp</td></tr>
+          <tr><td>&nbsp</td></tr>
+        </table>
+      </article>
+
+
+      <article id="motorStatusDiv">Loading...</article>
+
+
+     </section>

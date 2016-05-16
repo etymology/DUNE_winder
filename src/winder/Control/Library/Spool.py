@@ -27,7 +27,8 @@ class Spool :
     Args:
       length: Amount to subtract (in meters).
     """
-    self._wire -= length
+    if -1 != self._wire :
+      self._wire -= length
 
   #---------------------------------------------------------------------
   def isLow( self ) :
@@ -37,7 +38,7 @@ class Spool :
     Returns:
       True if low on wire, False if not.
     """
-    return self._wire < self._low
+    return ( self._wire < self._low ) and not ( -1 == self._wire )
 
   #---------------------------------------------------------------------
   def getWire( self ) :
@@ -55,7 +56,7 @@ class Spool :
     Set how much wire spool contains.
 
     Args:
-      amount: Amount of wire (in meters) the spool has.
+      amount: Amount of wire (in meters) the spool has.  -1 to disable.
     """
     self._wire = amount
 

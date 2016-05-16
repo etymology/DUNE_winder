@@ -1,0 +1,28 @@
+#motorStatusTable td
+{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#motorStatusTable tr td:first-child
+{
+  font-weight: bold;
+  text-align: center;
+  background-color: rgba( 64, 64, 64, 0.5 );
+}
+
+#motorStatusTable
+{
+  min-width: 500px;
+}
+
+#motorStatusTable th
+{
+  background-color: rgba( 64, 64, 64, 0.5 );
+}
+
+#motorStatusTable, #motorStatusTable td, #motorStatusTable th
+{
+  text-align: left;
+  border: 1px solid rgba( 128, 128, 128, 0.5 );
+}

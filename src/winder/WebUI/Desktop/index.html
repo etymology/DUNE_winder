@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>
+      DUNE Winder Interface
+    </title>
+
+    <link rel="stylesheet" href="/Scripts/Vendor/Jquery-ui/jquery-ui.css">
+    <link rel="stylesheet" href="/Desktop/main.css">
+
+    <style>
+      /*
+       * Local style specific to the header/footer.
+       */
+
+      header h1
+      {
+        font-size: 200%;
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 0;
+        vertical-align: middle;
+        line-height: 50px;
+        height: 50px;
+      }
+
+      #timeDiv
+      {
+        width: 200px;
+        float: right;
+      }
+
+      #titleDiv
+      {
+        width: 375px;
+        margin: auto;
+        float: none;
+      }
+
+      #fullStopDiv
+      {
+        width: 300px;
+        height: 50px;
+      }
+
+      #versionDiv, #statesDiv
+      {
+        float: right;
+      }
+
+      #fullStopButton
+      {
+        width: 300px;
+        height: 50px;
+        border-radius: 5px;
+        font-size: 150%;
+      }
+
+      main
+      {
+        clear: both;
+      }
+
+      footer div
+      {
+        position : fixed;
+        margin-left: 5px;
+        margin-right: 5px;
+        left: 0;
+        right: 0;
+      }
+
+      footer button
+      {
+        width: 150px;
+        height: 50px;
+        margin: 5px;
+      }
+
+    </style>
+
+    <script type="text/javascript" src="/Scripts/Vendor/jquery.js"></script>
+    <script type="text/javascript" src="/Scripts/Vendor/jquery-ui/jquery-ui.js"></script>
+    <script type="text/javascript" src="/Scripts/Vendor/jquery.blink.js"></script>
+    <script type="text/javascript" src="/Scripts/WinderInterface.js"></script>
+    <script type="text/javascript" src="/Scripts/FilterTable.js"></script>
+    <script type="text/javascript" src="/Desktop/main.js"></script>
+
+    <script type="text/javascript">
+    </script>
+
+  </head>
+  <body>
+
+    <!-- Heading, used for stop button, tittle, and system time. -->
+    <header>
+      <article id="fullStopDiv">
+        <button onclick="winder.remoteAction( 'process.stop()' )" id="fullStopButton">Stop</button>
+      </article>
+
+      <article id="timeDiv">
+        <h2>Time</h2>
+        <p id="systemTime">--</p>
+      </article>
+
+      <article id="titleDiv">
+        <h1>DUNE Winder Interface</h1>
+      </article>
+    </header>
+
+    <!-- Empty body which will be loaded depending on the page. -->
+    <main id="main">
+      <h2>Loading...</h2>
+    </main>
+
+    <!-- Footer, used for navigation, state information, and version. -->
+    <footer>
+      <article id="versionDiv">
+        <h2>Version</h2>
+        <p>Web interface: <span id="uiVersion">--</span></p>
+        <p>Control software: <span id="controlVersion">--</span></p>
+      </article>
+
+      <article id="statesDiv">
+        <h2>Running state</h2>
+        <p>Control state: <span id="controlState">--</span></p>
+        <p>PLC state: <span id="plcState">--</span></p>
+      </article>
+
+      <article>
+        <button onclick="load( 'apa' )" type="button">APA</button>
+        <button onclick="load( 'jog' )" type="button">Jog</button>
+        <button onclick="load( 'log' )" type="button">Log</button>
+        <button onclick="load( 'io' )" type="button">I/O</button>
+      </article>
+    </footer>
+
+  </body>
+</html>

@@ -8,8 +8,6 @@
 
 class Settings :
 
-  VERSION = "0.5.0a"
-
   SERVER_PORT                 = 6626  # Default TCP port number (plank's constant).
   WEB_SERVER_PORT             = 80    # Port for web server (80 is default).
   SERVER_MAX_DATA_SIZE        = 1024  # Max data that can be read from server at once.
@@ -20,11 +18,21 @@ class Settings :
   # Path to configuration file.
   CONFIG_FILE = "../configuration.xml"
 
+  # Path and name of version information file.
+  VERSION_FILE = "version.xml"
+  UI_VERSION_FILE = "../WebUI/version.xml"
+
   G_CODE_LOG_FILE = "_gCode.txt"
 
   IO_LOG = "../Data/IO_log.csv"
 
   WEB_DIRECTORY = "../WebUI"
+
+  # File making up the version for the control software.
+  CONTROL_FILES = ".*\.py"
+
+  # File making up the version for the user interface.
+  UI_FILES = ".*\.html|.*\.css|.*\.js"
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -54,15 +62,3 @@ class Settings :
     # Acceleration limits.
     configuration.default( "maxAcceleration", 8 * 25.4 ) # 8 inches/s^2
     configuration.default( "maxDeceleration", 2 * 25.4 ) # 2 inches/s^2
-
-  #---------------------------------------------------------------------
-  @staticmethod
-  def getVersion() :
-    """
-    Return the software version string.
-
-    Returns:
-      String of software version.
-    $$$FUTURE - Subject to move.
-    """
-    return Settings.VERSION

@@ -15,6 +15,7 @@ import json
 from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
+from Library.Version import Version
 
 from Machine.Settings import Settings
 
@@ -139,6 +140,22 @@ log = Log( systemTime, configuration.get( "LogDirectory" ) + '/log.csv', isLogEc
 log.add( "Main", "START", "Control system starts." )
 
 try:
+  # Version information for control software.
+  version = Version( Settings.VERSION_FILE, ".", Settings.CONTROL_FILES )
+
+  if version.update() :
+    log.add( "Main", "VERSION_CHANGE", "Control software has changed." )
+
+  log.add(
+    "Main",
+    "VERSION",
+    "Control software version " + str( version.getVersion() ),
+    [ version.getVersion(), version.getHash(), version.getDate() ]
+  )
+
+  # Version information for user interface.
+  uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
+
   # Create I/O map.
   if isSimulated :
     from Simulator.PLC_Simulator import PLC_Simulator
