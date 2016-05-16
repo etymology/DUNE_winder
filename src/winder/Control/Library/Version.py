@@ -25,6 +25,7 @@ class Version :
     self._includeMask = includeMask
     self._excludeMask = excludeMask
     self._computedHash = None
+    self._isValid = False  # Isn't valid until checked.
 
     try:
       self._xml = xml.dom.minidom.parse( versionFileName )
@@ -112,6 +113,7 @@ class Version :
       self._set( "string", versionString )
       self._set( "hash", self._computedHash )
       self._set( "date", str( datetime.datetime.now() ) )
+      self._isValid = True
       self.save()
 
     return hasChanged
@@ -179,7 +181,22 @@ class Version :
       True if the hash matches, False if not.
     """
     versionHash = self.compute()
-    return versionHash == self.getHash()
+    self._isValid = ( versionHash == self.getHash() )
+    return self._isValid
+
+  #---------------------------------------------------------------------
+  def isValid( self ) :
+    """
+    Check to see if the version information is valid.
+
+    Returns:
+      True if the hash matches, False if not.
+
+    Notes:
+      Does not do any calculations, so 'verify' must be called at some point
+      prior.  Otherwise, this function will return False.
+    """
+    return self._isValid
 
   #---------------------------------------------------------------------
   def save( self ) :

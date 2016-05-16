@@ -72,21 +72,39 @@ function loadVersion()
     "controlVersion"
   )
 
-  // $$$DEBUG - Do this every time?
   winder.remoteAction
   (
-    "uiVersion.update()",
-    function()
+    "version.isValid()",
+    function( data )
     {
-      winder.singleRemoteDisplay
-      (
-        "uiVersion.getVersion()",
-        "#uiVersion",
-        softwareVersion,
-        "uiVersion"
-      )
+      console.log( "Control version " + data )
+      if ( data )
+        $( "#controlVersion" ).attr( 'class', "" )
+      else
+        $( "#controlVersion" ).attr( 'class', "badVersion" )
     }
   )
+
+  winder.singleRemoteDisplay
+  (
+    "uiVersion.getVersion()",
+    "#uiVersion",
+    softwareVersion,
+    "uiVersion"
+  )
+
+  winder.remoteAction
+  (
+    "uiVersion.isValid()",
+    function( data )
+    {
+      if ( data )
+        $( "#uiVersion" ).attr( 'class', "" )
+      else
+        $( "#uiVersion" ).attr( 'class', "badVersion" )
+    }
+  )
+
 }
 
 //-----------------------------------------------------------------------------
@@ -170,10 +188,7 @@ function showVersionInformation()
     "#modalDiv",
     function()
     {
-      //$( "#overlayBox" ).html( "Hello world!" )
       winder.loadSubPage( "/Desktop/Modules/versionDetails", "#overlayBox" )
-
-
     }
   )
 }

@@ -121,6 +121,24 @@ for argument in sys.argv:
     isLogEchoed = ( "TRUE" == value )
   elif "LOG_IO" == option :
     isIO_Logged = ( "TRUE" == value )
+  elif "VERIFY_VERSION" == option :
+    version = Version( Settings.VERSION_FILE, ".", Settings.CONTROL_FILES )
+    uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
+
+    returnResult = 0
+    if not version.verify() :
+      print "Control version incorrect."
+      returnResult -= 1
+    else :
+      print "Control version correct."
+
+    if not uiVersion.verify() :
+      print "UI version incorrect."
+      returnResult -= 2
+    else :
+      print "UI version correct."
+
+    sys.exit( returnResult )
 
 # Install signal handler for Ctrl-C shutdown.
 signal.signal( signal.SIGINT, signalHandler )
