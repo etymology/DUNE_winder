@@ -1,3 +1,17 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name: WinderInterface.js
+// Uses: Interface to winder control.
+// Date: 2016-05-03
+// Author(s):
+//   Andrew Que <aque@bb7.com>
+// Example:
+//   Creating an instance:
+//     var winder = new WinterInterface()
+// Notes:
+//   Avoid uses ECMAScript 6 functions (let, const, class, etc.) because not all
+//   mobile browers support these functions.
+///////////////////////////////////////////////////////////////////////////////
+
 var WinderInterface = function()
 {
   // Reference to ourselves.
@@ -129,11 +143,12 @@ var WinderInterface = function()
   // Input:
   //   page - Filename (less extension) to load.
   //   tag - The id of the location to append this data.  Typically a <article>.
+  //   callback - Function to run after everything has loaded.
   // Notes:
   //   The page must have the extension "html".  In addition this function will
   //   also load the page with the extension ".js".
   //---------------------------------------------------------------------------
-  this.loadSubPage = function( page, tag )
+  this.loadSubPage = function( page, tag, callback )
   {
     var randomLine = "";
     if ( FORCE_RELOAD )
@@ -153,7 +168,7 @@ var WinderInterface = function()
           // Load the Javascipt for this page.
           // NOTE: Done after the page loads so that all elements have been
           // created before Javascript runs.
-          $.getScript( page + ".js" )
+          $.getScript( page + ".js", callback )
         }
       )
   }
@@ -645,4 +660,3 @@ var WinderInterface = function()
   }
 
 }
-

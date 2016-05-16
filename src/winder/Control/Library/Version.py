@@ -19,8 +19,9 @@ class Version :
     """
     Constructor.
     """
-    self._fileName = versionFileName
-    self._path = path
+
+    self._fileName = os.path.abspath( versionFileName )
+    self._path = os.path.abspath( path )
     self._includeMask = includeMask
     self._excludeMask = excludeMask
     self._computedHash = None
@@ -101,6 +102,7 @@ class Version :
     Returns:
       True if the version has changed, False if not.
     """
+    #$$$print "Update", self._fileName, self
     hasChanged = not self.verify()
     if hasChanged :
       versionString = self._get( "string" )
@@ -190,9 +192,8 @@ class Version :
     outputText = \
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
-    outputFile = open( self._fileName, "wb" )
-    outputFile.write( outputText )
-    outputFile.close()
+    with open( self._fileName, "wb" ) as outputFile :
+      outputFile.write( outputText )
 
 #------------------------------------------------------------------------------
 # Unit test.

@@ -160,3 +160,20 @@ $( document ).ready
     }
   }
 )
+
+
+function showVersionInformation()
+{
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/overlay",
+    "#modalDiv",
+    function()
+    {
+      //$( "#overlayBox" ).html( "Hello world!" )
+      winder.loadSubPage( "/Desktop/Modules/versionDetails", "#overlayBox" )
+
+
+    }
+  )
+}

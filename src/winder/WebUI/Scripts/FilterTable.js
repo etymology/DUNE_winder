@@ -1,3 +1,11 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name: FilterTable.js
+// Uses: Table that has filtered columns and is sortable.
+// Date: 2016-05-11
+// Author(s):
+//   Andrew Que <aque@bb7.com>
+///////////////////////////////////////////////////////////////////////////////
+
 //=============================================================================
 // Uses:
 //   A filterable, sortable table display class.
@@ -82,27 +90,38 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
       filter = activeFilter[ 1 ]
     }
 
+    // If there is a filter to apply...
     if ( "" != filter )
+    {
+      // Loop through all the raw data looking for matches...
       for ( var row of data )
-      {
+        // If this row is a match, add it to the filter data.
         if ( row[ column ] == filter )
           filteredData.push( row )
-      }
+    }
     else
       // Make copy of data.
       filteredData = data.slice()
 
+    // If sorting is enabled...
     if ( ( null !== sortColumn )
       && ( null !== sortDirection ) )
     {
-      console.log( filteredData )
+      // Do a sort using a custom callback that sorts based on the select column
+      // and direction of sort.
       filteredData.sort
       (
         function( a, b )
         {
+          // Get the objects in the selected column as strings.
           a = a[ sortColumn ].toString()
           b = b[ sortColumn ].toString()
+
+          // Compare strings.
           var result = a.localeCompare( b )
+
+          // Account for sort direction.
+          // (Remember: sort direction is either 1 or -1.)
           result *= sortDirection
 
           return result
@@ -235,7 +254,7 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
         var cell = $( "<td/>" ).appendTo( tableRow )
 
         // Localize column for callback function.
-        var currentColumn = column
+        let currentColumn = column
 
         // Pull-down select tag with a callback to apply a filter to this
         // column.

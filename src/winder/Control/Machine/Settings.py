@@ -29,7 +29,7 @@ class Settings :
   WEB_DIRECTORY = "../WebUI"
 
   # File making up the version for the control software.
-  CONTROL_FILES = ".*\.py"
+  CONTROL_FILES = ".*\.py$"
 
   # File making up the version for the user interface.
   UI_FILES = ".*\.html|.*\.css|.*\.js"

@@ -94,6 +94,9 @@
   </head>
   <body>
 
+    <!-- Empty div for modal screens. -->
+    <div id="modalDiv"></div>
+
     <!-- Heading, used for stop button, tittle, and system time. -->
     <header>
       <article id="fullStopDiv">
@@ -117,7 +120,7 @@
 
     <!-- Footer, used for navigation, state information, and version. -->
     <footer>
-      <article id="versionDiv">
+      <article id="versionDiv" onclick="showVersionInformation()">
         <h2>Version</h2>
         <p>Web interface: <span id="uiVersion">--</span></p>
         <p>Control software: <span id="controlVersion">--</span></p>
