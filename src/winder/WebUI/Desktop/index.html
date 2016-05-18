@@ -105,7 +105,7 @@
     <!-- Heading, used for stop button, tittle, and system time. -->
     <header>
       <article id="fullStopDiv">
-        <button onclick="winder.remoteAction( 'process.stop()' )" id="fullStopButton">Stop</button>
+        <button id="fullStopButton" onclick="fullStop()" id="fullStopButton">Stop &#9995;</button>
       </article>
 
       <article id="timeDiv">
@@ -138,10 +138,10 @@
       </article>
 
       <article>
-        <button onclick="load( 'apa' )" type="button">APA</button>
-        <button onclick="load( 'jog' )" type="button">Jog</button>
-        <button onclick="load( 'log' )" type="button">Log</button>
-        <button onclick="load( 'io' )" type="button">I/O</button>
+        <button onclick="load( 'apa' )">APA</button>
+        <button onclick="load( 'jog' )">Jog</button>
+        <button onclick="load( 'log' )">Log</button>
+        <button onclick="load( 'io' )">I/O</button>
       </article>
     </footer>
 

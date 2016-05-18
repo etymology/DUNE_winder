@@ -62,6 +62,16 @@ function setRunningState( isRunning )
 
 //-----------------------------------------------------------------------------
 // Uses:
+//   Re-enable APA interface.  Callback function.
+//-----------------------------------------------------------------------------
+function reenableAPA()
+{
+  enableAPA_Interface()
+  apaEnabledInhabit = false
+}
+
+//-----------------------------------------------------------------------------
+// Uses:
 //   APA selection callback.
 //-----------------------------------------------------------------------------
 function selectAPA()
@@ -80,13 +90,7 @@ function selectAPA()
     winder.remoteAction
     (
       'process.switchAPA( "' + apa + '" )',
-      function()
-      {
-        // When this request returns, the APA has been loaded and the interface
-        // can again be enabled.
-        enableAPA_Interface()
-        apaEnabledInhabit = false
-      }
+      reenableAPA
     )
   }
 }
@@ -111,13 +115,7 @@ function selectG_Code()
     winder.remoteAction
     (
       'process.apa.loadRecipe( "' + layer + '", "' + gCode + '", -1 )',
-      function()
-      {
-        // When this request returns, the G-Code has been loaded and the interface
-        // can again be enabled.
-        enableAPA_Interface()
-        apaEnabledInhabit = false
-      }
+      reenableAPA
     )
   }
 }
@@ -128,22 +126,34 @@ function selectG_Code()
 //-----------------------------------------------------------------------------
 function populateLists()
 {
-  var gCodeCallback = function()
-  {
-    winder.populateComboBox
-    (
-      "#gCodeSelection",
-      "process.getRecipes()",
-      "process.getRecipeName()"
-    )
-  }
-
   winder.populateComboBox
   (
     "#apaSelection",
     "process.getAPA_List()",
     "process.getLoadedAPA_Name()",
-    gCodeCallback
+    function()
+    {
+      var selection = $( "#apaSelection" ).val()
+      var isDisabled = ( "" == selection )
+      $( "#apaCloseButton" ).prop( "disabled", isDisabled )
+    }
+  )
+
+  winder.populateComboBox
+  (
+    "#gCodeSelection",
+    "process.getRecipes()",
+    "process.getRecipeName()"
+  )
+
+  // Get the current layer.
+  winder.remoteAction
+  (
+    'process.getRecipeLayer()',
+    function( data )
+    {
+      $( "#layerSelection" ).val( data )
+    }
   )
 
 }
@@ -186,6 +196,19 @@ function runToLine()
 function setSpool()
 {
   winder.remoteAction( "process.spool.setWire( " + $( "#setSpool" ).val() + " )" )
+}
+
+//-----------------------------------------------------------------------------
+// Uses:
+//   Close the current APA.
+//-----------------------------------------------------------------------------
+function closeAPA()
+{
+  winder.remoteAction
+  (
+    "process.closeAPA()",
+    populateLists
+  )
 }
 
 //-----------------------------------------------------------------------------
@@ -258,6 +281,19 @@ $( document ).ready
             (
               function()
               {
+                var isForward = $( "#reverseButton" ).val()
+
+                if ( "1" == isForward )
+                {
+                  $( "#gCodeForwardRow" ).attr( 'class', 'gCodeNextLine')
+                  $( "#gCodeReverseRow" ).attr( 'class', '' )
+                }
+                else
+                {
+                  $( "#gCodeForwardRow" ).attr( 'class', '')
+                  $( "#gCodeReverseRow" ).attr( 'class', 'gCodeNextLine' )
+                }
+
                 // Get text for this row.
                 var text = data[ index ]
 
@@ -287,6 +323,8 @@ $( document ).ready
       "process.getG_CodeLoop()",
       "process.setG_CodeLoop( $ )"
     )
+
+    //winder.inhibitUpdates()
   }
 )
 

@@ -148,6 +148,7 @@ signal.signal( signal.SIGINT, signalHandler )
 #
 
 systemTime = SystemTime()
+startTime = systemTime.get()
 
 # Load configuration and setup default values.
 configuration = Configuration( Settings.CONFIG_FILE )
@@ -173,6 +174,7 @@ try:
 
   # Version information for user interface.
   uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
+  uiVersion.verify()
 
   # Create I/O map.
   if isSimulated :
@@ -189,7 +191,7 @@ try:
   LowLevelIO.getTags()
 
   # Primary control process.
-  process = Process( io, log, configuration )
+  process = Process( io, log, configuration, systemTime )
 
   #
   # Initialize threads.
@@ -243,6 +245,12 @@ except Exception as exception:
       "Caught an exception.",
       [ exception, exceptionType, exceptionValue, tracebackString ]
     )
+
+elapsedTime = systemTime.getDelta( startTime )
+deltaString = systemTime.getElapsedString( elapsedTime )
+
+# Log run-time of this operation.
+log.add( "Main", "RUN_TIME", "Ran for " + deltaString + ".", [ elapsedTime ] )
 
 # Sign off.
 log.add( "Main", "END", "Control system stops." )

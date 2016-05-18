@@ -1,9 +1,20 @@
-
-article.jog
+#column1
 {
-  border: none;
+  max-width: 300px;
+  width: 40%;
+  float: left;
+}
+
+#column1 article
+{
+  width: calc( 100% - 20px );
+}
+
+div.jog
+{
   background: none;
   width: 175px;
+  margin: auto;
 }
 
 button.jog
@@ -34,12 +45,13 @@ button.jog
 
 #headControlDiv
 {
-  width: 250Px;
+  /*width: 250px;*/
 }
 
 #headControlDiv button
 {
-  width: 75px;
+  width: 80px;
   margin: 2px;
   float: left;
 }
+

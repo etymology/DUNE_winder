@@ -41,6 +41,7 @@ class AnodePlaneArray( Serializable ) :
     recipeArchiveDirectory,
     name,
     log,
+    systemTime,
     createNew=False
   ) :
     """
@@ -53,6 +54,7 @@ class AnodePlaneArray( Serializable ) :
       recipeArchiveDirectory: Directory recipes are archived.
       name: Name/serial number of APA.
       log: Instance of system log file.
+      systemTime: Instance of TimeSource.
       createNew: True if this APA should be created should it not already exist.
     """
 
@@ -71,6 +73,8 @@ class AnodePlaneArray( Serializable ) :
     self._name = name
     self._log = log
     self._gCodeHandler = gCodeHandler
+    self._systemTime = systemTime
+    self._startTime = systemTime.get()
 
     # Uninitialized data.
     self._lineNumber = None
@@ -271,6 +275,16 @@ class AnodePlaneArray( Serializable ) :
     return self._name
 
   #---------------------------------------------------------------------
+  def getLayer( self ) :
+    """
+    Return the current layer of the APA.
+
+    Returns:
+      String name of the current layer of the APA.
+    """
+    return self._layer
+
+  #---------------------------------------------------------------------
   def getRecipe( self ) :
     """
     Return the name of the loaded recipe.
@@ -299,18 +313,25 @@ class AnodePlaneArray( Serializable ) :
     APA is loaded.
     """
     self.save()
+
+    elapsedTime = self._systemTime.getDelta( self._startTime )
+    deltaString = self._systemTime.getElapsedString( elapsedTime )
+
     self._log.add(
       self.__class__.__name__,
       "CLOSE",
       "Closing APA " + self._name + ", "
-        + str( self._recipeFile ) + ":" + str( self._lineNumber ),
+        + str( self._recipeFile ) + ":" + str( self._lineNumber )
+        + "after " + deltaString,
       [
         self._name,
         self._recipeFile,
-        self._lineNumber
+        self._lineNumber,
+        elapsedTime
       ]
     )
     self._log.detach( self._getPath() + AnodePlaneArray.LOG_FILE )
+    AnodePlaneArray.activeAPA = None
 
 # end class
 

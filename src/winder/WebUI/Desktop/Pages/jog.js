@@ -47,10 +47,14 @@ function jogXY_Stop()
 // Uses:
 //   Callback to start X/Y axis seek.
 //-----------------------------------------------------------------------------
-function seekXY()
+function seekXY( x, y )
 {
-  var x = $( "#seekX" ).val()
-  var y = $( "#seekY" ).val()
+  if ( null == x )
+    x = $( "#seekX" ).val()
+
+  if ( null == y )
+    y = $( "#seekY" ).val()
+
   var velocity = $( "#velocitySlider" ).slider( "value" )
   winder.remoteAction( "process.manualSeekXY(" + x + "," + y + "," + velocity + ")"  )
 }

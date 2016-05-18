@@ -21,4 +21,10 @@ function versionControlRecompute()
   winder.remoteAction( "version.update()", versionUpdate )
 }
 
+function versionClose()
+{
+  loadVersion()
+  overlayClose()
+}
+
 versionUpdate()

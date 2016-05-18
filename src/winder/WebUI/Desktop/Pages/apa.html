@@ -2,8 +2,8 @@
       <article>
         <h2>G-Code Control</h2>
         <p>Current line: <span id="currentLine">-</span> of <span id="totalLines">-</span></p>
-        <button id="startButton" onclick="setRunningState( true )" type="button">Start</button>
-        <button id="stopButton" onclick="setRunningState( false )" type="button">Stop</button>
+        <button id="startButton" onclick="setRunningState( true )">Start</button>
+        <button id="stopButton" onclick="setRunningState( false )">Stop</button>
       </article>
 
       <article>
@@ -14,6 +14,7 @@
           <select onchange="selectAPA()" id="apaSelection">
             <option value=""></option>
           </select>
+          <button id="apaCloseButton" onclick="closeAPA()">Close</button>
         </article>
 
         <article>
@@ -34,6 +35,7 @@
             <option value=""></option>
           </select>
         </article>
+
         <p id="loading">&nbsp;</p>
 
       </article>
@@ -42,7 +44,7 @@
         <h2>APA Creation</h2>
         <label for="apaName">New APA name</label>
         <input type="text" id="apaName" />
-        <button id="apaNewButton" onclick="newAPA()" type="button">Create</button>
+        <button id="apaNewButton" onclick="newAPA()">Create</button>
       </article>
 
       <article>
@@ -84,9 +86,9 @@
         <table id="gCodeTable">
           <tr><td>&nbsp</td></tr>
           <tr><td>&nbsp</td></tr>
-          <tr><td>&nbsp</td></tr>
+          <tr id="gCodeReverseRow"><td>&nbsp</td></tr>
           <tr class="gCodeCurrentLine"><td>&nbsp</td></tr>
-          <tr class="gCodeNextLine"><td>&nbsp</td></tr>
+          <tr id="gCodeForwardRow"><td>&nbsp</td></tr>
           <tr><td>&nbsp</td></tr>
           <tr><td>&nbsp</td></tr>
         </table>

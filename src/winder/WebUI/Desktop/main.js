@@ -77,11 +77,10 @@ function loadVersion()
     "version.isValid()",
     function( data )
     {
-      console.log( "Control version " + data )
       if ( data )
         $( "#controlVersion" ).attr( 'class', "" )
       else
-        $( "#controlVersion" ).attr( 'class', "badVersion" )
+        $( "#controlVersion" ).attr( 'class', "badVersion"  )
     }
   )
 
@@ -138,6 +137,34 @@ $( document ).ready
         "controlState"
       )
 
+      winder.addPeriodicEndCallback
+      (
+        function()
+        {
+          var value = states[ "controlState" ]
+          var isDisabled = ( "StopMode" == value ) || ( "HardwareMode" == value )
+          $( "#fullStopButton" ).prop( "disabled", isDisabled )
+          $( "#controlState" ).text( value )
+          states[ "controlState" ] = value
+        }
+      )
+
+      // winder.addPeriodicRemoteCallback
+      // (
+      //   "process.controlStateMachine.state.__class__.__name__",
+      //   //"#controlState",
+      //   //states,
+      //   //"controlState",
+      //   function( value )
+      //   {
+      //     console.log( value )
+      //     var isDisabled = ( "StopMode" == value ) || ( "HardwareMode" == value )
+      //     $( "#fullStopButton" ).prop( "disabled", isDisabled )
+      //     $( "#controlState" ).text( value )
+      //     states[ "controlState" ] = value
+      //   }
+      // )
+
       // Update for PLC state machine.
       winder.addPeriodicRemoteCallback
       (
@@ -146,23 +173,22 @@ $( document ).ready
         {
           if ( null !== value )
           {
-            stateTranslateTable =
+            var stateTranslateTable =
             [
-              "Init",
-              "Ready",
-              "XY jog",
-              "XY seek",
-              "Z jog",
-              "Z seek",
-              "Latching",
-              "Latch homeing",
-              "Latch release"
+              "Init",          // 0
+              "Ready",         // 1
+              "XY jog",        // 2
+              "XY seek",       // 3
+              "Z jog",         // 4
+              "Z seek",        // 5
+              "Latching",      // 6
+              "Latch homeing", // 7
+              "Latch release"  // 8
             ]
 
-            value = stateTranslateTable[ value ]
-            states[ "plcState" ] = value
-            $( "#plcState" ).text( value )
-
+            var stringValue = stateTranslateTable[ value ]
+            states[ "plcState" ] = stringValue
+            $( "#plcState" ).text( stringValue )
           }
           else
             $( "#plcState" ).html( winder.errorString )
@@ -191,4 +217,9 @@ function showVersionInformation()
       winder.loadSubPage( "/Desktop/Modules/versionDetails", "#overlayBox" )
     }
   )
+}
+
+function fullStop()
+{
+  winder.remoteAction( 'process.stop()' )
 }

@@ -126,12 +126,12 @@ var WinderInterface = function()
             function( data )
             {
               $( tagId ).val( data )
+
+              if ( additionalCallback )
+                additionalCallback()
             }
           )
         }
-
-        if ( additionalCallback )
-          additionalCallback()
 
       }
     )
@@ -534,12 +534,18 @@ var WinderInterface = function()
         $( tagId ).prop( "disabled", toggleButtonStates[ tagId ] )
         toggleButtonStates[ tagId ] = null
 
-        value = ( data === "True" ) || ( data == "1" )
+        value = ( data === true ) || ( data == "1" )
         className = "toggle"
         if ( value )
           className = "toggleDown"
 
         $( tagId ).attr( 'class', className )
+
+        var value = 0
+        if ( $( this ).attr( 'class' ) == "toggleDown" )
+          value = 1
+
+        $( tagId ).val( value )
 
         if ( getCallback )
           getCallback( data )

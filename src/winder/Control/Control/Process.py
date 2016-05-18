@@ -15,16 +15,23 @@ from Control.ControlStateMachine import ControlStateMachine
 class Process :
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log, configuration ) :
+  def __init__( self, io, log, configuration, systemTime ) :
     """
     Constructor.
+
+    Args:
+      io: Instance of I/O map.
+      log: Log file to write state changes.
+      configuration: Instance of Configuration.
+      systemTime: Instance of TimeSource.
     """
     self._io = io
     self._log = log
     self._configuration = configuration
+    self._systemTime = systemTime
     self.spool = Spool( 27000000, 50 )
     self.gCodeHandler = G_CodeHandler( io, self.spool )
-    self.controlStateMachine = ControlStateMachine( io, log )
+    self.controlStateMachine = ControlStateMachine( io, log, systemTime )
 
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
@@ -139,6 +146,7 @@ class Process :
           self._configuration.get( "recipeArchiveDirectory" ),
           apaName,
           self._log,
+          self._systemTime,
           True
         )
 
@@ -349,6 +357,21 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
+  def getRecipeLayer( self ) :
+    """
+    Return the current layer of the APA.
+
+    Returns:
+      String name of the current layer of the APA.  Empty string if no recipe
+      loaded.
+    """
+    result = ""
+    if self.apa :
+      result = self.apa.getLayer()
+
+    return result
+
+  #---------------------------------------------------------------------
   def switchAPA( self, apaName ) :
     """
     Load an APA from disk.
@@ -364,6 +387,7 @@ class Process :
         self._configuration.get( "recipeArchiveDirectory" ),
         apaName,
         self._log,
+        self._systemTime,
         False
       )
 
@@ -375,6 +399,7 @@ class Process :
 
     if self.apa :
       self.apa.close()
+      self.apa = None
 
   #---------------------------------------------------------------------
   def jogXY( self, xVelocity, yVelocity ) :

@@ -172,11 +172,11 @@ $( document ).ready
 
     $( "#jogXY_dl" )
       .bind( 'touchstart', function() { jogXY_Start( +1, -1 ) } )
-      .bind( 'touchend', jogZ_Stop )
+      .bind( 'touchend', jogXY_Stop )
 
     $( "#jogXY_d" )
       .bind( 'touchstart', function() { jogXY_Start(  0, -1 ) } )
-      .bind( 'touchend', jogZ_Stop )
+      .bind( 'touchend', jogXY_Stop )
 
     $( "#jogXY_dr" )
       .bind( 'touchstart', function() { jogXY_Start( -1, -1 ) } )

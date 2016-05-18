@@ -1,62 +1,68 @@
-    <section style="max-width: 300px; width: 40%; float: left;">
+    <section id="column1">
       <article>
-        <h2>X/Y</h2>
+        <h2>X/Y Axis</h2>
         <article>
           <h2>Jog</h2>
-          <article class="jog" >
-            <button class="jog" onmousedown="jogXY_Start( -1, -1 )" onmouseup="jogXY_Stop()" type="button">&#8598;</button>
-            <button class="jog" onmousedown="jogXY_Start(  0, -1 )" onmouseup="jogXY_Stop()" type="button">&#8593; </button>
-            <button class="jog" onmousedown="jogXY_Start( +1, -1 )" onmouseup="jogXY_Stop()" type="button">&#8599; </button>
-            <button class="jog" onmousedown="jogXY_Start( -1,  0 )" onmouseup="jogXY_Stop()" type="button">&#8592; </button>
-            <button class="jog" onclick="winder.remoteAction( 'process.manualSeekXY( 0, 0, 100 )' )" type="button">&#8633; </button>
-            <button class="jog" onmousedown="jogXY_Start( +1,  0 )" onmouseup="jogXY_Stop()" type="button">&#8594; </button>
-            <button class="jog" onmousedown="jogXY_Start( -1, +1 )" onmouseup="jogXY_Stop()" type="button">&#8601; </button>
-            <button class="jog" onmousedown="jogXY_Start(  0, +1 )" onmouseup="jogXY_Stop()" type="button">&#8595; </button>
-            <button class="jog" onmousedown="jogXY_Start( +1, +1 )" onmouseup="jogXY_Stop()" type="button">&#8600; </button>
-          </article>
+          <div class="jog">
+            <button class="jog" onmousedown="jogXY_Start( -1, -1 )" onmouseup="jogXY_Stop()">&#8598;</button>
+            <button class="jog" onmousedown="jogXY_Start(  0, -1 )" onmouseup="jogXY_Stop()">&#8593;</button>
+            <button class="jog" onmousedown="jogXY_Start( +1, -1 )" onmouseup="jogXY_Stop()">&#8599;</button>
+            <button class="jog" onmousedown="jogXY_Start( -1,  0 )" onmouseup="jogXY_Stop()">&#8592;</button>
+            <button class="jog" onclick="seekXY( 0, 0 )">&#8962;</button>
+            <button class="jog" onmousedown="jogXY_Start( +1,  0 )" onmouseup="jogXY_Stop()">&#8594;</button>
+            <button class="jog" onmousedown="jogXY_Start( -1, +1 )" onmouseup="jogXY_Stop()">&#8601;</button>
+            <button class="jog" onmousedown="jogXY_Start(  0, +1 )" onmouseup="jogXY_Stop()">&#8595;</button>
+            <button class="jog" onmousedown="jogXY_Start( +1, +1 )" onmouseup="jogXY_Stop()">&#8600;</button>
+          </div>
         </article>
 
         <article>
-          <h2>Seek</h2>
+          <h3>Seek</h3>
           <input type="text" id="seekX" value="100.0" />
           <label for="query">X</label>
           <input type="text" id="seekY" value="150.0" />
           <label for="query">Y</label>
-          <button onclick="seekXY()" type="button">Seek X/Y</button>
+          <button onclick="seekXY()">Seek X/Y</button>
         </article>
+
       </article>
 
       <article>
+        <h2>Z Axis</h2>
         <article>
-          <h2>Jog Z</h2>
-          <article class="jog" >
+          <h3>Jog Z</h3>
+          <div class="jog" >
             <tbody>
-              <button class="jog" onmousedown="jogZ_Start( -1, -1 )" onmouseup="jogZ_Stop()" type="button">&#8592;</button>
-              <button class="jog" onclick="winder.remoteAction( 'process.manualSeekZ( 0, 100 )' )" type="button">&#8633; </button>
-              <button class="jog" onmousedown="jogZ_Start( +1, -1 )" onmouseup="jogZ_Stop()" type="button">&#8594; </button>
-          </article>
+              <button class="jog" onmousedown="jogZ_Start( -1, -1 )" onmouseup="jogZ_Stop()">&#8592;</button>
+              <button class="jog" onclick="winder.remoteAction( 'process.manualSeekZ( 0, 100 )' )">&#8962;</button>
+              <button class="jog" onmousedown="jogZ_Start( +1, -1 )" onmouseup="jogZ_Stop()">&#8594;</button>
+          </div>
         </article>
 
         <article>
-          <h2>Seek Z</h2>
+          <h3>Seek Z</h3>
           <input type="text" id="seekZ" value="" />
           <label for="query">Z</label>
-          <button onclick="seekZ()" type="button">Seek Z</button>
+          <button onclick="seekZ()">Seek Z</button>
         </article>
 
         <article id="headControlDiv">
-          <h2>Head Control</h2>
-          <button onclick="zRetract()" type="button">Retract</button>
-          <button onclick="" type="button">Mid</button>
-          <button onclick="zExtend()" type="button">Extend</button>
-          <button onclick="latch()" type="button">Latch</button>
-          <button onclick="latchHome()" type="button">Home</button>
-          <button onclick="latchUnlock()" type="button">Unlock</button>
+          <h3>Head Control</h3>
+          <button onclick="zRetract()">Retract</button>
+          <button onclick="">Mid</button>
+          <button onclick="zExtend()">Extend</button>
+          <button onclick="latch()">Latch</button>
+          <button onclick="latchHome()">Home</button>
+          <button onclick="latchUnlock()">Unlock</button>
           <input type="text" id="extendedPosition" value="416.0" />
           <label for="query">Extended position</label>
         </article>
       </article>
 
+      <article>
+        <h2>Motor Error Reset</h2>
+        <button onclick="winder.remoteAction( 'io.plcLogic.reset()' )">Reset</button>
+      </article>
     </section>
 
     <section style="float: left; width: 60%;">
@@ -68,3 +74,4 @@
 
       <article id="motorStatusDiv">Loading...</article>
     </section>
+

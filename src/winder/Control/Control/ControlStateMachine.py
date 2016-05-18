@@ -77,7 +77,7 @@ class ControlStateMachine( LoggedStateMachine ) :
     return self.States.STOP == self.getState() and self.stopMode.isIdle()
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log ) :
+  def __init__( self, io, log, systemTime ) :
     """
     Constructor.
 
@@ -86,6 +86,7 @@ class ControlStateMachine( LoggedStateMachine ) :
       log: Log file to write state changes.
       gCodeHandler: Instance of GCodeHandler.
       manualCommand: Instance of ManualCommand.
+      systemTime: Instance of TimeSource.
     """
 
     LoggedStateMachine.__init__( self, log )
@@ -98,6 +99,7 @@ class ControlStateMachine( LoggedStateMachine ) :
 
     self._io = io
 
+    self.systemTime = systemTime
     self.gCodeHandler = None
 
     # Wind mode.

@@ -20,3 +20,24 @@ class SystemTime( TimeSource ) :
     """
 
     return datetime.datetime.utcnow()
+
+  #-------------------------------------------------------------------
+  def getDelta( self, then, now=None ) :
+    """
+    Return the amount of time between two time stamps.
+
+    Args:
+      then - Starting time.
+      now - Current time.  If omitted, the current time is used.
+
+    Returns:
+      Time between to time stamps.
+    """
+
+    if None == now :
+      now = self.get()
+
+    delta = now - then
+
+    return delta.total_seconds()
+
