@@ -4,15 +4,15 @@
         <article>
           <h2>Jog</h2>
           <div class="jog">
-            <button class="jog" onmousedown="jogXY_Start( -1, -1 )" onmouseup="jogXY_Stop()">&#8598;</button>
-            <button class="jog" onmousedown="jogXY_Start(  0, -1 )" onmouseup="jogXY_Stop()">&#8593;</button>
-            <button class="jog" onmousedown="jogXY_Start( +1, -1 )" onmouseup="jogXY_Stop()">&#8599;</button>
-            <button class="jog" onmousedown="jogXY_Start( -1,  0 )" onmouseup="jogXY_Stop()">&#8592;</button>
-            <button class="jog" onclick="seekXY( 0, 0 )">&#8962;</button>
-            <button class="jog" onmousedown="jogXY_Start( +1,  0 )" onmouseup="jogXY_Stop()">&#8594;</button>
-            <button class="jog" onmousedown="jogXY_Start( -1, +1 )" onmouseup="jogXY_Stop()">&#8601;</button>
-            <button class="jog" onmousedown="jogXY_Start(  0, +1 )" onmouseup="jogXY_Stop()">&#8595;</button>
-            <button class="jog" onmousedown="jogXY_Start( +1, +1 )" onmouseup="jogXY_Stop()">&#8600;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start( -1, -1 )" onmouseup="jog.jogXY_Stop()">&#8598;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start(  0, -1 )" onmouseup="jog.jogXY_Stop()">&#8593;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start( +1, -1 )" onmouseup="jog.jogXY_Stop()">&#8599;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start( -1,  0 )" onmouseup="jog.jogXY_Stop()">&#8592;</button>
+            <button class="jog" onclick="jog.seekXY( 0, 0 )">&#8962;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start( +1,  0 )" onmouseup="jog.jogXY_Stop()">&#8594;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start( -1, +1 )" onmouseup="jog.jogXY_Stop()">&#8601;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start(  0, +1 )" onmouseup="jog.jogXY_Stop()">&#8595;</button>
+            <button class="jog" onmousedown="jog.jogXY_Start( +1, +1 )" onmouseup="jog.jogXY_Stop()">&#8600;</button>
           </div>
         </article>
 
@@ -22,7 +22,7 @@
           <label for="query">X</label>
           <input type="text" id="seekY" value="150.0" />
           <label for="query">Y</label>
-          <button onclick="seekXY()">Seek X/Y</button>
+          <button onclick="jog.seekXY()">Seek X/Y</button>
         </article>
 
       </article>
@@ -33,9 +33,9 @@
           <h3>Jog Z</h3>
           <div class="jog" >
             <tbody>
-              <button class="jog" onmousedown="jogZ_Start( -1, -1 )" onmouseup="jogZ_Stop()">&#8592;</button>
+              <button class="jog" onmousedown="jog.jogZ_Start( -1, -1 )" onmouseup="jog.jogZ_Stop()">&#8592;</button>
               <button class="jog" onclick="winder.remoteAction( 'process.manualSeekZ( 0, 100 )' )">&#8962;</button>
-              <button class="jog" onmousedown="jogZ_Start( +1, -1 )" onmouseup="jogZ_Stop()">&#8594;</button>
+              <button class="jog" onmousedown="jog.jogZ_Start( +1, -1 )" onmouseup="jog.jogZ_Stop()">&#8594;</button>
           </div>
         </article>
 
@@ -43,17 +43,17 @@
           <h3>Seek Z</h3>
           <input type="text" id="seekZ" value="" />
           <label for="query">Z</label>
-          <button onclick="seekZ()">Seek Z</button>
+          <button onclick="jog.seekZ()">Seek Z</button>
         </article>
 
         <article id="headControlDiv">
           <h3>Head Control</h3>
-          <button onclick="zRetract()">Retract</button>
+          <button onclick="jog.zRetract()">Retract</button>
           <button onclick="">Mid</button>
-          <button onclick="zExtend()">Extend</button>
-          <button onclick="latch()">Latch</button>
-          <button onclick="latchHome()">Home</button>
-          <button onclick="latchUnlock()">Unlock</button>
+          <button onclick="jog.zExtend()">Extend</button>
+          <button onclick="jog.latch()">Latch</button>
+          <button onclick="jog.latchHome()">Home</button>
+          <button onclick="jog.latchUnlock()">Unlock</button>
           <input type="text" id="extendedPosition" value="416.0" />
           <label for="query">Extended position</label>
         </article>

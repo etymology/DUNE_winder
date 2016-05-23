@@ -5,12 +5,12 @@
   float: left;
 }
 
-main article
+#column1 article, #column2 article, #column3 article
 {
   width: 95%;
 }
 
-article table
+#column1 table, #column2 table, #column3 table
 {
   width: 100%;
 }

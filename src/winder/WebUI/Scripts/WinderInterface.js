@@ -21,6 +21,9 @@ var WinderInterface = function()
   // loads).  Should be false for production for best performance.
   var FORCE_RELOAD = true
 
+  // Set to true to shutdown periodic updates.
+  var periodicShutdown = false
+
   // Delay (in milliseconds) between periodic updates.
   var updateRate = 100
 
@@ -104,18 +107,20 @@ var WinderInterface = function()
             $( "<option />" )
               .val( "" )
               .text( "" )
-          )
+          );
 
         // Loop through result data and add an option for each element.
-        for ( var item of data )
+        for ( var dataIndex in data )
+        {
+          var item = data[ dataIndex ]
           $( tagId )
             .append
             (
               $( "<option />" )
                 .val( item )
                 .text( item )
-            )
-
+            );
+        }
         // If there is a command to get the current selection, run it.
         if ( selectCommand )
         {
@@ -134,7 +139,7 @@ var WinderInterface = function()
         }
 
       }
-    )
+    );
   }
 
   //---------------------------------------------------------------------------
@@ -202,8 +207,9 @@ var WinderInterface = function()
           if ( ! isInError )
           {
             // Run all the remote callbacks with no data to signal an error.
-            for ( var remoteCallback of periodicRemoteCallbacks )
+            for ( var index in periodicRemoteCallbacks )
             {
+              var remoteCallback = periodicRemoteCallbacks[ index ]
               remoteCallback[ 1 ]( null )
             }
 
@@ -227,8 +233,8 @@ var WinderInterface = function()
               )
 
             // Run error callbacks.
-            for ( var callback of onErrorCallbacks )
-              callback()
+            for ( var index in onErrorCallbacks )
+              onErrorCallbacks[ index ]()
           }
 
           // Now in an error state.
@@ -255,8 +261,8 @@ var WinderInterface = function()
               )
 
             // Run error-clear callbacks.
-            for ( var callback of onErrorClearCallbacks )
-              callback()
+            for ( var index in onErrorClearCallbacks )
+              onErrorClearCallbacks[ index ]()
 
           }
 
@@ -302,8 +308,8 @@ var WinderInterface = function()
             ) // each
 
           // Run end of period update callbacks.
-          for ( var callback of onPeriodicEndCallbacks )
-            callback()
+          for ( var index in onPeriodicEndCallbacks )
+            onPeriodicEndCallbacks[ index ]()
 
           // Release semaphore.
           periodicRemoteUpdateSemaphore -= 1
@@ -315,8 +321,8 @@ var WinderInterface = function()
     // Setup to run this function again.  (i.e. make it periodic.)
     // NOTE: This needs to happen even if the function was skipped due to
     // the semaphore being in use.
-    setTimeout( self.periodicRemoteUpdate, updateRate )
-
+    if ( ! self.periodicShutdown )
+      setTimeout( self.periodicRemoteUpdate, updateRate )
   }
 
   //---------------------------------------------------------------------------
@@ -342,8 +348,9 @@ var WinderInterface = function()
     var index = 0
     periodicRemoteCallbackTable = {}
     periodicRemoteQuery = {}
-    for ( var remoteCallback of periodicRemoteCallbacks )
+    for ( var index in periodicRemoteCallbacks )
     {
+      var remoteCallback = periodicRemoteCallbacks[ index ]
       // Make an ID for this callback.
       var id = "id" + index
       periodicRemoteCallbackTable[ id ] = remoteCallback[ 1 ]
@@ -663,6 +670,13 @@ var WinderInterface = function()
       periodicRemoteUpdateSemaphore += 1
     else
       periodicRemoteUpdateSemaphore -= 1
+  }
+
+  //---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  this.shutdown = function()
+  {
+    this.periodicShutdown = true
   }
 
 }

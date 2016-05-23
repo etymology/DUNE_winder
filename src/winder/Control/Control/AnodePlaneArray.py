@@ -322,7 +322,7 @@ class AnodePlaneArray( Serializable ) :
       "CLOSE",
       "Closing APA " + self._name + ", "
         + str( self._recipeFile ) + ":" + str( self._lineNumber )
-        + "after " + deltaString,
+        + " after " + deltaString,
       [
         self._name,
         self._recipeFile,

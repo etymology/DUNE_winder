@@ -46,8 +46,11 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
     // Build filter enables with default value.
     columnFilterEnables = []
-    for ( var column of columnNames )
+    for ( var index in columnNames )
+    {
+      var column = columnNames[ index ]
       columnFilterEnables.push( defaultSetting )
+    }
   }
 
   //---------------------------------------------------------------------------
@@ -57,8 +60,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   this.getUnique = function( column )
   {
     var results = []
-    for ( var row of data )
+    for ( var rowIndex in data )
     {
+      var row = data[ rowIndex ]
       var item = row[ column ]
       if ( results.indexOf( item ) == -1 )
         results.push( item )
@@ -94,10 +98,13 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     if ( "" != filter )
     {
       // Loop through all the raw data looking for matches...
-      for ( var row of data )
+      for ( var rowIndex in data )
+      {
+        row = data[ rowIndex ]
         // If this row is a match, add it to the filter data.
         if ( row[ column ] == filter )
           filteredData.push( row )
+      }
     }
     else
       // Make copy of data.
@@ -176,10 +183,13 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
       // NOTE: Additional styles can be applied from style sheet--this is only
       // for widths.
       var tableRow = $( "<colgroup />" ).appendTo( table )
-      for ( var width of columnWidths )
+      for ( var index in columnWidths )
+      {
+        var width = columnWidths[ index ]
         $( "<col/>" )
           .appendTo( tableRow )
           .width( width )
+      }
     }
 
     var tableHeader = $( "<thead />" ).appendTo( table )
@@ -283,10 +293,13 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
         var items = this.getUnique( column )
 
         // Display filtering options for column.
-        for ( var item of items )
+        for ( var index in items )
+        {
+          var item = items[ index ]
           $( "<option />" )
             .appendTo( selectElement )
             .text( item )
+        }
 
         // Select the active filter (if filtering is enabled).
         if ( activeFilter[ 0 ] == column )
@@ -359,8 +372,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     }
 
     // Loop through all rows in new data...
-    for ( row of newData )
+    for ( var rowIndex in newData )
     {
+      var row = newData[ rowIndex ]
       // Build a row using column mapping.
       // Allows columns to be out-of-order or ignored all together.
       var rowData = []

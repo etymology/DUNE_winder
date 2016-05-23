@@ -59,10 +59,8 @@ class Configuration :
     outputText = \
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
-    outputFile = open( self._fileName, "wb" )
-    outputFile.write( outputText )
-    outputFile.close()
-
+    with open( self._fileName, "wb" ) as outputFile :
+      outputFile.write( outputText )
 
   #---------------------------------------------------------------------
   def set( self, tag, value ) :

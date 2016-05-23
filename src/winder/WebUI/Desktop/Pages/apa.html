@@ -2,8 +2,8 @@
       <article>
         <h2>G-Code Control</h2>
         <p>Current line: <span id="currentLine">-</span> of <span id="totalLines">-</span></p>
-        <button id="startButton" onclick="setRunningState( true )">Start</button>
-        <button id="stopButton" onclick="setRunningState( false )">Stop</button>
+        <button id="startButton" onclick="apa.setRunningState( true )">Start</button>
+        <button id="stopButton" onclick="apa.setRunningState( false )">Stop</button>
       </article>
 
       <article>
@@ -11,10 +11,10 @@
         <article>
           <h3>APA load</h3>
           <label for="apaSelection">APA selection</label>
-          <select onchange="selectAPA()" id="apaSelection">
+          <select onchange="apa.selectAPA()" id="apaSelection">
             <option value=""></option>
           </select>
-          <button id="apaCloseButton" onclick="closeAPA()">Close</button>
+          <button id="apaCloseButton" onclick="apa.closeAPA()">Close</button>
         </article>
 
         <article>
@@ -31,7 +31,7 @@
         <article>
           <h3>G-Code selection</h3>
           <label for="gCodeSelection">G-Code selection</label>
-          <select onchange="selectG_Code()" id="gCodeSelection">
+          <select onchange="apa.selectG_Code()" id="gCodeSelection">
             <option value=""></option>
           </select>
         </article>
@@ -44,7 +44,7 @@
         <h2>APA Creation</h2>
         <label for="apaName">New APA name</label>
         <input type="text" id="apaName" />
-        <button id="apaNewButton" onclick="newAPA()">Create</button>
+        <button id="apaNewButton" onclick="apa.newAPA()">Create</button>
       </article>
 
       <article>
@@ -53,14 +53,14 @@
           <h3>Line Seek</h3>
           <label for="apaLine">Goto line</label>
           <input type="text" id="apaLine" />
-          <button onclick="gotoLine()">Go</button>
+          <button onclick="apa.gotoLine()">Go</button>
         </article>
 
         <article>
           <h3>Breakpoint</h3>
           <label for="apaBreakLine">Run to line</label>
           <input type="text" id="apaBreakLine" value="-1" />
-          <button onclick="runToLine()">Set</button>
+          <button onclick="apa.runToLine()">Set</button>
         </article>
 
         <article>
@@ -75,7 +75,7 @@
         <p>Wire remaining: <span id="spoolAmount">--</span></p>
         <label for="apaBreakLine">Set spool wire</label>
         <input type="text" id="setSpool" />
-        <button onclick="setSpool()">Set</button>
+        <button onclick="apa.setSpool()">Set</button>
       </article>
 
      </section>

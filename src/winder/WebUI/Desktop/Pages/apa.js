@@ -1,233 +1,228 @@
-
-// True when the APA settings can be modified.  Used to prevent modifications
-// to the APA while the machine is running.
-var apaEnabled = true
-
-// True when
-var apaEnabledInhabit = false
-
-var loopButtonUpdate
-var reverseButtonUpdate
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Enable all APA interface controls.
-//-----------------------------------------------------------------------------
-function enableAPA_Interface()
+function APA()
 {
-  apaEnabled = true
-  $( "#apaSelection" ).prop( "disabled", false )
-  $( "#layerSelection" ).prop( "disabled", false )
-  $( "#gCodeSelection" ).prop( "disabled", false )
-  $( "#apaName" ).prop( "disabled", false )
-  $( "#apaNewButton" ).prop( "disabled", false )
-  $( "#loading" ).html( "&nbsp;" )
-  populateLists()
+  var self = this
 
-  if ( loopButtonUpdate )
-    loopButtonUpdate()
+  // True when the APA settings can be modified.  Used to prevent modifications
+  // to the APA while the machine is running.
+  var apaEnabled = true
 
-  if ( reverseButtonUpdate )
-    reverseButtonUpdate()
-}
+  // True when
+  var apaEnabledInhabit = false
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Disable all APA interface controls.
-//-----------------------------------------------------------------------------
-function disableAPA_Interface( message )
-{
-  apaEnabled = false
-  $( "#loading" ).html( message )
-  $( "#apaSelection" ).prop( "disabled", true )
-  $( "#layerSelection" ).prop( "disabled", true )
-  $( "#gCodeSelection" ).prop( "disabled", true )
-  $( "#apaName" ).prop( "disabled", true )
-  $( "#apaNewButton" ).prop( "disabled", true )
-}
+  var loopButtonUpdate
+  var reverseButtonUpdate
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback to start/stop recipe execution.
-// Input:
-//   isRunning - True to start, false to stop.
-//-----------------------------------------------------------------------------
-function setRunningState( isRunning )
-{
-  if ( isRunning )
-    winder.remoteAction( 'process.start()' )
-  else
-    winder.remoteAction( 'process.stop()' )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Re-enable APA interface.  Callback function.
-//-----------------------------------------------------------------------------
-function reenableAPA()
-{
-  enableAPA_Interface()
-  apaEnabledInhabit = false
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   APA selection callback.
-//-----------------------------------------------------------------------------
-function selectAPA()
-{
-  // Get the new APA selection.
-  var apa = $( "#apaSelection" ).val()
-
-  // If not the null selection...
-  if ( "" != apa )
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Enable all APA interface controls.
+  //-----------------------------------------------------------------------------
+  this.enableAPA_Interface = function()
   {
-    // Disable the APA interface during loading process.
-    apaEnabledInhabit = true
-    disableAPA_Interface( "Loading APA" )
+    apaEnabled = true
+    $( "#apaSelection" ).prop( "disabled", false )
+    $( "#layerSelection" ).prop( "disabled", false )
+    $( "#gCodeSelection" ).prop( "disabled", false )
+    $( "#apaName" ).prop( "disabled", false )
+    $( "#apaNewButton" ).prop( "disabled", false )
+    $( "#loading" ).html( "&nbsp;" )
+    this.populateLists()
 
-    // Start loading new APA.
+    if ( this.loopButtonUpdate )
+      this.loopButtonUpdate()
+
+    if ( this.reverseButtonUpdate )
+      this.reverseButtonUpdate()
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Disable all APA interface controls.
+  //-----------------------------------------------------------------------------
+  this.disableAPA_Interface = function( message )
+  {
+    apaEnabled = false
+    $( "#loading" ).html( message )
+    $( "#apaSelection" ).prop( "disabled", true )
+    $( "#layerSelection" ).prop( "disabled", true )
+    $( "#gCodeSelection" ).prop( "disabled", true )
+    $( "#apaName" ).prop( "disabled", true )
+    $( "#apaNewButton" ).prop( "disabled", true )
+    $( "#apaCloseButton" ).prop( "disabled", true )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback to start/stop recipe execution.
+  // Input:
+  //   isRunning - True to start, false to stop.
+  //-----------------------------------------------------------------------------
+  this.setRunningState = function( isRunning )
+  {
+    if ( isRunning )
+      winder.remoteAction( 'process.start()' )
+    else
+      winder.remoteAction( 'process.stop()' )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Re-enable APA interface.  Callback function.
+  //-----------------------------------------------------------------------------
+  this.reenableAPA = function()
+  {
+    self.enableAPA_Interface()
+    apaEnabledInhabit = false
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   APA selection callback.
+  //-----------------------------------------------------------------------------
+  this.selectAPA = function()
+  {
+    // Get the new APA selection.
+    var apa = $( "#apaSelection" ).val()
+
+    // If not the null selection...
+    if ( "" != apa )
+    {
+      // Disable the APA interface during loading process.
+      apaEnabledInhabit = true
+      this.disableAPA_Interface( "Loading APA" )
+
+      // Start loading new APA.
+      winder.remoteAction
+      (
+        'process.switchAPA( "' + apa + '" )',
+        this.reenableAPA
+      )
+    }
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   G-Code selection callback.
+  //-----------------------------------------------------------------------------
+  this.selectG_Code = function()
+  {
+    // Get the layer and G-Code recipe.
+    var layer = $( "#layerSelection" ).val()
+    var gCode = $( "#gCodeSelection" ).val()
+
+    // If not the null selection...
+    if ( "" != gCode )
+    {
+      // Disable APA interface during loading process.
+      this.disableAPA_Interface( "Loading G-Code" )
+
+      // Begin loading G-Code.
+      winder.remoteAction
+      (
+        'process.apa.loadRecipe( "' + layer + '", "' + gCode + '", -1 )',
+        self.reenableAPA
+      )
+    }
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Load values for and repopulate all lists.
+  //-----------------------------------------------------------------------------
+  this.populateLists = function()
+  {
+    winder.populateComboBox
+    (
+      "#apaSelection",
+      "process.getAPA_List()",
+      "process.getLoadedAPA_Name()",
+      function()
+      {
+        var selection = $( "#apaSelection" ).val()
+        var isDisabled = ( "" == selection ) || isRunning()
+        $( "#apaCloseButton" ).prop( "disabled", isDisabled )
+      }
+    )
+
+    winder.populateComboBox
+    (
+      "#gCodeSelection",
+      "process.getRecipes()",
+      "process.getRecipeName()"
+    )
+
+    // Get the current layer.
     winder.remoteAction
     (
-      'process.switchAPA( "' + apa + '" )',
-      reenableAPA
+      'process.getRecipeLayer()',
+      function( data )
+      {
+        $( "#layerSelection" ).val( data )
+      }
     )
+
   }
-}
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   G-Code selection callback.
-//-----------------------------------------------------------------------------
-function selectG_Code()
-{
-  // Get the layer and G-Code recipe.
-  var layer = $( "#layerSelection" ).val()
-  var gCode = $( "#gCodeSelection" ).val()
-
-  // If not the null selection...
-  if ( "" != gCode )
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback for generating new APA.
+  //-----------------------------------------------------------------------------
+  this.newAPA = function()
   {
-    // Disable APA interface during loading process.
-    disableAPA_Interface( "Loading G-Code" )
-
-    // Begin loading G-Code.
     winder.remoteAction
     (
-      'process.apa.loadRecipe( "' + layer + '", "' + gCode + '", -1 )',
-      reenableAPA
+      'process.createAPA( "' + $( "#apaName" ).val() + '" )',
+       this.populateLists
     )
   }
-}
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Load values for and repopulate all lists.
-//-----------------------------------------------------------------------------
-function populateLists()
-{
-  winder.populateComboBox
-  (
-    "#apaSelection",
-    "process.getAPA_List()",
-    "process.getLoadedAPA_Name()",
-    function()
-    {
-      var selection = $( "#apaSelection" ).val()
-      var isDisabled = ( "" == selection )
-      $( "#apaCloseButton" ).prop( "disabled", isDisabled )
-    }
-  )
-
-  winder.populateComboBox
-  (
-    "#gCodeSelection",
-    "process.getRecipes()",
-    "process.getRecipeName()"
-  )
-
-  // Get the current layer.
-  winder.remoteAction
-  (
-    'process.getRecipeLayer()',
-    function( data )
-    {
-      $( "#layerSelection" ).val( data )
-    }
-  )
-
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback for generating new APA.
-//-----------------------------------------------------------------------------
-function newAPA()
-{
-  winder.remoteAction
-  (
-    'process.createAPA( "' + $( "#apaName" ).val() + '" )',
-     populateLists
-  )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback for setting next active G-Code line.
-//-----------------------------------------------------------------------------
-function gotoLine()
-{
-  winder.remoteAction( 'process.setG_CodeLine( ' + $( "#apaLine" ).val() + ' )' )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback for setting G-Code breakpoint.
-//-----------------------------------------------------------------------------
-function runToLine()
-{
-  winder.remoteAction( "process.setG_CodeRunToLine( " + $( "#apaBreakLine" ).val() + " )" )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback for setting spool wire amount.
-//-----------------------------------------------------------------------------
-function setSpool()
-{
-  winder.remoteAction( "process.spool.setWire( " + $( "#setSpool" ).val() + " )" )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Close the current APA.
-//-----------------------------------------------------------------------------
-function closeAPA()
-{
-  winder.remoteAction
-  (
-    "process.closeAPA()",
-    populateLists
-  )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Call when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback for setting next active G-Code line.
+  //-----------------------------------------------------------------------------
+  this.gotoLine = function()
   {
+    winder.remoteAction( 'process.setG_CodeLine( ' + $( "#apaLine" ).val() + ' )' )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback for setting G-Code breakpoint.
+  //-----------------------------------------------------------------------------
+  this.runToLine = function()
+  {
+    winder.remoteAction( "process.setG_CodeRunToLine( " + $( "#apaBreakLine" ).val() + " )" )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback for setting spool wire amount.
+  //-----------------------------------------------------------------------------
+  this.setSpool = function()
+  {
+    winder.remoteAction( "process.spool.setWire( " + $( "#setSpool" ).val() + " )" )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Close the current APA.
+  //-----------------------------------------------------------------------------
+  this.closeAPA = function()
+  {
+    winder.remoteAction
+    (
+      "process.closeAPA()",
+      this.populateLists
+    )
+  }
+
     // Populate lists and have this function run after error recovery.
-    populateLists()
-    winder.addErrorClearCallback( populateLists )
+    this.populateLists()
+    winder.addErrorClearCallback( this.populateLists )
 
     // Set updates of current line and total lines.
     winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getLine()", "#currentLine" )
     winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines" )
     winder.addPeriodicRemoteDisplay( "process.spool.getWire()", "#spoolAmount" )
-
 
     // Load the motor status module.
     winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
@@ -252,14 +247,14 @@ $( document ).ready
           && ( apaEnabled )
           && ( ! apaEnabledInhabit ) )
         {
-          disableAPA_Interface( "Running." )
+          self.disableAPA_Interface( "Running." )
         }
         else
         if ( ( stopDisable )
           && ( ! apaEnabled )
           && ( ! apaEnabledInhabit ) )
         {
-          enableAPA_Interface()
+          self.enableAPA_Interface()
         }
       }
 
@@ -324,7 +319,18 @@ $( document ).ready
       "process.setG_CodeLoop( $ )"
     )
 
+}
+
+//-----------------------------------------------------------------------------
+// Uses:
+//   Call when page loads.
+//-----------------------------------------------------------------------------
+$( document ).ready
+(
+  function()
+  {
     //winder.inhibitUpdates()
+    apa = new APA()
   }
 )
 

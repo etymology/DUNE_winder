@@ -27,6 +27,8 @@ class PLC_Logic :
     LATCHING      = 6
     LATCH_HOMEING = 7
     LATCH_RELEASE = 8
+    __UNKNOWN__   = 9
+    ERROR         = 10
   # end class
 
   # States for move type state machine.
@@ -210,6 +212,34 @@ class PLC_Logic :
     self._maxXY_Deceleration.set( self._maxDeceleration )
     self._maxZ_Acceleration.set( self._maxAcceleration )
     self._maxZ_Deceleration.set( self._maxDeceleration )
+
+  #---------------------------------------------------------------------
+  # $$$FUTURE
+  def setCameraTrigger( self, deltaX, deltaY ) :
+    """
+    Setup the PLC for camera triggering.
+
+    Args:
+      deltaX - Change in X after which to trigger camera.  0 to disable.
+      deltaY - Change in Y after which to trigger camera.  0 to disable.
+    """
+    pass
+
+  #---------------------------------------------------------------------
+  # $$$FUTURE
+  def flushCameraFIFO( self ) :
+    pass
+
+  #---------------------------------------------------------------------
+  # $$$FUTURE
+  def getCameraFIFO( self ) :
+    """
+    Return any new elements in camera FIFO.
+
+    Returns:
+      Array of new capture elements from camera.
+    """
+    pass
 
   #---------------------------------------------------------------------
   def __init__( self, plc, xyAxis, zAxis ) :

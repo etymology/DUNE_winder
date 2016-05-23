@@ -6,11 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+
 from Library.Geometry.Location import Location
 
 from GX_LayerGeometry import GX_LayerGeometry
 
 class G_LayerGeometry( GX_LayerGeometry ) :
+
   #-------------------------------------------------------------------
   def __init__( self ) :
     """
@@ -20,7 +22,7 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     GX_LayerGeometry.__init__( self )
 
     # Total number of pins.
-    self.pins = 481 * 2
+    self.pins = int( 481 * 2 / self.scale )
 
     # Spacing between pins and front to back.
     self.depth = 114.2 / self.scale
@@ -28,7 +30,7 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     # Locations of the two columns of pins.
     self.boardWidth = 3.18
     self.leftEdge  = -self.boardWidth
-    self.rightEdge = 6410.37 + self.boardWidth
+    self.rightEdge = 6410.37 / self.scale + self.boardWidth
 
     # Offset from APA's (0,0,0) position.
     self.apaOffsetX = -13.23 + self.boardWidth

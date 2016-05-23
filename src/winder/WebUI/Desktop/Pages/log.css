@@ -14,12 +14,12 @@
   width: 100%;
 }
 
-tr:hover
+#logDiv tr:hover
 {
   background-color: gray;
 }
 
-th
+#logDiv Th
 {
   background: dimgray;
 }
