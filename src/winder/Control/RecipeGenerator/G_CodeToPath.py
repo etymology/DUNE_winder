@@ -59,10 +59,13 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     totalLines = self._gCode.getLineCount()
 
     FRONT = 0
-    #BACK = 1
+    PARTIAL_FRONT = 1
+    PARTIAL_BACK  = 2
+    BACK = 3
 
     offset = self._calibration.getOffset()
 
+    self._headZ = self._geometry.frontZ
     latchSide = FRONT
     for line in range( 0, totalLines ) :
 
@@ -82,12 +85,16 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
 
-        if G_Codes.LATCH == int( function[ 0 ] ) :
-          self._headZ = self._z
+        if G_Codes.HEAD_LOCATION == int( function[ 0 ] ) :
           latchSide = int( function[ 1 ] )
-
-      if FRONT == latchSide :
-        self._headZ = self._z
+          if FRONT == latchSide :
+            self._headZ = self._geometry.frontZ
+          elif PARTIAL_FRONT == latchSide :
+            self._headZ = self._geometry.partialZ_Front
+          elif PARTIAL_BACK == latchSide :
+            self._headZ = self._geometry.partialZ_Back
+          elif BACK == latchSide :
+            self._headZ = self._geometry.backZ
 
       path.push( self._x + offset.x, self._y + offset.y, self._headZ + offset.z )
 
@@ -142,28 +149,26 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       outputFileName: File name to create.
       enablePathLabels: Label additional G-Code points.
     """
-    rubyFile = open( outputFileName, "w" )
+    with open( outputFileName, "w" ) as rubyFile :
 
-    gCodePath = self.toPath()
+      gCodePath = self.toPath()
 
-    layerOffset = \
-      Location( self._geometry.apaOffsetX, self._geometry.apaOffsetY, self._geometry.apaOffsetZ )
+      layerOffset = \
+        Location( self._geometry.apaOffsetX, self._geometry.apaOffsetY, self._geometry.apaOffsetZ )
 
-    rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
-    if enablePinLabels :
-      for pinName in self._calibration.getPinNames() :
-        location = self._calibration.getPinLocation( pinName )
-        location = location.add( layerOffset )
+      rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
+      if enablePinLabels :
+        for pinName in self._calibration.getPinNames() :
+          location = self._calibration.getPinLocation( pinName )
+          location = location.add( layerOffset )
 
-        y = 0.1
-        x = 0.1
-        if "B" == pinName[ 0 ] :
-          location.z = self._geometry.depth
-          y = -y
-          x = -x
+          y = 0.1
+          x = 0.1
+          if "B" == pinName[ 0 ] :
+            location.z = self._geometry.depth + self._geometry.apaOffsetZ
+            y = -y
+            x = -x
 
-        self._pointLabel( rubyFile, location, pinName, 'layer', x, y )
+          self._pointLabel( rubyFile, location, pinName, 'layer', x, y )
 
-    gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
-
-    rubyFile.close()
+      gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )

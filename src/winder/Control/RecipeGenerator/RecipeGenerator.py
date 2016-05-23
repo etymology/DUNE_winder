@@ -145,16 +145,14 @@ class RecipeGenerator :
     if isAppend :
       attributes = "a"
 
-    rubyFile = open( outputFileName, attributes )
+    with open( outputFileName, attributes ) as rubyFile :
 
-    path3d = Path3d()
-    for net in self.net :
-      node = self.nodes[ net ]
-      path3d.push( node.x, node.y, node.z )
+      path3d = Path3d()
+      for net in self.net :
+        node = self.nodes[ net ]
+        path3d.push( node.x, node.y, node.z )
 
-    path3d.toSketchUpRuby( rubyFile )
-
-    rubyFile.close()
+      path3d.toSketchUpRuby( rubyFile )
 
   #---------------------------------------------------------------------
   def writeRubyCode(
@@ -181,15 +179,13 @@ class RecipeGenerator :
     if isAppend :
       attributes = "a"
 
-    rubyFile = open( outputFileName, attributes )
+    with open( outputFileName, attributes ) as rubyFile :
 
-    if enablePath :
-      self.gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
+      if enablePath :
+        self.gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
 
-    if enableWire :
-      self.nodePath.toSketchUpRuby( rubyFile )
-
-    rubyFile.close()
+      if enableWire :
+        self.nodePath.toSketchUpRuby( rubyFile )
 
   #---------------------------------------------------------------------
   def writeRubyAnimateCode(
@@ -205,45 +201,43 @@ class RecipeGenerator :
       outputFileName: Where to write this data.
       number: Number of segments of the path to animate.
     """
-    output = open( outputFileName, "w" )
+    with open( outputFileName, "w" ) as output :
 
-    for index in range( 0, number ) :
-      output.write( 'layer' + str( index )
-        + ' = Sketchup.active_model.layers.add "wire' + str( index ) + '"' )
+      for index in range( 0, number ) :
+        output.write( 'layer' + str( index )
+          + ' = Sketchup.active_model.layers.add "wire' + str( index ) + '"' )
 
-      output.write( 'layer' + str( index ) + '.visible = false' )
-      output.write( 'Sketchup.active_model.active_layer = layer' + str( index ) )
+        output.write( 'layer' + str( index ) + '.visible = false' )
+        output.write( 'Sketchup.active_model.active_layer = layer' + str( index ) )
 
-      # Convert millimeters to inches.  Sketch-up always works in inches.
-      point = self.nodePath.path[ index ]
-      x1 = point.x / 25.4
-      y1 = point.y / 25.4
-      z1 = point.z / 25.4
+        # Convert millimeters to inches.  Sketch-up always works in inches.
+        point = self.nodePath.path[ index ]
+        x1 = point.x / 25.4
+        y1 = point.y / 25.4
+        z1 = point.z / 25.4
 
-      point = self.nodePath.path[ index + 1 ]
-      x2 = point.x / 25.4
-      y2 = point.y / 25.4
-      z2 = point.z / 25.4
+        point = self.nodePath.path[ index + 1 ]
+        x2 = point.x / 25.4
+        y2 = point.y / 25.4
+        z2 = point.z / 25.4
 
-      output.write( 'Sketchup.active_model.entities.add_line '
-        + "[" + str( x1 ) + "," + str( z1 ) + "," + str( y1 ) + "], "
-        + "[" + str( x2 ) + "," + str( z2 ) + "," + str( y2 ) + "]"
-      )
+        output.write( 'Sketchup.active_model.entities.add_line '
+          + "[" + str( x1 ) + "," + str( z1 ) + "," + str( y1 ) + "], "
+          + "[" + str( x2 ) + "," + str( z2 ) + "," + str( y2 ) + "]"
+        )
 
-    for index in range( 0, number ) :
-      output.write(
-        'page' + str( index )
-        + ' = Sketchup.active_model.pages.add "page' + str( index ) + '"'
-      )
+      for index in range( 0, number ) :
+        output.write(
+          'page' + str( index )
+          + ' = Sketchup.active_model.pages.add "page' + str( index ) + '"'
+        )
 
-      for indexB in range( 0, number ) :
-        visible = 'true'
-        if indexB > index :
-          visible = 'false'
+        for indexB in range( 0, number ) :
+          visible = 'true'
+          if indexB > index :
+            visible = 'false'
 
-        output.write( 'layer' + str( indexB ) + '.visible = ' + visible )
-
-    output.close()
+          output.write( 'layer' + str( indexB ) + '.visible = ' + visible )
 
   #---------------------------------------------------------------------
   def writeG_Code( self, outputFileName, layerName ) :
