@@ -75,26 +75,19 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       self._lastZ = self._z
       self._functions = []
 
-      # Interpret the next line.
-      try :
-        self._gCode.executeNextLine( line )
-      except Exception as exception :
-        print "Error on line ", line
-        raise exception
+      self._gCode.executeNextLine( line )
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
 
-        if G_Codes.HEAD_LOCATION == int( function[ 0 ] ) :
-          latchSide = int( function[ 1 ] )
-          if FRONT == latchSide :
-            self._headZ = self._geometry.frontZ
-          elif PARTIAL_FRONT == latchSide :
-            self._headZ = self._geometry.partialZ_Front
-          elif PARTIAL_BACK == latchSide :
-            self._headZ = self._geometry.partialZ_Back
-          elif BACK == latchSide :
-            self._headZ = self._geometry.backZ
+      if FRONT == self._headPosition :
+        self._headZ = self._geometry.frontZ
+      elif PARTIAL_FRONT == self._headPosition :
+        self._headZ = self._geometry.partialZ_Front
+      elif PARTIAL_BACK == self._headPosition :
+        self._headZ = self._geometry.partialZ_Back
+      elif BACK == self._headPosition :
+        self._headZ = self._geometry.backZ
 
       path.push( self._x + offset.x, self._y + offset.y, self._headZ + offset.z )
 
@@ -109,6 +102,9 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       output: Open file for output.
       location: The location to label.
       text: The text to place on this label.
+      layer: Layer to add text.  None for default layer.
+      offsetX: X-offset to label.
+      offsetY: Y-offset to label.
     """
     x = location.x / 25.4
     y = location.y / 25.4
@@ -138,8 +134,10 @@ class G_CodeToPath( G_CodeHandlerBase ) :
   def writeRubyCode(
     self,
     outputFileName,
+    layerHalf,
     enablePathLabels=False,
-    enablePinLabels=False
+    enablePinLabels=False,
+    isAppend=False
   ) :
     """
     Export node paths to Ruby code for import into SketchUp for visual
@@ -147,9 +145,17 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
     Args:
       outputFileName: File name to create.
+      layerHalf: 0=first half, 1=second half.
       enablePathLabels: Label additional G-Code points.
+      enablePinLabels: True to enable pin labels.
+      isAppend: True to append, False to overwrite output file.
     """
-    with open( outputFileName, "w" ) as rubyFile :
+
+    attributes = "w"
+    if isAppend :
+      attributes = "a"
+
+    with open( outputFileName, attributes ) as rubyFile :
 
       gCodePath = self.toPath()
 
@@ -171,4 +177,4 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
           self._pointLabel( rubyFile, location, pinName, 'layer', x, y )
 
-      gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
+      gCodePath.toSketchUpRuby( rubyFile, layerHalf, enablePathLabels )

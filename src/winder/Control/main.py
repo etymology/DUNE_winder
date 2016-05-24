@@ -154,6 +154,10 @@ startTime = systemTime.get()
 configuration = Configuration( Settings.CONFIG_FILE )
 Settings.defaultConfig( configuration )
 
+# Save configuration (just in case it had not been created or new default
+# values added).
+configuration.save()
+
 # Setup log file.
 log = Log( systemTime, configuration.get( "LogDirectory" ) + '/log.csv', isLogEchoed )
 log.add( "Main", "START", "Control system starts." )

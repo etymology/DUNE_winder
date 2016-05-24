@@ -30,21 +30,129 @@ from RecipeGenerator.G_CodeToPath import G_CodeToPath
 # Can be overridden from the command-line.
 #==============================================================================
 
-# True to generate Ruby code for SketchUp.
+# Generate Ruby code for SketchUp.
 isRubyCode = False
 
-enablePath       = True
-enableWire       = True
-enablePathLabels = False
-enablePinLabels  = False
+# Enable G-Code path output for SketchUp.
+enablePath = True
 
+# Enable wire path output for SketchUp.
+enableWire = True
+
+# Enable G-Code labels.
+enablePathLabels = False
+
+# Enable pin labels.
+enablePinLabels = False
+
+# Do not use APA offsets in SketchUp output.
+zeroOffset = False
+
+# Enable base path (i.e. path without compensation for pin radius).
+isRubyBasePath = False
+
+# Individual layer enables.
 enableX = True
 enableU = True
 enableV = True
 enableG = True
-zeroOffset = False
 
 #==============================================================================
+
+#------------------------------------------------------------------------------
+def writeRubyCode( layer, recipe, geometry ) :
+  """
+  Generate the Ruby code for layer.
+
+  Args:
+    layer - Name of layer (X/U/V/G).
+    recipe - Instance of RecipeGenerator.
+    geometry - Geometry for layer.
+  """
+
+  print "Generating SketchUp Ruby code"
+
+  # Generate an ideal calibration file for layer.
+  print "  Generate an ideal calibration file for layer."
+  calibration = recipe.defaultCalibration( layer + " Layer" )
+  if not zeroOffset :
+    calibration.setOffset( geometry.apaOffset )
+
+  outputFileName = layer + "-Layer.rb"
+
+  # Construct G-Code for first half.
+  print "  Construct G-Code for first half."
+  gCodePath = G_CodeToPath(
+    recipeDirectory + "/" + layer + "-Layer_1.gc",
+    geometry,
+    calibration
+  )
+
+  # Write 1st wind G-Code path.
+  print "  Write 1st wind G-Code path."
+  gCodePath.writeRubyCode(
+    outputFileName,
+    "1st",
+    enablePathLabels,
+    enablePinLabels,
+    False
+  )
+
+  # Write wire path.
+  print "  Write wire path."
+  recipe.writeRubyCode(
+    0,
+    outputFileName,
+    enablePath,
+    enablePathLabels,
+    enableWire,
+    True
+  )
+
+  # Construct G-Code for second half.
+  print "  Construct G-Code for second half."
+  gCodePath = G_CodeToPath(
+    recipeDirectory + "/" + layer + "-Layer_2.gc",
+    geometry,
+    calibration
+  )
+
+  # Write 2nd wind G-Code path.
+  print "  Write 2nd wind G-Code path."
+  gCodePath.writeRubyCode(
+    outputFileName,
+    "2nd",
+    enablePathLabels,
+    enablePinLabels,
+    True
+  )
+
+#------------------------------------------------------------------------------
+def generateLayer( layer, recipeClass, geometry, enable ) :
+  """
+  Generate recipe data for given layer.
+
+  Args:
+    layer - Name of layer (X/U/V/G).
+    recipeClass - Class to generate recipe (child of RecipeGenerator).
+    geometry - Geometry for layer.
+    enable - True to generate data for this layer, False to skip.
+  """
+  if enable :
+    print "Generating " + layer + "-layer recipe"
+    recipe = recipeClass( geometry )
+    recipe.writeG_Code( recipeDirectory + "/" + layer + "-Layer", "gc", layer + " Layer" )
+
+    if isRubyCode :
+      writeRubyCode( layer, recipe, geometry )
+
+    if isRubyBasePath :
+      recipe.writeRubyBasePath( layer + "-Layer.rb", False )
+
+    recipe.printStats()
+  else :
+    print "Skipping " + layer + "-layer recipe"
+  print
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -87,122 +195,43 @@ if __name__ == "__main__":
       enableG = ( "TRUE" == value )
     elif "0" == option :
       zeroOffset = ( "TRUE" == value )
+    elif "BASEPATH" :
+      isRubyBasePath = ( "TRUE" == value )
     else :
       print "Unknown:", option
 
-  # Generate recipes for each layer.
-  if enableX :
-    geometryX = X_LayerGeometry()
-    recipeX = LayerX_Recipe( geometryX )
+  geometryX = X_LayerGeometry()
+  geometryV = V_LayerGeometry()
+  geometryU = U_LayerGeometry()
+  geometryG = G_LayerGeometry()
 
-  if enableV :
-    geometryV = V_LayerGeometry()
-    recipeV = LayerV_Recipe( geometryV, geometryV.pins / 6 + 1 )
+  # Ignoring offsets?
+  # (Typically used for SketchUp models without offsets).
+  if zeroOffset :
+    print "APA offsets set to zero"
 
-  if enableU :
-    geometryU = U_LayerGeometry()
-    if zeroOffset :
-      geometryU.apaOffsetX = 0
-      geometryU.apaOffsetY = 0
-      geometryU.apaOffsetZ = 0
+    geometryX.apaOffsetX = 0
+    geometryX.apaOffsetY = 0
+    geometryX.apaOffsetZ = 0
 
-    recipeU = LayerU_Recipe( geometryU, geometryU.pins / 12 + 1 )
+    geometryV.apaOffsetX = 0
+    geometryV.apaOffsetY = 0
+    geometryV.apaOffsetZ = 0
 
-  if enableG :
-    geometryG = G_LayerGeometry()
-    recipeG = LayerG_Recipe( geometryG )
+    geometryU.apaOffsetX = 0
+    geometryU.apaOffsetY = 0
+    geometryU.apaOffsetZ = 0
 
-  # Save recipes for each layer to recipe directory.
-  if enableX :
-    recipeX.printStats()
-    recipeX.writeG_Code( recipeDirectory + "/X-Layer.gc", "X Layer" )
+    geometryG.apaOffsetX = 0
+    geometryG.apaOffsetY = 0
+    geometryG.apaOffsetZ = 0
 
-  if enableV :
-    recipeV.printStats()
-    recipeV.writeG_Code( recipeDirectory + "/V-Layer.gc", "V Layer" )
+  print
 
-  if enableU :
-    recipeU.printStats()
-    recipeU.writeG_Code( recipeDirectory + "/U-Layer.gc", "U Layer" )
-
-  if enableG :
-    recipeG.printStats()
-    recipeG.writeG_Code( recipeDirectory + "/G-Layer.gc", "G Layer" )
-
-  if isRubyCode :
-    #
-    # Export SketchUp Ruby code.
-    #
-
-    isAppend         = True
-
-    if enableX :
-      # Generate an ideal calibration file for layer.
-      recipeX.writeDefaultCalibration( "./", "X-Layer_Calibration.xml", "X Layer" )
-      calibrationX = LayerCalibration()
-      calibrationX.load( "./", "X-Layer_Calibration.xml" )
-      calibrationX.setOffset( geometryX.apaOffset )
-      gCodePath = G_CodeToPath( recipeDirectory + "/X-Layer.gc", geometryX, calibrationX )
-      gCodePath.writeRubyCode( "X-Layer.rb", enablePathLabels, enablePinLabels )
-      recipeX.writeRubyCode(
-        "X-Layer.rb",
-        enablePath,
-        enablePathLabels,
-        enableWire,
-        isAppend
-      )
-
-    if enableV :
-      recipeV.writeDefaultCalibration( "./", "V-Layer_Calibration.xml", "V Layer" )
-      calibrationV = LayerCalibration()
-      calibrationV.load( "./", "V-Layer_Calibration.xml" )
-      if not zeroOffset :
-        calibrationV.setOffset( geometryV.apaOffset )
-      gCodePath = G_CodeToPath( recipeDirectory + "/V-Layer.gc", geometryV, calibrationV )
-      gCodePath.writeRubyCode( "V-Layer.rb", enablePathLabels, enablePinLabels )
-      recipeV.writeRubyCode(
-        "V-Layer.rb",
-        enablePath,
-        enablePathLabels,
-        enableWire,
-        isAppend
-      )
-
-    if enableU :
-      recipeU.writeDefaultCalibration( "./", "U-Layer_Calibration.xml", "U Layer" )
-      calibrationU = LayerCalibration()
-      calibrationU.load( "./", "U-Layer_Calibration.xml" )
-      if not zeroOffset :
-        calibrationU.setOffset( geometryU.apaOffset )
-      gCodePath = G_CodeToPath( recipeDirectory + "/U-Layer.gc", geometryU, calibrationU )
-      gCodePath.writeRubyCode( "U-Layer.rb", enablePathLabels, enablePinLabels )
-      recipeU.writeRubyCode(
-        "U-Layer.rb",
-        enablePath,
-        enablePathLabels,
-        enableWire,
-        isAppend
-      )
-
-    if enableG :
-      recipeG.writeDefaultCalibration( "./", "G-Layer_Calibration.xml", "G Layer" )
-      calibrationG = LayerCalibration()
-      calibrationG.load( "./", "G-Layer_Calibration.xml" )
-      calibrationG.setOffset( geometryG.apaOffset )
-      gCodePath = G_CodeToPath( recipeDirectory + "/G-Layer.gc", geometryG, calibrationG )
-      gCodePath.writeRubyCode( "G-Layer.rb", enablePathLabels, enablePinLabels )
-      recipeG.writeRubyCode(
-        "G-Layer.rb",
-        enablePath,
-        enablePathLabels,
-        enableWire,
-        isAppend
-      )
-
-    #recipeU.writeRubyCode( "U-Layer.rb", False, False, True, False )
-    #$$$recipeU.writeRubyBasePath( "U-Layer.rb", False )
-
-    #recipe.writeRubyAnimateCode( "V-LayerAnimation.rb", 20 )
+  generateLayer( "X", LayerX_Recipe, geometryX, enableX )
+  generateLayer( "V", LayerV_Recipe, geometryV, enableV )
+  generateLayer( "U", LayerU_Recipe, geometryU, enableU )
+  generateLayer( "G", LayerG_Recipe, geometryG, enableG )
 
 # "If quantum mechanics hasn't profoundly shocked you, you haven't understood
 # it yet." -- Niels Bohr

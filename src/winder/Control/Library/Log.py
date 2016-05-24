@@ -201,6 +201,7 @@ class Log:
     self._recent.append( line )
     for _, outputFile in self._outputFileList.iteritems():
       outputFile.write( line + "\n" )
+      outputFile.flush()
     self._lock.release()
 
     # Local echo if requested.

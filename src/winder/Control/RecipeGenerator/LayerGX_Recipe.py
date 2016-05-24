@@ -31,7 +31,8 @@ class LayerGX_Recipe( RecipeGenerator ) :
     self.basePath = Path3d()
 
     # G-Code path is the motions taken by the machine to wind the layer.
-    self.gCodePath = G_CodePath()
+    self.firstHalf  = None
+    self.secondHalf = None
 
     # The node path is a path of points that are connect together.  Used to calculate
     # the amount of wire actually dispensed.
@@ -96,23 +97,12 @@ class LayerGX_Recipe( RecipeGenerator ) :
     # connected.
     #
 
-
-    #self.printNodes()
-    #self.printNet()
-
+    self.gCodePath = G_CodePath()
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
     # Current net.
     self.netIndex = 0
 
-    #net = self.net[ self.netIndex ]
-    #orientation = self.orientations[ net ]
-    #
-    #self.nodePath.pushOffset(
-    #  self.location( self.netIndex ),
-    #  self.geometry.pinRadius,
-    #  self.orientations[ net ]
-    #)
     startLocation = self.location( self.netIndex )
     self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
     self.nodePath.push( startLocation.x, startLocation.y, 0 )
@@ -122,15 +112,15 @@ class LayerGX_Recipe( RecipeGenerator ) :
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
     totalCount = self.geometry.pins * 2
+    halfCount = totalCount / 2
 
     if windsOverride :
       totalCount = windsOverride
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for _ in range( 1, totalCount + 1 ) :
+    for self.netIndex in range( 1, totalCount + 1 ) :
 
-      self.netIndex += 1
       if self.netIndex < len( self.net ) :
 
         # Location of the the next pin.
@@ -154,10 +144,18 @@ class LayerGX_Recipe( RecipeGenerator ) :
           self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
           self.gCodePath.push()
 
+        if halfCount == self.netIndex :
+          self.firstHalf = self.gCodePath
+          self.gCodePath = G_CodePath()
+          self.gCodePath.last = lastLocation
+          self.gCodePath.push(
+            location.x,
+            location.y,
+            self.geometry.frontZ
+          )
+          self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+
         lastLocation = location
 
-
-    #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
-    #self.basePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
-
-
+    self.secondHalf = self.gCodePath
+    self.gCodePath = None

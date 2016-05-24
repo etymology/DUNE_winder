@@ -103,7 +103,6 @@ class Version :
     Returns:
       True if the version has changed, False if not.
     """
-    #$$$print "Update", self._fileName, self
     hasChanged = not self.verify()
     if hasChanged :
       versionString = self._get( "string" )

@@ -92,6 +92,7 @@ class Path3d :
 
     Args:
       output: Open file for output.
+      name: Name of SketchUp layer for output.
     """
 
     output.write( 'layer = Sketchup.active_model.layers.add "' + name + '"' + "\r\n" )

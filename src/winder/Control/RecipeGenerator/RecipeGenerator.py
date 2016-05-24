@@ -140,6 +140,7 @@ class RecipeGenerator :
     Args:
       outputFileName: File name to create.
       enableWire: Show the wire wound on the layer.
+      isAppend: True to append file, False to overwrite.
     """
     attributes = "w"
     if isAppend :
@@ -157,6 +158,7 @@ class RecipeGenerator :
   #---------------------------------------------------------------------
   def writeRubyCode(
     self,
+    half,
     outputFileName,
     enablePath=True,
     enablePathLabels=False,
@@ -168,6 +170,7 @@ class RecipeGenerator :
     verification.  Debug function.
 
     Args:
+      half: 0 for first half, 1 for second half.
       outputFileName: File name to create.
       enablePath: Show the path taken to wind the layer.
       enablePathLabels: Label additional G-Code points.
@@ -182,7 +185,10 @@ class RecipeGenerator :
     with open( outputFileName, attributes ) as rubyFile :
 
       if enablePath :
-        self.gCodePath.toSketchUpRuby( rubyFile, enablePathLabels )
+        if 0 == half :
+          self.firstHalf.toSketchUpRuby( rubyFile, "1st", enablePathLabels )
+        else:
+          self.secondHalf.toSketchUpRuby( rubyFile, "2nd", enablePathLabels )
 
       if enableWire :
         self.nodePath.toSketchUpRuby( rubyFile )
@@ -240,29 +246,37 @@ class RecipeGenerator :
           output.write( 'layer' + str( indexB ) + '.visible = ' + visible )
 
   #---------------------------------------------------------------------
-  def writeG_Code( self, outputFileName, layerName ) :
+  def writeG_Code( self, outputFileName, outputExtension, layerName ) :
     """
     Export G-Code to file.
 
     Args:
-      outputFileName: File name to create.
+      outputFileName: File name to create (less extension).
+      outputExtension: Extension of file to create.
       layerName: Name of recipe.
+
+    Note:
+      Two files are created with the name <outputFileName>_1<outputExtension>
+      and <outputFileName>_2<outputExtension>.
     """
 
     # Safe G-Code instructions.
-    with open( outputFileName, "w" ) as gCodeFile :
-      self.gCodePath.toG_Code( gCodeFile, layerName )
+    with open( outputFileName + "_1." + outputExtension, "w" ) as gCodeFile :
+      self.firstHalf.toG_Code( gCodeFile, layerName + " first half" )
+
+    with open( outputFileName + "_2." + outputExtension, "w" ) as gCodeFile :
+      self.secondHalf.toG_Code( gCodeFile, layerName + " second half" )
 
     # Create an instance of Recipe to update the header with the correct hash.
-    Recipe( outputFileName, None )
+    Recipe( outputFileName + "_1." + outputExtension, None )
+    Recipe( outputFileName + "_2." + outputExtension, None )
 
   #---------------------------------------------------------------------
-  def writeDefaultCalibration( self, outputFilePath, outputFileName, layerName ) :
+  def defaultCalibration( self, layerName ) :
     """
     Export node list to calibration file.  Debug function.
 
     Args:
-      outputFileName: File name to create.
       layerName: Name of recipe.
     """
 
@@ -274,7 +288,8 @@ class RecipeGenerator :
       newLocation = SerializableLocation( location.x, location.y )
       calibration.setPinLocation( node, location )
 
-    calibration.save( outputFilePath, outputFileName )
+    #calibration.save( ".", layerName + ".xml" )
+    return calibration
 
   #---------------------------------------------------------------------
   def printStats( self ) :
@@ -283,7 +298,8 @@ class RecipeGenerator :
     """
 
     print "Wire consumed:", "{:,.2f}mm".format( self.nodePath.totalLength() )
-    print "G-Code lines:", len( self.gCodePath )
+    print "G-Code lines (1st half):", len( self.firstHalf )
+    print "G-Code lines (2nd half):", len( self.secondHalf )
 
   #---------------------------------------------------------------------
   @staticmethod

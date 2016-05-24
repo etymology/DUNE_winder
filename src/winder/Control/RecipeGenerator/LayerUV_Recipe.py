@@ -42,13 +42,15 @@ class LayerUV_Recipe( RecipeGenerator ) :
     self.centering = {}
 
     # G-Code path is the motions taken by the machine to wind the layer.
-    self.gCodePath = G_CodePath()
+    self.gCodePath  = None
+    self.firstHalf  = None
+    self.secondHalf = None
 
     # The node path is a path of points that are connect together.  Used to calculate
     # the amount of wire actually dispensed.
     self.nodePath = Path3d( frameOffset )
 
-    self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+    self.z = None
 
   #-------------------------------------------------------------------
   def _createNode( self, grid, orientation, side, depth, startPin, direction ) :
@@ -308,20 +310,32 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.orientations[ net ]
     )
 
+    self.gCodePath = G_CodePath()
     self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
     self.basePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
+    self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
-    totalCount = self.geometry.pins / 12
+    totalCount = self.geometry.pins / 6 + 1
+    halfCount = self.geometry.pins / 12
 
     if windsOverride :
       totalCount = windsOverride
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for _ in range( 1, totalCount + 1 ) :
+    for index in range( 1, totalCount + 1 ) :
       self._wrapCenter()
       self._wrapEdge( direction )
       self._wrapCenter()
       self._wrapEdge( -direction )
+
+      if halfCount == index :
+        self.firstHalf = self.gCodePath
+        self.gCodePath = G_CodePath()
+        self.gCodePath.push( self.firstHalf.last.x, self.firstHalf.last.y, self.geometry.frontZ )
+        self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+
+    self.secondHalf = self.gCodePath
+    self.gCodePath = None
