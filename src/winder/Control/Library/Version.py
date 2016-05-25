@@ -164,6 +164,15 @@ class Version :
           fullName = os.path.join( root, fileName )
           with open( fullName, 'rb' ) as inputFile :
             buffer = inputFile.read()
+
+            # Line-ending workaround.
+            # Manually convert DOS-style carriage return, line feed into just
+            # a line feed by removing the carriage return.
+            # This fixes the fact the version control software can change
+            # line ending types upon checkout which would otherwise cause a
+            # different hash.
+            buffer = buffer.replace( "\r", "" )
+
             hashValue.update( buffer )
 
     # Turn hash into base 32 encoding.

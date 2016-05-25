@@ -10,6 +10,8 @@ from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
 from Simulator.Delay import Delay
 
+from Machine.MachineGeometry import MachineGeometry
+
 class PLC_Simulator :
 
   class LatchPosition :
@@ -31,6 +33,7 @@ class PLC_Simulator :
       if self._io.plcLogic.MoveTypes.RESET == moveType :
         self._xAxis.stop()
         self._yAxis.stop()
+        self._zAxis.stop()
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
 
       # Seek in X/Y?
@@ -95,13 +98,36 @@ class PLC_Simulator :
     self._yAxis.poll()
     self._zAxis.poll()
 
+    # Local function to validate that motor positions are within limits.
+    def verifyPositionLimits( axis, axisIO, positionMin, positionMax ) :
+      if axis.isInMotion() :
+        position = axisIO.getPosition()
+        velocity = axisIO.getVelocity()
+        if   ( velocity < 0 and position < positionMin ) \
+          or ( velocity > 0 and position > positionMax ) :
+
+          # Change to an error state.
+          self._io.plc.write( self._stateTag, self._io.plcLogic.States.ERROR )
+
+          # Stop all motion.
+          self._xAxis.stop()
+          self._yAxis.stop()
+          self._zAxis.stop()
+
+    # Verify that all axis potions are within limits.
+    verifyPositionLimits( self._xAxis, self._io.xAxis, self._xMin, self._xMax )
+    verifyPositionLimits( self._yAxis, self._io.yAxis, self._yMin, self._yMax )
+    verifyPositionLimits( self._zAxis, self._io.zAxis, self._zMin, self._zMax )
+
     state = self._io.plc.getTag( self._stateTag )
+
     # All motions and delays finished?
     if not self._xAxis.isInMotion() \
       and not self._yAxis.isInMotion() \
       and not self._zAxis.isInMotion() \
       and self._latchDelay.hasExpired() \
-      and self._io.plcLogic.States.LATCH_RELEASE != state :
+      and self._io.plcLogic.States.LATCH_RELEASE != state \
+      and self._io.plcLogic.States.ERROR != state :
 
       self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.RESET )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
@@ -151,3 +177,12 @@ class PLC_Simulator :
 
     self._latchDelay = Delay( self._simulationTime )
     self._latchPosition = PLC_Simulator.LatchPosition.TOP
+
+    machineGeometry = MachineGeometry()
+
+    self._xMin = machineGeometry.left - 100
+    self._xMax = machineGeometry.right + 100
+    self._yMin = machineGeometry.bottom - 100
+    self._yMax = machineGeometry.top + 100
+    self._zMin = -10
+    self._zMax = 450

@@ -27,6 +27,26 @@ class HardwareMode( StateMachineState ) :
     self.isX_AxisWorking = True
     self.isY_AxisWorking = True
     self.isZ_AxisWorking = True
+    self.isStateClear    = True
+
+  #---------------------------------------------------------------------
+  def enter( self ) :
+    """
+    Enter into manual mode.
+
+    Returns:
+      True if there was an error, false if not.  The error can happen
+      if there isn't a manual action to preform.
+    """
+
+    if self.isPLC_Working and self.io.plcLogic.isError() :
+      self.log.add(
+        self.__class__.__name__,
+        "HARD_ERROR",
+        "PLC error reported."
+      )
+
+    return False
 
   #---------------------------------------------------------------------
   def exit( self ) :
@@ -73,6 +93,18 @@ class HardwareMode( StateMachineState ) :
       xWorking = self.io.xAxis.isFunctional()
       yWorking = self.io.yAxis.isFunctional()
       zWorking = self.io.zAxis.isFunctional()
+
+      isStateClear = not self.io.plcLogic.isError()
+
+      if not self.isStateClear and isStateClear :
+
+        # $$$FUTURE : Log which PLC error.
+        self.log.add(
+          self.__class__.__name__,
+          "HARD_ERROR",
+          "PLC error reported."
+        )
+        self.isStateClear = False
 
       if not xWorking and self.isX_AxisWorking :
         self.log.add(

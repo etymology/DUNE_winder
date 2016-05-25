@@ -28,6 +28,7 @@ class BaseIO:
     result &= self.xAxis.isFunctional()
     result &= self.yAxis.isFunctional()
     result &= self.zAxis.isFunctional()
+    result &= not self.plcLogic.isError()
 
     return result
 

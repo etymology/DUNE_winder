@@ -284,7 +284,9 @@ $( document ).ready
               "Z seek",        // 5
               "Latching",      // 6
               "Latch homing",  // 7
-              "Latch release"  // 8
+              "Latch release", // 8
+              "",              // 9
+              "Error"          // 10
             ]
 
             var stringValue = stateTranslateTable[ value ]

@@ -120,6 +120,19 @@ class Process :
       self.controlStateMachine.stopRequest = True
 
   #---------------------------------------------------------------------
+  def acknowledgeError( self ) :
+    """
+    Request that the winding process stop.
+    """
+    if self._io.plcLogic.isError() :
+      self._log.add(
+        self.__class__.__name__,
+        "ERROR_RESET",
+        "PLC error acknowledgment and clear."
+      )
+      self._io.plcLogic.reset()
+
+  #---------------------------------------------------------------------
   def createAPA( self, apaName ) :
     """
     Create a new APA.

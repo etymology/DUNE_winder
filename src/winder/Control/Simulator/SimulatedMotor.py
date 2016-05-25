@@ -51,6 +51,8 @@ class SimulatedMotor :
     Stop current motion.
     """
     self._inMotion = False
+    self._velocity = 0
+    self._acceleration = 0
 
   #---------------------------------------------------------------------
   def isInMotion( self ) :

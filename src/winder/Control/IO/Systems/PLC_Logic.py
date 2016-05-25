@@ -63,6 +63,17 @@ class PLC_Logic :
     return result
 
   #---------------------------------------------------------------------
+  def isError( self ) :
+    """
+    Check to see if PLC state machine is in error.
+
+    Returns:
+      True if in error, False if not.
+    """
+
+    return self.States.ERROR == self._state.get()
+
+  #---------------------------------------------------------------------
   def stopSeek( self ) :
     """
     Stop all motor position seeks.
