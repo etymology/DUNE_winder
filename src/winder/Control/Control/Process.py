@@ -385,6 +385,20 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
+  def getStage( self ) :
+    """
+    Return the current stage of APA progress.
+
+    Returns:
+      Integer number (table in APA.Stages) of APA progress.
+    """
+    result = ""
+    if self.apa :
+      result = self.apa.getStage()
+
+    return result
+
+  #---------------------------------------------------------------------
   def switchAPA( self, apaName ) :
     """
     Load an APA from disk.

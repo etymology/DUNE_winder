@@ -32,6 +32,27 @@ class AnodePlaneArray( Serializable ) :
   # saved before loading or starting a new one.
   activeAPA = None
 
+  class Stages :
+    # No actions have yet been done.
+    UNINITIALIZED = 0
+
+    # Stages for each half of each layer.
+    LAYER_X_FIRST  = 1
+    LAYER_X_SECOND = 2
+    LAYER_V_FIRST  = 3
+    LAYER_V_SECOND = 4
+    LAYER_U_FIRST  = 5
+    LAYER_U_SECOND = 6
+    LAYER_G_FIRST  = 7
+    LAYER_G_SECOND = 8
+
+    # Stage needing sign-off.
+    SIGN_OFF = 9
+
+    # APA is complete.
+    COMPLETE = 10
+  # end class
+
   #---------------------------------------------------------------------
   def __init__(
     self,
@@ -58,7 +79,17 @@ class AnodePlaneArray( Serializable ) :
       createNew: True if this APA should be created should it not already exist.
     """
 
-    includeOnly = [ '_name', "_calibrationFile", "_recipeFile", "_lineNumber", "_layer" ]
+    # Items saved to disk.
+    includeOnly = \
+    [
+      '_name',
+      "_calibrationFile",
+      "_recipeFile",
+      "_lineNumber",
+      "_layer",
+      "_stage"
+    ]
+
     Serializable.__init__( self, includeOnly=includeOnly )
 
     # If there was an APA previously active, save it.
@@ -75,6 +106,9 @@ class AnodePlaneArray( Serializable ) :
     self._gCodeHandler = gCodeHandler
     self._systemTime = systemTime
     self._startTime = systemTime.get()
+
+    # Tracking of what stage this APA is.
+    self._stage = AnodePlaneArray.Stages.UNINITIALIZED
 
     # Uninitialized data.
     self._lineNumber = None
@@ -283,6 +317,35 @@ class AnodePlaneArray( Serializable ) :
       String name of the current layer of the APA.
     """
     return self._layer
+
+  #---------------------------------------------------------------------
+  def getStage( self ) :
+    """
+    Return the current stage of APA progress.
+
+    Returns:
+      Integer number (table in APA.Stages) of APA progress.
+    """
+    return self._stage
+
+  #---------------------------------------------------------------------
+  def setStage( self, stage, message="<unspecified>" ) :
+    """
+    Set the APA progress stage.
+
+    Args:
+      stage: Integer number (table in APA.Stages) of APA progress.
+      message: Message/reason for changing to new stage.
+    """
+
+    # Note in the log the stage change.
+    self._log.add(
+      self.__class__.__name__,
+      "STAGE",
+      "APA stage change from " + str( self._stage ) + " to " + str( stage ) + ".  Reason: " + message,
+      [ self._stage, stage, message ]
+    )
+    self._stage = stage
 
   #---------------------------------------------------------------------
   def getRecipe( self ) :

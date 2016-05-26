@@ -12,12 +12,12 @@ body
   background: linear-gradient(155deg, rgba(40,40,114,1) 0%,rgba(70,70,140,1) 15%,rgba(42,42,84,1) 60%,rgba(12,12,51,1) 100%);
 }
 
-body, input, select, button
+body, input, select, button, textarea
 {
   color: white;
 }
 
-button:disabled, input:disabled, select:disabled
+button:disabled, input:disabled, select:disabled, textarea:disabled
 {
   color: rgba( 255, 255, 255, 0.25 );
 }
@@ -48,7 +48,7 @@ span.error
   font-weight: bold;
 }
 
-input, select
+input, select, textarea
 {
   background-color: rgba( 80, 80, 200, 0.25 );
   border-color:     rgba( 40, 40, 114, 0.75 );
@@ -61,6 +61,7 @@ input, select
 }
 
 button,
+.select:after,
 .ui-widget-content,
 .ui-widget-content .ui-state-default,
 .ui-widget-header .ui-state-default
@@ -112,3 +113,37 @@ h1, h2, h3, h4, h5, h6, p
   margin: 0;
   padding: 0;
 }
+
+
+
+
+
+
+.select
+{
+  /*position: relative;
+  display: block;*/
+}
+
+select
+{
+  /*-webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;*/
+}
+
+/*.select:after
+{
+  content: "\25BC";
+  position: absolute;
+  right: 0px;
+  top: 0;
+  text-shadow: 2px 2px 5px rgba( 0, 0, 0, 0.75 );
+  z-index: 1;
+  text-align: center;
+  width: 25px;
+  height: 100%;
+  pointer-events: none;
+  box-sizing: border-box;
+}*/

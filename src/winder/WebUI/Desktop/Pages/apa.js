@@ -12,6 +12,21 @@ function APA()
   var loopButtonUpdate
   var reverseButtonUpdate
 
+  // Tags to disable during APA loading.
+  var apaInterfaceTags =
+  [
+    "#apaSelection",
+    "#layerSelection",
+    "#gCodeSelection",
+    "#apaName",
+    "#apaNewButton",
+    "#apaStageSelect",
+    "#apaStageReason",
+    "#apaStageButton"
+  ]
+
+  var stage = null
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Enable all APA interface controls.
@@ -19,11 +34,12 @@ function APA()
   this.enableAPA_Interface = function()
   {
     apaEnabled = true
-    $( "#apaSelection" ).prop( "disabled", false )
-    $( "#layerSelection" ).prop( "disabled", false )
-    $( "#gCodeSelection" ).prop( "disabled", false )
-    $( "#apaName" ).prop( "disabled", false )
-    $( "#apaNewButton" ).prop( "disabled", false )
+    for ( var index in apaInterfaceTags )
+    {
+      var tag = apaInterfaceTags[ index ]
+      $( tag ).prop( "disabled", false )
+    }
+
     $( "#loading" ).html( "&nbsp;" )
     this.populateLists()
 
@@ -42,12 +58,12 @@ function APA()
   {
     apaEnabled = false
     $( "#loading" ).html( message )
-    $( "#apaSelection" ).prop( "disabled", true )
-    $( "#layerSelection" ).prop( "disabled", true )
-    $( "#gCodeSelection" ).prop( "disabled", true )
-    $( "#apaName" ).prop( "disabled", true )
-    $( "#apaNewButton" ).prop( "disabled", true )
-    $( "#apaCloseButton" ).prop( "disabled", true )
+
+    for ( var index in apaInterfaceTags )
+    {
+      var tag = apaInterfaceTags[ index ]
+      $( tag ).prop( "disabled", true )
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -113,6 +129,7 @@ function APA()
     if ( "" != gCode )
     {
       // Disable APA interface during loading process.
+      apaEnabledInhabit = true
       this.disableAPA_Interface( "Loading G-Code" )
 
       // Begin loading G-Code.
@@ -215,109 +232,151 @@ function APA()
     )
   }
 
-    // Populate lists and have this function run after error recovery.
-    this.populateLists()
-    winder.addErrorClearCallback( this.populateLists )
-
-    // Set updates of current line and total lines.
-    winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getLine()", "#currentLine" )
-    winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines" )
-    winder.addPeriodicRemoteDisplay( "process.spool.getWire()", "#spoolAmount" )
-
-    // Load the motor status module.
-    winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
-
-    // Callback run after period updates happen to enable/disable APA controls
-    // depending on machine state.
-    winder.addPeriodicEndCallback
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Change the APA stage of progress.
+  //-----------------------------------------------------------------------------
+  this.changeStage = function()
+  {
+    var newStage = $( "#apaStageSelect" ).val()
+    var reasonForChange = $( "#apaStageReason" ).val()
+    winder.remoteAction
     (
+      'process.apa.setStage( ' + newStage + ', "' + reasonForChange + '" )',
       function()
       {
-        var controlState = states[ "controlState" ]
-
-        $( "#controlState" ).text( controlState )
-
-        var startDisable = ( "StopMode" != controlState ) || apaEnabledInhabit
-        $( "#startButton" ).prop( "disabled", startDisable )
-
-        var stopDisable = ( "WindMode" != controlState )
-        $( "#stopButton" ).prop( "disabled", stopDisable )
-
-        if ( ( ! stopDisable )
-          && ( apaEnabled )
-          && ( ! apaEnabledInhabit ) )
-        {
-          self.disableAPA_Interface( "Running." )
-        }
-        else
-        if ( ( stopDisable )
-          && ( ! apaEnabled )
-          && ( ! apaEnabledInhabit ) )
-        {
-          self.enableAPA_Interface()
-        }
+        $( "#apaStageReason" ).val( "" )
+        self.populateLists()
       }
-
     )
+  }
 
-    // Setup G-Code table.
-    winder.addPeriodicRemoteCallback
-    (
-      "process.getG_CodeList( None, 3 )",
-      function( data )
+  // Populate lists and have this function run after error recovery.
+  this.populateLists()
+  winder.addErrorClearCallback( this.populateLists )
+
+  // Set updates of current line and total lines.
+  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getLine()", "#currentLine" )
+  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines" )
+  winder.addPeriodicRemoteDisplay( "process.spool.getWire()", "#spoolAmount" )
+
+  //winder.addPeriodicRemoteDisplay( "process.getStage()", "#apaStage" )
+  winder.addPeriodicRemoteCallback
+  (
+    "process.getStage()",
+    function( value )
+    {
+      stage = value
+      var isDisabled = false
+      if ( "" == stage )
       {
-        // If there is any data.
-        if ( data )
-        {
-          var index = 0
-          // For each row of table...
-          $( "#gCodeTable td" )
-            .each
-            (
-              function()
-              {
-                var isForward = $( "#reverseButton" ).val()
-
-                if ( "1" == isForward )
-                {
-                  $( "#gCodeForwardRow" ).attr( 'class', 'gCodeNextLine')
-                  $( "#gCodeReverseRow" ).attr( 'class', '' )
-                }
-                else
-                {
-                  $( "#gCodeForwardRow" ).attr( 'class', '')
-                  $( "#gCodeReverseRow" ).attr( 'class', 'gCodeNextLine' )
-                }
-
-                // Get text for this row.
-                var text = data[ index ]
-
-                // If there isn't any text, put in a non-breaking space to
-                // preserve the cell.
-                if ( ! text )
-                  text = "&nbsp;"
-
-                $( this ).html( text )
-                index += 1
-              }
-            )
-        }
+        stage = "(no APA loaded)"
+        isDisabled = true
       }
-    )
 
-    reverseButtonUpdate = winder.addToggleButton
-    (
-      "#reverseButton",
-      "process.getG_CodeDirection()",
-      "process.setG_CodeDirection( $ )"
-    )
+      $( "#apaStageSelect" ).prop( "disabled", isDisabled )
+      $( "#apaStageReason" ).prop( "disabled", isDisabled )
+      $( "#apaStageButton" ).prop( "disabled", isDisabled )
 
-    loopButtonUpdate = winder.addToggleButton
-    (
-      "#loopButton",
-      "process.getG_CodeLoop()",
-      "process.setG_CodeLoop( $ )"
-    )
+      $( "#apaStage" ).html( stage )
+    }
+  )
+
+  // Load the motor status module.
+  winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
+
+  // Callback run after period updates happen to enable/disable APA controls
+  // depending on machine state.
+  winder.addPeriodicEndCallback
+  (
+    function()
+    {
+      var controlState = states[ "controlState" ]
+
+      $( "#controlState" ).text( controlState )
+
+      var startDisable = ( "StopMode" != controlState ) || apaEnabledInhabit
+      $( "#startButton" ).prop( "disabled", startDisable )
+
+      var stopDisable = ( "WindMode" != controlState )
+      $( "#stopButton" ).prop( "disabled", stopDisable )
+
+      if ( ( ! stopDisable )
+        && ( apaEnabled )
+        && ( ! apaEnabledInhabit ) )
+      {
+        self.disableAPA_Interface( "Running." )
+      }
+      else
+      if ( ( stopDisable )
+        && ( ! apaEnabled )
+        && ( ! apaEnabledInhabit ) )
+      {
+        self.enableAPA_Interface()
+      }
+    }
+
+  )
+
+  // Setup G-Code table.
+  winder.addPeriodicRemoteCallback
+  (
+    "process.getG_CodeList( None, 3 )",
+    function( data )
+    {
+      // If there is any data.
+      if ( data )
+      {
+        var index = 0
+        // For each row of table...
+        $( "#gCodeTable td" )
+          .each
+          (
+            function()
+            {
+              var isForward = $( "#reverseButton" ).val()
+
+              if ( "1" == isForward )
+              {
+                $( "#gCodeForwardRow" ).attr( 'class', 'gCodeNextLine')
+                $( "#gCodeReverseRow" ).attr( 'class', '' )
+              }
+              else
+              {
+                $( "#gCodeForwardRow" ).attr( 'class', '')
+                $( "#gCodeReverseRow" ).attr( 'class', 'gCodeNextLine' )
+              }
+
+              // Get text for this row.
+              var text = data[ index ]
+
+              // If there isn't any text, put in a non-breaking space to
+              // preserve the cell.
+              if ( ! text )
+                text = "&nbsp;"
+
+              $( this ).html( text )
+              index += 1
+            }
+          )
+      }
+    }
+  )
+
+  reverseButtonUpdate = winder.addToggleButton
+  (
+    "#reverseButton",
+    "process.getG_CodeDirection()",
+    "process.setG_CodeDirection( $ )"
+  )
+
+  loopButtonUpdate = winder.addToggleButton
+  (
+    "#loopButton",
+    "process.getG_CodeLoop()",
+    "process.setG_CodeLoop( $ )"
+  )
+
 
 }
 

@@ -184,5 +184,5 @@ class PLC_Simulator :
     self._xMax = machineGeometry.right + 100
     self._yMin = machineGeometry.bottom - 100
     self._yMax = machineGeometry.top + 100
-    self._zMin = -10
+    self._zMin = -100
     self._zMax = 450

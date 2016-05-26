@@ -11,33 +11,65 @@
         <article>
           <h3>APA load</h3>
           <label for="apaSelection">APA selection</label>
-          <select onchange="apa.selectAPA()" id="apaSelection">
-            <option value=""></option>
-          </select>
+          <div class="select">
+            <select onchange="apa.selectAPA()" id="apaSelection">
+              <option value=""></option>
+            </select>
+          </div>
           <button id="apaCloseButton" onclick="apa.closeAPA()">Close</button>
         </article>
 
         <article>
           <h3>Layer assignment</h3>
           <label for="layerSelection">Layer</label>
-          <select id="layerSelection">
-            <option value="G">G</option>
-            <option value="U">U</option>
-            <option value="V">V</option>
-            <option value="X">X</option>
-          </select>
+          <div class="select">
+            <select id="layerSelection">
+              <option value="G">G</option>
+              <option value="U">U</option>
+              <option value="V">V</option>
+              <option value="X">X</option>
+            </select>
+          </div>
         </article>
 
         <article>
           <h3>G-Code selection</h3>
           <label for="gCodeSelection">G-Code selection</label>
-          <select onchange="apa.selectG_Code()" id="gCodeSelection">
-            <option value=""></option>
-          </select>
+          <div class="select">
+            <select onchange="apa.selectG_Code()" id="gCodeSelection">
+              <option value=""></option>
+            </select>
+          </div>
         </article>
 
         <p id="loading">&nbsp;</p>
 
+      </article>
+
+      <article>
+        <h2>APA Stage</h2>
+        <p>Stage: <span id="apaStage"></span></p>
+        <p>
+          <label for="apaStageSelect">APA stage selection</label>
+          <select id="apaStageSelect">
+            <option value="0">Uninitialized</option>
+            <option value="1">X first</option>
+            <option value="2">X second</option>
+            <option value="3">V first</option>
+            <option value="4">V second</option>
+            <option value="5">U first</option>
+            <option value="6">U second</option>
+            <option value="7">G first</option>
+            <option value="8">G second</option>
+            <option value="9">Sign off</option>
+            <option value="10">Complete</option>
+          </select>
+        </p>
+        <div id="apaStageReasonDiv">
+          <label for="apaStageReason">Reason for changing stage</label>
+          <textarea id="apaStageReason"></textarea>
+        </div>
+        <button id="apaStageButton" onclick="apa.changeStage()">Change</button>
       </article>
 
       <article>

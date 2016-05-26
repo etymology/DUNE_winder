@@ -292,6 +292,13 @@ $( document ).ready
             var stringValue = stateTranslateTable[ value ]
             states[ "plcState" ] = stringValue
             $( "#plcState" ).text( stringValue )
+
+            // Change the CSS class for a PLC state error.
+            if ( 10 == value )
+              $( "#plcState" ).attr( 'class', 'plcError' )
+            else
+              $( "#plcState" ).attr( 'class', '' )
+
           }
           else
             $( "#plcState" ).html( winder.errorString )
@@ -304,6 +311,25 @@ $( document ).ready
 
       // Start the periodic updates.
       winder.periodicRemoteUpdate()
+
+      // Make all articles in main draggable and resizable after the page
+      // loads.
+      // $$$DEBUG - Layout function.
+      setTimeout
+      (
+        function()
+        {
+          $( "main article" ).each
+          (
+            function()
+            {
+              $( this ).draggable().resizable()
+            }
+          )
+        },
+        1000
+      )
+
     }
   }
 )
