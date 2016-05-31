@@ -120,7 +120,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.latch = function()
   {
-    winder.remoteAction.get( "io.plcLogic.latch()" )
+    winder.remoteAction( "io.plcLogic.latch()" )
   }
 
   //-----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.latchHome = function()
   {
-    winder.remoteAction.get( "io.plcLogic.latchHome()" )
+    winder.remoteAction( "io.plcLogic.latchHome()" )
   }
 
   //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.latchUnlock = function()
   {
-    winder.remoteAction.get( "io.plcLogic.latchUnlock()" )
+    winder.remoteAction( "io.plcLogic.latchUnlock()" )
   }
 
     winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
