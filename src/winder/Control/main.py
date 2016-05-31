@@ -27,6 +27,10 @@ from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
 from Threads.WebServerThread import WebServerThread
 
+# $$$DEBUG - Temporary.
+import xml.dom.minidom
+from Debug.APA_Generator import APA_Generator
+
 #==============================================================================
 # Debug settings.
 # These should all be set to False for production.

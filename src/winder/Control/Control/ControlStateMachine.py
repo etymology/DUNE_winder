@@ -102,6 +102,8 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.systemTime = systemTime
     self.gCodeHandler = None
 
+    self.windTime = 0
+
     # Wind mode.
     self.startRequest = False
     self.stopRequest  = False

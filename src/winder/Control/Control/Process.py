@@ -8,6 +8,7 @@
 
 import os
 from Control.AnodePlaneArray import AnodePlaneArray
+from Control.APA_Base import APA_Base
 from Library.Spool import Spool
 from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
@@ -107,6 +108,7 @@ class Process :
     Request that the winding process begin.
     """
     if self.controlStateMachine.isMovementReady() :
+
       self.controlStateMachine.startRequest = True
       self.controlStateMachine.stopRequest = False
 
@@ -151,6 +153,7 @@ class Process :
     if apaName in apaList :
       isError = True
     else:
+      self.controlStateMachine.windTime = 0
       self.apa = \
         AnodePlaneArray(
           self.gCodeHandler,
@@ -342,6 +345,40 @@ class Process :
     return apaList
 
   #---------------------------------------------------------------------
+  def getAPA_DetailedList( self ) :
+    """
+    Return a detailed list of all the available APAs.
+
+    Returns:
+      Detailed list of all the available APAs.
+    """
+
+    directory = self._configuration.get( "APA_LogDirectory" )
+
+    apaList = []
+    for apaName in self.getAPA_List() :
+      apaList.append( self.getAPA_Details() )
+
+    return apaList
+
+  #---------------------------------------------------------------------
+  def getAPA_Details( self, name ) :
+    """
+    Return details of about specified APA.
+
+    Args:
+      name: APA to retrieve details about.
+
+    Returns:
+      Dictionary with all APA details.
+    """
+
+    apa = APA_Base( self._configuration.get( "APA_LogDirectory" ), name )
+    apa.load( "AnodePlaneArray" )
+
+    return apa.toDictionary()
+
+  #---------------------------------------------------------------------
   def getLoadedAPA_Name( self ) :
     """
     Get the name of the loaded APA.
@@ -406,6 +443,7 @@ class Process :
     Args:
       apaName: Name of the APA to load.  Must exist.
     """
+    self.controlStateMachine.windTime = 0
     self.apa = \
       AnodePlaneArray(
         self.gCodeHandler,
@@ -425,6 +463,7 @@ class Process :
     """
 
     if self.apa :
+      self.apa.addWindTime( self.controlStateMachine.windTime )
       self.apa.close()
       self.apa = None
 

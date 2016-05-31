@@ -32,6 +32,8 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
   var filteredData
 
+  var displayCallback = null
+
   // If using a global filter enable, or no filters are enabled...
   if ( ( false === columnFilterEnables )
     || ( true === columnFilterEnables )
@@ -86,7 +88,7 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   {
     filteredData = []
 
-    if ( column && filter )
+    if ( column && ( null !== filter ) )
       activeFilter = [ column, filter ]
     else
     {
@@ -334,6 +336,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
       }
     }
 
+    if ( displayCallback )
+      displayCallback()
+
   }
 
   //---------------------------------------------------------------------------
@@ -404,5 +409,15 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     return "cell_" + this.id + "_" + row + "_" + column
   }
 
-}
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Set a callback to run after display.
+  // Input:
+  //   callback - Callback function.
+  //---------------------------------------------------------------------------
+  this.setDisplayCallback = function( callback )
+  {
+    displayCallback = callback
+  }
 
+}

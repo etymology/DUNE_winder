@@ -225,6 +225,25 @@ class Serializable :
           self.__dict__[ name ] = result
 
   #-------------------------------------------------------------------
+  def toXML( self, nameOverride=None ) :
+    """
+    Serialize class to XML.
+
+    Args:
+      nameOverride: Top-level XML name.
+
+    Returns:
+      XML document of class.
+    """
+    # Serialize data into XML.
+    xmlDocument = xml.dom.minidom.parseString( '<SerializableData/>' )
+
+    node = self.serialize( xmlDocument, nameOverride )
+    xmlDocument.childNodes[ 0 ].appendChild( node )
+
+    return xmlDocument
+
+  #-------------------------------------------------------------------
   def toXML_String( self, nameOverride=None ) :
     """
     Serialize class to XML string.
@@ -236,11 +255,7 @@ class Serializable :
       XML string of class.
     """
 
-    # Serialize data into XML.
-    xmlDocument = xml.dom.minidom.parseString( '<SerializableData/>' )
-
-    node = self.serialize( xmlDocument, nameOverride )
-    xmlDocument.childNodes[ 0 ].appendChild( node )
+    xmlDocument = self.toXML( nameOverride )
 
     # Create text from XML data.
     outputText = xmlDocument.toprettyxml()

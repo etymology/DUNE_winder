@@ -18,9 +18,9 @@ var states =
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   $$$DEBUG
-// Input:
+//   See if machine is running based on control state.
 // Output:
+//   True if running, false if not.
 //-----------------------------------------------------------------------------
 function isRunning()
 {

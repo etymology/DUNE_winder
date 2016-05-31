@@ -64,6 +64,7 @@ class WindMode( StateMachineState ) :
 
     if not isError :
       self._startTime = self.stateMachine.systemTime.get()
+      self.stateMachine.windTime = 0
       self.stateMachine.stopRequest = False
       self._log.add(
         self.__class__.__name__,
@@ -84,15 +85,17 @@ class WindMode( StateMachineState ) :
       True if there was an error, false if not.
     """
 
-    elapsedTime = self.stateMachine.systemTime.getDelta( self._startTime )
-    deltaString = self.stateMachine.systemTime.getElapsedString( elapsedTime )
+    self.stateMachine.windTime += \
+      self.stateMachine.systemTime.getDelta( self._startTime )
+
+    deltaString = self.stateMachine.systemTime.getElapsedString( self.stateMachine.windTime )
 
     # Log message that wind is complete.
     self._log.add(
       self.__class__.__name__,
       "WIND_TIME",
       "Wind ran for " + deltaString + ".",
-      [ elapsedTime ]
+      [ self.stateMachine.windTime ]
     )
 
     self.stateMachine.gCodeHandler.stop()

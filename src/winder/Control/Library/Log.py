@@ -78,9 +78,10 @@ class Log:
       outputFileName: Log file previously attached.
     """
     self._lock.acquire()
-    outputFile = self._outputFileList[ outputFileName ]
-    self._outputFileList.pop( outputFileName )
-    outputFile.close()
+    if outputFileName in self._outputFileList :
+      outputFile = self._outputFileList[ outputFileName ]
+      self._outputFileList.pop( outputFileName )
+      outputFile.close()
     self._lock.release()
 
   #---------------------------------------------------------------------

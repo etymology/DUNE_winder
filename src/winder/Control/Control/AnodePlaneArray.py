@@ -1,5 +1,5 @@
 ###############################################################################
-# Name: Recipe.py
+# Name: AnodePlaneArray.py
 # Uses: Anode Plane Array (APA) management.
 # Date: 2016-03-01
 # Author(s):
@@ -14,44 +14,21 @@ from Debug.DefaultCalibration import DefaultCalibration
 
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
-from Machine.Settings import Settings
 
+from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
 from Machine.G_LayerGeometry import G_LayerGeometry
 from Machine.U_LayerGeometry import U_LayerGeometry
 from Machine.V_LayerGeometry import V_LayerGeometry
 from Machine.X_LayerGeometry import X_LayerGeometry
 
-class AnodePlaneArray( Serializable ) :
+from APA_Base import APA_Base
 
-  # File name of the APA state (this object) on disk.
-  FILE_NAME = "state.xml"
-  LOG_FILE  = "log.csv"
+class AnodePlaneArray( APA_Base ) :
 
   # There can only be a single working instance of an APA, and it must be
   # saved before loading or starting a new one.
   activeAPA = None
-
-  class Stages :
-    # No actions have yet been done.
-    UNINITIALIZED = 0
-
-    # Stages for each half of each layer.
-    LAYER_X_FIRST  = 1
-    LAYER_X_SECOND = 2
-    LAYER_V_FIRST  = 3
-    LAYER_V_SECOND = 4
-    LAYER_U_FIRST  = 5
-    LAYER_U_SECOND = 6
-    LAYER_G_FIRST  = 7
-    LAYER_G_SECOND = 8
-
-    # Stage needing sign-off.
-    SIGN_OFF = 9
-
-    # APA is complete.
-    COMPLETE = 10
-  # end class
 
   #---------------------------------------------------------------------
   def __init__(
@@ -79,18 +56,7 @@ class AnodePlaneArray( Serializable ) :
       createNew: True if this APA should be created should it not already exist.
     """
 
-    # Items saved to disk.
-    includeOnly = \
-    [
-      '_name',
-      "_calibrationFile",
-      "_recipeFile",
-      "_lineNumber",
-      "_layer",
-      "_stage"
-    ]
-
-    Serializable.__init__( self, includeOnly=includeOnly )
+    APA_Base.__init__( self, apaDirectory, name, systemTime )
 
     # If there was an APA previously active, save it.
     if AnodePlaneArray.activeAPA :
@@ -98,66 +64,23 @@ class AnodePlaneArray( Serializable ) :
 
     AnodePlaneArray.activeAPA = self
 
-    self._apaDirectory = apaDirectory
     self._recipeDirectory = recipeDirectory
     self._recipeArchiveDirectory = recipeArchiveDirectory
-    self._name = name
     self._log = log
     self._gCodeHandler = gCodeHandler
     self._systemTime = systemTime
     self._startTime = systemTime.get()
 
-    # Tracking of what stage this APA is.
-    self._stage = AnodePlaneArray.Stages.UNINITIALIZED
-
     # Uninitialized data.
-    self._lineNumber = None
-    self._recipeFile = None
     self._recipe = None
-    self._layer = None
-    self._calibrationFile = None
     self._calibration = None
 
-    # Create directory if it doesn't exist.
-    apaExists = os.path.exists( self._getPath() )
-    pathsCreated = False
-    if not apaExists and createNew :
-      os.makedirs( self._getPath() )
-      pathsCreated = True
+    self._log.attach( self._getPath() + AnodePlaneArray.LOG_FILE )
 
-    # Attach a log file such that all future messages are logged to this APA
-    # as well.
-    if apaExists or pathsCreated :
-      self._log.attach( self._getPath() + AnodePlaneArray.LOG_FILE )
-
-    if not apaExists :
-      if createNew :
-        self._log.add(
-          self.__class__.__name__,
-          "NEW",
-          "Created new APA called " + self._name,
-          [ self._name ]
-        )
-      else:
-        self._log.add(
-          self.__class__.__name__,
-          "NEW",
-          "Unable to load APA called " + self._name
-            + ".  Active layer " + self._layer ,
-          [ self._name, self._layer ]
-        )
-
-        # $$$DEBUG - Do we want to crash when a file is not found?
-        raise Exception( "APA not found" )
-    else:
+    if createNew :
+      self.save()
+    else :
       self.load()
-
-  #---------------------------------------------------------------------
-  def _getPath( self ) :
-    """
-    Get the path for all files related to this APA.
-    """
-    return self._apaDirectory + "/" + self._name + "/"
 
   #---------------------------------------------------------------------
   def _getG_CodeLogName( self, layer ) :
@@ -271,7 +194,7 @@ class AnodePlaneArray( Serializable ) :
       [ self._name ]
     )
 
-    Serializable.load( self, self._getPath(), AnodePlaneArray.FILE_NAME )
+    APA_Base.load( self )
 
     if self._recipeFile :
       self.loadRecipe( self._layer )
@@ -299,42 +222,12 @@ class AnodePlaneArray( Serializable ) :
         self._gCodeHandler.useCalibration( self._calibration )
 
   #---------------------------------------------------------------------
-  def getName( self ) :
-    """
-    Return the name of the APA.
-
-    Returns:
-      String name of the APA.
-    """
-    return self._name
-
-  #---------------------------------------------------------------------
-  def getLayer( self ) :
-    """
-    Return the current layer of the APA.
-
-    Returns:
-      String name of the current layer of the APA.
-    """
-    return self._layer
-
-  #---------------------------------------------------------------------
-  def getStage( self ) :
-    """
-    Return the current stage of APA progress.
-
-    Returns:
-      Integer number (table in APA.Stages) of APA progress.
-    """
-    return self._stage
-
-  #---------------------------------------------------------------------
   def setStage( self, stage, message="<unspecified>" ) :
     """
     Set the APA progress stage.
 
     Args:
-      stage: Integer number (table in APA.Stages) of APA progress.
+      stage: Integer number (table in APA_Base.Stages) of APA progress.
       message: Message/reason for changing to new stage.
     """
 
@@ -348,26 +241,12 @@ class AnodePlaneArray( Serializable ) :
     self._stage = stage
 
   #---------------------------------------------------------------------
-  def getRecipe( self ) :
-    """
-    Return the name of the loaded recipe.
-
-    Returns:
-      String name of the loaded recipe.  Empty string if no recipe loaded.
-    """
-    result = self._recipeFile
-    if None == result :
-      result = ""
-
-    return result
-
-  #---------------------------------------------------------------------
   def save( self ) :
     """
     Save current APA state to file.
     """
     self._lineNumber = self._gCodeHandler.getLine()
-    Serializable.save( self, self._getPath(), AnodePlaneArray.FILE_NAME )
+    APA_Base.save( self )
 
   #---------------------------------------------------------------------
   def close( self ) :

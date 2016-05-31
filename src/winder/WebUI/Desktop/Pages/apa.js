@@ -27,6 +27,8 @@ function APA()
 
   var stage = null
 
+  var currentAPA = ""
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Enable all APA interface controls.
@@ -154,9 +156,7 @@ function APA()
       "process.getLoadedAPA_Name()",
       function()
       {
-        var selection = $( "#apaSelection" ).val()
-        var isDisabled = ( "" == selection ) || isRunning()
-        $( "#apaCloseButton" ).prop( "disabled", isDisabled )
+        currentAPA = $( "#apaSelection" ).val()
       }
     )
 
@@ -260,24 +260,45 @@ function APA()
   winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines" )
   winder.addPeriodicRemoteDisplay( "process.spool.getWire()", "#spoolAmount" )
 
-  //winder.addPeriodicRemoteDisplay( "process.getStage()", "#apaStage" )
+  // Special periodic for current APA stage.
   winder.addPeriodicRemoteCallback
   (
     "process.getStage()",
     function( value )
     {
-      stage = value
+      var STAGES =
+      [
+        "Uninitialized",
+        "X first",
+        "X second",
+        "V first",
+        "V second",
+        "U first",
+        "U second",
+        "G first",
+        "G second",
+        "Sign off",
+        "Complete",
+      ]
+
+      // If there is no APA loaded, the value will be an empty string and
+      // the options to change the stage need to be disabled.
       var isDisabled = false
-      if ( "" == stage )
+      if ( "" === value )
       {
         stage = "(no APA loaded)"
         isDisabled = true
       }
+      else
+        // Translate the stage name.
+        stage = STAGES[ value ]
 
+      // Enable/disable APA stage control interface.
       $( "#apaStageSelect" ).prop( "disabled", isDisabled )
       $( "#apaStageReason" ).prop( "disabled", isDisabled )
       $( "#apaStageButton" ).prop( "disabled", isDisabled )
 
+      // Display the current stage.
       $( "#apaStage" ).html( stage )
     }
   )
@@ -291,16 +312,24 @@ function APA()
   (
     function()
     {
+      // Display control state.
       var controlState = states[ "controlState" ]
-
       $( "#controlState" ).text( controlState )
 
+      // Start button enable.
       var startDisable = ( "StopMode" != controlState ) || apaEnabledInhabit
       $( "#startButton" ).prop( "disabled", startDisable )
 
+      var isCloseDisabled = ( "" == currentAPA ) || isRunning()
+      $( "#apaCloseButton" ).prop( "disabled", isCloseDisabled )
+
+      //$( "#apaCloseButton" ).prop( "disabled", startDisable )
+
+      // Stop button enable.
       var stopDisable = ( "WindMode" != controlState )
       $( "#stopButton" ).prop( "disabled", stopDisable )
 
+      // If the winder was stopped and is now running disable APA selection.
       if ( ( ! stopDisable )
         && ( apaEnabled )
         && ( ! apaEnabledInhabit ) )
@@ -308,6 +337,7 @@ function APA()
         self.disableAPA_Interface( "Running." )
       }
       else
+      // If the winder was running but is now stopped enable APA selection.
       if ( ( stopDisable )
         && ( ! apaEnabled )
         && ( ! apaEnabledInhabit ) )
@@ -317,6 +347,19 @@ function APA()
     }
 
   )
+
+  this.createRandomAPA = function()
+  {
+    winder.remoteAction
+    (
+      'APA_Generator.create( process, 1 )',
+      function()
+      {
+        self.populateLists()
+      }
+    )
+
+  }
 
   // Setup G-Code table.
   winder.addPeriodicRemoteCallback
