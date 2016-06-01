@@ -270,7 +270,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._nextLine = -1
     self._geometry = geometry
 
-    # $$$DEBUG
+    # $$$DEBUG - G-Code shouldn't need geometry--only calibration.
     self._head._geometry = geometry
 
     # Use current X/Y/Z position as starting points.

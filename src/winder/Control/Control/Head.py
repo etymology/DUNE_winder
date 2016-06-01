@@ -35,7 +35,6 @@ class Head :
       True if not in motion, False if not.
     """
 
-    # $$$DEBUG - Do this here?
     self.update()
 
     return self.States.IDLE == self._state

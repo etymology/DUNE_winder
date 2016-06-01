@@ -27,7 +27,7 @@ from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
 from Threads.WebServerThread import WebServerThread
 
-# $$$DEBUG - Temporary.
+# $$$TEMPORARY - Temporary.
 import xml.dom.minidom
 from Debug.APA_Generator import APA_Generator
 

@@ -91,6 +91,32 @@ function APA_List()
     )
   }
 
+  var apaDetails = {}
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Display the details of an APA.
+  // Input:
+  //   name - Name of APA to display.
+  //-----------------------------------------------------------------------------
+  this.showDetails = function( name )
+  {
+    var data = apaDetails[ name ]
+
+    $( "#apaDetails_name"            ).text( data[ "_name"            ] )
+    $( "#apaDetails_calibrationFile" ).text( data[ "_calibrationFile" ] )
+    $( "#apaDetails_recipeFile"      ).text( data[ "_recipeFile"      ] )
+    $( "#apaDetails_lineNumber"      ).text( data[ "_lineNumber"      ] )
+    $( "#apaDetails_layer"           ).text( data[ "_layer"           ] )
+    $( "#apaDetails_stage"           ).text( STAGES[ data[ "_stage" ] ] )
+    $( "#apaDetails_creationDate"    ).text( self.toLocalTime( data[ "_creationDate"    ] ) )
+    $( "#apaDetails_lastModifyDate"  ).text( self.toLocalTime( data[ "_lastModifyDate"  ] ) )
+    $( "#apaDetails_loadedTime"      ).text( data[ "_loadedTime"      ] )
+    $( "#apaDetails_windTime"        ).text( data[ "_windTime"        ] )
+    $( "#apaDetails" ).slideDown()
+  }
+
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Load the log data into a filtered table.
@@ -100,7 +126,7 @@ function APA_List()
   this.loadData = function()
   {
     // Filter table object with columns for the log file.
-    var apaList =
+    var apaListTable =
         new FilteredTable
         (
           [ "Name", "Creation", "Last Modified", "Stage" ],
@@ -113,7 +139,8 @@ function APA_List()
       "process.getAPA_DetailedList()",
       function( data )
       {
-        var dataSet = []
+        apaDetails = {}
+        var apaList = []
 
         // Create a data set used by table from detailed information.
         for ( item of data )
@@ -124,16 +151,21 @@ function APA_List()
           subSet.push( self.toLocalTime( item[ '_lastModifyDate' ] ) )
           subSet.push( STAGES[ item[ '_stage' ] ] )
 
-          dataSet.push( subSet )
+          apaList.push( subSet )
+
+          // Add item to global list.
+          // This dictionary, keyed by the APA name, will be used to display
+          // the full details.
+          apaDetails[ item[ '_name' ] ] = item
         }
 
-        apaList.loadFromArray( dataSet )
-        apaList.setSort( 0, 1 )
+        apaListTable.loadFromArray( apaList )
+        apaListTable.setSort( 0, 1 )
 
         // For every row of the table, setup a click callback such that when
         // a row is clicked, it loads and displays the details of that entry.
         // This callback needs to be run any time the table is displayed.
-        apaList.setDisplayCallback
+        apaListTable.setDisplayCallback
         (
           function()
           {
@@ -154,7 +186,7 @@ function APA_List()
                       function()
                       {
                         // Display the details about this name.
-                        self.loadDetails( localName )
+                        self.showDetails( localName )
                       }
                     )
                 }
@@ -162,7 +194,7 @@ function APA_List()
           }
         )
 
-        apaList.display( "#apaList" )
+        apaListTable.display( "#apaList" )
 
       }
     )
@@ -179,6 +211,7 @@ $( document ).ready
 (
   function()
   {
+    // Winder.inhibitUpdates()
     apaList = new APA_List()
   }
 )

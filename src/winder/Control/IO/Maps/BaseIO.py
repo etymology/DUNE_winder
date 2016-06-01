@@ -72,8 +72,6 @@ class BaseIO:
     # NOTE: Most of these inputs do not exist on the test hardware fixture.
     #
 
-    # $$$DEBUG - No tags for these I/O points yet.
-    #self.estop = PLC_Input( "estop", self.plc, "Point_IO:1:I", 0, True )
     # $$$DEBUG - Restore default to True
     self.estop = PLC_Input( "estop", self.plc, "Point_IO:1:I", 0, False )
     self.park  = PLC_Input( "park",  self.plc, "Point_IO:1:I", 1 )

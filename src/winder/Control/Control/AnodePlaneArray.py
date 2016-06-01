@@ -9,7 +9,7 @@
 import xml.dom.minidom
 import os.path
 
-# $$$DEBUG - Temporary.
+# $$$TEMPORARY - Temporary.
 from Debug.DefaultCalibration import DefaultCalibration
 
 from Library.Serializable import Serializable
@@ -121,12 +121,12 @@ class AnodePlaneArray( APA_Base ) :
     else:
       raise Exception( "Recipe has no layer for geometry." )
 
-    # $$$DEBUG - Temporary.
+    # $$$TEMPORARY - Temporary.
     self._calibrationFile = self._layer + "_Calibration.xml"
     self._calibration = \
       DefaultCalibration( self._getPath(), self._calibrationFile, self._layer )
 
-    # $$$DEBUG - Temporary.
+    # $$$TEMPORARY - Temporary.
     self._gCodeHandler.useCalibration( self._calibration )
 
     if None != recipeFile :

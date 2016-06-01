@@ -95,8 +95,10 @@ class ManualMode( StateMachineState ) :
       self.stateMachine.stopRequest = False
 
     # Is movement done?
-    if self._io.plcLogic.isReady() \
-      and not self.stateMachine.isJogging :
+    if self._io.plcLogic.isReady() :
+
+      # $$$DEBUG - Removed the below.  Verify this is correct on actual machine.
+      #  and not self.stateMachine.isJogging :
 
       # If we were seeking and stopped pre-maturely, note where.
       if self._noteSeekStop :

@@ -181,43 +181,6 @@ class Motor( IO_Point ) :
     pass
 
   #---------------------------------------------------------------------
-  @abstractmethod
-  def setMaxTorque( self, maxTorque ) :
-    """
-    Set maximum torque motor may exert.
-
-    Args:
-      maxTorque: Maximum torque motor may exert.
-
-    """
-
-    pass
-
-  #---------------------------------------------------------------------
-  @abstractmethod
-  def getMaxTorque( self ) :
-    """
-    Get maximum torque motor may exert.
-
-    Returns:
-      Maximum torque.
-    """
-
-    pass
-
-  #---------------------------------------------------------------------
-  @abstractmethod
-  def getTorque( self ) :
-    """
-    Get the current torque on motor shaft.
-
-    Returns:
-      Torque on motor shaft (in motor torque units).
-    """
-
-    pass
-
-  #---------------------------------------------------------------------
   def get( self ) :
     """
     Get function. Not meaningful.

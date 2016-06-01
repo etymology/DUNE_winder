@@ -357,7 +357,7 @@ class Process :
 
     apaList = []
     for apaName in self.getAPA_List() :
-      apaList.append( self.getAPA_Details() )
+      apaList.append( self.getAPA_Details( apaName ) )
 
     return apaList
 
