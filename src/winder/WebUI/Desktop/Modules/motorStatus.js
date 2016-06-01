@@ -81,10 +81,21 @@ function MotorStatus()
       axis + "Acceleration"
     )
 
+    let localAxis = axis
+
+    // $$$DEBUG
+    winder.addPeriodicRemoteCallback
+    (
+      "io." + axis + "Axis.getSeekStartPosition()",
+      function( value )
+      {
+        self.motor[ localAxis + "SeekStartPosition" ] = value
+      }
+    )
+
     this.readConfig()
     winder.addErrorClearCallback( this.readConfig )
 
-    let localAxis = axis
     winder.addPeriodicEndCallback
     (
       function()
@@ -92,27 +103,24 @@ function MotorStatus()
         var acceleration = self.motor[ localAxis + "Acceleration" ]
         var topAcceleration = self.motor[ "maxAcceleration" ]
         if ( acceleration < 0 )
-          topAcceleration = -self.motor[ "maxAcceleration" ]
+          topAcceleration = -self.motor[ "maxDeceleration" ]
 
         var level = 0
         if ( topAcceleration != 0 )
+        {
           level = acceleration / topAcceleration
+          level = Math.min( level, 1.0 )
+        }
 
         level *= $( "#" + axis + "AccelerationBar" ).parent().width() + 10
         $( "#" + localAxis + "AccelerationBar" ).width( "" + Math.round( level ) + "px" )
 
         var desiredPosition = self.motor[ localAxis + "DesiredPosition" ]
         var position = self.motor[ localAxis + "Position" ]
+        var startPosition = self.motor[ localAxis + "SeekStartPosition" ]
 
-        // $$$DEBUG - Put geometry readings in here.
-        var top = 435
-        if ( "x" == localAxis )
-          top = 6500
-        else
-        if ( "y" == localAxis )
-          top = 2800
-
-        level = Math.abs( position / top )
+        level = Math.abs( position - startPosition ) / Math.abs( desiredPosition - startPosition )
+        level = Math.min( level, 1.0 )
 
         level *= $( "#" + localAxis + "PositionBar" ).parent().width() + 10
         $( "#" + localAxis + "PositionBar" ).width( "" + Math.round( level ) + "px" )
@@ -122,7 +130,10 @@ function MotorStatus()
 
         var level = 0
         if ( maxVelocity != 0 )
+        {
           level = velocity / maxVelocity
+          level = Math.min( level, 1.0 )
+        }
 
         level *= $( "#" + axis + "VelocityBar" ).parent().width() + 10
         $( "#" + localAxis + "VelocityBar" ).width( "" + Math.round( level ) + "px" )

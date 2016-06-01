@@ -57,6 +57,8 @@ class PLC_Motor( Motor ) :
     attributes.defaultValue = True
     self._faulted = PLC.Tag( plc, tagBase + "_Axis.ModuleFault", attributes )
 
+    self._seekStartPosition = 0
+
   #---------------------------------------------------------------------
   def isFunctional( self ) :
     """
@@ -76,7 +78,18 @@ class PLC_Motor( Motor ) :
     Args:
       positions: Position to seek (in motor units).
     """
+    self._seekStartPosition = self.getPosition()
     self._setPosition.set( position )
+
+  #---------------------------------------------------------------------
+  def getSeekStartPosition( self ) :
+    """
+    Get the position the current (or last) seek started from.
+
+    Returns:
+      Position the current (or last) seek started from.
+    """
+    return self._seekStartPosition
 
   #---------------------------------------------------------------------
   def getDesiredPosition( self ) :
