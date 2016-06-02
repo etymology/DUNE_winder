@@ -132,7 +132,8 @@ class Process :
         "ERROR_RESET",
         "PLC error acknowledgment and clear."
       )
-      self._io.plcLogic.reset()
+      
+    self._io.plcLogic.reset()
 
   #---------------------------------------------------------------------
   def createAPA( self, apaName ) :

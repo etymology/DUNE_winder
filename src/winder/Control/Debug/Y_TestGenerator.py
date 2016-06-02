@@ -23,6 +23,7 @@ outputFileName = "../Recipes/Y_Test.gc"
 cycles      = 1000
 Y_BOTTOM    = 0
 Y_TOP       = 2750
+Y_MID       = Y_TOP / 2
 Z_RETRACTED = 0
 Z_EXTENDED  = 434
 
@@ -56,18 +57,32 @@ with open( outputFileName, "w" ) as gCodeFile :
   gCodeFile.write( "( Y/Z cycle test using " + str( cycles ) + " cycles.  Random seed: " + str( seed ) + " )\n" )
 
   for cycle in range( 0, cycles ) :
-    y = random.random() * ( Y_TOP - Y_BOTTOM ) + Y_BOTTOM
+
+    def randomY() :
+      setType = random.randint( 0, 2 )
+      y = random.random() * ( Y_MID - Y_BOTTOM ) + Y_BOTTOM
+      if 0 == setType :
+        y = Y_BOTTOM
+      elif 1 == setType :
+        y = Y_TOP
+
+      return y
+    
+    y = randomY()
     gCodeFile.write( "N" + str( cycle + 1 ) + " Y" + str( y ) + "\n" )
 
     # Go and get head.
     gCodeFile.write( "Z" + str( Z_EXTENDED ) + "\n" )
-    gCodeFile.write( "G100" )
+    gCodeFile.write( "G100\n" )
     gCodeFile.write( "Z" + str( Z_RETRACTED ) + "\n" )
+
+    y = randomY()
+    gCodeFile.write( "Y" + str( y ) + "\n" )
 
     # Return head.
     gCodeFile.write( "Z" + str( Z_EXTENDED ) + "\n" )
-    gCodeFile.write( "G100" )
-    gCodeFile.write( "G100" )
+    gCodeFile.write( "G100\n" )
+    gCodeFile.write( "G100\n" )
     gCodeFile.write( "Z" + str( Z_RETRACTED ) + "\n" )
 
 # Use the recipe to create hash.

@@ -156,7 +156,7 @@ function Jog()
         {
           min: 1,
           max: 500,
-          value: 100,
+          value: 500,
           change: sliderFunction,
           slide: sliderFunction
         }
