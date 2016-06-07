@@ -562,11 +562,16 @@ var WinderInterface = function()
     {
       $( tagId ).prop( "disabled", true )
 
-      // Get the initial value.
-      self.remoteAction( getQuery, updateFunction )
+      queryFunction = function()
+      {
+        // Get the initial value.
+        self.remoteAction( getQuery, updateFunction )
+      }
+
+      queryFunction()
 
       // Also get the initial value when errors clear.
-      self.addErrorClearCallback( updateFunction )
+      self.addErrorClearCallback( queryFunction )
     }
 
     // Disable the button if there is a loss of communication to server.

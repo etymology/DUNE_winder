@@ -256,8 +256,8 @@ function APA()
   winder.addErrorClearCallback( this.populateLists )
 
   // Set updates of current line and total lines.
-  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getLine()", "#currentLine" )
-  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines" )
+  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getLine()", "#currentLine", null, null, "-" )
+  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines", null, null, "-" )
   winder.addPeriodicRemoteDisplay( "process.spool.getWire()", "#spoolAmount" )
 
   // Special periodic for current APA stage.
@@ -420,6 +420,61 @@ function APA()
     "process.setG_CodeLoop( $ )"
   )
 
+  createSlider = function( slider, getString, setString )
+  {
+    var isLoad = true
+    velocitySliderFunction =
+      function( event, ui )
+      {
+        $( "#" + slider + "Value" ).html( ui.value + "%" )
+      }
+
+    $( "#" + slider + "Slider" )
+      .slider
+      (
+        {
+          min: 5,
+          max: 100,
+          value: 100,
+          step: 5,
+
+          change: function( event, ui )
+          {
+            if ( ! isLoad )
+            {
+              var value = ui.value / 100.0
+              winder.remoteAction( setString + "( " + value + " )" )
+            }
+            velocitySliderFunction( event, ui )
+            isLoad = false
+          },
+
+          slide: velocitySliderFunction
+        }
+      )
+
+      var readSlider = function()
+      {
+        winder.remoteAction
+        (
+          getString + "()",
+          function( value )
+          {
+            isLoad = true
+            value *= 100
+            $( "#" + slider + "Slider" ).slider( "value", value )
+          }
+        )
+      }
+
+      readSlider()
+      winder.addErrorClearCallback( readSlider )
+  }
+
+
+  createSlider( "velocity", "process.gCodeHandler.getVelocityScale", "process.setG_CodeVelocityScale" )
+  //createSlider( "acceleration" )
+  //createSlider( "deceleration" )
 
 }
 

@@ -32,9 +32,9 @@ tr.gCodeNextLine
   margin-bottom: 10px;
 }
 
-#velocitySlider
+#velocitySlider, #accelerationSlider, #decelerationSlider
 {
-  width: 85%;
+  width: 97%;
 }
 
 #column1
@@ -70,4 +70,11 @@ textarea
 {
   width: 100%;
   height: 4em;
+}
+
+#sliderBox
+{
+  margin-left: 10px;
+  margin-bottom: 10px;
+  width: 500px;
 }

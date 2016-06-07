@@ -100,10 +100,14 @@ function MotorStatus()
     (
       function()
       {
+        var rawVelocity = self.motor[ localAxis + "Velocity" ]
         var acceleration = self.motor[ localAxis + "Acceleration" ]
         var topAcceleration = self.motor[ "maxAcceleration" ]
-        if ( acceleration < 0 )
-          topAcceleration = -self.motor[ "maxDeceleration" ]
+        var direction = ( acceleration < 0 ) ^ ( rawVelocity < 0 )
+        if ( direction )
+          topAcceleration = self.motor[ "maxDeceleration" ]
+
+        topAcceleration *= Math.sign( acceleration )
 
         var level = 0
         if ( topAcceleration != 0 )

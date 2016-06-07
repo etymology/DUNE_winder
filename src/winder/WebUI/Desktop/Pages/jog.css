@@ -30,12 +30,12 @@ button.jog
 {
   margin-left: 10px;
   margin-bottom: 10px;
-  width: 500px;
+  width: 800px;
 }
 
 #velocitySlider
 {
-  width: 85%;
+  width: 95%;
 }
 
 #seekX, #seekY, #seekZ, #extendedPosition

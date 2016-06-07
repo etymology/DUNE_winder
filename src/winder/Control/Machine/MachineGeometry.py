@@ -23,7 +23,7 @@ class MachineGeometry :
 
     # Location of Z-Transfer areas.
     # Top/bottom for Y, left/right for X.
-    self.top    = 2500  / self.scale
+    self.top    = 2800  / self.scale
     self.bottom = -25   / self.scale
     self.left   = -250  / self.scale
     self.right  = 6500  / self.scale

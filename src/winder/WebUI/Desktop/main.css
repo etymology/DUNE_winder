@@ -57,21 +57,27 @@ input, select, textarea
 
 .ui-slider-horizontal
 {
-  height: 2px;
+  height: 15px;
 }
 
 button,
 .select:after,
 .ui-widget-content,
-.ui-widget-content .ui-state-default,
-.ui-widget-header .ui-state-default
+.ui-slider-handle,
+.ui-corner-all,
+.ui-widget-header
 {
-  border-radius: 5%;
+  border-radius: 5% !important;
   background-color: rgba( 128, 128, 255, 0.40 );
-  border-top:    3px solid rgba( 128, 128, 255, 0.75 );
-  border-left:   3px solid rgba( 128, 128, 255, 0.75 );
-  border-bottom: 3px solid rgba( 128, 128, 255, 0.25 );
-  border-right:  3px solid rgba( 128, 128, 255, 0.25 );
+  border-top:    3px solid rgba( 128, 128, 255, 0.75 ) !important;
+  border-left:   3px solid rgba( 128, 128, 255, 0.75 ) !important;
+  border-bottom: 3px solid rgba( 128, 128, 255, 0.25 ) !important;
+  border-right:  3px solid rgba( 128, 128, 255, 0.25 ) !important;
+}
+
+.ui-slider-handle
+{
+  background-color: rgb( 96, 96, 192 ) !important;
 }
 
 button.toggle

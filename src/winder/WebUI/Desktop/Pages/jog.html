@@ -49,7 +49,7 @@
         <article id="headControlDiv">
           <h3>Head Control</h3>
           <button onclick="jog.zRetract()">Retract</button>
-          <button onclick="">Mid</button>
+          <button onclick="jog.zMid()">Mid</button>
           <button onclick="jog.zExtend()">Extend</button>
           <button onclick="jog.latch()">Latch</button>
           <button onclick="jog.latchHome()">Home</button>
@@ -65,11 +65,11 @@
       </article>
     </section>
 
-    <section style="float: left; width: 60%;">
+    <section>
       <article id="velocitySliderBox">
         <h2>Velocity</h2>
-        <p id="velocityValue">500</p>
-        <article id="velocitySlider"></article>
+        <p id="velocityValue">-</p>
+        <div id="velocitySlider"></div>
       </article>
 
       <article id="motorStatusDiv">Loading...</article>

@@ -116,6 +116,17 @@ function Jog()
 
   //-----------------------------------------------------------------------------
   // Uses:
+  //   Partly extend Z axis.
+  //-----------------------------------------------------------------------------
+  this.zMid = function()
+  {
+    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var position = $( "#extendedPosition" ).val() / 2
+    winder.remoteAction( "process.manualSeekZ( " + position + ", " + velocity + " )" )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
   //   Run a latching operation.
   //-----------------------------------------------------------------------------
   this.latch = function()
@@ -141,28 +152,31 @@ function Jog()
     winder.remoteAction( "io.plcLogic.latchUnlock()" )
   }
 
-    winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
 
-    sliderFunction =
-      function( event, ui )
+  winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
+
+  var MAX_VELOCITY = 406.4
+
+  sliderFunction =
+    function( event, ui )
+    {
+      var value = Math.round( ui.value * MAX_VELOCITY / 100.0 * 10.0 ) / 10.0
+      $( "#velocityValue" ).html( value + " mm/s" )
+    }
+
+  ui = new function() { this.value = 100 }
+  sliderFunction( null, ui )
+  $( "#velocitySlider" )
+    .slider
+    (
       {
-        $( "#velocityValue" )
-          .html( $( "#velocitySlider" ).slider( "value" ) );
+        min: 1,
+        max: 100,
+        value: 100,
+        change: sliderFunction,
+        slide: sliderFunction
       }
-
-    $( "#velocitySlider" )
-      .slider
-      (
-        {
-          min: 1,
-          max: 500,
-          value: 500,
-          change: sliderFunction,
-          slide: sliderFunction
-        }
-      )
-
-    winder.periodicRemoteUpdate();
+    )
 }
 
 //-----------------------------------------------------------------------------

@@ -132,7 +132,7 @@ class Process :
         "ERROR_RESET",
         "PLC error acknowledgment and clear."
       )
-      
+
     self._io.plcLogic.reset()
 
   #---------------------------------------------------------------------
@@ -333,6 +333,27 @@ class Process :
     )
 
     self.controlStateMachine.loopMode = isLoopMode
+
+  #---------------------------------------------------------------------
+  def setG_CodeVelocityScale( self, scaleFactor=1.0 ) :
+    """
+    Set the velocity scale factor that limits the speed of all motions.
+
+    Args:
+      scaleFactor: New scale factor (typically between 0.0-1.0, although > 1 is
+                   allowed).
+    """
+    self._log.add(
+      self.__class__.__name__,
+      "VELOCITY_SCALE",
+      "G-Code velocity scale change from "
+        + str( self.gCodeHandler.getVelocityScale() )
+        + " to "
+        + str( scaleFactor ),
+      [ self.gCodeHandler.getVelocityScale(), scaleFactor ]
+    )
+
+    self.gCodeHandler.setVelocityScale( scaleFactor )
 
   #---------------------------------------------------------------------
   def getAPA_List( self ) :

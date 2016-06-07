@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Simulator.Motion import Motion
+from Simulator.TrapezoidalMotion import TrapezoidalMotion
 
 class SimulatedMotor :
 
@@ -24,10 +24,10 @@ class SimulatedMotor :
 
     self._startTime = self._simulationTime.get()
     self._motion =                                          \
-      Motion                                                \
+      TrapezoidalMotion                                     \
       (                                                     \
-        self._jerk,                                         \
         acceleration,                                       \
+        deceleration,                                       \
         velocity,                                           \
         self._position,                                     \
         self._seekPosition                                  \
@@ -118,7 +118,6 @@ class SimulatedMotor :
 
     self._startPosition   = 0
     self._startTime       = simulationTime.get()
-    self._motion          = Motion()
     self._isSeek          = False
     self._isJog           = False
     self._simulationTime  = simulationTime
@@ -134,7 +133,7 @@ class SimulatedMotor :
     self._maxAcceleration = 0
     self._maxVelocity     = 0
     self._startTime       = simulationTime.get()
-    self._motion          = Motion()
+    self._motion          = None
 
     self._desiredPositionTag = plc.setupTag( tagBase + "_POSITION", 0                     )
     self._desiredVelocityTag = plc.setupTag( tagBase + "_Axis.CommandVelocity", 0         )

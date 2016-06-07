@@ -122,6 +122,27 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     return 1 == self._direction
 
   #---------------------------------------------------------------------
+  def setVelocityScale( self, scaleFactor=1.0 ) :
+    """
+    Set the velocity scale factor that limits the speed of all motions.
+
+    Args:
+      scaleFactor: New scale factor (typically between 0.0-1.0, although > 1 is
+                   allowed).
+    """
+    self._velocityScale = scaleFactor
+
+  #---------------------------------------------------------------------
+  def getVelocityScale( self ) :
+    """
+    Get the velocity scale factor that limits the speed of all motions.
+
+    Returns:
+      Scale factor (typically between 0-1.0).
+    """
+    return self._velocityScale
+
+  #---------------------------------------------------------------------
   def stop( self ) :
     """
     Stop the running G-Code.  Call when interrupting G-Code sequence.
@@ -185,10 +206,10 @@ class G_CodeHandler( G_CodeHandlerBase ) :
         self._y += offset.y
 
     velocity = min( self._velocity, self._maxVelocity )
+    velocity *= self._velocityScale
+
     # If an X/Y coordinate change is needed...
     if self._xyChange :
-
-
       # Make the move.
       self._io.plcLogic.setXY_Position( self._x, self._y, velocity )
 
@@ -359,3 +380,5 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     # Delay from G-Code file.
     self._delay = 0
+
+    self._velocityScale = 1.0
