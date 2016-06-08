@@ -129,9 +129,9 @@ function APA_List()
     var apaListTable =
         new FilteredTable
         (
-          [ "Name", "Creation", "Last Modified", "Stage" ],
-          [ false, false, false, true ],
-          [ "25%", "25%", "25%", "25%" ]
+          [ "Name", "Creation", "Last Modified", "Hours", "Stage" ],
+          [ false, false, false, false, true ],
+          [ "20%", "20%", "20%", "20%", "20%" ]
         )
 
     winder.remoteAction
@@ -149,6 +149,7 @@ function APA_List()
           subSet.push( item[ '_name' ] )
           subSet.push( self.toLocalTime( item[ '_creationDate' ] ) )
           subSet.push( self.toLocalTime( item[ '_lastModifyDate' ] ) )
+          subSet.push( Math.round( item[ '_windTime' ] / 3600.0 * 100 ) / 100 )
           subSet.push( STAGES[ item[ '_stage' ] ] )
 
           apaList.push( subSet )
@@ -160,7 +161,7 @@ function APA_List()
         }
 
         apaListTable.loadFromArray( apaList )
-        apaListTable.setSort( 0, 1 )
+        apaListTable.setSort( "0", 1 )
 
         // For every row of the table, setup a click callback such that when
         // a row is clicked, it loads and displays the details of that entry.
@@ -211,7 +212,6 @@ $( document ).ready
 (
   function()
   {
-    // Winder.inhibitUpdates()
     apaList = new APA_List()
   }
 )

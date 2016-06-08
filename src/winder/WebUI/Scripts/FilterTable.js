@@ -26,9 +26,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   // Table data.
   var data
 
-  var activeFilter = [ null, "" ]
-  var sortColumn = null
-  var sortDirection = null
+  var columnFilters = null
+
+  var sortArray = []
 
   var filteredData
 
@@ -88,54 +88,57 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   {
     filteredData = []
 
-    if ( column && ( null !== filter ) )
-      activeFilter = [ column, filter ]
-    else
+    // Loop through all the raw data looking for matches...
+    for ( var rowIndex in data )
     {
-      column = activeFilter[ 0 ]
-      filter = activeFilter[ 1 ]
-    }
+      var row = data[ rowIndex ]
 
-    // If there is a filter to apply...
-    if ( "" != filter )
-    {
-      // Loop through all the raw data looking for matches...
-      for ( var rowIndex in data )
-      {
-        row = data[ rowIndex ]
+      var addRow = true
+      for ( var column in row )
         // If this row is a match, add it to the filter data.
-        if ( row[ column ] == filter )
-          filteredData.push( row )
-      }
-    }
-    else
-      // Make copy of data.
-      filteredData = data.slice()
-
-    // If sorting is enabled...
-    if ( ( null !== sortColumn )
-      && ( null !== sortDirection ) )
-    {
-      // Do a sort using a custom callback that sorts based on the select column
-      // and direction of sort.
-      filteredData.sort
-      (
-        function( a, b )
+        if ( ( null != columnFilters )
+          && ( null != columnFilters[ column ] ) )
         {
-          // Get the objects in the selected column as strings.
-          a = a[ sortColumn ].toString()
-          b = b[ sortColumn ].toString()
-
-          // Compare strings.
-          var result = a.localeCompare( b )
-
-          // Account for sort direction.
-          // (Remember: sort direction is either 1 or -1.)
-          result *= sortDirection
-
-          return result
+          addRow &= columnFilters[ column ][ row[ column ] ]
         }
-      )
+
+      if ( addRow )
+        filteredData.push( row )
+    }
+
+    for ( var forwardIndex in sortArray )
+    {
+      // Sort happens in reverse order using the oldest filters first, and
+      // moving to the newest last.
+      var index = sortArray.length - 1 - forwardIndex
+      var sortColumn    = sortArray[ index ][ 0 ]
+      var sortDirection = sortArray[ index ][ 1 ]
+
+      // If sorting is enabled...
+      if ( ( null !== sortColumn )
+        && ( null !== sortDirection ) )
+      {
+        // Do a sort using a custom callback that sorts based on the select column
+        // and direction of sort.
+        filteredData.sort
+        (
+          function( a, b )
+          {
+            // Get the objects in the selected column as strings.
+            a = a[ sortColumn ].toString()
+            b = b[ sortColumn ].toString()
+
+            // Compare strings.
+            var result = a.localeCompare( b )
+
+            // Account for sort direction.
+            // (Remember: sort direction is either 1 or -1.)
+            result *= sortDirection
+
+            return result
+          }
+        )
+      }
     }
   }
 
@@ -150,14 +153,20 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   //---------------------------------------------------------------------------
   this.setSort = function( column, direction )
   {
-    sortColumn = column
-
     if ( direction )
       direction = 1
     else
       direction = -1
 
-    sortDirection = direction
+    // If this sort is already being applied, remove it.
+    for ( index in sortArray )
+    {
+      if ( column == sortArray[ index ][ 0 ]  )
+        sortArray.splice( index, 1 )
+    }
+
+    // Push new sort ordering to the front of the array.
+    sortArray.unshift( [ column, direction ] )
 
     // Re-run the filter.
     self.filter()
@@ -194,11 +203,12 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
       }
     }
 
+    var newColumnFilters = []
     var tableHeader = $( "<thead />" ).appendTo( table )
 
     // Table heading with column names.
     var tableRow = $( "<tr />" ).appendTo( tableHeader )
-    for ( var columnIndex in columnNames )
+    for ( let columnIndex in columnNames )
     {
       // Look up column name.
       var columnName = columnNames[ columnIndex ]
@@ -208,7 +218,7 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
       var cell = $( "<th/>" )
         .appendTo( tableRow )
-        .text( columnName )
+        .css( "position", "relative" )
         .click
         (
           function()
@@ -216,24 +226,162 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
             var message = $( "<p />" ).attr( "id", idString ).text( "Sorting..." )
             $( tableId ).replaceWith( message )
 
-            if ( localColumn != sortColumn )
+            if ( ( ! sortArray[ 0 ] )
+              || ( localColumn != sortArray[ 0 ][ 0 ] ) )
             {
-              sortColumn = localColumn
-              sortDirection = 1
+              self.setSort( localColumn, 1 )
             }
             else
-              sortDirection *= -1
+              sortArray[ 0 ][ 1 ] *= -1
 
             self.filter()
             self.display( tableId )
           }
         )
 
+      var subCell = $( "<span/>" ).text( columnName )
+      newColumnFilters[ columnIndex ] = null
+      if ( columnFilterEnables[ columnIndex ] )
+      {
+        let localMouseControl = false
+        var dropDown =
+          $( "<div>" )
+            .attr( "class", "dropDown" )
+            .mouseout
+            (
+              function()
+              {
+                localMouseControl = false
+              }
+            )
+            .mouseenter
+            (
+              function()
+              {
+                localMouseControl = true
+              }
+            )
+            .click
+            (
+              function()
+              {
+                return localMouseControl
+              }
+            )
+            .append
+            (
+              $( "<p>" ).html( columnName + "&#9662;" )
+            )
+
+        subCell = dropDown
+
+        let optionsDiv = $( "<div/>" )
+          .appendTo( dropDown )
+          .mouseleave
+          (
+            function()
+            {
+              self.filter()
+              self.display( tableId )
+            }
+          )
+
+        // Select all options.
+        $( "<button />" )
+          .appendTo( optionsDiv )
+          .text( "All" )
+          .click
+          (
+            function()
+            {
+              $( optionsDiv )
+                .find( "button.toggle" )
+                .each
+                (
+                  function()
+                  {
+                    $( this ).click()
+                  }
+                )
+            }
+          )
+
+        // Select no options.
+        $( "<button />" )
+          .appendTo( optionsDiv )
+          .text( "None" )
+          .click
+          (
+            function()
+            {
+              $( optionsDiv )
+                .find( "button.toggleDown" )
+                .each
+                (
+                  function()
+                  {
+                    $( this ).click()
+                  }
+                )
+            }
+          )
+
+        newColumnFilters[ columnIndex ] = {}
+
+        // Get all the unique items in this column.
+        var items = this.getUnique( columnIndex )
+        items.sort()
+
+        // Display filtering options for column.
+        for ( var index in items )
+        {
+          let item = items[ index ]
+          newColumnFilters[ columnIndex ][ item ] = true
+
+          var buttonValue = true
+          var buttonClass = "toggleDown"
+          if ( null != columnFilters )
+          {
+            buttonValue = columnFilters[ columnIndex ][ item ]
+            if ( ! buttonValue )
+              buttonClass = "toggle"
+          }
+
+          $( "<button />" )
+            .appendTo( optionsDiv )
+            .val( buttonValue )
+            .attr( "class", buttonClass )
+            .text( item )
+            .click
+            (
+              function()
+              {
+                $( this ).toggleClass( "toggle" )
+                $( this ).toggleClass( "toggleDown" )
+
+                var value = false
+                if ( $( this ).attr( 'class' ) == "toggleDown" )
+                  value = true
+
+                columnFilters[ localColumn ][ item ] = value
+
+                $( this ).val( value )
+              }
+            )
+        }
+
+        if ( null == columnFilters )
+          columnFilters = newColumnFilters
+      }
+
+      cell.append( subCell )
+
       // If this is the sorted column, draw the arrow.
-      if ( columnIndex == sortColumn )
+      if ( ( sortArray[ 0 ] )
+        && ( columnIndex == sortArray[ 0 ][ 0 ] ) )
       {
         var arrow = "&#8593;"
-        if ( -1 == sortDirection )
+        if ( -1 == sortArray[ 0 ][ 1 ] )
           arrow = "&#8595;"
 
         // Create a <div> tag to hold sorting arrow.
@@ -245,7 +393,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
             {
               "border" : "none",
               "background" : "none",
-              "float" : "right",
+              "position" : "absolute",
+              "right" : 4,
+              "top" : 0,
               "margin" : 0,
               "padding" : 0
             }
@@ -254,66 +404,6 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
           .appendTo( cell )
 
       }
-    }
-
-    // Filter drop-downs.
-    tableRow = $( "<tr />" ).appendTo( tableHeader )
-    for ( var column in columnNames )
-    {
-      // If this column can be filtered...
-      if ( columnFilterEnables[ column ] )
-      {
-        var cell = $( "<td/>" ).appendTo( tableRow )
-
-        // Localize column for callback function.
-        let currentColumn = column
-
-        // Pull-down select tag with a callback to apply a filter to this
-        // column.
-        var selectElement =
-          $( '<select />' )
-            .appendTo( cell )
-            .change
-            (
-              function()
-              {
-                // Get the filter value.
-                var filter = $( this ).val()
-
-                // Filter this column using the filter value.
-                self.filter( currentColumn, filter )
-
-                // Redraw table.
-                self.display( tableId )
-              }
-            )
-
-        // Default no filtering option.
-        $( "<option></option>" ).appendTo( selectElement )
-
-        // Get all the unique items in this column.
-        var items = this.getUnique( column )
-
-        // Display filtering options for column.
-        for ( var index in items )
-        {
-          var item = items[ index ]
-          $( "<option />" )
-            .appendTo( selectElement )
-            .text( item )
-        }
-
-        // Select the active filter (if filtering is enabled).
-        if ( activeFilter[ 0 ] == column )
-          selectElement.val( activeFilter[ 1 ] )
-        else
-          selectElement.val( "" )
-
-      }
-      else
-        // If no filter for this column, just make a blank column.
-        $( "<td/>" ).appendTo( tableRow )
-
     }
 
     // If there is as yet no filtered data, use the full data set.

@@ -48,7 +48,7 @@ span.error
   font-weight: bold;
 }
 
-input, select, textarea
+input, select, textarea, .dropDownButton
 {
   background-color: rgba( 80, 80, 200, 0.25 );
   border-color:     rgba( 40, 40, 114, 0.75 );
@@ -65,7 +65,7 @@ button,
 .ui-widget-content,
 .ui-slider-handle,
 .ui-corner-all,
-.ui-widget-header
+.ui-widget-header, .dropDownContent
 {
   border-radius: 5% !important;
   background-color: rgba( 128, 128, 255, 0.40 );
@@ -80,17 +80,18 @@ button,
   background-color: rgb( 96, 96, 192 ) !important;
 }
 
-button.toggle
+button.toggle, button.toggleDown
 {
+  margin: 2px;
 }
 
 button.toggleDown
 {
-  background-color: rgba( 96 , 96 , 255, 0.25 );
-  border-top:    3px solid rgba( 128, 128, 192, 0.25 );
-  border-left:   3px solid rgba( 128, 128, 192, 0.25 );
-  border-bottom: 3px solid rgba( 128, 128, 192, 0.75 );
-  border-right:  3px solid rgba( 128, 128, 192, 0.75 );
+  background-color: rgba( 64 , 64 , 225, 0.25 );
+  border-top:    3px solid rgba( 128, 128, 255, 0.25 ) !important;
+  border-left:   3px solid rgba( 128, 128, 255, 0.25 ) !important;
+  border-bottom: 3px solid rgba( 128, 128, 255, 0.75 ) !important;
+  border-right:  3px solid rgba( 128, 128, 255, 0.75 ) !important;
 }
 
 article, .standardFrame
@@ -120,36 +121,40 @@ h1, h2, h3, h4, h5, h6, p
   padding: 0;
 }
 
-
-
-
-
-
-.select
+/*
+ * Drop-down boxes.
+ */
+.dropDown
 {
-  /*position: relative;
-  display: block;*/
+  position: relative;
+  display: inline-block;
 }
 
-select
+.dropDown p
 {
-  /*-webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 100%;*/
-}
-
-/*.select:after
-{
-  content: "\25BC";
-  position: absolute;
-  right: 0px;
-  top: 0;
-  text-shadow: 2px 2px 5px rgba( 0, 0, 0, 0.75 );
-  z-index: 1;
+  display: block;
+  min-width: 100px;
   text-align: center;
-  width: 25px;
-  height: 100%;
-  pointer-events: none;
-  box-sizing: border-box;
-}*/
+  padding: 2px;
+  border-radius: 5% !important;
+}
+
+.dropDown div
+{
+  padding: 4px;
+  display: none;
+  position: absolute;
+  min-width: 160px;
+  background-color: rgb( 99, 99, 129 );
+}
+
+.dropDown button
+{
+  min-width: 150px;
+}
+
+.dropDown:hover div
+{
+  display: block;
+}
+

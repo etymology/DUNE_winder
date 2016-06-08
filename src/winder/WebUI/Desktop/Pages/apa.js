@@ -348,11 +348,11 @@ function APA()
 
   )
 
-  this.createRandomAPA = function()
+  this.createRandomAPA = function( number )
   {
     winder.remoteAction
     (
-      'APA_Generator.create( process, 1 )',
+      'APA_Generator.create( process, ' + number + ' )',
       function()
       {
         self.populateLists()

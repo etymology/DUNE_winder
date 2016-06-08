@@ -7,6 +7,7 @@
 ###############################################################################
 import random
 from Control.Process import Process
+from Control.APA_Base import APA_Base
 
 class APA_Generator :
 
@@ -33,6 +34,10 @@ class APA_Generator :
         + str( random3 ).zfill( 4 )
 
       process.createAPA( name )
+
+      stage = random.randint( 0, APA_Base.Stages.COMPLETE )
+      process.apa.setStage( stage, "Setting of random initial stage" )
+      process.apa._windTime = random.randint( stage * 9 * 60 * 60, stage * 12 * 60 * 60 )
 
 
 if __name__ == "__main__":

@@ -141,7 +141,7 @@ class SimulatedMotor :
     self._directionTag    = plc.setupTag( tagBase + "_DIR", 0                          )
     self._positionTag     = plc.setupTag( tagBase + "_Axis.ActualPosition", 0          )
     self._velocityTag     = plc.setupTag( tagBase + "_Axis.ActualVelocity", 0          )
-    self._accelerationTag = plc.setupTag( tagBase + "_Axis.ActualAcceleration", 0      )
+    self._accelerationTag = plc.setupTag( tagBase + "_Axis.CommandAcceleration", 0     )
     self._motionTag       = plc.setupTag( tagBase + "_Axis.CoordinatedMotionStatus", 0 )
     self._faultTag        = plc.setupTag( tagBase + "_Axis.ModuleFault", 0             )
 

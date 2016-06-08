@@ -72,7 +72,12 @@ function load( page )
 {
   window.location = "?page=" + page;
 
-  /*if ( winder )
+  /*
+
+  $$$FUTURE - This will load the new page without reloading everything.  Still
+    isn't fully functional.
+
+  if ( winder )
     winder.shutdown()
 
   winder = new WinderInterface()
@@ -232,9 +237,55 @@ $( document ).ready
       window.location = "?page=apa";
     else
     {
-      //load( page )
-
       winder = new WinderInterface()
+
+      // Before sub-pages begin to load, register a callback to run after all
+      // have been loaded.
+      winder.addFullyLoadedCallback
+      (
+        function()
+        {
+          $( "main article" ).each
+          (
+            function()
+            {
+              //$( this ).draggable().resizable()
+            }
+          )
+
+          $( "button.makeToggle" )
+            .each
+            (
+              function()
+              {
+                if ( $( this ).val() )
+                  $( this ).attr( "class", "toggleDown" )
+                else
+                  $( this ).attr( "class", "toggle" )
+
+                //if ( ! $( this ).click() )
+                {
+                  $( this )
+                    .click
+                    (
+                      function()
+                      {
+                        $( this ).toggleClass( "toggle" )
+                        $( this ).toggleClass( "toggleDown" )
+
+                        var value = 0
+                        if ( $( this ).attr( 'class' ) == "toggleDown" )
+                          value = 1
+
+                        $( this ).val( value )
+                      }
+                    )
+                }
+
+              }
+            )
+        }
+      )
 
       // Begin loading the requested sub-page.
       winder.loadSubPage( "/Desktop/Pages/" + page, "#main" )
@@ -311,30 +362,14 @@ $( document ).ready
 
       // Start the periodic updates.
       winder.periodicRemoteUpdate()
-
-      // Make all articles in main draggable and resizable after the page
-      // loads.
-      // $$$DEBUG - Layout function.
-      setTimeout
-      (
-        function()
-        {
-          $( "main article" ).each
-          (
-            function()
-            {
-              $( this ).draggable().resizable()
-            }
-          )
-        },
-        1000
-      )
-
     }
   }
 )
 
-
+//-----------------------------------------------------------------------------
+// Uses:
+//   Callback when version information box is clicked.
+//-----------------------------------------------------------------------------
 function showVersionInformation()
 {
   winder.loadSubPage
@@ -348,6 +383,10 @@ function showVersionInformation()
   )
 }
 
+//-----------------------------------------------------------------------------
+// Uses:
+//   Callback for global stop button.
+//-----------------------------------------------------------------------------
 function fullStop()
 {
   winder.remoteAction( 'process.stop()' )

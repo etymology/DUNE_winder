@@ -67,12 +67,19 @@ var WinderInterface = function()
   // Callbacks to run when periodic functions have all been run.
   var onPeriodicEndCallbacks = []
 
+  // Callbacks run once pages is completely loaded.
+  var onFullyLoadedCallbacks = []
+
   // Default error string.
   this.errorString = '<span class="error">X</span>'
 
   // Enable states of the toggle buttons.  If an error occurs, all the toggle buttons are
   // disabled.  The state they were before being disabled is saved in this map.
   var toggleButtonStates = {}
+
+  // Number of pages currently still loading.
+  // Used for triggering fully-loaded event.
+  var pagesLoading = 0
 
   //---------------------------------------------------------------------------
   // Uses:
@@ -164,6 +171,8 @@ var WinderInterface = function()
 
     $( "head" ).append( cssLink )
 
+    pagesLoading += 1
+
     $( tag )
       .load
       (
@@ -173,7 +182,22 @@ var WinderInterface = function()
           // Load the Javascipt for this page.
           // NOTE: Done after the page loads so that all elements have been
           // created before Javascript runs.
-          $.getScript( page + ".js", callback )
+          $.getScript
+          (
+            page + ".js",
+            function()
+            {
+              if ( callback )
+                callback()
+
+              pagesLoading -= 1
+
+              // If all pages have been loaded, run fully loaded callbacks.
+              if ( 0 == pagesLoading )
+                for ( var index in onFullyLoadedCallbacks )
+                  onFullyLoadedCallbacks[ index ]()
+            }
+          )
         }
       )
   }
@@ -658,6 +682,17 @@ var WinderInterface = function()
   this.addPeriodicEndCallback = function( callback )
   {
     onPeriodicEndCallbacks.push( callback )
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Add a callback to be run after the entire pages has finished loading.
+  // Input:
+  //   callback - Function to run.
+  //---------------------------------------------------------------------------
+  this.addFullyLoadedCallback = function( callback )
+  {
+    onFullyLoadedCallbacks.push( callback )
   }
 
   //---------------------------------------------------------------------------

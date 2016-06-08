@@ -11,7 +11,7 @@
 
 #apaListDiv
 {
-  max-height: 890px;
+  height: 890px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
