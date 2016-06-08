@@ -20,10 +20,10 @@ class Head :
     SECOND_SEEK = 5
   # end class
 
-  FRONT = 0
-  PARTIAL_FRONT = 1
-  PARTIAL_BACK  = 2
-  BACK = 3
+  RETRACTED = 0
+  FRONT     = 1
+  BACK      = 2
+  EXTENDED  = 3
 
   #---------------------------------------------------------------------
   def isIdle( self ) :
@@ -67,15 +67,25 @@ class Head :
       self._state = self.States.SEEK
 
   #---------------------------------------------------------------------
-  def __init__( self, io, geometry ) :
+  def __init__( self, io, retracted, extended, front, back ) :
     """
     Constructor.
+
+    Args:
+      io: Instance of machine I/O.
+      retracted: Fully retracted seek position.
+      extended: Fully extended seek position.
+      front: Level with front side of layer seek position.
+      back: Level with back side of layer seek position.
     """
     self._io = io
-    self._geometry = geometry
-    self._position = Head.FRONT
-    self._velocity = None
-    self._lastSeek = None
+    self._extended  = extended
+    self._retracted = retracted
+    self._front     = front
+    self._back      = back
+    self._position  = Head.RETRACTED
+    self._velocity  = None
+    self._lastSeek  = None
     self._state = self.States.IDLE
 
   #---------------------------------------------------------------------
@@ -84,7 +94,7 @@ class Head :
     Set the head position.
 
     Args:
-      position: FRONT/PARTIAL_FRONT/PARTIAL_BACK/BACK.
+      position: RETRACTED/FRONT/BACK/EXTENDED.
       velocity: Max travel velocity.
     """
     isError = True
@@ -94,28 +104,30 @@ class Head :
 
       self._velocity = velocity
 
-      if self.FRONT == position :
-        desiredPosition = self._geometry.frontZ
-      elif self.PARTIAL_FRONT == position :
-        desiredPosition = self._geometry.partialZ_Front
-      elif self.PARTIAL_BACK == position :
-        desiredPosition = self._geometry.partialZ_Back
+      if self.RETRACTED == position :
+        desiredPosition = self._retracted
+      elif self.FRONT == position :
+        desiredPosition = self._front
       elif self.BACK == position :
-        desiredPosition = self._geometry.backZ
+        desiredPosition = self._back
+      elif self.EXTENDED == position :
+        desiredPosition = self._extended
+      else:
+        raise "Unknown head position request" + str( position )
 
       # Do we have to go get/leave the head?
-      if self.BACK == self._position or self.BACK == position :
+      if self.EXTENDED == self._position or self.EXTENDED == position :
 
         # The last seek is the set to the desired position.  If the back is
         # the desired position, then the last seek will be to the front, leaving
         # the head on the back.
-        if self.BACK == position :
-          self._lastSeek = self._geometry.frontZ
+        if self.EXTENDED == position :
+          self._lastSeek = self._retracted
         else :
           self._lastSeek = desiredPosition
 
         # First seek is all the way to the back.
-        desiredPosition = self._geometry.backZ
+        desiredPosition = self._extended
 
         # After the seek is complete, begin a latch operation.
         self._nextState = self.States.START_LATCH
@@ -140,7 +152,7 @@ class Head :
     Get the current position of the head.
 
     Returns:
-      FRONT/PARTIAL_FRONT/PARTIAL_BACK/BACK.
+      RETRACTED/FRONT/BACK/EXTENDED.
     """
     return self._position
 

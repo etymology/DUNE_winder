@@ -26,13 +26,15 @@ class Settings :
 
   IO_LOG = "../Data/IO_log.csv"
 
+  MACHINE_CALIBRATION_FILE = "machineCalibration.xml"
+
   WEB_DIRECTORY = "../WebUI"
 
   # File making up the version for the control software.
   CONTROL_FILES = ".*\.py$"
 
   # File making up the version for the user interface.
-  UI_FILES = ".*\.html|.*\.css|.*\.js"
+  UI_FILES = ".*\.html$|.*\.css$|.*\.js$"
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -51,6 +53,8 @@ class Settings :
 
     # Log file locations.
     configuration.default( "LogDirectory", "../Data" )
+    configuration.default( "machineCalibrationPath", "../Data/" )
+    configuration.default( "machineCalibrationFile", Settings.MACHINE_CALIBRATION_FILE )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
     configuration.default( "recipeDirectory", "../Recipes" )
     configuration.default( "recipeArchiveDirectory", "../Data/Recipes" )

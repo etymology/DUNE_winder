@@ -9,6 +9,8 @@ from Library.Geometry.Location import Location
 from Library.SerializableLocation import SerializableLocation
 
 from Machine.LayerCalibration import LayerCalibration
+from Machine.MachineCalibration import MachineCalibration
+from Machine.MachineGeometry import MachineGeometry
 from Machine.X_LayerGeometry import X_LayerGeometry
 from Machine.V_LayerGeometry import V_LayerGeometry
 from Machine.U_LayerGeometry import U_LayerGeometry
@@ -19,7 +21,36 @@ from RecipeGenerator.LayerV_Recipe import LayerV_Recipe
 from RecipeGenerator.LayerU_Recipe import LayerU_Recipe
 from RecipeGenerator.LayerG_Recipe import LayerG_Recipe
 
-class DefaultCalibration( LayerCalibration ) :
+class DefaultMachineCalibration( MachineCalibration ) :
+
+  #---------------------------------------------------------------------
+  def __init__( self, outputFilePath, outputFileName ) :
+    """
+    """
+    geometry = MachineGeometry()
+
+    self.park = SerializableLocation()
+    self.spoolLoad = SerializableLocation()
+
+    self.transferLeft     = geometry.left
+    self.transferLeftTop  = geometry.top / 2
+    self.transferTop      = geometry.top
+    self.transferRight    = geometry.right
+    self.transferRightTop = geometry.top / 2
+    self.transferBottom   = geometry.bottom
+
+    self.limitLeft        = geometry.left
+    self.limitTop         = geometry.top
+    self.limitRight       = geometry.right
+    self.limitBottom      = geometry.bottom
+    self.zFront           = 0
+    self.zBack            = geometry.zTravel
+    self.zLimitFront      = 0
+    self.zLimitRear       = geometry.zTravel
+
+    self.save( outputFilePath, outputFileName, "MachineCalibration" )
+
+class DefaultLayerCalibration( LayerCalibration ) :
 
   #---------------------------------------------------------------------
   def __init__( self, outputFilePath, outputFileName, layerName ) :
@@ -47,7 +78,9 @@ class DefaultCalibration( LayerCalibration ) :
       raise "Unknown layer: " + str( layerName )
 
     LayerCalibration.__init__( self, layerName )
-    self.setOffset( SerializableLocation( 0, 0 ) )
+    self.offset = SerializableLocation( 0, 0 )
+    self.zFront = geometry.frontZ
+    self.zBack  = geometry.backZ
 
     for node in recipe.nodes :
       location = recipe.nodes[ node ]
@@ -59,7 +92,8 @@ class DefaultCalibration( LayerCalibration ) :
 # end class
 
 if __name__ == "__main__":
-  DefaultCalibration( ".", "X_Calibration.xml", "X" )
-  DefaultCalibration( ".", "V_Calibration.xml", "V" )
-  DefaultCalibration( ".", "U_Calibration.xml", "U" )
-  DefaultCalibration( ".", "G_Calibration.xml", "G" )
+  DefaultMachineCalibration( ".", "MachineCalibration.xml" )
+  DefaultLayerCalibration( ".", "X_Calibration.xml", "X" )
+  DefaultLayerCalibration( ".", "V_Calibration.xml", "V" )
+  DefaultLayerCalibration( ".", "U_Calibration.xml", "U" )
+  DefaultLayerCalibration( ".", "G_Calibration.xml", "G" )

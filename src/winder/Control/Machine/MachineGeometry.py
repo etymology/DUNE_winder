@@ -32,6 +32,9 @@ class MachineGeometry :
     # The Z-transfer windows start at top/bottom/left/right locations.
     self.zWindow = 20
 
+    # Amount of distance the Z-axis can travel.
+    self.zTravel = 434
+
     # Lines defining the where a Z hand-off can take place.  Used for intercept
     # calculations.
     self.lineTop    = Line( 0, self.top )

@@ -10,17 +10,13 @@ import xml.dom.minidom
 import os.path
 
 # $$$TEMPORARY - Temporary.
-from Debug.DefaultCalibration import DefaultCalibration
+from Debug.DefaultCalibration import DefaultLayerCalibration
 
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
 
 from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
-from Machine.G_LayerGeometry import G_LayerGeometry
-from Machine.U_LayerGeometry import U_LayerGeometry
-from Machine.V_LayerGeometry import V_LayerGeometry
-from Machine.X_LayerGeometry import X_LayerGeometry
 
 from APA_Base import APA_Base
 
@@ -110,23 +106,11 @@ class AnodePlaneArray( APA_Base ) :
     if None != layer :
       self._layer = layer
 
-    if "G" == self._layer :
-      geometry = G_LayerGeometry()
-    elif "U" == self._layer :
-      geometry = U_LayerGeometry()
-    elif "V" == self._layer :
-      geometry = V_LayerGeometry()
-    elif "X" == self._layer :
-      geometry = X_LayerGeometry()
-    else:
-      raise Exception( "Recipe has no layer for geometry." )
-
-    # $$$TEMPORARY - Temporary.
+    # $$$TEMPORARY - Temporary.  Load the actual calibration file instead.
     self._calibrationFile = self._layer + "_Calibration.xml"
     self._calibration = \
-      DefaultCalibration( self._getPath(), self._calibrationFile, self._layer )
+      DefaultLayerCalibration( self._getPath(), self._calibrationFile, self._layer )
 
-    # $$$TEMPORARY - Temporary.
     self._gCodeHandler.useCalibration( self._calibration )
 
     if None != recipeFile :
@@ -137,7 +121,7 @@ class AnodePlaneArray( APA_Base ) :
 
     self._recipe = \
       Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
-    self._gCodeHandler.loadG_Code( self._recipe.getLines(), geometry )
+    self._gCodeHandler.loadG_Code( self._recipe.getLines(), self._calibration )
 
     # Assign a G-Code log.
     gCodeLogName = self._getG_CodeLogName( self._layer )

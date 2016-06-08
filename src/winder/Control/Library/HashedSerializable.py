@@ -17,7 +17,7 @@ from Serializable import Serializable
 class HashedSerializable( Serializable ) :
 
   #-------------------------------------------------------------------
-  def __init__( self, includeOnly=None, exclude=None ) :
+  def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ) :
     """
     Constructor.
 
@@ -28,7 +28,7 @@ class HashedSerializable( Serializable ) :
         must be None for this to have effect.  None to include all class
         variables.
     """
-    Serializable.__init__( self, includeOnly, exclude )
+    Serializable.__init__( self, includeOnly, exclude, ignoreMissing )
 
     # Hash of XML data used for modification detection.
     self.hashValue = ""

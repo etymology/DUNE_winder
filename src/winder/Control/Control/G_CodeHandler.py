@@ -198,9 +198,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     # Interpret the next line.
     self._gCode.executeNextLine( self._nextLine )
 
-    # Calibrate the position (if we have a calibration file.)
-    if self._calibration :
-      offset = self._calibration.getOffset()
+    # Calibrate the position (if we have a layerCalibration file.)
+    if self._layerCalibration :
+      offset = self._layerCalibration.offset
       if offset :
         self._x += offset.x
         self._y += offset.y
@@ -278,21 +278,27 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
-  def loadG_Code( self, lines, geometry ) :
+  def loadG_Code( self, lines, calibration ) :
     """
     Load G-Code file.
 
     Args:
       fileName: Full file name to G-Code to be loaded.
-      geometry: Instance of machine geometry.
+      calibration: Calibration for layer being loaded.
     """
     self._gCode = G_Code( lines, self._callbacks )
     self._currentLine = -1
     self._nextLine = -1
-    self._geometry = geometry
 
-    # $$$DEBUG - G-Code shouldn't need geometry--only calibration.
-    self._head._geometry = geometry
+    # Create instance of head.
+    self._head = \
+      Head(
+        self._io,
+        self._machineCalibration.zFront,
+        self._machineCalibration.zBack,
+        calibration.zFront,
+        calibration.zBack
+      )
 
     # Use current X/Y/Z position as starting points.
     # (These will be moved to self.lastN when the next line is executed.)
@@ -341,31 +347,23 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._gCodeLog = open( gCodeLogFile, "a" )
 
   #---------------------------------------------------------------------
-  def useCalibration( self, calibration ) :
-    """
-    Give handler an instance of Calibration to use for pin locations.  Must
-    be called before running G-Code.
-    """
-    self._calibration = calibration
-
-  #---------------------------------------------------------------------
-  def __init__( self, io, spool, geometry=None ):
+  def __init__( self, io, spool, machineCalibration ):
     """
     Constructor.
 
     Args:
       io: Instance of I/O map.
       spool: Instance of Spool.
-      geometry: Machine geometry.
+      machineCalibration: Machine calibration instance.
     """
-    G_CodeHandlerBase.__init__( self )
+    G_CodeHandlerBase.__init__( self, machineCalibration )
 
     self._gCode = None
 
     self._io = io
     self._spool = spool
 
-    self._head = Head( io, geometry )
+    self._head = None
 
     self._direction = 1
     self.runToLine = -1

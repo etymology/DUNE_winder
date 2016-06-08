@@ -13,6 +13,8 @@
 from Library.G_Code import G_CodeCallbacks
 
 from Library.Geometry.Location import Location
+from Library.Geometry.Line    import Line
+from Library.Geometry.Box     import Box
 from Library.Geometry.Segment import Segment
 
 from .G_Codes import G_Codes
@@ -123,11 +125,7 @@ class G_CodeHandlerBase :
       startLocation = Location( self._lastX, self._lastY, self._lastZ )
       endLocation = Location( self._x, self._y, self._z )
       segment = Segment( startLocation, endLocation )
-
-      if not self._geometry :
-        raise Exception( "G-Code request for boundary move, but no geometry to use." )
-
-      location = self._geometry.edges.intersectSegment( segment )
+      location = self._edges.intersectSegment( segment )
 
       self._x = location.x
       self._y = location.y
@@ -139,11 +137,11 @@ class G_CodeHandlerBase :
       pinNumberB = function[ 2 ]
       axies = function[ 3 ]
 
-      if not self._calibration :
-        raise Exception( "G-Code request for calibrated move, but no calibration to use." )
+      if not self._layerCalibration :
+        raise Exception( "G-Code request for calibrated move, but no layer calibration to use." )
 
-      pinA = self._calibration.getPinLocation( pinNumberA )
-      pinB = self._calibration.getPinLocation( pinNumberB )
+      pinA = self._layerCalibration.getPinLocation( pinNumberA )
+      pinB = self._layerCalibration.getPinLocation( pinNumberB )
       center = pinA.center( pinB )
 
       if "X" in axies :
@@ -159,10 +157,10 @@ class G_CodeHandlerBase :
       oldX = self._x
       oldY = self._y
 
-      self._y = max( self._y, self._geometry.bottom )
-      self._y = min( self._y, self._geometry.top )
-      self._x = max( self._x, self._geometry.left )
-      self._x = min( self._x, self._geometry.right )
+      self._y = max( self._y, self._machineCalibration.transferBottom )
+      self._y = min( self._y, self._machineCalibration.transferTop )
+      self._x = max( self._x, self._machineCalibration.transferLeft )
+      self._x = min( self._x, self._machineCalibration.transferRight )
 
       self._xyChange = ( oldX != self._x ) or ( oldY != self._y )
 
@@ -219,7 +217,18 @@ class G_CodeHandlerBase :
     self._velocity = velocity
 
   #---------------------------------------------------------------------
-  def __init__( self ):
+  def useCalibration( self, layerCalibration ) :
+    """
+    Give handler an instance of layerCalibration to use for pin locations.  Must
+    be called before running G-Code.
+
+    Args:
+      layerCalibration: Calibration specific to the layer being wound.
+    """
+    self._layerCalibration = layerCalibration
+
+  #---------------------------------------------------------------------
+  def __init__( self, machineCalibration ):
     """
     Constructor.
     """
@@ -259,5 +268,14 @@ class G_CodeHandlerBase :
     self._maxVelocity = float( "inf" )   # <- No limit.
     self._velocity = 0                   # <- $$$DEBUG
 
-    self._geometry = None
-    self._calibration = None
+    self._layerCalibration = None
+    self._machineCalibration = machineCalibration
+
+    # Box that defines the Z hand-off edges.
+    self._edges = \
+      Box(
+        machineCalibration.transferLeft,
+        machineCalibration.transferTop,
+        machineCalibration.transferRight,
+        machineCalibration.transferBottom
+      )

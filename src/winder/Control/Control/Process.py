@@ -13,6 +13,8 @@ from Library.Spool import Spool
 from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
 
+from Debug.DefaultCalibration import DefaultMachineCalibration
+
 class Process :
 
   #---------------------------------------------------------------------
@@ -31,10 +33,8 @@ class Process :
     self._configuration = configuration
     self._systemTime = systemTime
     self.spool = Spool( 27000000, 50 )
-    self.gCodeHandler = G_CodeHandler( io, self.spool )
-    self.controlStateMachine = ControlStateMachine( io, log, systemTime )
 
-    self.controlStateMachine.gCodeHandler = self.gCodeHandler
+    self.controlStateMachine = ControlStateMachine( io, log, systemTime )
 
     self.apa = None
 
@@ -49,6 +49,15 @@ class Process :
     path = self._configuration.get( "recipeDirectory" )
     if not os.path.exists( path ) :
       raise Exception( "Recipe directory (" + path + ") does not exist." )
+
+    # $$$TEMPORARY
+    calibration = DefaultMachineCalibration(
+      self._configuration.get( "machineCalibrationPath" ),
+      self._configuration.get( "machineCalibrationFile" )
+    )
+
+    self.gCodeHandler = G_CodeHandler( io, self.spool, calibration )
+    self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     maxVelocity = float( configuration.get( "maxVelocity" ) )
 

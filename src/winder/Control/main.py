@@ -119,8 +119,6 @@ for argument in sys.argv:
 
   if "SIMULATED" == option or "SIMULATOR" == option :
     isSimulated = ( "TRUE" == value )
-  elif "DEBUG" == option :
-    debugInterface = ( "TRUE" == value )
   elif "LOG" == option :
     isLogEchoed = ( "TRUE" == value )
   elif "LOG_IO" == option :
@@ -209,18 +207,6 @@ try:
   webServerThread = WebServerThread( commandHandler, log )
 
   controlThread = ControlThread( io, log, process.controlStateMachine, systemTime, isIO_Logged )
-
-  # Setup debug interface (if enabled).
-  if debugInterface :
-    from Threads.DebugThread import DebugThread
-    debugUI = \
-      DebugThread(
-        log,
-        configuration.get( "serverAddress" ),
-        int( configuration.get( "serverPort" ) )
-      )
-
-  PrimaryThread.useGracefulException = not debugInterface
 
   # Begin operation.
   PrimaryThread.startAllThreads()

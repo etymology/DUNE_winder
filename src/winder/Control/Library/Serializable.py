@@ -17,7 +17,7 @@ class Serializable :
   SUPPORTED_PRIMITIVES = (int, long, float, complex, str, bool, list, dict, types.NoneType )
 
   #---------------------------------------------------------------------
-  def __init__( self, includeOnly=None, exclude=None ) :
+  def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ) :
     """
     Constructor.
 
@@ -35,6 +35,8 @@ class Serializable :
     if None != exclude :
       self._serializeIgnore = exclude
       self._serializeIgnore.append( "_serializeIgnore" )
+
+    self._ignoreMissing = ignoreMissing
 
   #---------------------------------------------------------------------
   def getVariableList( self ) :
@@ -216,13 +218,14 @@ class Serializable :
 
         # Is this a legitimate class variable?
         if not name in self.__dict__ :
-          raise KeyError( name + " not in class." )
-
-        if isinstance( self.__dict__[ name ], Serializable ) :
-          self.__dict__[ name ].unserialize( node )
+          if not self._ignoreMissing :
+            raise KeyError( name + " not in class." )
         else:
-          result = self.unserializeNode( node )
-          self.__dict__[ name ] = result
+          if isinstance( self.__dict__[ name ], Serializable ) :
+            self.__dict__[ name ].unserialize( node )
+          else:
+            result = self.unserializeNode( node )
+            self.__dict__[ name ] = result
 
   #-------------------------------------------------------------------
   def toXML( self, nameOverride=None ) :

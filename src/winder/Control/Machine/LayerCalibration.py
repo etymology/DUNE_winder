@@ -24,39 +24,24 @@ class LayerCalibration( HashedSerializable ) :
     Constructor.
     """
 
-    HashedSerializable.__init__( self )
+    # Include only is just for the automatic serialized objects.
+    # Missing keys are ignored by the base class because we deal with them
+    # specifically with this class.
+    includeOnly = [ 'zFront', 'zBack' ]
+    HashedSerializable.__init__( self, includeOnly=includeOnly, ignoreMissing=True )
 
     # Name of layer this calibration file applies.
     self._layer = layer
 
     # Offset of 0,0 on the APA to machine offset.
-    self._offset = None
+    self.offset = None
+
+    # Z-positions to level with front/back of pins.
+    self.zFront = None
+    self.zBack  = None
 
     # Look-up table that correlates pin names to their locations.
     self._locations = {}
-
-  #-------------------------------------------------------------------
-  def setOffset( self, offset ) :
-    """
-    Set the offset of pin 1 from the machine offset.  Should only be called
-    from a calibration routine.
-
-    Args:
-      offset: Instance of SerializableLocation with absolute machine position.
-    """
-
-    self._offset = SerializableLocation( offset.x, offset.y, offset.z )
-
-  #-------------------------------------------------------------------
-  def getOffset( self ) :
-    """
-    Return the offset from raw machine position.  Subtract this value from
-    the raw position to get the APA position.
-
-    Returns:
-      SerializableLocation of pin 1 in raw machine position.
-    """
-    return self._offset
 
   #-------------------------------------------------------------------
   def setPinLocation( self, pin, location ) :
@@ -105,10 +90,13 @@ class LayerCalibration( HashedSerializable ) :
     Returns:
       Must return an XML node with the data from this object.
     """
-    node = xmlDocument.createElement( "LayerCalibration" )
+
+    node = HashedSerializable.serialize( self, xmlDocument, nameOverride )
+
+    #node = xmlDocument.createElement( "LayerCalibration" )
     node.setAttribute( "layer", str( self._layer ) )
 
-    offsetNode = self.serializeObject( xmlDocument, "Offset", self._offset )
+    offsetNode = self.serializeObject( xmlDocument, "Offset", self.offset )
     node.appendChild( offsetNode )
 
     for pin in self._locations :
@@ -133,6 +121,8 @@ class LayerCalibration( HashedSerializable ) :
       True if there was an error, False if not.
     """
 
+    HashedSerializable.unserialize( self, node )
+
     self._layer = node.getAttribute( "layer" )
 
     nodes = node.getElementsByTagName( "SerializableLocation" )
@@ -142,7 +132,7 @@ class LayerCalibration( HashedSerializable ) :
 
       name = node.getAttribute( "name" )
       if "Offset" == name :
-        self.setOffset( location )
+        self.offset = location
       else:
         self._locations[ name ] = location
 
@@ -153,7 +143,9 @@ if __name__ == "__main__":
     return ( a.x == b.x ) and ( a.y == b.y ) and ( a.z == b.z )
 
   layerCalibration = LayerCalibration( "V" )
-  layerCalibration.setOffset( SerializableLocation( 1, 2 ) )
+  layerCalibration.offset = SerializableLocation( 1, 2 )
+  layerCalibration.zFront = 10
+  layerCalibration.zBack  = 20
   layerCalibration.setPinLocation( "F1", SerializableLocation( 0, 0, 0 ) )
   layerCalibration.setPinLocation( "F2", SerializableLocation( 1, 0, 0 ) )
   layerCalibration.setPinLocation( "F3", SerializableLocation( 1, 1, 0 ) )
@@ -168,7 +160,9 @@ if __name__ == "__main__":
   layerCopy.load( ".", "layerCalibrationTest.xml" )
 
   assert( layerCopy._layer == layerCalibration._layer )
-  assert( compare( layerCopy._offset, layerCalibration._offset ) )
+  assert( layerCopy.zFront == layerCalibration.zFront  )
+  assert( layerCopy.zBack  == layerCalibration.zBack   )
+  assert( compare( layerCopy.offset, layerCalibration.offset ) )
   assert( compare( layerCopy._locations[ "F1" ], layerCalibration._locations[ "F1" ] ) )
   assert( compare( layerCopy._locations[ "F2" ], layerCalibration._locations[ "F2" ] ) )
   assert( compare( layerCopy._locations[ "F3" ], layerCalibration._locations[ "F3" ] ) )
