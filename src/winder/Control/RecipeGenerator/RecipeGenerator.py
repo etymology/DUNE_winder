@@ -272,7 +272,7 @@ class RecipeGenerator :
     Recipe( outputFileName + "_2." + outputExtension, None )
 
   #---------------------------------------------------------------------
-  def defaultCalibration( self, layerName ) :
+  def defaultCalibration( self, layerName, geometry ) :
     """
     Export node list to calibration file.  Debug function.
 
@@ -281,7 +281,10 @@ class RecipeGenerator :
     """
 
     calibration = LayerCalibration( layerName )
-    calibration.setOffset( SerializableLocation( 0, 0 ) )
+    calibration.offset = SerializableLocation( 0, 0 )
+
+    calibration.zFront = geometry.frontZ
+    calibration.zBack  = geometry.backZ
 
     for node in self.nodes :
       location = self.nodes[ node ]

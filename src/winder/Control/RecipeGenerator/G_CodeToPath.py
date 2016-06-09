@@ -14,6 +14,7 @@ from Library.Geometry.Location import Location
 
 from Machine.G_Codes import G_Codes
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
+from Machine.DefaultCalibration import DefaultMachineCalibration
 
 from .G_CodePath import G_CodePath
 from .G_CodeFunctions.G_CodeFunction import G_CodeFunction
@@ -30,8 +31,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       geometry: Layer/machine geometry.
       calibration: Layer calibration.
     """
-
-    G_CodeHandlerBase.__init__( self )
+    G_CodeHandlerBase.__init__( self, DefaultMachineCalibration() )
 
     # Read input file.
     with open( fileName ) as inputFile :
@@ -45,6 +45,8 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self._calibration = calibration
     self._geometry = geometry
     self._headZ = 0
+
+    self.useCalibration( calibration )
 
   #---------------------------------------------------------------------
   def toPath( self ) :
@@ -63,7 +65,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     PARTIAL_BACK  = 2
     BACK = 3
 
-    offset = self._calibration.getOffset()
+    offset = self._calibration.offset
 
     self._headZ = self._geometry.frontZ
     latchSide = FRONT

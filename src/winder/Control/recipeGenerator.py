@@ -74,9 +74,9 @@ def writeRubyCode( layer, recipe, geometry ) :
 
   # Generate an ideal calibration file for layer.
   print "  Generate an ideal calibration file for layer."
-  calibration = recipe.defaultCalibration( layer + " Layer" )
+  calibration = recipe.defaultCalibration( layer + " Layer", geometry )
   if not zeroOffset :
-    calibration.setOffset( geometry.apaOffset )
+    calibration.offset = geometry.apaOffset
 
   outputFileName = layer + "-Layer.rb"
 

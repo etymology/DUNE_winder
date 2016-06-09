@@ -24,7 +24,7 @@ from RecipeGenerator.LayerG_Recipe import LayerG_Recipe
 class DefaultMachineCalibration( MachineCalibration ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, outputFilePath, outputFileName ) :
+  def __init__( self, outputFilePath=None, outputFileName=None ) :
     """
     """
     geometry = MachineGeometry()
@@ -48,7 +48,8 @@ class DefaultMachineCalibration( MachineCalibration ) :
     self.zLimitFront      = 0
     self.zLimitRear       = geometry.zTravel
 
-    self.save( outputFilePath, outputFileName, "MachineCalibration" )
+    if outputFilePath and outputFileName :
+      self.save( outputFilePath, outputFileName, "MachineCalibration" )
 
 class DefaultLayerCalibration( LayerCalibration ) :
 
