@@ -10,7 +10,7 @@ import xml.dom.minidom
 import os.path
 
 # $$$TEMPORARY - Temporary.
-from Machine.DefaultCalibration import DefaultMachineCalibration
+from Machine.DefaultCalibration import DefaultLayerCalibration
 
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
