@@ -1,5 +1,25 @@
 function Jog()
 {
+  var MIN_VELOCITY = 1.0
+  var MAX_VELOCITY = 406.4
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Get the desired velocity.
+  //-----------------------------------------------------------------------------
+  this.getVelocity = function()
+  {
+    // Start with the level of the velocity slider.
+    var velocity = parseFloat( $( "#velocitySlider" ).slider( "value" )  )
+
+    // Correctly scale the velocity.
+    velocity /= 100.0  
+    velocity *= ( MAX_VELOCITY - MIN_VELOCITY )
+    velocity += MIN_VELOCITY
+
+    return velocity
+  }
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Callback to start X/Y axis jog.
@@ -10,7 +30,7 @@ function Jog()
   this.jogXY_Start = function( x, y )
   {
     // Convert direction to velocity.
-    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var velocity = this.getVelocity()
     x *= velocity
     y *= velocity
 
@@ -57,7 +77,7 @@ function Jog()
     if ( null == y )
       y = $( "#seekY" ).val()
 
-    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekXY(" + x + "," + y + "," + velocity + ")"  )
   }
 
@@ -68,7 +88,7 @@ function Jog()
   this.seekZ = function()
   {
     var z = $( "#seekZ" ).val()
-    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekZ(" + z + "," + velocity + ")"  )
   }
 
@@ -99,7 +119,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.zRetract = function()
   {
-    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekZ( 0, " + velocity + " )" )
   }
 
@@ -109,7 +129,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.zExtend = function()
   {
-    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var velocity = this.getVelocity()
     var position = $( "#extendedPosition" ).val()
     winder.remoteAction( "process.manualSeekZ( " + position + ", " + velocity + " )" )
   }
@@ -120,7 +140,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.zMid = function()
   {
-    var velocity = $( "#velocitySlider" ).slider( "value" )
+    var velocity = this.getVelocity()
     var position = $( "#extendedPosition" ).val() / 2
     winder.remoteAction( "process.manualSeekZ( " + position + ", " + velocity + " )" )
   }
@@ -155,12 +175,11 @@ function Jog()
 
   winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
 
-  var MAX_VELOCITY = 406.4
-
   sliderFunction =
     function( event, ui )
     {
-      var value = Math.round( ui.value * MAX_VELOCITY / 100.0 * 10.0 ) / 10.0
+      var velocity = ui.value / 100.0 * ( MAX_VELOCITY - MIN_VELOCITY ) + MIN_VELOCITY
+      var value = Math.round( velocity * 10.0 ) / 10.0
       $( "#velocityValue" ).html( value + " mm/s" )
     }
 
@@ -170,7 +189,7 @@ function Jog()
     .slider
     (
       {
-        min: 1,
+        min: 0,
         max: 100,
         value: 100,
         change: sliderFunction,
