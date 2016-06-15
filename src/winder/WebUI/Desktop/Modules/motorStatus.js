@@ -42,8 +42,14 @@ function MotorStatus()
   {
     formatFunction = function( data, decimals )
     {
-      var multiplier = Math.pow( 10, decimals )
-      data = Math.round( data * multiplier ) / multiplier
+      if ( $.isNumeric( data ) )
+      {
+
+        var multiplier = Math.pow( 10, decimals )
+        data = Math.round( data * multiplier ) / multiplier
+      }
+      else
+        data = "-"
 
       return data
     }

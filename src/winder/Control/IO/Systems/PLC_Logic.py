@@ -271,13 +271,23 @@ class PLC_Logic :
     attributes.isPolled = True
     self._state           = PLC.Tag( plc, "STATE", attributes, tagType="DINT" )
 
+    # $$$DEBUG - Temporary
+    self.cameraResultStatus = PLC.Tag( plc, "Cam_F:I.InspectionResults[0]", attributes, tagType="REAL" )
+    self.cameraResultScore  = PLC.Tag( plc, "Cam_F:I.InspectionResults[1]", attributes, tagType="REAL" )
+    self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
+    self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
+
     self._moveType           = PLC.Tag( plc, "MOVE_TYPE",       tagType="INT" )
     self._maxXY_Velocity     = PLC.Tag( plc, "XY_SPEED",        tagType="REAL" )
     self._maxXY_Acceleration = PLC.Tag( plc, "XY_ACCELERATION", tagType="REAL" )
     self._maxXY_Deceleration = PLC.Tag( plc, "XY_DECELERATION", tagType="REAL" )
     self._maxZ_Velocity      = PLC.Tag( plc, "Z_SPEED",         tagType="REAL" )
-    self._maxZ_Acceleration  = PLC.Tag( plc, "Z_ACCELERATION",  tagType="DINT" )
-    self._maxZ_Deceleration  = PLC.Tag( plc, "Z_DECELLERATION", tagType="DINT" )
+    self._maxZ_Acceleration  = PLC.Tag( plc, "Z_ACCELERATION",  tagType="REAL" )
+    self._maxZ_Deceleration  = PLC.Tag( plc, "Z_DECELLERATION", tagType="REAL" )
+
+    # $$$DEBUG - Move to own unit.
+    self.cameraTrigger        = PLC.Tag( plc, "Cam_F_Trigger", tagType="BOOL" )
+    self.cameraTriggerEnable  = PLC.Tag( plc, "Cam_F:O.Control.TriggerEnable", tagType="BOOL" )
 
     self._velocity = 0.0
     self._maxAcceleration = 0

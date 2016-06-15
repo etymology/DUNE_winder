@@ -270,6 +270,62 @@ function Configuration()
     }
   )
 
+  // $$$DEBUG - Temporary
+  $( "#cameraTriggerButton" )
+    .click
+    (
+      function()
+      {
+
+        winder.remoteAction
+        (
+          "io.plcLogic.cameraTrigger.set( 1 )",
+          function()
+          {
+            winder.remoteAction( "io.plcLogic.cameraTrigger.set( 0 )" )
+          }
+        )
+
+      }
+    )
+
+  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
+  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
+  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )
+  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultY.get()", "#cameraY" )
+
+  var count = 0
+  var cameraUpdateFunction = function()
+  {
+    var url = "ftp://admin@192.168.16.55/image.bmp?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
+    $( "#cameraImage" )
+      .attr( "src", url )
+
+    count += 1
+    $( "#debugText" ).text( count )
+
+    setTimeout( cameraUpdateFunction, 100 )
+  }
+
+  cameraUpdateFunction()
+
+  $( "#customCommandButton" )
+    .click
+    (
+      function()
+      {
+        var command = $( "#customCommand" ).val()
+        winder.remoteAction
+        (
+          command,
+          function( data )
+          {
+            $( "#customCommandResult" ).val( data )
+          }
+        )
+      }
+    )
+
 }
 
 //-----------------------------------------------------------------------------
