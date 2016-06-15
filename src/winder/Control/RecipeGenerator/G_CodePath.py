@@ -86,9 +86,9 @@ class G_CodePath( Path3d ) :
     output.write( "( " + name + " )\r\n" )
     lineNumber = 1
 
-    lastX = None
-    lastY = None
-    lastZ = None
+    lastX = 0
+    lastY = 0
+    lastZ = 0
 
     for index, point in enumerate( self.path ) :
       if isCommentOut :

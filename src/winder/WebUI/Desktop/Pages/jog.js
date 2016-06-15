@@ -13,7 +13,7 @@ function Jog()
     var velocity = parseFloat( $( "#velocitySlider" ).slider( "value" )  )
 
     // Correctly scale the velocity.
-    velocity /= 100.0  
+    velocity /= 100.0
     velocity *= ( MAX_VELOCITY - MIN_VELOCITY )
     velocity += MIN_VELOCITY
 
@@ -173,7 +173,43 @@ function Jog()
   }
 
 
-  winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
+  $( "#loopImage" ).draggable()
+
+  // Callback function to initialize position graphic.
+  // Called twice--once when the position graphic page is loaded, and again
+  // when the motor status page is loaded.  Both must be loaded before
+  // initialization can take place, and either could load first.
+  var positionGraphicCount = 2
+  positionGraphicInitialize = function()
+  {
+    positionGraphicCount -= 1
+    if ( 0 == positionGraphicCount )
+      positionGraphic.initialize()
+  }
+
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/positionGraphic",
+    "#positionGraphicDiv",
+    positionGraphicInitialize
+  )
+
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/motorStatus",
+    "#motorStatusDiv",
+    positionGraphicInitialize
+  )
+
+  // Fetch fully extended position from machine calibration.
+  winder.remoteAction
+  (
+    "machineCalibration.zBack",
+    function( data )
+    {
+      $( "#extendedPosition" ).val( data )
+    }
+  )
 
   sliderFunction =
     function( event, ui )
@@ -196,6 +232,7 @@ function Jog()
         slide: sliderFunction
       }
     )
+
 }
 
 //-----------------------------------------------------------------------------

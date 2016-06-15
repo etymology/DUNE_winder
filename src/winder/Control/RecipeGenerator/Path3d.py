@@ -22,7 +22,7 @@ class Path3d :
     Constructor.
     """
     self.path = []
-    self.last = None
+    self.last = Location()
     self.baseOffset = baseOffset
 
   #---------------------------------------------------------------------

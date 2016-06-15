@@ -40,6 +40,15 @@ function MotorStatus()
   var AXIES = [ "x", "y", "z" ]
   for ( var index in AXIES )
   {
+    formatFunction = function( data, decimals )
+    {
+      var multiplier = Math.pow( 10, decimals )
+      data = Math.round( data * multiplier ) / multiplier
+
+      return data
+    }
+
+
     var axis = AXIES[ index ]
     winder.addPeriodicRemoteDisplay
     (
@@ -51,34 +60,42 @@ function MotorStatus()
 
     winder.addPeriodicRemoteDisplay
     (
-      "round( io." + axis + "Axis.getDesiredPosition(), 1 ) + 0",
+      "io." + axis + "Axis.getDesiredPosition()",
       "#" + axis + "DesiredPosition",
       this.motor,
-      axis + "DesiredPosition"
+      axis + "DesiredPosition",
+      formatFunction,
+      1
     )
 
     winder.addPeriodicRemoteDisplay
     (
-      "round( io." + axis + "Axis.getPosition(), 1 ) + 0",
+      "io." + axis + "Axis.getPosition()",
       "#" + axis + "Position",
       this.motor,
-      axis + "Position"
+      axis + "Position",
+      formatFunction,
+      1
     )
 
     winder.addPeriodicRemoteDisplay
     (
-      "round( io." + axis + "Axis.getVelocity(), 2 ) + 0",
+      "io." + axis + "Axis.getVelocity()",
       "#" + axis + "Velocity",
       this.motor,
-      axis + "Velocity"
+      axis + "Velocity",
+      formatFunction,
+      2
     )
 
     winder.addPeriodicRemoteDisplay
     (
-      "round( io." + axis + "Axis.getAcceleration(), 2 ) + 0",
+      "io." + axis + "Axis.getAcceleration()",
       "#" + axis + "Acceleration",
       this.motor,
-      axis + "Acceleration"
+      axis + "Acceleration",
+      formatFunction,
+      2
     )
 
     let localAxis = axis

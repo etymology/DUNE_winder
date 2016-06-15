@@ -1,0 +1,19 @@
+.configurationSet div
+{
+  padding-top:    4px;
+  padding-bottom: 4px;
+}
+
+.configurationSet label
+{
+  display: block;
+  float: left;
+  width: 125px;
+}
+
+.configurationSet button
+{
+  margin-right: 5px;
+}
+
+

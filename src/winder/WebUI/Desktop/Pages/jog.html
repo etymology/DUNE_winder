@@ -54,7 +54,7 @@
           <button onclick="jog.latch()">Latch</button>
           <button onclick="jog.latchHome()">Home</button>
           <button onclick="jog.latchUnlock()">Unlock</button>
-          <input type="text" id="extendedPosition" value="434.0" />
+          <input type="text" id="extendedPosition" value="-" />
           <label for="query">Extended position</label>
         </article>
       </article>
@@ -66,6 +66,8 @@
     </section>
 
     <section>
+      <div id="positionGraphicDiv"></div>
+
       <article id="velocitySliderBox">
         <h2>Velocity</h2>
         <p id="velocityValue">-</p>

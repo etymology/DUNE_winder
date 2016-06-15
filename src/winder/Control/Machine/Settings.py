@@ -42,7 +42,7 @@ class Settings :
     """
     Setup default values for configuration.
     """
-    configuration.default( "plcAddress", "192.168.1.36" )
+    configuration.default( "plcAddress", "192.168.16.49" )
 
     # Default for GUI server.
     configuration.default( "serverAddress", "127.0.0.1" )

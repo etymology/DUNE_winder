@@ -390,9 +390,8 @@ var WinderInterface = function()
   // Input:
   //   query - Remote query to execute that returns the desired data.
   //   displayId - The id of the tag the data is displayed.
-  //   errorText - Data to be sent to callback if an error reading the data
-  //     occurs.
-  // Output:
+  //   formatFunction - Optional function to format data before displaying.
+  //   formatParameters - Optional parameters passed to format function.
   //---------------------------------------------------------------------------
   this.addPeriodicRemoteDisplay = function
   (
@@ -400,7 +399,8 @@ var WinderInterface = function()
     displayId,
     variableMap,
     variableIndex,
-    errorText
+    formatFunction,
+    formatParameters
   )
   {
     // Add a periodic callback with the callback being specified.
@@ -409,7 +409,15 @@ var WinderInterface = function()
       query,
       function( value )
       {
-        self.displayCallback( value, displayId, variableMap, variableIndex, errorText )
+        self.displayCallback
+        (
+          value,
+          displayId,
+          variableMap,
+          variableIndex,
+          formatFunction,
+          formatParameters
+        )
       }
     )
   }
@@ -460,6 +468,7 @@ var WinderInterface = function()
 
 
   //---------------------------------------------------------------------------
+  // $$$DEBUG
   //---------------------------------------------------------------------------
   this.displayCallback = function
   (
@@ -467,27 +476,22 @@ var WinderInterface = function()
     displayId,
     variableMap,
     variableIndex,
-    errorText
+    formatFunction,
+    formatParameters
   )
   {
     if ( ( variableMap )
       && ( variableIndex ) )
         variableMap[ variableIndex ] = value
 
-    // If there is data (undefined means there was an error reading the
-    // data).
-    if ( null != value )
-      $( displayId ).text( value )
-    else
-    {
-      if ( ! errorText )
-        errorText = this.errorString
+    if ( formatFunction )
+      value = formatFunction( value, formatParameters )
 
-      $( displayId ).html( errorText )
-    }
+    $( displayId ).text( value )
   }
 
   //---------------------------------------------------------------------------
+  // $$$DEBUG
   //---------------------------------------------------------------------------
   this.singleRemoteDisplay = function
   (
@@ -495,7 +499,8 @@ var WinderInterface = function()
     displayId,
     variableMap,
     variableIndex,
-    errorText
+    formatFunction,
+    formatParameters
   )
   {
     self.remoteAction
@@ -503,12 +508,21 @@ var WinderInterface = function()
       query,
       function( value )
       {
-        self.displayCallback( value, displayId, variableMap, variableIndex, errorText )
+        self.displayCallback
+        (
+          value,
+          displayId,
+          variableMap,
+          variableIndex,
+          formatFunction,
+          formatParameters
+        )
       }
     )
   }
 
   //---------------------------------------------------------------------------
+  // $$$DEBUG
   //---------------------------------------------------------------------------
   this.readXML_Display = function
   (
@@ -517,29 +531,38 @@ var WinderInterface = function()
     displayId,
     variableMap,
     variableIndex,
-    errorText
+    formatFunction,
+    formatParameters
   )
   {
     // Run the query.
     $.get( fileName )
-    .error
-    (
-      function()
-      {
-        if ( callback )
-          callback( null )
-      }
-    )
-    .done
-    (
-      function( data )
-      {
-        var xml = $( data )
-        var value = xml.find( xmlFiled ).text()
+      .error
+      (
+        function()
+        {
+          if ( callback )
+            callback( null )
+        }
+      )
+      .done
+      (
+        function( data )
+        {
+          var xml = $( data )
+          var value = xml.find( xmlFiled ).text()
 
-        self.displayCallback( value, displayId, variableMap, variableIndex, errorText )
-      }
-    )
+          self.displayCallback
+          (
+            value,
+            displayId,
+            variableMap,
+            variableIndex,
+            formatFunction,
+            formatParameters
+          )
+        }
+      )
   }
 
   //---------------------------------------------------------------------------
@@ -638,15 +661,6 @@ var WinderInterface = function()
       )
 
     return updateFunction
-  }
-
-  //---------------------------------------------------------------------------
-  // Uses:
-  //   Setup function.  Call once document has been loaded.
-  // $$$DEPRECATED
-  //---------------------------------------------------------------------------
-  this.initialize = function()
-  {
   }
 
   //---------------------------------------------------------------------------

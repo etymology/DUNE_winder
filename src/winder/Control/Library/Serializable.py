@@ -35,6 +35,7 @@ class Serializable :
     if None != exclude :
       self._serializeIgnore = exclude
       self._serializeIgnore.append( "_serializeIgnore" )
+      self._serializeIgnore.append( "_ignoreMissing" )
 
     self._ignoreMissing = ignoreMissing
 

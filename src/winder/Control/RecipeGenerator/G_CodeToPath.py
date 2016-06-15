@@ -46,7 +46,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self._geometry = geometry
     self._headZ = 0
 
-    self.useCalibration( calibration )
+    self.useLayerCalibration( calibration )
 
   #---------------------------------------------------------------------
   def toPath( self ) :

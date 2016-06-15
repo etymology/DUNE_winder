@@ -7,6 +7,7 @@
 ###############################################################################
 
 import signal
+import os
 import sys
 import traceback
 import time
@@ -30,6 +31,7 @@ from Threads.WebServerThread import WebServerThread
 # $$$TEMPORARY - Temporary.
 import xml.dom.minidom
 from Debug.APA_Generator import APA_Generator
+from Machine.DefaultCalibration import DefaultMachineCalibration
 
 #==============================================================================
 # Debug settings.
@@ -196,8 +198,14 @@ try:
   # (Low-level I/O is needed by remote commands.)
   LowLevelIO.getTags()
 
+  # $$$TEMPORARY
+  machineCalibration = DefaultMachineCalibration(
+    configuration.get( "machineCalibrationPath" ),
+    configuration.get( "machineCalibrationFile" )
+  )
+
   # Primary control process.
-  process = Process( io, log, configuration, systemTime )
+  process = Process( io, log, configuration, systemTime, machineCalibration )
 
   #
   # Initialize threads.

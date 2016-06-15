@@ -104,7 +104,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
     self.netIndex = 0
 
     startLocation = self.location( self.netIndex )
-    self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
+    #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
     self.nodePath.push( startLocation.x, startLocation.y, 0 )
     self.basePath.push( startLocation.x, startLocation.y, 0 )
     lastLocation = startLocation

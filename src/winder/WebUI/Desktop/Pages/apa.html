@@ -83,9 +83,11 @@
         <h2>Recipe control</h2>
         <article>
           <h3>Line Seek</h3>
-          <label for="apaLine">Goto line</label>
+          <label for="apaLine">Next line</label>
           <input type="text" id="apaLine" />
           <button onclick="apa.gotoLine()">Go</button>
+          <button onclick="apa.nextLine()">+</button>
+          <button onclick="apa.previousLine()">-</button>
         </article>
 
         <article>
@@ -116,13 +118,6 @@
       <article>
         <h2>Running G-Code</h2>
         <table id="gCodeTable">
-          <tr><td>&nbsp</td></tr>
-          <tr><td>&nbsp</td></tr>
-          <tr id="gCodeReverseRow"><td>&nbsp</td></tr>
-          <tr class="gCodeCurrentLine"><td>&nbsp</td></tr>
-          <tr id="gCodeForwardRow"><td>&nbsp</td></tr>
-          <tr><td>&nbsp</td></tr>
-          <tr><td>&nbsp</td></tr>
         </table>
       </article>
 
@@ -132,6 +127,8 @@
         <h2>Generate random APA</h2>
         <button onclick="apa.createRandomAPA( 1 )">Go</button>
         <button onclick="apa.createRandomAPA( 25 )">Create 25</button>
+
+        <button onclick=" winder.remoteAction( 'os.execl(sys.executable, sys.executable, *sys.argv)' ) ">Restart</button>
       </article>
 
       <article id="sliderBox">

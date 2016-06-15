@@ -66,13 +66,14 @@ class HashedSerializable( Serializable ) :
     return hashValue
 
   #-------------------------------------------------------------------
-  def load( self, filePath, fileName, exceptionForMismatch=True ) :
+  def load( self, filePath, fileName, nameOverride=None, exceptionForMismatch=True ) :
     """
     Load an XML file and return instance.
 
     Args:
       filePath: Directory of file.
       fileName: File name to load.
+      nameOverride: Top-level XML name.
       exceptionForMismatch: True to raise an exception if the hash does not
         match.  Default is True.
 
@@ -81,7 +82,7 @@ class HashedSerializable( Serializable ) :
     """
 
     # Load the serialized XML data as usual.
-    Serializable.load( self, filePath, fileName )
+    Serializable.load( self, filePath, fileName, nameOverride )
 
     # Get all XML lines.
     with open( filePath + "/" + fileName ) as inputFile :

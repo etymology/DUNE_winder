@@ -6,24 +6,29 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Library.HashedSerializable import HashedSerializable
+from Library.Serializable import Serializable
 from Library.SerializableLocation import SerializableLocation
 
-class MachineCalibration( HashedSerializable ) :
+class MachineCalibration( Serializable ) :
 
   #-------------------------------------------------------------------
-  def __init__( self ) :
+  def __init__( self, outputFilePath, outputFileName ) :
     """
     Constructor.
     """
 
-    HashedSerializable.__init__( self )
+    Serializable.__init__( self, exclude=[ "_outputFilePath", "_outputFileName" ] )
+
+    self._outputFilePath = outputFilePath
+    self._outputFileName = outputFileName
 
     # Location of the park position.  Instance of Location.
-    self.park = SerializableLocation()
+    self.parkX = None
+    self.parkY = None
 
     # Location for loading/unloading the spool.
-    self.spoolLoad = SerializableLocation()
+    self.spoolLoadX = None
+    self.spoolLoadY = None
 
     # Locations of the transfer areas.  Single number.
     # NOTE: The left/right transfer areas can transfer from the bottom and up
@@ -48,6 +53,27 @@ class MachineCalibration( HashedSerializable ) :
     # End-of-travels for Z-axis.  Single number.
     self.zLimitFront  = None
     self.zLimitRear   = None
+
+  #---------------------------------------------------------------------
+  def set( self, item, value ) :
+    """$$$DEBUG"""
+    self.__dict__[ item ] = value
+
+  #---------------------------------------------------------------------
+  def get( self, item ) :
+    """$$$DEBUG"""
+    return self.__dict__[ item ]
+
+  #---------------------------------------------------------------------
+  def save( self ) :
+    """$$$DEBUG"""
+    Serializable.save( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
+
+  #---------------------------------------------------------------------
+  def load( self ) :
+    """$$$DEBUG"""
+    Serializable.load( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
+
 
 if __name__ == "__main__":
   machineCalibration = MachineCalibration()

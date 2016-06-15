@@ -5,6 +5,8 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+import os
+
 from Library.Geometry.Location import Location
 from Library.SerializableLocation import SerializableLocation
 
@@ -27,10 +29,16 @@ class DefaultMachineCalibration( MachineCalibration ) :
   def __init__( self, outputFilePath=None, outputFileName=None ) :
     """
     """
+    MachineCalibration.__init__( self, outputFilePath, outputFileName )
     geometry = MachineGeometry()
 
-    self.park = SerializableLocation()
-    self.spoolLoad = SerializableLocation()
+    # Location of the park position.  Instance of Location.
+    self.parkX = 0
+    self.parkY = 0
+
+    # Location for loading/unloading the spool.
+    self.spoolLoadX = 0
+    self.spoolLoadY = 0
 
     self.transferLeft     = geometry.left
     self.transferLeftTop  = geometry.top / 2
@@ -49,7 +57,12 @@ class DefaultMachineCalibration( MachineCalibration ) :
     self.zLimitRear       = geometry.zTravel
 
     if outputFilePath and outputFileName :
-      self.save( outputFilePath, outputFileName, "MachineCalibration" )
+      # If there isn't a calibration file, create it.  Otherwise, load what
+      # has already been saved.
+      if not os.path.isfile( outputFilePath + "/" + outputFileName ) :
+        self.save()
+      else :
+        self.load()
 
 class DefaultLayerCalibration( LayerCalibration ) :
 

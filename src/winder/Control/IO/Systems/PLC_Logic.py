@@ -78,7 +78,9 @@ class PLC_Logic :
     """
     Stop all motor position seeks.
     """
-    self._moveType.set( self.MoveTypes.RESET )
+    #self._moveType.set( self.MoveTypes.RESET )
+    self._maxXY_Velocity.set( 0 )
+    self._maxZ_Velocity.set( 0 )
 
   #---------------------------------------------------------------------
   def setXY_Position( self, x, y, velocity=None ) :
@@ -269,11 +271,12 @@ class PLC_Logic :
     attributes.isPolled = True
     self._state           = PLC.Tag( plc, "STATE", attributes, tagType="DINT" )
 
-    self._moveType           = PLC.Tag( plc, "MOVE_TYPE", tagType="INT" )
-    self._maxXY_Velocity     = PLC.Tag( plc, "XY_VELOCITY", tagType="REAL" )
+    self._moveType           = PLC.Tag( plc, "MOVE_TYPE",       tagType="INT" )
+    self._maxXY_Velocity     = PLC.Tag( plc, "XY_SPEED",        tagType="REAL" )
     self._maxXY_Acceleration = PLC.Tag( plc, "XY_ACCELERATION", tagType="REAL" )
     self._maxXY_Deceleration = PLC.Tag( plc, "XY_DECELERATION", tagType="REAL" )
-    self._maxZ_Acceleration  = PLC.Tag( plc, "Z_ACCELERATION", tagType="DINT" )
+    self._maxZ_Velocity      = PLC.Tag( plc, "Z_SPEED",         tagType="REAL" )
+    self._maxZ_Acceleration  = PLC.Tag( plc, "Z_ACCELERATION",  tagType="DINT" )
     self._maxZ_Deceleration  = PLC.Tag( plc, "Z_DECELLERATION", tagType="DINT" )
 
     self._velocity = 0.0

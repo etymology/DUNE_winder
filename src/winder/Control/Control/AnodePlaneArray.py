@@ -111,7 +111,7 @@ class AnodePlaneArray( APA_Base ) :
     self._calibration = \
       DefaultLayerCalibration( self._getPath(), self._calibrationFile, self._layer )
 
-    self._gCodeHandler.useCalibration( self._calibration )
+    self._gCodeHandler.useLayerCalibration( self._calibration )
 
     if None != recipeFile :
       self._recipeFile = recipeFile
@@ -203,7 +203,7 @@ class AnodePlaneArray( APA_Base ) :
           [ self._calibrationFile, self._calibration.hashValue ]
         )
 
-        self._gCodeHandler.useCalibration( self._calibration )
+        self._gCodeHandler.useLayerCalibration( self._calibration )
 
   #---------------------------------------------------------------------
   def setStage( self, stage, message="<unspecified>" ) :

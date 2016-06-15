@@ -311,7 +311,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     )
 
     self.gCodePath = G_CodePath()
-    self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
+    #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
     self.basePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 

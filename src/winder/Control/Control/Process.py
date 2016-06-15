@@ -13,13 +13,10 @@ from Library.Spool import Spool
 from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
 
-# $$$TEMPORARY
-from Machine.DefaultCalibration import DefaultMachineCalibration
-
 class Process :
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log, configuration, systemTime ) :
+  def __init__( self, io, log, configuration, systemTime, machineCalibration ) :
     """
     Constructor.
 
@@ -51,13 +48,7 @@ class Process :
     if not os.path.exists( path ) :
       raise Exception( "Recipe directory (" + path + ") does not exist." )
 
-    # $$$TEMPORARY
-    calibration = DefaultMachineCalibration(
-      self._configuration.get( "machineCalibrationPath" ),
-      self._configuration.get( "machineCalibrationFile" )
-    )
-
-    self.gCodeHandler = G_CodeHandler( io, self.spool, calibration )
+    self.gCodeHandler = G_CodeHandler( io, self.spool, machineCalibration )
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     maxVelocity = float( configuration.get( "maxVelocity" ) )

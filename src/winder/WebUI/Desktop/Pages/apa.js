@@ -12,6 +12,10 @@ function APA()
   var loopButtonUpdate
   var reverseButtonUpdate
 
+  var gCodeLine = {}
+
+  var G_CODE_ROWS = 19
+
   // Tags to disable during APA loading.
   var apaInterfaceTags =
   [
@@ -193,12 +197,48 @@ function APA()
   }
 
   //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.nextLine = function()
+  {
+    if ( null != gCodeLine[ "currentLine" ] )
+    {
+      // Next line is the current line because the current line has been incremented
+      // by 1.
+      var nextLine = gCodeLine[ "currentLine" ]
+      if ( nextLine < ( gCodeLine[ "totalLines" ] - 1 ) )
+        winder.remoteAction( 'process.setG_CodeLine( ' + nextLine + ' )' )
+    }
+  }
+
+  //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.previousLine = function()
+  {
+    if ( null != gCodeLine[ "currentLine" ] )
+    {
+      var nextLine = gCodeLine[ "currentLine" ] - 2
+      if ( nextLine >= -1 )
+        winder.remoteAction( 'process.setG_CodeLine( ' + nextLine + ' )' )
+    }
+  }
+
+  //-----------------------------------------------------------------------------
   // Uses:
   //   Callback for setting next active G-Code line.
   //-----------------------------------------------------------------------------
   this.gotoLine = function()
   {
-    winder.remoteAction( 'process.setG_CodeLine( ' + $( "#apaLine" ).val() + ' )' )
+    var line = $( "#apaLine" ).val() - 1
+    var isForward = $( "#reverseButton" ).val()
+
+    if ( "1" == isForward )
+      line -= 1
+    else
+      line += 1
+
+    winder.remoteAction( 'process.setG_CodeLine( ' + line + ' )' )
   }
 
   //-----------------------------------------------------------------------------
@@ -216,7 +256,9 @@ function APA()
   //-----------------------------------------------------------------------------
   this.setSpool = function()
   {
-    winder.remoteAction( "process.spool.setWire( " + $( "#setSpool" ).val() + " )" )
+    // Get the values and convert to millimeters.
+    var value = $( "#setSpool" ).val() * 1000
+    winder.remoteAction( "process.spool.setWire( " + value + " )" )
   }
 
   //-----------------------------------------------------------------------------
@@ -251,14 +293,63 @@ function APA()
     )
   }
 
+  //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.numberWithCommas = function( number )
+  {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   // Populate lists and have this function run after error recovery.
   this.populateLists()
   winder.addErrorClearCallback( this.populateLists )
 
   // Set updates of current line and total lines.
-  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getLine()", "#currentLine", null, null, "-" )
-  winder.addPeriodicRemoteDisplay( "process.gCodeHandler.getTotalLines()", "#totalLines", null, null, "-" )
-  winder.addPeriodicRemoteDisplay( "process.spool.getWire()", "#spoolAmount" )
+  winder.addPeriodicRemoteCallback
+  (
+    "process.gCodeHandler.getLine()",
+    function( data )
+    {
+      if ( null !== data )
+      {
+        data = data + 1
+        gCodeLine[ "currentLine" ] = data
+      }
+      else
+      {
+        data = "-"
+        gCodeLine[ "currentLine" ] = null
+      }
+
+      $( "#currentLine" ).text( data )
+    }
+  )
+
+  winder.addPeriodicRemoteDisplay
+  (
+    "process.gCodeHandler.getTotalLines()",
+    "#totalLines",
+    gCodeLine,
+    "totalLines"
+  )
+
+  winder.addPeriodicRemoteCallback
+  (
+    'process.spool.getWire()',
+    function( data )
+    {
+      if ( data )
+      {
+        data /= 1000
+        data = data.toLocaleString() + " meters"
+      }
+      else
+        data = "-"
+
+      $( "#spoolAmount" ).text( data )
+    }
+  )
 
   // Special periodic for current APA stage.
   winder.addPeriodicRemoteCallback
@@ -361,10 +452,30 @@ function APA()
 
   }
 
+  var totalRows = G_CODE_ROWS * 2 + 1
+  $( "#gCodeTable" ).empty()
+  var gGodeBody = $( "<tbody/>" ).appendTo( "#gCodeTable" )
+  var gCodeMid = totalRows / 2
+  for ( var rowIndex = 0; rowIndex < totalRows; rowIndex += 1 )
+  {
+    var newRow = $( "<tr/>" ).appendTo( gGodeBody )
+
+    if ( G_CODE_ROWS == rowIndex )
+      newRow.attr( "class", "gCodeCurrentLine" )
+    else
+    if ( G_CODE_ROWS - 1 == rowIndex )
+      newRow.attr( "id", "gCodeReverseRow" )
+    else
+    if ( G_CODE_ROWS + 1 == rowIndex )
+      newRow.attr( "id", "gCodeForwardRow" )
+
+    var newCell = $( "<td/>" ).appendTo( newRow ).html( "&nbsp;" )
+  }
+
   // Setup G-Code table.
   winder.addPeriodicRemoteCallback
   (
-    "process.getG_CodeList( None, 3 )",
+    "process.getG_CodeList( None, " + G_CODE_ROWS + " )",
     function( data )
     {
       // If there is any data.
@@ -470,7 +581,6 @@ function APA()
       readSlider()
       winder.addErrorClearCallback( readSlider )
   }
-
 
   createSlider( "velocity", "process.gCodeHandler.getVelocityScale", "process.setG_CodeVelocityScale" )
   //createSlider( "acceleration" )

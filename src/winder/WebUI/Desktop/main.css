@@ -158,3 +158,25 @@ h1, h2, h3, h4, h5, h6, p
   display: block;
 }
 
+input.changed
+{
+  background-color: grey;
+}
+
+input.error
+{
+  background-color: red;
+}
+
+/*
+ * Copy selection
+ */
+.copySelect
+{
+  border: 2px solid cyan;
+}
+
+.copySelect:hover
+{
+  background-color: rgb( 99, 99, 129 );
+}

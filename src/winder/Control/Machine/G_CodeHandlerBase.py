@@ -125,7 +125,17 @@ class G_CodeHandlerBase :
       startLocation = Location( self._lastX, self._lastY, self._lastZ )
       endLocation = Location( self._x, self._y, self._z )
       segment = Segment( startLocation, endLocation )
-      location = self._edges.intersectSegment( segment )
+
+      # Box that defines the Z hand-off edges.
+      edges = \
+        Box(
+          self._machineCalibration.transferLeft,
+          self._machineCalibration.transferTop,
+          self._machineCalibration.transferRight,
+          self._machineCalibration.transferBottom
+        )
+
+      location = edges.intersectSegment( segment )
 
       self._x = location.x
       self._y = location.y
@@ -217,7 +227,7 @@ class G_CodeHandlerBase :
     self._velocity = velocity
 
   #---------------------------------------------------------------------
-  def useCalibration( self, layerCalibration ) :
+  def useLayerCalibration( self, layerCalibration ) :
     """
     Give handler an instance of layerCalibration to use for pin locations.  Must
     be called before running G-Code.
@@ -270,12 +280,3 @@ class G_CodeHandlerBase :
 
     self._layerCalibration = None
     self._machineCalibration = machineCalibration
-
-    # Box that defines the Z hand-off edges.
-    self._edges = \
-      Box(
-        machineCalibration.transferLeft,
-        machineCalibration.transferTop,
-        machineCalibration.transferRight,
-        machineCalibration.transferBottom
-      )

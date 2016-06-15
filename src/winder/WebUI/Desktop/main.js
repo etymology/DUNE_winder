@@ -290,9 +290,6 @@ $( document ).ready
       // Begin loading the requested sub-page.
       winder.loadSubPage( "/Desktop/Pages/" + page, "#main" )
 
-      // Initialize winder.
-      winder.initialize()
-
       // Display system time.
       winder.addPeriodicRemoteDisplay( "systemTime.get()", "#systemTime" )
 
