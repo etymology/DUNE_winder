@@ -4,6 +4,9 @@
 // Date: 2016-05-11
 // Author(s):
 //   Andrew Que <aque@bb7.com>
+// Notes:
+//   Uses ECMAScript 6 functions.  Will not function on all mobile devices.
+//   $$$FUTURE - Fix this fact and remove use of 'let'?
 ///////////////////////////////////////////////////////////////////////////////
 
 //=============================================================================

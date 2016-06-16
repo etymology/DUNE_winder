@@ -103,9 +103,6 @@ var WinderInterface = function()
       remoteCommand,
       function( data )
       {
-        // Convert results to array.
-        //data = self.pythonArrayStringToArray( data )
-
         // Empty the combobox and make first entry blank.
         $( tagId )
           .empty()
@@ -114,7 +111,7 @@ var WinderInterface = function()
             $( "<option />" )
               .val( "" )
               .text( "" )
-          );
+          )
 
         // Loop through result data and add an option for each element.
         for ( var dataIndex in data )
@@ -126,7 +123,7 @@ var WinderInterface = function()
               $( "<option />" )
                 .val( item )
                 .text( item )
-            );
+            )
         }
         // If there is a command to get the current selection, run it.
         if ( selectCommand )
@@ -146,7 +143,7 @@ var WinderInterface = function()
         }
 
       }
-    );
+    )
   }
 
   //---------------------------------------------------------------------------
@@ -162,7 +159,10 @@ var WinderInterface = function()
   //---------------------------------------------------------------------------
   this.loadSubPage = function( page, tag, callback )
   {
-    var randomLine = "";
+    // The random line is added to the end of a URL to force the browser to
+    // actually load the data.  Otherwise, the browser may used a cached
+    // version.
+    var randomLine = ""
     if ( FORCE_RELOAD )
       randomLine = "?random=" + Math.random()
 
@@ -171,6 +171,7 @@ var WinderInterface = function()
 
     $( "head" ).append( cssLink )
 
+    // Denote an other page is loading.
     pagesLoading += 1
 
     $( tag )
@@ -187,9 +188,11 @@ var WinderInterface = function()
             page + ".js",
             function()
             {
+              // If there is a callback once page is finished loading, run it.
               if ( callback )
                 callback()
 
+              // One more page is finished loading.
               pagesLoading -= 1
 
               // If all pages have been loaded, run fully loaded callbacks.
@@ -428,6 +431,10 @@ var WinderInterface = function()
   // Input:
   //   actionQuery - The action to execute on remote server.
   //   callback - A callback to run with the results of this query.  Optional.
+  // Notes:
+  //   Remote actions are a query (presumably a Python command) whose results
+  //   are returned as a JSON object.  This JSON object is unpacked and that
+  //   unpacked result sent to the callback.
   //---------------------------------------------------------------------------
   this.remoteAction = function( actionQuery, callback )
   {
@@ -459,16 +466,37 @@ var WinderInterface = function()
 
           value = jQuery.parseJSON( value )
 
-          callback( value )
+          if ( callback )
+            callback( value )
         }
-
       }
     )
   }
 
 
   //---------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Function that is called to display a value in a tag.
+  // Input:
+  //   value - Value to display.
+  //   displayId - Tag on screen to display item.
+  //   variableMap - Dictionary to place value of item. (Optional)
+  //   variableIndex - Input in dictionary to place value of item. (Optional)
+  //   formatFunction - Function to format the data before being displayed. (Optional)
+  //   formatParameters - Parameter to pass to the format function. (Optional)
+  // Example:
+  //   var savedValue = {}
+  //   winderInterface.displayCallback
+  //   (
+  //     1234,
+  //     "#tag",
+  //     savedValue,
+  //     "name",
+  //     function( value )
+  //     {
+  //       return Math.round( value )
+  //     }
+  //   )
   //---------------------------------------------------------------------------
   this.displayCallback = function
   (
@@ -480,18 +508,29 @@ var WinderInterface = function()
     formatParameters
   )
   {
+    // If this value needs to be saved...
     if ( ( variableMap )
       && ( variableIndex ) )
         variableMap[ variableIndex ] = value
 
+    // If the value needs to be formatted...
     if ( formatFunction )
       value = formatFunction( value, formatParameters )
 
+    // Display value.
     $( displayId ).text( value )
   }
 
   //---------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Load an item from remote server and display it in a given tag.
+  // Input:
+  //   query - Query to be made of remote server.
+  //   displayId - Tag on screen to display item.
+  //   variableMap - Dictionary to place value of item. (Optional)
+  //   variableIndex - Input in dictionary to place value of item. (Optional)
+  //   formatFunction - Function to format the data before being displayed. (Optional)
+  //   formatParameters - Parameter to pass to the format function. (Optional)
   //---------------------------------------------------------------------------
   this.singleRemoteDisplay = function
   (
@@ -522,7 +561,14 @@ var WinderInterface = function()
   }
 
   //---------------------------------------------------------------------------
-  // $$$DEBUG
+  // Input:
+  //   fileName - Path and name of XML file from remote server.
+  //   xmlFiled - The specific XML tag that has the data to be displayed.
+  //   displayId - Tag on screen to display item.
+  //   variableMap - Dictionary to place value of item. (Optional)
+  //   variableIndex - Input in dictionary to place value of item. (Optional)
+  //   formatFunction - Function to format the data before being displayed. (Optional)
+  //   formatParameters - Parameter to pass to the format function. (Optional)
   //---------------------------------------------------------------------------
   this.readXML_Display = function
   (
@@ -537,14 +583,6 @@ var WinderInterface = function()
   {
     // Run the query.
     $.get( fileName )
-      .error
-      (
-        function()
-        {
-          if ( callback )
-            callback( null )
-        }
-      )
       .done
       (
         function( data )
@@ -581,7 +619,10 @@ var WinderInterface = function()
   //---------------------------------------------------------------------------
   this.addToggleButton = function( tagId, getQuery, setQuery, getCallback, setCallback )
   {
+    // Save the enable/disabled state of the button in case we modify it latter.
     toggleButtonStates[ tagId ] = $( tagId ).prop( "disabled" )
+
+    // Function that sets the state of button with data being true or false.
     var updateFunction =
       function( data )
       {
@@ -605,19 +646,24 @@ var WinderInterface = function()
           getCallback( data )
       }
 
+    // If there is a function that can query the current state of button...
     if ( getQuery )
     {
+      // Disable button until we know what state (on/off) it should be in.
       $( tagId ).prop( "disabled", true )
 
+      // Function to get the current state of button.
       queryFunction = function()
       {
         // Get the initial value.
         self.remoteAction( getQuery, updateFunction )
       }
 
+      // Run the query now.
       queryFunction()
 
-      // Also get the initial value when errors clear.
+      // Also query the state of the button anytime we go from an error
+      // state to working.
       self.addErrorClearCallback( queryFunction )
     }
 
@@ -635,6 +681,7 @@ var WinderInterface = function()
       }
     )
 
+    // Callback when button is clicked.
     $( tagId )
       .click
       (
@@ -660,6 +707,7 @@ var WinderInterface = function()
         }
       )
 
+    // Return the update function.
     return updateFunction
   }
 
@@ -727,6 +775,9 @@ var WinderInterface = function()
   }
 
   //---------------------------------------------------------------------------
+  // Uses:
+  //   Shutdown periodic update function.  Call when internals of page are to
+  // be reloaded.
   //---------------------------------------------------------------------------
   this.shutdown = function()
   {

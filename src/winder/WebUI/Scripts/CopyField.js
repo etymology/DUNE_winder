@@ -26,7 +26,7 @@ function CopyField( dataTag, parentTag )
   // Uses:
   //   Enable/disable copy field.
   // Input:
-  //   isEnabled -
+  //   isEnabled - True to enable.
   //---------------------------------------------------------------------------
   this.enableCopy = function( isEnabled )
   {
