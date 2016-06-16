@@ -1,13 +1,27 @@
+#sideGraphic
+{
+  margin: 10px;
+  position: relative;
+  width: 1300px;
+}
+
 #baseImage
 {
   margin-top: 75px;
-  width: 1200px;
+  /*width: 1200px;*/
 }
 
 #loopImage
 {
-  width: 150px;
+  /*width: 120px;*/
   position: absolute;
-  top: 0px;
+  top: 5px;
   left: 500px;
+}
+
+#headImage
+{
+  position: absolute;
+  top: 0;
+  left: 0;
 }

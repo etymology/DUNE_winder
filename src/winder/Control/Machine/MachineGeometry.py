@@ -23,10 +23,10 @@ class MachineGeometry :
 
     # Location of Z-Transfer areas.
     # Top/bottom for Y, left/right for X.
-    self.top    = 2800  / self.scale
-    self.bottom = -25   / self.scale
-    self.left   = -250  / self.scale
-    self.right  = 6500  / self.scale
+    self.top    = 2800  / self.scale  # 2800
+    self.bottom = 0     / self.scale  # -25
+    self.left   = 400   / self.scale  # -250
+    self.right  = 6500  / self.scale  # 6500
 
     # How big the Z-transfer windows are.
     # The Z-transfer windows start at top/bottom/left/right locations.
