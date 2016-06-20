@@ -135,6 +135,15 @@ function MotorStatus()
   // Constructor
   //-----------------------------------------------------------------------------
 
+  winder.addPeriodicRemoteCallback
+  (
+    "io.plcLogic.getHeadSide()",
+    function( value )
+    {
+      self.motor[ "headSide" ] = value
+    }
+  )
+
   var AXIES = [ "x", "y", "z" ]
   for ( var index in AXIES )
   {

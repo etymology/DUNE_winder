@@ -1,5 +1,5 @@
 ###############################################################################
-# Name:
+# Name: APA_Base.py
 # Uses: Anode Plane Array (APA) base.
 # Date: 2016-05-26
 # Author(s):
@@ -53,6 +53,10 @@ class APA_Base( Serializable ) :
     "_lastModifyDate",
     "_loadedTime",
     "_windTime",
+    "_x",
+    "_y",
+    "_z",
+    "_headLocation",
   ]
 
   #---------------------------------------------------------------------
@@ -102,6 +106,10 @@ class APA_Base( Serializable ) :
     self._layer = None
     self._calibrationFile = None
     self._systemTime = systemTime
+    self._x = None
+    self._y = None
+    self._z = None
+    self._headLocation = None
 
     if self._systemTime :
       now = self._systemTime.get()
@@ -116,7 +124,7 @@ class APA_Base( Serializable ) :
 
 
   #---------------------------------------------------------------------
-  def _getPath( self ) :
+  def getPath( self ) :
     """
     Get the path for all files related to this APA.
     """
@@ -191,6 +199,22 @@ class APA_Base( Serializable ) :
     return result
 
   #---------------------------------------------------------------------
+  def setLocation( self, x, y, z, headLocation ) :
+    """
+    Set the machine location.  Call before closing.
+
+    Args:
+      x: X location.
+      y: Y location.
+      z: Z location.
+      headLocation: Position of the winder head (front/back).
+    """
+    self._x = x
+    self._y = y
+    self._z = z
+    self._headLocation = headLocation
+
+  #---------------------------------------------------------------------
   def load( self, nameOverride=None ) :
     """
     Load
@@ -202,7 +226,7 @@ class APA_Base( Serializable ) :
     if self._systemTime :
       self._loadStart = self._systemTime.get()
 
-    Serializable.load( self, self._getPath(), APA_Base.FILE_NAME, nameOverride )
+    Serializable.load( self, self.getPath(), APA_Base.FILE_NAME, nameOverride )
 
   #---------------------------------------------------------------------
   def save( self ) :
@@ -215,6 +239,6 @@ class APA_Base( Serializable ) :
     # Count the amount of APA time loaded.
     self._loadedTime += self._systemTime.getDelta( self._loadStart, now )
 
-    Serializable.save( self, self._getPath(), APA_Base.FILE_NAME )
+    Serializable.save( self, self.getPath(), APA_Base.FILE_NAME )
 
 # end class

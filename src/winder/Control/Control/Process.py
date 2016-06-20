@@ -30,7 +30,9 @@ class Process :
     self._log = log
     self._configuration = configuration
     self._systemTime = systemTime
-    self.spool = Spool( 27000000, 50 )
+
+    # $$$FUTURE - Change these settings.
+    self.spool = Spool( 27000000, 5000 )
 
     self.controlStateMachine = ControlStateMachine( io, log, systemTime )
 
@@ -486,6 +488,11 @@ class Process :
     """
 
     if self.apa :
+      x = self._io.xAxis.getPosition()
+      y = self._io.yAxis.getPosition()
+      z = self._io.zAxis.getPosition()
+      headLocation = self._io.plcLogic.getHeadSide()
+      self.apa.setLocation( x, y, z, headLocation )
       self.apa.addWindTime( self.controlStateMachine.windTime )
       self.apa.close()
       self.apa = None

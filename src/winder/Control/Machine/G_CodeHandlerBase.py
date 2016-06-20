@@ -238,6 +238,19 @@ class G_CodeHandlerBase :
     self._layerCalibration = layerCalibration
 
   #---------------------------------------------------------------------
+  def setLastLocation( self, location ) :
+    """
+    Set the last machine location.  This is needed when loading a new recipe
+    because seeks to transfer areas need to know form where to begin.
+
+    Args:
+      location: Coordinates of starting position.
+    """
+    self._lastX = location.x
+    self._lastY = location.y
+    self._lastZ = location.z
+
+  #---------------------------------------------------------------------
   def __init__( self, machineCalibration ):
     """
     Constructor.

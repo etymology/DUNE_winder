@@ -226,6 +226,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     # Head movement...
     if self._headPositionChange :
+      print "Chaging head position" # $$$
       self._head.setPosition( self._headPosition, velocity )
       self._headPositionChange = False
 
@@ -302,6 +303,8 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     # Use current X/Y/Z position as starting points.
     # (These will be moved to self.lastN when the next line is executed.)
+    # $$$DEBUG - Decide if this stays.  Initial position should be set by
+    # APA loading.
     self._x = self._io.xAxis.getPosition()
     self._y = self._io.yAxis.getPosition()
     self._z = self._io.zAxis.getPosition()

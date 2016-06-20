@@ -10,6 +10,7 @@ import sys
 import os.path
 
 from Library.Configuration import Configuration
+from Library.Geometry.Location import Location
 
 from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
@@ -80,6 +81,9 @@ def writeRubyCode( layer, recipe, geometry ) :
 
   outputFileName = layer + "-Layer.rb"
 
+  startingLocation = \
+    Location( geometry.apaOffsetX, geometry.apaOffsetY, geometry.apaOffsetZ )
+
   # Construct G-Code for first half.
   print "  Construct G-Code for first half."
   gCodePath = G_CodeToPath(
@@ -93,6 +97,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   gCodePath.writeRubyCode(
     outputFileName,
     "1st",
+    startingLocation,
     enablePathLabels,
     enablePinLabels,
     False
@@ -122,6 +127,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   gCodePath.writeRubyCode(
     outputFileName,
     "2nd",
+    startingLocation,
     enablePathLabels,
     enablePinLabels,
     True

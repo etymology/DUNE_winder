@@ -1,6 +1,12 @@
+#positionGraphic
+{
+  margin-left: 10px;
+  width: 1025px;
+}
+
 #column1
 {
-  max-width: 300px;
+  max-width: 320px;
   width: 40%;
   float: left;
 }
@@ -30,7 +36,7 @@ button.jog
 {
   margin-left: 10px;
   margin-bottom: 10px;
-  width: 800px;
+  width: 1025px;
 }
 
 #velocitySlider

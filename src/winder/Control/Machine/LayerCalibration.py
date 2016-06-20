@@ -27,7 +27,7 @@ class LayerCalibration( HashedSerializable ) :
     # Include only is just for the automatic serialized objects.
     # Missing keys are ignored by the base class because we deal with them
     # specifically with this class.
-    includeOnly = [ 'zFront', 'zBack' ]
+    includeOnly = [ 'zFront', 'zBack', "_layer" ]
     HashedSerializable.__init__( self, includeOnly=includeOnly, ignoreMissing=True )
 
     # Name of layer this calibration file applies.

@@ -43,6 +43,17 @@ class PLC_Logic :
     LATCH_UNLOCK = 7
   # end class
 
+  class LatchPosition :
+    FULL_UP    = 0
+    PARTIAL_UP = 1
+    DOWN       = 2
+  # end class
+
+  class HeadSide :
+    FRONT = 0
+    BACK  = 1
+  # end class
+
   #---------------------------------------------------------------------
   def isReady( self ) :
     """
@@ -146,10 +157,40 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.JOG_Z )
 
   #---------------------------------------------------------------------
+  def getLatchPosition( self ) :
+    """
+    Get the current latch position.
+    $$$FUTURE - Use inputs to determine side.
+
+    Returns:
+      One of the PLC_Logic.LatchPosition elements.
+    """
+    return self._latchPosition
+
+  #---------------------------------------------------------------------
+  def getHeadSide( self ) :
+    """
+    Get the side of the machine the head is located.
+    $$$FUTURE - Use inputs to determine side.
+
+    Returns:
+      PLC_Logic.HeadSide.FRONT/BACK.
+    """
+    return self._headSide
+
+  #---------------------------------------------------------------------
   def latch( self ) :
     """
     Start a latching operation.
     """
+    self._latchPosition += 1
+    self._latchPosition %= 3
+
+    if self._latchPosition >= 2 :
+      self._headSide = self.HeadSide.FRONT
+    else:
+      self._headSide = self.HeadSide.BACK
+
     self._moveType.set( self.MoveTypes.LATCH )
 
   #---------------------------------------------------------------------
@@ -266,6 +307,8 @@ class PLC_Logic :
     self._plc = plc
     self._xyAxis = xyAxis
     self._zAxis = zAxis
+    self._latchPosition = 1
+    self._headSide = self.HeadSide.FRONT
 
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True

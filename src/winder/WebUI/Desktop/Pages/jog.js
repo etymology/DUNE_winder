@@ -172,9 +172,6 @@ function Jog()
     winder.remoteAction( "io.plcLogic.latchUnlock()" )
   }
 
-
-  $( "#loopImage" ).draggable()
-
   // Callback function to initialize position graphic.
   // Called twice--once when the position graphic page is loaded, and again
   // when the motor status page is loaded.  Both must be loaded before

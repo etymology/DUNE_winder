@@ -89,6 +89,31 @@ class Head :
     self._state = self.States.IDLE
 
   #---------------------------------------------------------------------
+  def setFrontAndBack( self, front, back ) :
+    """
+    Set the front and back locations (i.e. locations to put head level with
+    the current layer).
+
+    Args:
+      front: Z-location to make head level with current layer on front side.
+      back: Z-location to make head level with current layer on back side.
+    """
+    self._front = front
+    self._back  = back
+
+  #---------------------------------------------------------------------
+  def setExtendedAndRetracted( self, retracted, extended ) :
+    """
+    Set the extended and retracted position for the Z-axis.
+
+    Args:
+      retracted: Z-position for fully retracted.
+      extended: Z-position for fully extended (i.e. ready to latch).
+    """
+    self._extended  = extended
+    self._retracted = retracted
+
+  #---------------------------------------------------------------------
   def setPosition( self, position, velocity ) :
     """
     Set the head position.

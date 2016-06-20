@@ -71,7 +71,7 @@ class AnodePlaneArray( APA_Base ) :
     self._recipe = None
     self._calibration = None
 
-    self._log.attach( self._getPath() + AnodePlaneArray.LOG_FILE )
+    self._log.attach( self.getPath() + AnodePlaneArray.LOG_FILE )
 
     if createNew :
       self.save()
@@ -86,7 +86,21 @@ class AnodePlaneArray( APA_Base ) :
     Args:
       layer: Name of the layer.
     """
-    return self._getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
+    return self.getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
+
+  #---------------------------------------------------------------------
+  def useDefaultCalibration( self ) :
+    """
+    Generate and use default calibration file for layer.
+    $$$TEMPORARY
+    """
+
+    # $$$TEMPORARY - Temporary.  Load the actual calibration file instead.
+    self._calibrationFile = self._layer + "_Calibration.xml"
+    self._calibration = \
+      DefaultLayerCalibration( self.getPath(), self._calibrationFile, self._layer )
+
+    self._gCodeHandler.useLayerCalibration( self._calibration )
 
   #---------------------------------------------------------------------
   def loadRecipe( self, layer=None, recipeFile=None, startingLine=None ) :
@@ -106,12 +120,16 @@ class AnodePlaneArray( APA_Base ) :
     if None != layer :
       self._layer = layer
 
-    # $$$TEMPORARY - Temporary.  Load the actual calibration file instead.
-    self._calibrationFile = self._layer + "_Calibration.xml"
-    self._calibration = \
-      DefaultLayerCalibration( self._getPath(), self._calibrationFile, self._layer )
+    # If there is a calibration file, load it.
+    if self._calibrationFile :
+      self._calibration = LayerCalibration()
+      self._calibration.load( self.getPath(), self._calibrationFile )
 
-    self._gCodeHandler.useLayerCalibration( self._calibration )
+      # Make use of calibration.
+      self._gCodeHandler.useLayerCalibration( self._calibration )
+    else :
+      # If there is no calibration, use none.
+      self._gCodeHandler.useLayerCalibration( None )
 
     if None != recipeFile :
       self._recipeFile = recipeFile
@@ -185,7 +203,7 @@ class AnodePlaneArray( APA_Base ) :
 
     if self._calibrationFile :
       self._calibration = LayerCalibration()
-      self._calibration.load( self._getPath(), self._calibrationFile )
+      self._calibration.load( self.getPath(), self._calibrationFile )
 
       if not self._calibration :
         isError = True
@@ -204,6 +222,31 @@ class AnodePlaneArray( APA_Base ) :
         )
 
         self._gCodeHandler.useLayerCalibration( self._calibration )
+
+  #---------------------------------------------------------------------
+  def getCalibrationFile( self ) :
+    """
+    Get the file name of the calibration file currently in use.
+
+    Returns:
+      File name of the calibration file currently in use.  None if no calibration
+      file has yet been assigned.
+    """
+    return self._calibrationFile
+
+  #---------------------------------------------------------------------
+  def setCalibrationFile( self, calibrationFile ) :
+    """
+    Set a calibration file to use for layer.
+
+    Args:
+      calibrationFile: Calibration file to be used.
+    """
+    self._calibrationFile = calibrationFile
+    self._calibration = LayerCalibration()
+    self._calibration.load( self.getPath(), self._calibrationFile )
+
+    self._gCodeHandler.useLayerCalibration( self._calibration )
 
   #---------------------------------------------------------------------
   def setStage( self, stage, message="<unspecified>" ) :
@@ -256,7 +299,7 @@ class AnodePlaneArray( APA_Base ) :
         elapsedTime
       ]
     )
-    self._log.detach( self._getPath() + AnodePlaneArray.LOG_FILE )
+    self._log.detach( self.getPath() + AnodePlaneArray.LOG_FILE )
     AnodePlaneArray.activeAPA = None
 
 # end class
