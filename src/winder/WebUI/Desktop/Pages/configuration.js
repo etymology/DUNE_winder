@@ -282,7 +282,7 @@ function Configuration()
           "io.plcLogic.cameraTrigger.set( 1 )",
           function()
           {
-            winder.remoteAction( "io.plcLogic.cameraTrigger.set( 0 )" )
+            //winder.remoteAction( "io.plcLogic.cameraTrigger.set( 0 )" )
           }
         )
 
