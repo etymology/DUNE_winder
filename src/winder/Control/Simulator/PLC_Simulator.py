@@ -64,8 +64,21 @@ class PLC_Simulator :
         velocity = self._io.plc.getTag( self._maxXY_VelocityTag )
         acceleration = self._io.plc.getTag( self._maxXY_AccelerationTag )
         deceleration = self._io.plc.getTag( self._maxXY_DecelerationTag )
-        self._xAxis.startSeek( velocity, acceleration, deceleration )
-        self._yAxis.startSeek( velocity, acceleration, deceleration )
+
+        xTime = self._xAxis.travelTime( velocity, acceleration, deceleration )
+        yTime = self._yAxis.travelTime( velocity, acceleration, deceleration )
+
+        xVelocity = velocity
+        yVelocity = velocity
+
+        if xTime > 0 and yTime > 0 :
+          if xTime < yTime :
+            xVelocity = self._xAxis.computeVelocity( acceleration, deceleration, yTime )
+          else:
+            yVelocity = self._yAxis.computeVelocity( acceleration, deceleration, xTime )
+
+        self._xAxis.startSeek( xVelocity, acceleration, deceleration )
+        self._yAxis.startSeek( yVelocity, acceleration, deceleration )
 
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_SEEK )
       # Jog in X/Y?

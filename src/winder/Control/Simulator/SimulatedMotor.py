@@ -11,12 +11,61 @@ from Simulator.TrapezoidalMotion import TrapezoidalMotion
 class SimulatedMotor :
 
   #---------------------------------------------------------------------
+  def travelTime( self, velocity, acceleration, deceleration ) :
+    """
+    Compute travel time of the motion.
+
+    Args:
+      velocity: Maximum velocity.
+      acceleration: Maximum positive acceleration.
+      deceleration: Maximum negative acceleration.
+
+    Returns:
+      Time it will take to travel seek distance.
+    """
+
+    seekPosition = self._plc.getTag( self._desiredPositionTag )
+
+    return TrapezoidalMotion.computeTravelTime(
+      acceleration,
+      deceleration,
+      velocity,
+      self._position,
+      seekPosition
+    )
+
+  #---------------------------------------------------------------------
+  def computeVelocity( self, acceleration, deceleration, desiredTime ) :
+    """
+    Compute travel time of the motion.
+
+    Args:
+      acceleration: Maximum positive acceleration.
+      deceleration: Maximum negative acceleration.
+      desiredTime: Time to traverse motion.
+
+    Returns:
+      Velocity to traverse the seek distance with the given time.
+    """
+    seekPosition = self._plc.getTag( self._desiredPositionTag )
+
+    return TrapezoidalMotion.computeLimitingVelocity(
+      acceleration,
+      deceleration,
+      self._position,
+      seekPosition,
+      desiredTime
+    )
+
+  #---------------------------------------------------------------------
   def startSeek( self, velocity, acceleration, deceleration ) :
     """
     Begin moving to a new position.
 
     Args:
-      velocity - Maximum velocity for seek.
+      velocity: Maximum velocity for seek.
+      acceleration: Maximum positive acceleration.
+      deceleration: Maximum negative acceleration.
     """
     self._inMotion = True
     self._seekPosition = self._plc.getTag( self._desiredPositionTag )
@@ -123,27 +172,23 @@ class SimulatedMotor :
     self._simulationTime  = simulationTime
     self._wasEnabled      = False
     self._inMotion        = False
-    self._torque          = 0
-    self._maxTorque       = 1000
     self._seekPosition    = 0
     self._position        = 0
     self._velocity        = 0
     self._acceleration    = 0
-    self._jerk            = 200
-    self._maxAcceleration = 0
     self._maxVelocity     = 0
     self._startTime       = simulationTime.get()
     self._motion          = None
 
     self._desiredPositionTag = plc.setupTag( tagBase + "_POSITION", 0                     )
     self._desiredVelocityTag = plc.setupTag( tagBase + "_Axis.CommandVelocity", 0         )
-    self._speedTag        = plc.setupTag( tagBase + "_SPEED", 0                        )
-    self._directionTag    = plc.setupTag( tagBase + "_DIR", 0                          )
-    self._positionTag     = plc.setupTag( tagBase + "_Axis.ActualPosition", 0          )
-    self._velocityTag     = plc.setupTag( tagBase + "_Axis.ActualVelocity", 0          )
-    self._accelerationTag = plc.setupTag( tagBase + "_Axis.CommandAcceleration", 0     )
-    self._motionTag       = plc.setupTag( tagBase + "_Axis.CoordinatedMotionStatus", 0 )
-    self._faultTag        = plc.setupTag( tagBase + "_Axis.ModuleFault", 0             )
+    self._speedTag           = plc.setupTag( tagBase + "_SPEED", 0                        )
+    self._directionTag       = plc.setupTag( tagBase + "_DIR", 0                          )
+    self._positionTag        = plc.setupTag( tagBase + "_Axis.ActualPosition", 0          )
+    self._velocityTag        = plc.setupTag( tagBase + "_Axis.ActualVelocity", 0          )
+    self._accelerationTag    = plc.setupTag( tagBase + "_Axis.CommandAcceleration", 0     )
+    self._motionTag          = plc.setupTag( tagBase + "_Axis.CoordinatedMotionStatus", 0 )
+    self._faultTag           = plc.setupTag( tagBase + "_Axis.ModuleFault", 0             )
 
   #---------------------------------------------------------------------
   def getSpeedTag( self ) :

@@ -136,12 +136,55 @@ class TrapezoidalMotion( Motion ) :
 
 
   #---------------------------------------------------------------------
+  @staticmethod
+  def computeLimitingVelocity(
+    maxAcceleration,
+    minAcceleration,
+    startPosition,
+    endPosition,
+    desiredTime
+  ) :
+    """
+    Calculate a limiting velocity that will result in the desired time.
+
+    Args:
+      maxAcceleration: Maximum positive acceleration.
+      minAcceleration: Maximum negative acceleration.
+      startPosition: Starting position.
+      endPosition: Finial position.
+      desiredTime: Amount of time to traverse this distance.
+
+    Returns:
+      Limiting velocity needed to obtain this time.  0 if the time needed is
+      greater than desired time denoting the operation cannot be done.
+
+    Notes:
+      Desired time should be more than the minimum time needed to reach the destination
+      with given accelerations.  Otherwise, 0 is returned.
+    """
+
+    delta = abs( endPosition - startPosition )
+    accumulator = maxAcceleration**2 * minAcceleration**2 * desiredTime** 2
+    accumulator -= 2 * maxAcceleration**2 * minAcceleration * delta
+    accumulator -= 2 * maxAcceleration * minAcceleration**2 * delta
+    if accumulator > 0 :
+      accumulator  = sqrt( accumulator )
+      accumulator  = maxAcceleration * minAcceleration * desiredTime - accumulator
+      accumulator /= maxAcceleration + minAcceleration
+    else :
+      # Cannot be done in this amount of time.
+      accumulator = 0
+
+    return accumulator
+
+  #---------------------------------------------------------------------
   def compute( self, maxAcceleration, minAcceleration, velocity, startPosition, endPosition ) :
     """
     Compute internal point table using the specified settings. Call before using 'interpolatePosition'.
 
     Args:
-      acceleration: Maximum acceleration.
+      maxAcceleration: Maximum positive acceleration.
+      minAcceleration: Maximum negative acceleration.
       velocity: Maximum velocity.
       startPosition: Starting position.
       endPosition: Finial position.
@@ -250,8 +293,32 @@ class TrapezoidalMotion( Motion ) :
       True if in motion at this time, False if not.
     """
 
-    #print time, self._point[ self.Point.T7 ].t, time < self._point[ self.Point.T7 ].t
     return time >= 0 and time < self._point[ self.Point.T3 ].t
+
+  #---------------------------------------------------------------------
+  @staticmethod
+  def computeTravelTime( maxAcceleration, minAcceleration, velocity, startPosition, endPosition ) :
+    """
+    Return total time need for travel.
+
+    Args:
+      maxAcceleration: Maximum positive acceleration.
+      minAcceleration: Maximum negative acceleration.
+      velocity: Maximum velocity.
+      startPosition: Starting position.
+      endPosition: Finial position.
+
+    Returns:
+      Time needed for travel.
+    """
+
+    delta = abs( endPosition - startPosition )
+
+    accumulator = delta / velocity
+    accumulator += velocity / ( 2 * maxAcceleration )
+    accumulator += velocity / ( 2 * minAcceleration )
+
+    return accumulator
 
   #---------------------------------------------------------------------
   def interpolatePosition( self, time ) :
