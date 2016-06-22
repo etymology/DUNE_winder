@@ -120,6 +120,9 @@ class AnodePlaneArray( APA_Base ) :
     if None != layer :
       self._layer = layer
 
+    # $$$TEMPORARY
+    self.useDefaultCalibration()
+
     # If there is a calibration file, load it.
     if self._calibrationFile :
       self._calibration = LayerCalibration()
@@ -200,6 +203,7 @@ class AnodePlaneArray( APA_Base ) :
 
     if self._recipeFile :
       self.loadRecipe( self._layer )
+      self._gCodeHandler.setInitialLocation( self._x, self._y, self._headLocation )
 
     if self._calibrationFile :
       self._calibration = LayerCalibration()
@@ -281,6 +285,14 @@ class AnodePlaneArray( APA_Base ) :
     Close an APA.  Call during shutdown sequence.  Called internally when new
     APA is loaded.
     """
+
+    x = self._gCodeHandler._x #self._io.xAxis.getPosition()
+    y = self._gCodeHandler._y #self._io.yAxis.getPosition()
+
+    # $$$DEBUG - Move head to PLC logic or I/O.
+    headLocation = self._io.head.getPosition()
+    self.setLocation( x, y, headLocation )
+
     self.save()
 
     elapsedTime = self._systemTime.getDelta( self._startTime )

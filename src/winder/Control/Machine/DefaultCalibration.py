@@ -47,14 +47,14 @@ class DefaultMachineCalibration( MachineCalibration ) :
     self.transferRightTop = geometry.top / 2
     self.transferBottom   = geometry.bottom
 
-    self.limitLeft        = geometry.left
-    self.limitTop         = geometry.top
-    self.limitRight       = geometry.right
-    self.limitBottom      = geometry.bottom
+    self.limitLeft        = geometry.limitLeft
+    self.limitTop         = geometry.limitTop
+    self.limitRight       = geometry.limitRight
+    self.limitBottom      = geometry.limitBottom
     self.zFront           = 0
     self.zBack            = geometry.zTravel
-    self.zLimitFront      = 0
-    self.zLimitRear       = geometry.zTravel
+    self.zLimitFront      = geometry.limitRetracted
+    self.zLimitRear       = geometry.limitExtended
 
     if outputFilePath and outputFileName :
       # If there isn't a calibration file, create it.  Otherwise, load what

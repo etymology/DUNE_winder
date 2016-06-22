@@ -394,8 +394,35 @@ function APA()
     }
   )
 
-  // Load the motor status module.
-  winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
+  // $$$ // Load the motor status module.
+  // $$$ winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
+
+  // Callback function to initialize position graphic.
+  // Called twice--once when the position graphic page is loaded, and again
+  // when the motor status page is loaded.  Both must be loaded before
+  // initialization can take place, and either could load first.
+  var positionGraphicCount = 2
+  positionGraphicInitialize = function()
+  {
+    positionGraphicCount -= 1
+    if ( 0 == positionGraphicCount )
+      positionGraphic.initialize( 0.50 )
+  }
+
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/positionGraphic",
+    "#positionGraphicDiv",
+    positionGraphicInitialize
+  )
+
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/motorStatus",
+    "#motorStatusDiv",
+    positionGraphicInitialize
+  )
+
 
   // Callback run after period updates happen to enable/disable APA controls
   // depending on machine state.

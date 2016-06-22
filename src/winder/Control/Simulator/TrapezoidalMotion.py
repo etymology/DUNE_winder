@@ -44,7 +44,7 @@ class TrapezoidalMotion( Motion ) :
       Position after time.
     """
 
-    return x + v * t + 1.0 / 2.0 * a * t ** 2
+    return round( x + v * t + 1.0 / 2.0 * a * t ** 2, 5 )
 
   #---------------------------------------------------------------------
   def _calculateV( self, a, v, t ) :
@@ -60,7 +60,7 @@ class TrapezoidalMotion( Motion ) :
       Velocity after time.
     """
 
-    return v + a * t
+    return round( v + a * t, 5 )
 
   # #---------------------------------------------------------------------
   # def _calculateA( self, j, a, t ) :
@@ -136,48 +136,6 @@ class TrapezoidalMotion( Motion ) :
 
 
   #---------------------------------------------------------------------
-  @staticmethod
-  def computeLimitingVelocity(
-    maxAcceleration,
-    minAcceleration,
-    startPosition,
-    endPosition,
-    desiredTime
-  ) :
-    """
-    Calculate a limiting velocity that will result in the desired time.
-
-    Args:
-      maxAcceleration: Maximum positive acceleration.
-      minAcceleration: Maximum negative acceleration.
-      startPosition: Starting position.
-      endPosition: Finial position.
-      desiredTime: Amount of time to traverse this distance.
-
-    Returns:
-      Limiting velocity needed to obtain this time.  0 if the time needed is
-      greater than desired time denoting the operation cannot be done.
-
-    Notes:
-      Desired time should be more than the minimum time needed to reach the destination
-      with given accelerations.  Otherwise, 0 is returned.
-    """
-
-    delta = abs( endPosition - startPosition )
-    accumulator = maxAcceleration**2 * minAcceleration**2 * desiredTime** 2
-    accumulator -= 2 * maxAcceleration**2 * minAcceleration * delta
-    accumulator -= 2 * maxAcceleration * minAcceleration**2 * delta
-    if accumulator > 0 :
-      accumulator  = sqrt( accumulator )
-      accumulator  = maxAcceleration * minAcceleration * desiredTime - accumulator
-      accumulator /= maxAcceleration + minAcceleration
-    else :
-      # Cannot be done in this amount of time.
-      accumulator = 0
-
-    return accumulator
-
-  #---------------------------------------------------------------------
   def compute( self, maxAcceleration, minAcceleration, velocity, startPosition, endPosition ) :
     """
     Compute internal point table using the specified settings. Call before using 'interpolatePosition'.
@@ -214,9 +172,9 @@ class TrapezoidalMotion( Motion ) :
       reverseAcceleration = -reverseAcceleration
       svelocity   = -velocity
 
-    # $$$DEBUG # We must either not be moving or have a jerk term.
-    # $$$DEBUG assert ( 0 == position or not 0 == jerk ), "Cannot move without a jerk term"
-    # $$$DEBUG assert ( 0 == position or 0 != velocity ), "Cannot move without a velocity term"
+    # We must either not be moving or have a acceleration and velocity term.
+    assert ( 0 == position or ( 0 != maxAcceleration and 0 != minAcceleration ) ), "Cannot move without a acceleration term"
+    assert ( 0 == position or 0 != velocity ), "Cannot move without a velocity term"
 
     # If actually moving...
     if not 0 == position :
@@ -297,14 +255,67 @@ class TrapezoidalMotion( Motion ) :
 
   #---------------------------------------------------------------------
   @staticmethod
-  def computeTravelTime( maxAcceleration, minAcceleration, velocity, startPosition, endPosition ) :
+  def computeLimitingVelocity(
+    maxAcceleration,
+    minAcceleration,
+    startPosition,
+    endPosition,
+    desiredTime
+  ) :
+    """
+    Calculate a limiting velocity that will result in the desired time.  Useful
+    for synchronizing multi-axis motion.
+
+    Args:
+      maxAcceleration: Maximum positive acceleration.
+      minAcceleration: Maximum negative acceleration.
+      startPosition: Starting position.
+      endPosition: Finial position.
+      desiredTime: Amount of time to traverse this distance.
+
+    Returns:
+      Limiting velocity needed to obtain this time.  0 if the time needed is
+      greater than desired time denoting the operation cannot be done.
+
+    Notes:
+      Desired time should be more than the minimum time needed to reach the destination
+      with given accelerations.  Otherwise, 0 is returned.
+    """
+
+    delta = round( abs( endPosition - startPosition ), 5 )
+
+    # Start with the radicand.
+    accumulator  = maxAcceleration**2 * minAcceleration**2 * desiredTime** 2
+    accumulator -= 2 * maxAcceleration**2 * minAcceleration * delta
+    accumulator -= 2 * maxAcceleration * minAcceleration**2 * delta
+
+    # Can this be accomplished (i.e. radicand greater than 0)?
+    if accumulator > 0 :
+      accumulator  = sqrt( accumulator )
+      accumulator  = maxAcceleration * minAcceleration * desiredTime - accumulator
+      accumulator /= maxAcceleration + minAcceleration
+    else :
+      # Cannot be done in this amount of time.
+      accumulator = 0
+
+    return accumulator
+
+  #---------------------------------------------------------------------
+  @staticmethod
+  def computeTravelTime(
+    maxAcceleration,
+    minAcceleration,
+    maxVelocity,
+    startPosition,
+    endPosition
+  ) :
     """
     Return total time need for travel.
 
     Args:
       maxAcceleration: Maximum positive acceleration.
       minAcceleration: Maximum negative acceleration.
-      velocity: Maximum velocity.
+      maxVelocity: Maximum maxVelocity.
       startPosition: Starting position.
       endPosition: Finial position.
 
@@ -312,13 +323,38 @@ class TrapezoidalMotion( Motion ) :
       Time needed for travel.
     """
 
-    delta = abs( endPosition - startPosition )
+    delta = round( abs( endPosition - startPosition ), 5 )
 
-    accumulator = delta / velocity
-    accumulator += velocity / ( 2 * maxAcceleration )
-    accumulator += velocity / ( 2 * minAcceleration )
+    result = 0
 
-    return accumulator
+    # Don't bother if there isn't any motion.
+    if delta > 0 :
+      # Time if max maxVelocity is reached.
+      t1  = delta / maxVelocity
+      t1 += maxVelocity / ( 2 * maxAcceleration )
+      t1 += maxVelocity / ( 2 * minAcceleration )
+
+      # Time if max maxVelocity is not reached.
+      t2  = 1.0 / minAcceleration
+      t2 += 1.0 / maxAcceleration
+      t2 *= 2 * delta
+      t2  = sqrt( t2 )
+
+      # Maximum maxVelocity using t2.
+      finialVelocity  = maxAcceleration + minAcceleration
+      finialVelocity *= minAcceleration
+      finialVelocity  = 2 * maxAcceleration * delta / finialVelocity
+      finialVelocity  = sqrt( finialVelocity )
+      finialVelocity *= minAcceleration
+
+      # We can use t2 (which should always be lower) if it does not exceed the
+      # maximum maxVelocity.
+      if finialVelocity < maxVelocity :
+        result = t2
+      else :
+        result = t1
+
+    return result
 
   #---------------------------------------------------------------------
   def interpolatePosition( self, time ) :

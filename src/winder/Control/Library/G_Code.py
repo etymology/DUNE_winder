@@ -356,14 +356,26 @@ class G_Code :
     return len( self.lines )
 
   #---------------------------------------------------------------------
-  def executeNextLine( self, lineNumber ) :
+  def execute( self, line ) :
     """
     Run a line of G-code.
 
+    Args:
+      line: G-Code to execute.
+    """
+    gCodeLine = G_CodeLine( self.callbacks, line )
+    gCodeLine.execute()
+
+  #---------------------------------------------------------------------
+  def executeNextLine( self, lineNumber ) :
+    """
+    Run the next line of G-code.
+
+    Args:
+      lineNumber: Which line to execute.
     """
     if lineNumber < len( self.lines ) :
-      gCodeLine = G_CodeLine( self.callbacks, self.lines[ lineNumber ] )
-      gCodeLine.execute()
+      self.execute( self.lines[ lineNumber ] )
 
 #------------------------------------------------------------------------------
 # Unit test.

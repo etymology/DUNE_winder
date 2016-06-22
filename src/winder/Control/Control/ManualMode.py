@@ -25,9 +25,6 @@ class ManualMode( StateMachineState ) :
     StateMachineState.__init__( self, stateMachine, state )
     self._io   = io
     self._log  = log
-    # $$$ self._jogX = 0
-    # $$$ self._jogY = 0
-    # $$$ self._jogZ = 0
     self._wasJogging = False
     self._wasSeekingZ  = False
     self._noteSeekStop = False
@@ -73,6 +70,22 @@ class ManualMode( StateMachineState ) :
       self.stateMachine.seekZ = None
       isError = False
 
+    # Move the head?
+    if None != self.stateMachine.setHeadPosition :
+      isError = self._io.head.setPosition(
+        self.stateMachine.setHeadPosition,
+        self.stateMachine.seekVelocity
+      )
+
+      if isError :
+        self._log.add(
+          self.__class__.__name__,
+          "SEEK_HEAD",
+          "Head position request failed."
+        )
+
+      self.stateMachine.setHeadPosition = None
+
     return isError
 
   #---------------------------------------------------------------------
@@ -86,6 +99,7 @@ class ManualMode( StateMachineState ) :
     if self.stateMachine.stopRequest :
       # We didn't finish this line.  Run it again.
       self._io.plcLogic.stopSeek()
+      self._io.head.stop()
       self._log.add(
         self.__class__.__name__,
         "SEEK_STOP",
@@ -95,10 +109,7 @@ class ManualMode( StateMachineState ) :
       self.stateMachine.stopRequest = False
 
     # Is movement done?
-    if self._io.plcLogic.isReady() :
-
-      # $$$DEBUG - Removed the below.  Verify this is correct on actual machine.
-      #  and not self.stateMachine.isJogging :
+    if self._io.plcLogic.isReady() and self._io.head.isIdle() :
 
       # If we were seeking and stopped pre-maturely, note where.
       if self._noteSeekStop :

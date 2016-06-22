@@ -172,6 +172,16 @@ function Jog()
     winder.remoteAction( "io.plcLogic.latchUnlock()" )
   }
 
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Set the position of the head.
+  //-----------------------------------------------------------------------------
+  this.headPosition = function( position )
+  {
+    var velocity = this.getVelocity()
+    winder.remoteAction( "process.manualHeadPosition( " + position + "," + velocity + " )" )
+  }
+
   // Callback function to initialize position graphic.
   // Called twice--once when the position graphic page is loaded, and again
   // when the motor status page is loaded.  Both must be loaded before
@@ -181,7 +191,7 @@ function Jog()
   {
     positionGraphicCount -= 1
     if ( 0 == positionGraphicCount )
-      positionGraphic.initialize()
+      positionGraphic.initialize( 0.7 )
   }
 
   winder.loadSubPage

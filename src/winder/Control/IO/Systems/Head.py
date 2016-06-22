@@ -16,6 +16,7 @@ class Head :
 
     # Momentary states.
     #FIRST_SEEK  = 3
+    START_DOUBLE_LATCH = 3
     START_LATCH = 4
     SECOND_SEEK = 5
   # end class
@@ -47,43 +48,47 @@ class Head :
 
     # Seeking/latching?
     if self.States.SEEK == self._state or self.States.LATCH == self._state :
-      if self._io.plcLogic.isReady() :
+      if self._plcLogic.isReady() :
         self._state = self._nextState
+
+    elif self.States.START_DOUBLE_LATCH == self._state :
+      # Start first latch, and prepare to latch again as the next state.
+      self._plcLogic.latch()
+      self._nextState = self.States.START_LATCH
+      self._state = self.States.LATCH
 
     # Start latching?
     elif self.States.START_LATCH == self._state :
       # Begin latch and setup state machine for second seek when latch finishes.
-      self._io.plcLogic.latch()
+      self._plcLogic.latch()
       self._nextState = self.States.SECOND_SEEK
       self._state = self.States.LATCH
 
     # Start second seek?
     elif self.States.SECOND_SEEK == self._state :
+
       # Start seek to the finial position.
-      self._io.plcLogic.setZ_Position( self._lastSeek, self._velocity )
+      self._plcLogic.setZ_Position( self._lastSeek, self._velocity )
 
       # Always idle after this motion.
       self._nextState = self.States.IDLE
       self._state = self.States.SEEK
 
   #---------------------------------------------------------------------
-  def __init__( self, io, retracted, extended, front, back ) :
+  def __init__( self, plcLogic ) :
     """
     Constructor.
 
     Args:
-      io: Instance of machine I/O.
-      retracted: Fully retracted seek position.
-      extended: Fully extended seek position.
-      front: Level with front side of layer seek position.
-      back: Level with back side of layer seek position.
+      plcLogic: Instance of PLC_Logic.
     """
-    self._io = io
-    self._extended  = extended
-    self._retracted = retracted
-    self._front     = front
-    self._back      = back
+    self._plcLogic  = plcLogic
+    self._extended  = None
+    self._retracted = None
+    self._front     = None
+    self._back      = None
     self._position  = Head.RETRACTED
+    self._lastPosition = Head.RETRACTED
     self._velocity  = None
     self._lastSeek  = None
     self._state = self.States.IDLE
@@ -127,6 +132,9 @@ class Head :
     # If the head is idle and the position is actually different...
     if self.States.IDLE == self._state and position != self._position :
 
+      # Note from where we started.
+      self._lastPosition = self._position
+
       self._velocity = velocity
 
       if self.RETRACTED == position :
@@ -140,34 +148,43 @@ class Head :
       else:
         raise "Unknown head position request" + str( position )
 
-      # Do we have to go get/leave the head?
-      if self.EXTENDED == self._position or self.EXTENDED == position :
+      # No desired position likely means the locations have not been setup.
+      if None != desiredPosition :
 
-        # The last seek is the set to the desired position.  If the back is
-        # the desired position, then the last seek will be to the front, leaving
-        # the head on the back.
-        if self.EXTENDED == position :
-          self._lastSeek = self._retracted
-        else :
-          self._lastSeek = desiredPosition
+        # $$$ POSITIONS = [ "RETRACTED", "FRONT", "BACK", "EXTENDED" ]
+        # $$$ print "Moving head from", POSITIONS[ self._position ], "to", POSITIONS[ position ]
 
-        # First seek is all the way to the back.
-        desiredPosition = self._extended
+        # Do we have to go get/leave the head?
+        if self.EXTENDED == self._position or self.EXTENDED == position :
 
-        # After the seek is complete, begin a latch operation.
-        self._nextState = self.States.START_LATCH
-      else:
-        # If no latching operations are required, the seek finishes the operation.
-        self._nextState = self.States.IDLE
+          # The last seek is the set to the desired position.  If the back is
+          # the desired position, then the last seek will be to the front, leaving
+          # the head on the back.
+          if self.EXTENDED == position :
+            self._lastSeek = self._retracted
+          else :
+            self._lastSeek = desiredPosition
 
-      # Begin seeking.
-      self._io.plcLogic.setZ_Position( desiredPosition, self._velocity )
-      self._state = self.States.SEEK
+          # First seek is all the way to the back.
+          desiredPosition = self._extended
 
-      # Use the new position as the current position.
-      self._position = position
+          # After the seek is complete, begin a latch operation.
+          if self.EXTENDED == position :
+            self._nextState = self.States.START_DOUBLE_LATCH
+          else :
+            self._nextState = self.States.START_LATCH
+        else:
+          # If no latching operations are required, the seek finishes the operation.
+          self._nextState = self.States.IDLE
 
-      isError = False
+        # Begin seeking.
+        self._plcLogic.setZ_Position( desiredPosition, self._velocity )
+        self._state = self.States.SEEK
+
+        # Use the new position as the current position.
+        self._position = position
+
+        isError = False
 
     return isError
 
@@ -180,5 +197,24 @@ class Head :
       RETRACTED/FRONT/BACK/EXTENDED.
     """
     return self._position
+
+  #---------------------------------------------------------------------
+  def stop( self ) :
+    """
+    Stop/abort transfer.
+    """
+
+    # If in transition...
+    if self.States.IDLE != self._state :
+
+      # If Z axis is in motion, stop it.
+      if self.States.SEEK == self._state :
+        self._plcLogic.stopSeek()
+
+      # Revert to previous position.
+      self._position = self._lastPosition
+
+      # Idle the state machine.
+      self._state = self.States.IDLE
 
 # end class

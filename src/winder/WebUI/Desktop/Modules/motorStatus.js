@@ -197,7 +197,7 @@ function MotorStatus()
     )
 
     readConfig()
-    winder.addErrorClearCallback( this.readConfig )
+    winder.addErrorClearCallback( readConfig )
 
     barSetup( axis )
   }

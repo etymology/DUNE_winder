@@ -12,6 +12,7 @@ from IO.Types.PLC_Motor import PLC_Motor
 
 from IO.Systems.MultiAxisMotor import MultiAxisMotor
 from IO.Systems.PLC_Logic import PLC_Logic
+from IO.Systems.Head import Head
 
 class BaseIO:
 
@@ -66,6 +67,7 @@ class BaseIO:
     # PLC logic system, including its polling.
     self.plcLogic = PLC_Logic( self.plc, self.xyAxis, self.zAxis )
     self.pollCallbacks.append( self.plcLogic.poll )
+    self.head = Head( self.plcLogic )
 
     #
     # Inputs

@@ -55,7 +55,6 @@ class APA_Base( Serializable ) :
     "_windTime",
     "_x",
     "_y",
-    "_z",
     "_headLocation",
   ]
 
@@ -199,7 +198,7 @@ class APA_Base( Serializable ) :
     return result
 
   #---------------------------------------------------------------------
-  def setLocation( self, x, y, z, headLocation ) :
+  def setLocation( self, x, y, headLocation ) :
     """
     Set the machine location.  Call before closing.
 
@@ -211,7 +210,6 @@ class APA_Base( Serializable ) :
     """
     self._x = x
     self._y = y
-    self._z = z
     self._headLocation = headLocation
 
   #---------------------------------------------------------------------

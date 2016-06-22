@@ -116,6 +116,7 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.seekY = None
     self.seekZ = None
     self.seekVelocity = None
+    self.setHeadPosition = None
 
 
 # end class

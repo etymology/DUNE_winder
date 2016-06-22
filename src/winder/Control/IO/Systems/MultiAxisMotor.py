@@ -37,6 +37,20 @@ class MultiAxisMotor :
       motor.setEnable( isEnabled )
 
   #---------------------------------------------------------------------
+  def getPosition( self ) :
+    """
+    Return current motor positions.
+
+    Returns:
+      Array of motor positions (in motor units).
+    """
+    position = []
+    for motor in self._motors :
+      position.append( motor.getPosition() )
+
+    return position
+
+  #---------------------------------------------------------------------
   def setDesiredPosition( self, positions ) :
     """
     Go to a location specified by a list.
@@ -140,29 +154,5 @@ class MultiAxisMotor :
     """
 
     return self._motor[ 0 ].getMaxAcceleration()
-
-  #---------------------------------------------------------------------
-  def setMaxTorque( self, maxTorque ) :
-    """
-    Set maximum torque motors may exert.
-
-    Args:
-      maxTorque: Maximum torque motors may exert.
-
-    """
-
-    for motor in self._motors :
-      motor.setMaxTorque( maxTorque )
-
-  #---------------------------------------------------------------------
-  def getMaxTorque( self ) :
-    """
-    Get maximum torque motors may exert.
-
-    Returns:
-      Maximum torque motors may exert.
-    """
-
-    return self._motor[ 0 ].getMaxTorque()
 
 # end class

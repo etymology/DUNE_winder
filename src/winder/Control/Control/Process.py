@@ -62,6 +62,9 @@ class Process :
       float( configuration.get( "maxDeceleration" ) )
     )
 
+    # Setup extended/retracted positions for head.
+    io.head.setExtendedAndRetracted( machineCalibration.zFront, machineCalibration.zBack )
+
     # By default, the G-Code handler will use maximum velocity.
     self.gCodeHandler.setLimitVelocity( maxVelocity )
     self.gCodeHandler.setVelocity( maxVelocity )
@@ -488,11 +491,6 @@ class Process :
     """
 
     if self.apa :
-      x = self._io.xAxis.getPosition()
-      y = self._io.yAxis.getPosition()
-      z = self._io.zAxis.getPosition()
-      headLocation = self._io.plcLogic.getHeadSide()
-      self.apa.setLocation( x, y, z, headLocation )
       self.apa.addWindTime( self.controlStateMachine.windTime )
       self.apa.close()
       self.apa = None
@@ -606,6 +604,43 @@ class Process :
         self.__class__.__name__,
         "JOG",
         "Manual move Z ignored.",
+        [ position, velocity ]
+      )
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def manualHeadPosition( self, position, velocity ) :
+    """
+    Manually position the head.
+
+    Args:
+      position: One of the Head positions (RETRACTED/FRONT/BACK/EXTENDED).
+      velocity: Maximum speed at which to move.
+
+    Returns:
+      True if there was an error, False if not.
+    """
+    isError = True
+
+    if self.controlStateMachine.isMovementReady() and self._io.head.getPosition() != position :
+      isError = False
+
+      self._log.add(
+        self.__class__.__name__,
+        "HEAD",
+        "Manual head position to " + str( position ) + " at " + str( velocity ) + ".",
+        [ position, velocity ]
+      )
+      self.controlStateMachine.setHeadPosition = position
+      self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.manualRequest = True
+
+    else :
+      self._log.add(
+        self.__class__.__name__,
+        "HEAD",
+        "Manual head position ignored.",
         [ position, velocity ]
       )
 

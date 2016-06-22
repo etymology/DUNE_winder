@@ -153,11 +153,12 @@ var WinderInterface = function()
   //   page - Filename (less extension) to load.
   //   tag - The id of the location to append this data.  Typically a <article>.
   //   callback - Function to run after everything has loaded.
+  //   callbackParameters - Parameters to pass to callback.
   // Notes:
   //   The page must have the extension "html".  In addition this function will
   //   also load the page with the extension ".js".
   //---------------------------------------------------------------------------
-  this.loadSubPage = function( page, tag, callback )
+  this.loadSubPage = function( page, tag, callback, callbackParameters )
   {
     // The random line is added to the end of a URL to force the browser to
     // actually load the data.  Otherwise, the browser may used a cached
@@ -190,7 +191,7 @@ var WinderInterface = function()
             {
               // If there is a callback once page is finished loading, run it.
               if ( callback )
-                callback()
+                callback( callbackParameters )
 
               // One more page is finished loading.
               pagesLoading -= 1

@@ -186,7 +186,7 @@ class PLC_Logic :
     self._latchPosition += 1
     self._latchPosition %= 3
 
-    if self._latchPosition >= 2 :
+    if self._latchPosition == 0 :
       self._headSide = self.HeadSide.FRONT
     else:
       self._headSide = self.HeadSide.BACK
@@ -269,6 +269,17 @@ class PLC_Logic :
 
   #---------------------------------------------------------------------
   # $$$FUTURE
+  def isInTransferArea( self ) :
+
+    # $$$DEBUG - Fix.
+    positions = self._xyAxis.getPosition()
+
+    result = ( 0 == positions[ 0 ] and 0 == positions[ 1 ] )
+
+    return result
+
+  #---------------------------------------------------------------------
+  # $$$FUTURE
   def setCameraTrigger( self, deltaX, deltaY ) :
     """
     Setup the PLC for camera triggering.
@@ -307,7 +318,7 @@ class PLC_Logic :
     self._plc = plc
     self._xyAxis = xyAxis
     self._zAxis = zAxis
-    self._latchPosition = 1
+    self._latchPosition = 0
     self._headSide = self.HeadSide.FRONT
 
     attributes = PLC.Tag.Attributes()

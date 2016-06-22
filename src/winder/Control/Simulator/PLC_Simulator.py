@@ -40,7 +40,7 @@ class PLC_Simulator :
       self._lastXY_Speed = xySpeed
 
     zSpeed = self._zAxis.getSpeedTag()
-    if self._lastXY_Speed != xySpeed :
+    if self._lastZ_Speed != zSpeed :
 
       if 0 == zSpeed :
         self._zAxis.stop()
@@ -108,7 +108,7 @@ class PLC_Simulator :
         if self._latchPosition > self.LatchPosition.BOTTOM :
           self._latchPosition = 0
 
-        # State is now homing.
+        # State is now latching.
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCHING )
 
         # Wait 1 second for transition.
@@ -218,9 +218,9 @@ class PLC_Simulator :
 
     machineGeometry = MachineGeometry()
 
-    self._xMin = machineGeometry.left - 100
-    self._xMax = machineGeometry.right + 100
-    self._yMin = machineGeometry.bottom - 100
-    self._yMax = machineGeometry.top + 100
-    self._zMin = -100
-    self._zMax = 450
+    self._xMin = machineGeometry.limitLeft
+    self._xMax = machineGeometry.limitRight
+    self._yMin = machineGeometry.limitBottom
+    self._yMax = machineGeometry.limitTop
+    self._zMin = machineGeometry.limitRetracted
+    self._zMax = machineGeometry.limitExtended

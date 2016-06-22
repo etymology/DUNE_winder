@@ -2,24 +2,32 @@ function PositionGraphic()
 {
   var self = this
 
+  // Default scale factor for all images.
+  var DEFAULT_SCALE = 1.0
+
   // Scale factor for all images.
-  var SCALE = 0.7
+  var scale
 
   //-----------------------------------------------------------------------------
   // Uses:
   //   Setup periodic callback that will reposition images.  Don't call until
   //   page is fully loaded.
   //-----------------------------------------------------------------------------
-  this.initialize = function()
+  this.initialize = function( scaleParameter )
   {
+    if ( scaleParameter )
+      scale = scaleParameter
+    else
+      scale = DEFAULT_SCALE
+
     // Image position
     winder.addPeriodicEndCallback
     (
       function()
       {
         // Limits of image (in pixels)
-        var MIN_X = 58 * SCALE    //52
-        var MAX_X = 1110 * SCALE
+        var MIN_X = 58 * scale
+        var MAX_X = 1110 * scale
 
         // Limits of travel (in mm)
         // $$$DEBUG - This should come from machine geometry.
@@ -34,11 +42,11 @@ function PositionGraphic()
         $( "#loopImage" )
           .css( "left", x + "px" )
 
-        var HEAD_X_OFFSET = 100 * SCALE
+        var HEAD_X_OFFSET = 100 * scale
 
         // Limits of image (in pixels)
-        var MIN_Y = 387 * SCALE
-        var MAX_Y = 28 * SCALE
+        var MIN_Y = 387 * scale
+        var MAX_Y = 28 * scale
 
         // Limits of travel (in mm)
         // $$$DEBUG - This should come from machine geometry.
@@ -57,8 +65,8 @@ function PositionGraphic()
           .css( "top", y + "px" )
 
         // Limits of image (in pixels)
-        var MIN_HEAD_Z = 783 * SCALE
-        var MAX_HEAD_Z = 1064 * SCALE
+        var MIN_HEAD_Z = 783 * scale
+        var MAX_HEAD_Z = 1064 * scale
 
         // Limits of travel (in mm)
         // $$$DEBUG - This should come from machine geometry.
@@ -70,15 +78,15 @@ function PositionGraphic()
         z /= ( MAX_Z_POSITION - MIN_Z_POSITION )
         z += MIN_HEAD_Z
 
-        if ( 1 == motorStatus.motor[ "headSide" ] )
+        if ( 0 != motorStatus.motor[ "headSide" ] )
           z = MAX_HEAD_Z
 
         $( "#zHeadImage" )
           .css( "left", z + "px" )
 
         // Limits of image (in pixels)
-        var MIN_HEAD_Z = 0 * SCALE
-        var MAX_HEAD_Z = 281 * SCALE
+        var MIN_HEAD_Z = 0 * scale
+        var MAX_HEAD_Z = 281 * scale
 
         var z = MAX_HEAD_Z - MIN_HEAD_Z
         z *= motorStatus.motor[ "zPosition" ] - MIN_Z_POSITION
@@ -103,7 +111,7 @@ function PositionGraphic()
   //-----------------------------------------------------------------------------
   var rescale = function()
   {
-    var width = $( this ).width() * SCALE
+    var width = $( this ).width() * scale
     $( this ).width( width )
     $( this ).css( "display", "inline" )
 
@@ -120,7 +128,7 @@ function PositionGraphic()
         if ( $.isNumeric( newSize ) )
         {
           newSize  = parseFloat( newSize )
-          newSize *= SCALE
+          newSize *= scale
 
           $( this ).css( item, newSize )
           console.log( $( this ).attr( "id" ) + " " + raw + " " + item + " " + newSize )

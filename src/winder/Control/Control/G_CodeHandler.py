@@ -6,7 +6,6 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from .Head import Head
 from Library.G_Code import G_Code
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 
@@ -164,20 +163,60 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     isDone = False
 
-    if self._io.plcLogic.isReady() and self._head.isIdle() :
-      self._currentLine = self._nextLine
+    if self._io.plcLogic.isReady() and self._io.head.isIdle() :
 
-      isDone = self.isDone() or self.isOutOfWire()
+      moving = False
 
-      if not isDone :
-        if self._delay > 0 :
-          self._delay -= 1
-        elif self._pauseCount < self._PAUSE :
-          self._pauseCount += 1
-        else :
-          self._pauseCount = 0
-          self._nextLine += self._direction
-          self.runNextLine()
+      velocity = min( self._velocity, self._maxVelocity )
+      velocity *= self._velocityScale
+
+      # If an X/Y coordinate change is needed...
+      if self._xyChange and not moving :
+        # Make the move.
+        self._io.plcLogic.setXY_Position( self._x, self._y, velocity )
+
+        # Reset change flag.
+        self._xyChange = False
+        moving = True
+
+      # If Z move...
+      if self._zChange and not moving :
+        # Make the move.
+        self._io.plcLogic.setZ_Position( self._z, velocity )
+
+        # Reset change flag.
+        self._zChange = False
+        moving = True
+
+      # Head movement...
+      if self._headPositionChange and not moving :
+
+        self._io.head.setPosition( self._headPosition, velocity )
+        self._headPositionChange = False
+
+        moving = True
+
+      # Toggle the latch.
+      if self._latchRequest and not moving :
+        self._io.plcLogic.latch()
+        self._latchRequest = False
+        moving = True
+
+      # If there are no more moves, run the next line of G-Code.
+      if not moving :
+        self._currentLine = self._nextLine
+
+        isDone = self.isDone() or self.isOutOfWire()
+
+        if not isDone :
+          if self._delay > 0 :
+            self._delay -= 1
+          elif self._pauseCount < self._PAUSE :
+            self._pauseCount += 1
+          else :
+            self._pauseCount = 0
+            self._nextLine += self._direction
+            self.runNextLine()
 
     return isDone
 
@@ -195,8 +234,36 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._lastVelocity = self._velocity
     self._functions = []
 
-    # Interpret the next line.
-    self._gCode.executeNextLine( self._nextLine )
+    if self._startHeadLocation :
+      if self._io.plcLogic.isInTransferArea() :
+        print "Restoring initial head location"
+        self._headPosition = self._startHeadLocation
+        self._headPositionChange = True
+        self._startHeadLocation = None
+      else :
+        print "Restoring initial head location--moving to transfer area"
+        self._x = 0
+        self._y = 0
+        self._xyChange = True
+
+    elif self._startLocationX or self._startLocationY :
+
+      print "Restoring initial X/Y location"
+
+      if self._startLocationX :
+        self._x = self._startLocationX
+
+      if self._startLocationY :
+        self._y = self._startLocationY
+
+      self._xyChange = True
+
+      self._startLocationX = None
+      self._startLocationY = None
+
+    else :
+      # Interpret the next line.
+      self._gCode.executeNextLine( self._nextLine )
 
     # Calibrate the position (if we have a layerCalibration file.)
     if self._layerCalibration :
@@ -204,36 +271,6 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       if offset :
         self._x += offset.x
         self._y += offset.y
-
-    velocity = min( self._velocity, self._maxVelocity )
-    velocity *= self._velocityScale
-
-    # If an X/Y coordinate change is needed...
-    if self._xyChange :
-      # Make the move.
-      self._io.plcLogic.setXY_Position( self._x, self._y, velocity )
-
-      # Reset change flag.
-      self._xyChange = False
-
-    # If Z move...
-    if self._zChange :
-      # Make the move.
-      self._io.plcLogic.setZ_Position( self._z, velocity )
-
-      # Reset change flag.
-      self._zChange = False
-
-    # Head movement...
-    if self._headPositionChange :
-      print "Chaging head position" # $$$
-      self._head.setPosition( self._headPosition, velocity )
-      self._headPositionChange = False
-
-    # Toggle the latch.
-    if self._latchRequest :
-      self._io.plcLogic.latch()
-      self._latchRequest = False
 
     # Account for wire used.
     if self._wireLength :
@@ -290,16 +327,10 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._gCode = G_Code( lines, self._callbacks )
     self._currentLine = -1
     self._nextLine = -1
+    self._firstMove = True
 
-    # Create instance of head.
-    self._head = \
-      Head(
-        self._io,
-        self._machineCalibration.zFront,
-        self._machineCalibration.zBack,
-        calibration.zFront,
-        calibration.zBack
-      )
+    # Setup the front and back head locations.
+    self._io.head.setFrontAndBack( calibration.zFront, calibration.zBack )
 
     # Use current X/Y/Z position as starting points.
     # (These will be moved to self.lastN when the next line is executed.)
@@ -366,8 +397,6 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._io = io
     self._spool = spool
 
-    self._head = None
-
     self._direction = 1
     self.runToLine = -1
     self._currentLine = None
@@ -383,3 +412,5 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._delay = 0
 
     self._velocityScale = 1.0
+
+    self._firstMove = False

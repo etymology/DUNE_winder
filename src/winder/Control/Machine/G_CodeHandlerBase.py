@@ -238,7 +238,7 @@ class G_CodeHandlerBase :
     self._layerCalibration = layerCalibration
 
   #---------------------------------------------------------------------
-  def setLastLocation( self, location ) :
+  def setInitialLocation( self, x, y, headLocation ) :
     """
     Set the last machine location.  This is needed when loading a new recipe
     because seeks to transfer areas need to know form where to begin.
@@ -246,9 +246,11 @@ class G_CodeHandlerBase :
     Args:
       location: Coordinates of starting position.
     """
-    self._lastX = location.x
-    self._lastY = location.y
-    self._lastZ = location.z
+
+    self._startLocationX = x
+    self._startLocationY = y
+    self._startHeadLocation = headLocation
+
 
   #---------------------------------------------------------------------
   def __init__( self, machineCalibration ):
@@ -289,7 +291,12 @@ class G_CodeHandlerBase :
 
     # Velocity.
     self._maxVelocity = float( "inf" )   # <- No limit.
-    self._velocity = 0                   # <- $$$DEBUG
+    self._velocity = 0
 
     self._layerCalibration = None
     self._machineCalibration = machineCalibration
+
+    self._startLocationX = None
+    self._startLocationY = None
+    self._startHeadLocation = None
+
