@@ -87,10 +87,10 @@ function load( page )
   winder.initialize()
 
   // Display system time.
-  winder.addPeriodicRemoteDisplay( "systemTime.get()", "#systemTime" )
+  winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
 
   // Update for primary state machine.
-  winder.addPeriodicRemoteDisplay
+  winder.addPeriodicDisplay
   (
     "process.controlStateMachine.state.__class__.__name__",
     "#controlState",
@@ -111,7 +111,7 @@ function load( page )
   )
 
   // Update for PLC state machine.
-  winder.addPeriodicRemoteCallback
+  winder.addPeriodicCallback
   (
     "io.plcLogic.getState()",
     function( value )
@@ -145,7 +145,7 @@ function load( page )
   winder.addErrorClearCallback( loadVersion )
 
   // Start the periodic updates.
-  winder.periodicRemoteUpdate()
+  winder.periodicUpdate()
 
   /*if ( activeDiv )
   {
@@ -291,10 +291,10 @@ $( document ).ready
       winder.loadSubPage( "/Desktop/Pages/" + page, "#main" )
 
       // Display system time.
-      winder.addPeriodicRemoteDisplay( "systemTime.get()", "#systemTime" )
+      winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
 
       // Update for primary state machine.
-      winder.addPeriodicRemoteDisplay
+      winder.addPeriodicDisplay
       (
         "process.controlStateMachine.state.__class__.__name__",
         "#controlState",
@@ -315,7 +315,7 @@ $( document ).ready
       )
 
       // Update for PLC state machine.
-      winder.addPeriodicRemoteCallback
+      winder.addPeriodicCallback
       (
         "io.plcLogic.getState()",
         function( value )
@@ -358,7 +358,7 @@ $( document ).ready
       winder.addErrorClearCallback( loadVersion )
 
       // Start the periodic updates.
-      winder.periodicRemoteUpdate()
+      winder.periodicUpdate()
     }
   }
 )

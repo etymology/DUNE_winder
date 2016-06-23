@@ -50,7 +50,7 @@ function MotorStatus()
   //-----------------------------------------------------------------------------
   var barSetup = function( axis )
   {
-    winder.addPeriodicRemoteCallback
+    winder.addPeriodicCallback
     (
       "io." + axis + "Axis.getSeekStartPosition()",
       function( value )
@@ -63,6 +63,7 @@ function MotorStatus()
     (
       function()
       {
+        var isMoving = self.motor[ axis + "Moving" ]
         var rawVelocity = self.motor[ axis + "Velocity" ]
         var acceleration = self.motor[ axis + "Acceleration" ]
         var topAcceleration = self.motor[ "maxAcceleration" ]
@@ -72,12 +73,20 @@ function MotorStatus()
 
         topAcceleration *= Math.sign( acceleration )
 
+        if ( isMoving )
+          $( "#" + axis + "Label" ).addClass( "inMotion" )
+        else
+          $( "#" + axis + "Label" ).removeClass( "inMotion" )
+
         var level = 0
         if ( topAcceleration != 0 )
         {
           level = acceleration / topAcceleration
           level = Math.min( level, 1.0 )
         }
+
+        if ( ! isMoving )
+          level = 0
 
         level *= $( "#" + axis + "AccelerationBar" ).parent().width() + 10
         $( "#" + axis + "AccelerationBar" ).width( "" + Math.round( level ) + "px" )
@@ -88,6 +97,9 @@ function MotorStatus()
 
         level = Math.abs( position - startPosition ) / Math.abs( desiredPosition - startPosition )
         level = Math.min( level, 1.0 )
+
+        if ( ! isMoving )
+          level = 1
 
         level *= $( "#" + axis + "PositionBar" ).parent().width() + 10
         $( "#" + axis + "PositionBar" ).width( "" + Math.round( level ) + "px" )
@@ -101,6 +113,9 @@ function MotorStatus()
           level = velocity / maxVelocity
           level = Math.min( level, 1.0 )
         }
+
+        if ( ! isMoving )
+          level = 0
 
         level *= $( "#" + axis + "VelocityBar" ).parent().width() + 10
         $( "#" + axis + "VelocityBar" ).width( "" + Math.round( level ) + "px" )
@@ -135,7 +150,7 @@ function MotorStatus()
   // Constructor
   //-----------------------------------------------------------------------------
 
-  winder.addPeriodicRemoteCallback
+  winder.addPeriodicCallback
   (
     "io.plcLogic.getHeadSide()",
     function( value )
@@ -148,15 +163,15 @@ function MotorStatus()
   for ( var index in AXIES )
   {
     var axis = AXIES[ index ]
-    winder.addPeriodicRemoteDisplay
+
+    winder.addPeriodicRead
     (
       "io." + axis + "Axis.isSeeking()",
-      "#" + axis + "Moving",
       this.motor,
       axis + "Moving"
     )
 
-    winder.addPeriodicRemoteDisplay
+    winder.addPeriodicDisplay
     (
       "io." + axis + "Axis.getDesiredPosition()",
       "#" + axis + "DesiredPosition",
@@ -166,7 +181,7 @@ function MotorStatus()
       1
     )
 
-    winder.addPeriodicRemoteDisplay
+    winder.addPeriodicDisplay
     (
       "io." + axis + "Axis.getPosition()",
       "#" + axis + "Position",
@@ -176,7 +191,7 @@ function MotorStatus()
       1
     )
 
-    winder.addPeriodicRemoteDisplay
+    winder.addPeriodicDisplay
     (
       "io." + axis + "Axis.getVelocity()",
       "#" + axis + "Velocity",
@@ -186,7 +201,7 @@ function MotorStatus()
       2
     )
 
-    winder.addPeriodicRemoteDisplay
+    winder.addPeriodicDisplay
     (
       "io." + axis + "Axis.getAcceleration()",
       "#" + axis + "Acceleration",

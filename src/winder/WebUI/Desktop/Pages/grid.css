@@ -1,0 +1,11 @@
+#positionGraphic
+{
+  width: 1350px;
+  height: 890px;
+  overflow: hidden;
+}
+
+#motorStatusDiv
+{
+  float: right;
+}

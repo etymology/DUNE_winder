@@ -102,10 +102,10 @@ $( document ).ready
       winder.initialize()
 
       // // Display system time.
-      // winder.addPeriodicRemoteDisplay( "systemTime.get()", "#systemTime" )
+      // winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
       //
       // // Update for primary state machine.
-      // winder.addPeriodicRemoteDisplay
+      // winder.addPeriodicDisplay
       // (
       //   "process.controlStateMachine.state.__class__.__name__",
       //   "#controlState",
@@ -114,7 +114,7 @@ $( document ).ready
       // )
       //
       // // Update for PLC state machine.
-      // winder.addPeriodicRemoteCallback
+      // winder.addPeriodicCallback
       // (
       //   "io.plcLogic.getState()",
       //   function( value )
@@ -149,7 +149,7 @@ $( document ).ready
       // winder.addErrorClearCallback( loadVersion )
 
       // Start the periodic updates.
-      winder.periodicRemoteUpdate()
+      winder.periodicUpdate()
     }
   }
 )

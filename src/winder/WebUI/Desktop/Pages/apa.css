@@ -26,12 +26,6 @@ tr.gCodeNextLine
   width: 40em;
 }
 
-#velocitySliderBox
-{
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
 #velocitySlider, #accelerationSlider, #decelerationSlider
 {
   width: 97%;
@@ -56,6 +50,12 @@ tr.gCodeNextLine
   float: left;
 }
 
+#column3
+{
+  float: left;
+  width: 74%;
+}
+
 #loading
 {
   clear: both;
@@ -74,7 +74,31 @@ textarea
 
 #sliderBox
 {
-  margin-left: 10px;
-  margin-bottom: 10px;
   width: 500px;
+}
+
+#recentLogDiv
+{
+  clear: both;
+  width: 99%;
+}
+
+#recentLog tr:hover
+{
+  background-color: gray;
+}
+
+#recentLog table
+{
+  width: 100%;
+}
+
+#recentLog th
+{
+  background: dimgray;
+}
+
+#recentLog th:first-child
+{
+  width: 15%;
 }

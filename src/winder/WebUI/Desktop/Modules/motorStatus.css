@@ -11,6 +11,11 @@
   background-color: rgba( 64, 64, 64, 0.5 );
 }
 
+#motorStatusTable .inMotion
+{
+  background-color: rgba( 0, 128, 0, 0.5 ) !important;
+}
+
 #motorStatusTable
 {
   min-width: 500px;

@@ -32,15 +32,15 @@ var WinderInterface = function()
 
   // List of remote commands that are updated periodically, and the callbacks run
   // when they have new data.
-  var periodicRemoteCallbacks = []
+  var periodicCallbacks = []
 
   // Last values of each of the remote commands.  Used so that only values
   // that have changed get a callback.
-  var periodicRemoteHistory = {}
+  var periodicHistory = {}
 
   // Semaphore to prevent periodic update command from running multiple
   // instances.  Can happen if network delay is too long.
-  var periodicRemoteUpdateSemaphore = 0
+  var periodicUpdateSemaphore = 0
 
   // The enable status of buttons/inputs/selects.  Used to save the current
   // state of these tags before disabling them in the event of an error.
@@ -49,14 +49,14 @@ var WinderInterface = function()
   // The periodic remote commands are each assigned an id because there needs
   // to be a way to translate from a remote query to the data returned by that
   // query.  Two dictionaries are used to do this.
-  //   periodicRemoteQuery maps an id to a remote query.
-  //   periodicRemoteCallbackTable maps an id to a callback function.
+  //   periodicQuery maps an id to a remote query.
+  //   periodicCallbackTable maps an id to a callback function.
   // This intermediate id is needed because the query probably isn't safe as
   // an XML field name.  So a unique id is used instead.  The id simply takes
   // the form "idN" where N is an integer number starting at 0 and incrementing
   // by one for each periodic query.
-  var periodicRemoteCallbackTable = {}
-  var periodicRemoteQuery = {}
+  var periodicCallbackTable = {}
+  var periodicQuery = {}
 
   // Callbacks to run when an error occurs.
   var onErrorCallbacks = []
@@ -212,20 +212,20 @@ var WinderInterface = function()
   //   if any of the data has changed.  Internal function--no need to call
   //   externally.
   //---------------------------------------------------------------------------
-  this.periodicRemoteUpdate = function()
+  this.periodicUpdate = function()
   {
     // Use a semaphore to prevent a stack-up of multiple instances.  Could
     // happen if there are long network delays.
-    if ( ( 0 == periodicRemoteUpdateSemaphore )
-      && ( Object.keys( periodicRemoteQuery ).length > 0 ) )
+    if ( ( 0 == periodicUpdateSemaphore )
+      && ( Object.keys( periodicQuery ).length > 0 ) )
     {
-      periodicRemoteUpdateSemaphore += 1
+      periodicUpdateSemaphore += 1
 
       // Make the request to the remote server.
       $.post
       (
         "",
-        periodicRemoteQuery
+        periodicQuery
       )
       .error
       (
@@ -235,14 +235,14 @@ var WinderInterface = function()
           if ( ! isInError )
           {
             // Run all the remote callbacks with no data to signal an error.
-            for ( var index in periodicRemoteCallbacks )
+            for ( var index in periodicCallbacks )
             {
-              var remoteCallback = periodicRemoteCallbacks[ index ]
+              var remoteCallback = periodicCallbacks[ index ]
               remoteCallback[ 1 ]( null )
             }
 
             // All data is invalid and must be refreshed.
-            periodicRemoteHistory = {}
+            periodicHistory = {}
 
             // Enable blinking.
             $( '.error' ).blink( { delay: 500 } )
@@ -268,7 +268,7 @@ var WinderInterface = function()
           // Now in an error state.
           isInError = true
 
-          periodicRemoteUpdateSemaphore -= 1
+          periodicUpdateSemaphore -= 1
         }
       )
       .done
@@ -318,17 +318,17 @@ var WinderInterface = function()
                 var id = this.tagName
 
                 // Has the value changed?
-                if ( periodicRemoteHistory[ id ] != valueString )
+                if ( periodicHistory[ id ] != valueString )
                 {
 
                   // Fetch the callback function associated with the ID.
-                  callbackFunction = periodicRemoteCallbackTable[ id ]
+                  callbackFunction = periodicCallbackTable[ id ]
 
                   // Send the retrieved data to the callback.
                   callbackFunction( valueString )
 
                   // Save the current data.
-                  periodicRemoteHistory[ id ] = valueString
+                  periodicHistory[ id ] = valueString
                 }
 
               } // each callback function
@@ -340,7 +340,7 @@ var WinderInterface = function()
             onPeriodicEndCallbacks[ index ]()
 
           // Release semaphore.
-          periodicRemoteUpdateSemaphore -= 1
+          periodicUpdateSemaphore -= 1
         }
       )
 
@@ -350,7 +350,7 @@ var WinderInterface = function()
     // NOTE: This needs to happen even if the function was skipped due to
     // the semaphore being in use.
     if ( ! self.periodicShutdown )
-      setTimeout( self.periodicRemoteUpdate, updateRate )
+      setTimeout( self.periodicUpdate, updateRate )
   }
 
   //---------------------------------------------------------------------------
@@ -364,9 +364,9 @@ var WinderInterface = function()
   //   The callback function receives one parameter containing the new data.
   //   Callbacks are not run if the data has not changed.
   //---------------------------------------------------------------------------
-  this.addPeriodicRemoteCallback = function( query, callback )
+  this.addPeriodicCallback = function( query, callback )
   {
-    periodicRemoteCallbacks.push( [ query, callback ] )
+    periodicCallbacks.push( [ query, callback ] )
 
     // Build a remote query table, and a callback table.  The query table
     // associates an ID with a remote command needing to be issued.  The
@@ -374,15 +374,15 @@ var WinderInterface = function()
     // if the data changes.
     var values = ""
     var index = 0
-    periodicRemoteCallbackTable = {}
-    periodicRemoteQuery = {}
-    for ( var index in periodicRemoteCallbacks )
+    periodicCallbackTable = {}
+    periodicQuery = {}
+    for ( var index in periodicCallbacks )
     {
-      var remoteCallback = periodicRemoteCallbacks[ index ]
+      var remoteCallback = periodicCallbacks[ index ]
       // Make an ID for this callback.
       var id = "id" + index
-      periodicRemoteCallbackTable[ id ] = remoteCallback[ 1 ]
-      periodicRemoteQuery[ id ] = remoteCallback[ 0 ]
+      periodicCallbackTable[ id ] = remoteCallback[ 1 ]
+      periodicQuery[ id ] = remoteCallback[ 0 ]
       index += 1
     }
 
@@ -394,10 +394,12 @@ var WinderInterface = function()
   // Input:
   //   query - Remote query to execute that returns the desired data.
   //   displayId - The id of the tag the data is displayed.
+  //   variableMap - Dictionary to place value of item. (Optional)
+  //   variableIndex - Input in dictionary to place value of item. (Optional)
   //   formatFunction - Optional function to format data before displaying.
   //   formatParameters - Optional parameters passed to format function.
   //---------------------------------------------------------------------------
-  this.addPeriodicRemoteDisplay = function
+  this.addPeriodicDisplay = function
   (
     query,
     displayId,
@@ -408,7 +410,7 @@ var WinderInterface = function()
   )
   {
     // Add a periodic callback with the callback being specified.
-    self.addPeriodicRemoteCallback
+    self.addPeriodicCallback
     (
       query,
       function( value )
@@ -422,6 +424,45 @@ var WinderInterface = function()
           formatFunction,
           formatParameters
         )
+      }
+    )
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Add a periodic query whose value is saved in a dictionary.
+  // Input:
+  //   query - Remote query to execute that returns the desired data.
+  //   variableMap - Dictionary to place value of item.
+  //   variableIndex - Input in dictionary to place value of item.
+  //   callback - Optional function to to call wiht data. (Optional)
+  //   callbackParameters - Optional parameters passed to callback function.
+  //                        (Optional)
+  // Notes:
+  //   Callback gets two parameters: value read, followed by callback
+  //   parameters.
+  //---------------------------------------------------------------------------
+  this.addPeriodicRead = function
+  (
+    query,
+    variableMap,
+    variableIndex,
+    callback,
+    callbackParameters
+  )
+  {
+    // Add a periodic callback with the callback being specified.
+    self.addPeriodicCallback
+    (
+      query,
+      function( value )
+      {
+        // Save value.
+        variableMap[ variableIndex ] = value
+
+        // Run callback if requested.
+        if ( callback )
+          callback( value, callbackParameters )
       }
     )
   }
@@ -770,9 +811,9 @@ var WinderInterface = function()
   this.inhibitUpdates = function( isInhibit )
   {
     if ( isInhibit )
-      periodicRemoteUpdateSemaphore += 1
+      periodicUpdateSemaphore += 1
     else
-      periodicRemoteUpdateSemaphore -= 1
+      periodicUpdateSemaphore -= 1
   }
 
   //---------------------------------------------------------------------------

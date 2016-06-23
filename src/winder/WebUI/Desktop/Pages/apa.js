@@ -14,7 +14,9 @@ function APA()
 
   var gCodeLine = {}
 
-  var G_CODE_ROWS = 19
+  var G_CODE_ROWS = 14
+
+  var LOG_ENTIRES = 6
 
   // Tags to disable during APA loading.
   var apaInterfaceTags =
@@ -197,7 +199,8 @@ function APA()
   }
 
   //-----------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Callback to advance G-Code by one line.
   //-----------------------------------------------------------------------------
   this.nextLine = function()
   {
@@ -212,7 +215,8 @@ function APA()
   }
 
   //-----------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Callback to retard G-Code by one line.
   //-----------------------------------------------------------------------------
   this.previousLine = function()
   {
@@ -294,11 +298,21 @@ function APA()
   }
 
   //-----------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Used to create random APA entries.  Debug function.
+  //   $$$TEMPORARY
   //-----------------------------------------------------------------------------
-  this.numberWithCommas = function( number )
+  this.createRandomAPA = function( number )
   {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    winder.remoteAction
+    (
+      'APA_Generator.create( process, ' + number + ' )',
+      function()
+      {
+        self.populateLists()
+      }
+    )
+
   }
 
   // Populate lists and have this function run after error recovery.
@@ -306,7 +320,7 @@ function APA()
   winder.addErrorClearCallback( this.populateLists )
 
   // Set updates of current line and total lines.
-  winder.addPeriodicRemoteCallback
+  winder.addPeriodicCallback
   (
     "process.gCodeHandler.getLine()",
     function( data )
@@ -326,7 +340,7 @@ function APA()
     }
   )
 
-  winder.addPeriodicRemoteDisplay
+  winder.addPeriodicDisplay
   (
     "process.gCodeHandler.getTotalLines()",
     "#totalLines",
@@ -334,7 +348,7 @@ function APA()
     "totalLines"
   )
 
-  winder.addPeriodicRemoteCallback
+  winder.addPeriodicCallback
   (
     'process.spool.getWire()',
     function( data )
@@ -352,7 +366,7 @@ function APA()
   )
 
   // Special periodic for current APA stage.
-  winder.addPeriodicRemoteCallback
+  winder.addPeriodicCallback
   (
     "process.getStage()",
     function( value )
@@ -394,9 +408,6 @@ function APA()
     }
   )
 
-  // $$$ // Load the motor status module.
-  // $$$ winder.loadSubPage( "/Desktop/Modules/motorStatus", "#motorStatusDiv" )
-
   // Callback function to initialize position graphic.
   // Called twice--once when the position graphic page is loaded, and again
   // when the motor status page is loaded.  Both must be loaded before
@@ -406,7 +417,7 @@ function APA()
   {
     positionGraphicCount -= 1
     if ( 0 == positionGraphicCount )
-      positionGraphic.initialize( 0.50 )
+      positionGraphic.initialize( 0.465 )
   }
 
   winder.loadSubPage
@@ -422,7 +433,6 @@ function APA()
     "#motorStatusDiv",
     positionGraphicInitialize
   )
-
 
   // Callback run after period updates happen to enable/disable APA controls
   // depending on machine state.
@@ -466,18 +476,8 @@ function APA()
 
   )
 
-  this.createRandomAPA = function( number )
-  {
-    winder.remoteAction
-    (
-      'APA_Generator.create( process, ' + number + ' )',
-      function()
-      {
-        self.populateLists()
-      }
-    )
+  winder.addPeriodicEndCallback
 
-  }
 
   var totalRows = G_CODE_ROWS * 2 + 1
   $( "#gCodeTable" ).empty()
@@ -500,7 +500,7 @@ function APA()
   }
 
   // Setup G-Code table.
-  winder.addPeriodicRemoteCallback
+  winder.addPeriodicCallback
   (
     "process.getG_CodeList( None, " + G_CODE_ROWS + " )",
     function( data )
@@ -612,6 +612,49 @@ function APA()
   createSlider( "velocity", "process.gCodeHandler.getVelocityScale", "process.setG_CodeVelocityScale" )
   //createSlider( "acceleration" )
   //createSlider( "deceleration" )
+
+  var table = $( "<table />" ).appendTo( "#recentLog" )
+  var row = $( "<tr />" ).appendTo( table )
+  $( "<th />" ).appendTo( row ).text( "Time" )
+  $( "<th />" ).appendTo( row ).text( "Description" )
+  for ( var index = 0; index < LOG_ENTIRES; index += 1 )
+  {
+    var row = $( "<tr />" ).appendTo( table )
+    $( "<td />" )
+      .appendTo( row )
+      .attr( "id", "logTable" + index + "Time" )
+      .text( "-" )
+
+    $( "<td />" )
+      .appendTo( row )
+      .attr( "id", "logTable" + index + "Description" )
+      .text( "-" )
+  }
+
+  winder.addPeriodicCallback
+  (
+    "log.getRecent()",
+    function( data )
+    {
+        for ( var index = 0; index < LOG_ENTIRES; index += 1 )
+        {
+          var dataIndex = -1
+
+          if ( data )
+            dataIndex = data.length - index - 1
+
+          var row = [ "-", "-", "-", "-" ]
+          if ( dataIndex >= 0 )
+            row = data[ data.length - index - 1 ].split( "\t" )
+
+          var time = row[ 0 ]
+          var description = row[ 3 ]
+          $( "#logTable" + index + "Time" ).text( time )
+          $( "#logTable" + index + "Description" ).text( description )
+        }
+    }
+  )
+
 
 }
 

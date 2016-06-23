@@ -9,6 +9,13 @@
   display: none;
 }
 
+#baseCanvas
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 #loopImage
 {
   position: absolute;

@@ -115,7 +115,7 @@
      </section>
 
      <section id="column2">
-      <article>
+      <article id="gCodeDiv">
         <h2>Running G-Code</h2>
         <table id="gCodeTable">
         </table>
@@ -123,12 +123,11 @@
 
 
       <article id="motorStatusDiv">Loading...</article>
+
       <article>
         <h2>Generate random APA</h2>
         <button onclick="apa.createRandomAPA( 1 )">Go</button>
         <button onclick="apa.createRandomAPA( 25 )">Create 25</button>
-
-        <button onclick=" winder.remoteAction( 'os.execl(sys.executable, sys.executable, *sys.argv)' ) ">Restart</button>
       </article>
 
       <article id="sliderBox">
@@ -146,5 +145,13 @@
       </article>
 
       <div id="positionGraphicDiv"></div>
+    </section>
 
-     </section>
+    <section id="column3">
+
+      <article id="recentLogDiv">
+        <h2>Recent log entires</h2>
+        <div id="recentLog"></div>
+      </article>
+
+    </section>

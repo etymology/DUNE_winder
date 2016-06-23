@@ -29,7 +29,7 @@ function loadIO_Set( listQuery, itemQuery, tag )
 
         var id = filteredTable.getCellId( row, 1 )
 
-        winder.addPeriodicRemoteDisplay( query, "#" + id )
+        winder.addPeriodicDisplay( query, "#" + id )
       }
     }
   )

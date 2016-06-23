@@ -289,10 +289,10 @@ function Configuration()
       }
     )
 
-  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
-  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
-  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )
-  winder.addPeriodicRemoteDisplay( "io.plcLogic.cameraResultY.get()", "#cameraY" )
+  winder.addPeriodicDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
+  winder.addPeriodicDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
+  winder.addPeriodicDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )
+  winder.addPeriodicDisplay( "io.plcLogic.cameraResultY.get()", "#cameraY" )
 
   var count = 0
   var cameraUpdateFunction = function()
