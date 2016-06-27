@@ -1,7 +1,7 @@
 function Jog()
 {
   var MIN_VELOCITY = 1.0
-  var MAX_VELOCITY = 406.4
+  var maxVelocity
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -14,7 +14,7 @@ function Jog()
 
     // Correctly scale the velocity.
     velocity /= 100.0
-    velocity *= ( MAX_VELOCITY - MIN_VELOCITY )
+    velocity *= ( maxVelocity - MIN_VELOCITY )
     velocity += MIN_VELOCITY
 
     return velocity
@@ -79,6 +79,30 @@ function Jog()
 
     var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekXY(" + x + "," + y + "," + velocity + ")"  )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Seek a point in machine geometry.
+  // Input:
+  //   x - Name of geometry variable that defines x position.
+  //   y - Name of geometry variable that defines y position.
+  //-----------------------------------------------------------------------------
+  this.seekLocation = function( x, y )
+  {
+    var velocity = this.getVelocity()
+
+    if ( x )
+      x = "process.apa._gCodeHandler." + x
+    else
+      x = "None"
+
+    if ( y )
+      y = "process.apa._gCodeHandler." + y
+    else
+      y = "None"
+
+    winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
   }
 
   //-----------------------------------------------------------------------------
@@ -218,27 +242,41 @@ function Jog()
     }
   )
 
-  sliderFunction =
-    function( event, ui )
+  // Maximum velocity.
+  winder.remoteAction
+  (
+    'configuration.get( "maxVelocity" )',
+    function( data )
     {
-      var velocity = ui.value / 100.0 * ( MAX_VELOCITY - MIN_VELOCITY ) + MIN_VELOCITY
-      var value = Math.round( velocity * 10.0 ) / 10.0
-      $( "#velocityValue" ).html( value + " mm/s" )
-    }
+      maxVelocity = parseFloat( data )
 
-  ui = new function() { this.value = 100 }
-  sliderFunction( null, ui )
-  $( "#velocitySlider" )
-    .slider
-    (
-      {
-        min: 0,
-        max: 100,
-        value: 100,
-        change: sliderFunction,
-        slide: sliderFunction
-      }
-    )
+      // Callback when slider is changed.
+      sliderFunction =
+        function( event, ui )
+        {
+          var velocity = ui.value / 100.0 * ( maxVelocity - MIN_VELOCITY ) + MIN_VELOCITY
+          var value = Math.round( velocity * 10.0 ) / 10.0
+          $( "#velocityValue" ).html( value + " mm/s" )
+        }
+
+      // Run slider callback with initial value.
+      ui = new function() { this.value = 100 }
+      sliderFunction( null, ui )
+
+      // Setup slider.
+      $( "#velocitySlider" )
+        .slider
+        (
+          {
+            min: 0,
+            max: 100,
+            value: 100,
+            change: sliderFunction,
+            slide: sliderFunction
+          }
+        )
+    }
+  )
 
 }
 

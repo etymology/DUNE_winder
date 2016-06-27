@@ -35,7 +35,16 @@ function Log()
         var dataSet = []
 
         for ( item of data )
-          dataSet.push( item.split( "\t" ) )
+        {
+          var row = item.split( "\t" )
+
+          // Get the time/date of occurrence and format it for local time.
+          var time = new Date( row[ 0 ] + 'Z' )
+          var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+          row[ 0 ] = timeString
+
+          dataSet.push( row )
+        }
 
         filteredTable.loadFromArray( dataSet )
         filteredTable.setSort( 0, 1 )

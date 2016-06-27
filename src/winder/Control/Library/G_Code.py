@@ -251,7 +251,8 @@ class G_CodeLine :
           lastClass.addParameter( parameter )
         else:
           raise Exception( 'Unassigned parameter', parameter )
-      else:
+      # Ignore blank lines.
+      elif '' != code :
         # Create an object to hold this command.
         lastClass = G_CodeLine.FUNCTION_TABLE[ code ]( self )
 

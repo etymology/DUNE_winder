@@ -35,9 +35,9 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     self.apaOffset = Location( self.apaOffsetX, self.apaOffsetY, self.apaOffsetZ )
 
     # Distance from the layer to the head.
-    self.zClearance = ( self.depth - self.apaToHead ) / self.scale
-    self.frontZ = -self.zClearance
-    self.backZ  = self.depth + self.zClearance
+    self.frontZ = ( self.zTravel - self.depth ) / ( 2 * self.scale )
+    self.backZ  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+    self.zClearance = self.frontZ
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.

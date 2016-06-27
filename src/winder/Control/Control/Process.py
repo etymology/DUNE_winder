@@ -7,6 +7,7 @@
 ###############################################################################
 
 import os
+import re
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
 from Library.Spool import Spool
@@ -105,7 +106,14 @@ class Process :
     Returns:
       List of available recipes.
     """
+
+    # Fetch all files in recipe directory.
     recipeList = os.listdir( self._configuration.get( "recipeDirectory" ) )
+
+    # Filter just the G-Code file extension.
+    expression = re.compile( r'\.gc$' )
+    recipeList = filter( lambda index: expression.search( index ), recipeList )
+
     return recipeList
 
   #---------------------------------------------------------------------
@@ -539,7 +547,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def manualSeekXY( self, xPosition, yPosition, velocity=None ) :
+  def manualSeekXY( self, xPosition=None, yPosition=None, velocity=None ) :
     """
     Seek an X/Y location.
 

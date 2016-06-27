@@ -21,20 +21,25 @@ class MachineGeometry :
     # Debug only.  Set to 1 for production.
     self.scale = 1
 
+    # Handles on either side of the APA.
+    self.handleWidth  = 330.2 / self.scale
+    self.leftHandle   = ( 300.764 - 25.4 / 2) / self.scale
+    self.rightHandle  = ( 7109.333 - 25.4 / 2) / self.scale
+
     # Hard machine limits.
-    self.limitTop    = 2850  / self.scale
-    self.limitBottom = 0     / self.scale
-    self.limitLeft   = 0     / self.scale
-    self.limitRight  = 6600  / self.scale
-    self.limitRetracted = 0   / self.scale
-    self.limitExtended  = 450 / self.scale
+    self.limitTop       = 2827.752 / self.scale
+    self.limitBottom    = 0        / self.scale
+    self.limitLeft      = 0        / self.scale
+    self.limitRight     = 7360.436 / self.scale
+    self.limitRetracted = 0        / self.scale
+    self.limitExtended  = 450      / self.scale
 
     # Location of Z-Transfer areas.
     # Top/bottom for Y, left/right for X.
-    self.top    = 2800  / self.scale  # 2800
-    self.bottom = 10    / self.scale  # -25
-    self.left   = 400   / self.scale  # -250
-    self.right  = 6500  / self.scale  # 6500
+    self.top    = 2800  / self.scale
+    self.bottom = 0     / self.scale
+    self.left   = ( self.leftHandle + self.handleWidth / 2 ) / self.scale
+    self.right  = ( self.rightHandle + self.handleWidth / 2 ) / self.scale
 
     # How big the Z-transfer windows are.
     # The Z-transfer windows start at top/bottom/left/right locations.

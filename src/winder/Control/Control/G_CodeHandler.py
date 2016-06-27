@@ -234,43 +234,8 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._lastVelocity = self._velocity
     self._functions = []
 
-    if self._startHeadLocation :
-      if self._io.plcLogic.isInTransferArea() :
-        print "Restoring initial head location"
-        self._headPosition = self._startHeadLocation
-        self._headPositionChange = True
-        self._startHeadLocation = None
-      else :
-        print "Restoring initial head location--moving to transfer area"
-        self._x = 0
-        self._y = 0
-        self._xyChange = True
-
-    elif self._startLocationX or self._startLocationY :
-
-      print "Restoring initial X/Y location"
-
-      if self._startLocationX :
-        self._x = self._startLocationX
-
-      if self._startLocationY :
-        self._y = self._startLocationY
-
-      self._xyChange = True
-
-      self._startLocationX = None
-      self._startLocationY = None
-
-    else :
-      # Interpret the next line.
-      self._gCode.executeNextLine( self._nextLine )
-
-    # Calibrate the position (if we have a layerCalibration file.)
-    if self._layerCalibration :
-      offset = self._layerCalibration.offset
-      if offset :
-        self._x += offset.x
-        self._y += offset.y
+    # Interpret the next line.
+    self._gCode.executeNextLine( self._nextLine )
 
     # Account for wire used.
     if self._wireLength :

@@ -153,6 +153,7 @@ class G_CodeHandlerBase :
       pinA = self._layerCalibration.getPinLocation( pinNumberA )
       pinB = self._layerCalibration.getPinLocation( pinNumberB )
       center = pinA.center( pinB )
+      center = center.add( self._layerCalibration.offset )
 
       if "X" in axies :
         self._x = center.x

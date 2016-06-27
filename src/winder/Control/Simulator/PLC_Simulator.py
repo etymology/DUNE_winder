@@ -112,7 +112,7 @@ class PLC_Simulator :
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCHING )
 
         # Wait 1 second for transition.
-        self._latchDelay.set( 1000 )
+        #self._latchDelay.set( 1000 )
 
       # Re-home latch?
       # (Does nothing.)
@@ -141,6 +141,8 @@ class PLC_Simulator :
         velocity = axisIO.getVelocity()
         if   ( velocity < 0 and position < positionMin ) \
           or ( velocity > 0 and position > positionMax ) :
+
+          print axisIO.name, "out of range", positionMin, "<=", position, "<=", positionMax
 
           # Change to an error state.
           self._io.plc.write( self._stateTag, self._io.plcLogic.States.ERROR )

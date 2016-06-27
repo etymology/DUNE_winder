@@ -636,22 +636,25 @@ function APA()
     "log.getRecent()",
     function( data )
     {
-        for ( var index = 0; index < LOG_ENTIRES; index += 1 )
-        {
-          var dataIndex = -1
+      for ( var index = 0; index < LOG_ENTIRES; index += 1 )
+      {
+        var dataIndex = -1
 
-          if ( data )
-            dataIndex = data.length - index - 1
+        if ( data )
+          dataIndex = data.length - index - 1
 
-          var row = [ "-", "-", "-", "-" ]
-          if ( dataIndex >= 0 )
-            row = data[ data.length - index - 1 ].split( "\t" )
+        var row = [ "-", "-", "-", "-" ]
+        if ( dataIndex >= 0 )
+          row = data[ data.length - index - 1 ].split( "\t" )
 
-          var time = row[ 0 ]
-          var description = row[ 3 ]
-          $( "#logTable" + index + "Time" ).text( time )
-          $( "#logTable" + index + "Description" ).text( description )
-        }
+        // Get the time/date of occurrence and format it for local time.
+        var time = new Date( row[ 0 ] + 'Z' )
+        var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+
+        var description = row[ 3 ]
+        $( "#logTable" + index + "Time" ).text( timeString )
+        $( "#logTable" + index + "Description" ).text( description )
+      }
     }
   )
 

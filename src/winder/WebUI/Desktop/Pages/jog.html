@@ -85,5 +85,41 @@
         <p id="velocityValue">-</p>
         <div id="velocitySlider"></div>
       </article>
+
+
+      <article>
+        <h2>Locations</h2>
+        <article>
+          <h3>Special locations</h3>
+          <button onclick="jog.seekLocation( '_layerCalibration.offset.x', '_layerCalibration.offset.y' )">APA</button>
+          <button onclick="jog.seekLocation( '_machineCalibration.parkX', '_machineCalibration.parkY' )">Park</button>
+        </article>
+        <article>
+          <h3>Corners</h3>
+          <button onclick="jog.seekLocation( '_machineCalibration.limitLeft',  '_machineCalibration.limitTop' )"   >Top left    </button>
+          <button onclick="jog.seekLocation( '_machineCalibration.limitLeft',  '_machineCalibration.limitBottom' )">Bottom left </button>
+          <button onclick="jog.seekLocation( '_machineCalibration.limitRight', '_machineCalibration.limitTop' )"   >Top right   </button>
+          <button onclick="jog.seekLocation( '_machineCalibration.limitRight', '_machineCalibration.limitBottom' )">Bottom right</button>
+        </article>
+
+        <article>
+          <h3>Transfer areas</h3>
+          <button onclick="jog.seekLocation( '_machineCalibration.transferLeft',  null )" >Left        </button>
+          <button onclick="jog.seekLocation( '_machineCalibration.transferRight', null )" >Right       </button>
+          <button onclick="jog.seekLocation( null, '_machineCalibration.transferTop' )"   >Top         </button>
+          <button onclick="jog.seekLocation( null, '_machineCalibration.transferBottom' )">Bottom      </button>
+        </article>
+
+
+        <article>
+          <h3>Limits</h3>
+          <button onclick="jog.seekLocation( null, '_machineCalibration.limitBottom' )">Bottom</button>
+          <button onclick="jog.seekLocation( null, '_machineCalibration.limitTop' )">Top</button>
+          <button onclick="jog.seekLocation( '_machineCalibration.limitLeft', null )">Left</button>
+          <button onclick="jog.seekLocation( '_machineCalibration.limitRight', null )">Right</button>
+        </article>
+
+      </article>
+
     </section>
 

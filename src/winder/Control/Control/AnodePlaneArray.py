@@ -286,12 +286,11 @@ class AnodePlaneArray( APA_Base ) :
     APA is loaded.
     """
 
-    x = self._gCodeHandler._x #self._io.xAxis.getPosition()
-    y = self._gCodeHandler._y #self._io.yAxis.getPosition()
-
-    # $$$DEBUG - Move head to PLC logic or I/O.
-    headLocation = self._io.head.getPosition()
-    self.setLocation( x, y, headLocation )
+    self.setLocation(
+      self._gCodeHandler._x,
+      self._gCodeHandler._y,
+      self._gCodeHandler._headPosition
+    )
 
     self.save()
 

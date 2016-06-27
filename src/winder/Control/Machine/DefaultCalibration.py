@@ -92,7 +92,7 @@ class DefaultLayerCalibration( LayerCalibration ) :
       raise "Unknown layer: " + str( layerName )
 
     LayerCalibration.__init__( self, layerName )
-    self.offset = SerializableLocation( 0, 0 )
+    self.offset = SerializableLocation( geometry.toAPA_OffsetX , geometry.toAPA_OffsetY )
     self.zFront = geometry.frontZ
     self.zBack  = geometry.backZ
 

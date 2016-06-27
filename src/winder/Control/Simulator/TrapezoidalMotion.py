@@ -44,7 +44,7 @@ class TrapezoidalMotion( Motion ) :
       Position after time.
     """
 
-    return round( x + v * t + 1.0 / 2.0 * a * t ** 2, 5 )
+    return x + v * t + 1.0 / 2.0 * a * t ** 2
 
   #---------------------------------------------------------------------
   def _calculateV( self, a, v, t ) :
@@ -60,7 +60,7 @@ class TrapezoidalMotion( Motion ) :
       Velocity after time.
     """
 
-    return round( v + a * t, 5 )
+    return v + a * t
 
   # #---------------------------------------------------------------------
   # def _calculateA( self, j, a, t ) :
@@ -211,6 +211,12 @@ class TrapezoidalMotion( Motion ) :
 
       self._nextPoint( self.Point.T3, self.Point.T2, reverseAcceleration, fallTime )
 
+      # Force the last position to end at the right location and time.
+      # Avoids tiny rounding errors.
+      self._point[ self.Point.T3 ].a = 0.0
+      self._point[ self.Point.T3 ].v = 0.0
+      self._point[ self.Point.T3 ].x = endPosition
+
     else:
       self._point = [ self.Point() for _ in range( self.Point.POINTS ) ]
       for point in self._point :
@@ -282,7 +288,7 @@ class TrapezoidalMotion( Motion ) :
       with given accelerations.  Otherwise, 0 is returned.
     """
 
-    delta = round( abs( endPosition - startPosition ), 5 )
+    delta = abs( endPosition - startPosition )
 
     # Start with the radicand.
     accumulator  = maxAcceleration**2 * minAcceleration**2 * desiredTime** 2
@@ -323,7 +329,7 @@ class TrapezoidalMotion( Motion ) :
       Time needed for travel.
     """
 
-    delta = round( abs( endPosition - startPosition ), 5 )
+    delta = abs( endPosition - startPosition )
 
     result = 0
 
