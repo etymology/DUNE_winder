@@ -109,9 +109,12 @@ function Jog()
   // Uses:
   //   Callback to start Z axis seek.
   //-----------------------------------------------------------------------------
-  this.seekZ = function()
+  this.seekZ = function( position )
   {
-    var z = $( "#seekZ" ).val()
+    var z = position
+
+    if ( null == z )
+      position = $( "#seekZ" ).val()
     var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekZ(" + z + "," + velocity + ")"  )
   }

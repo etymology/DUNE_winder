@@ -13,6 +13,8 @@ function PositionGraphic()
   // scaled at class creation.
   var BASE_GRAPHIC_X = 1286
   var BASE_GRAPHIC_Y = 463
+  var Z_GRAPHIC_X    = 1500
+  var Z_GRAPHIC_Y    = 332
   var MIN_X          = 95
   var MAX_X          = 1065
   var MIN_Y          = 387
@@ -37,6 +39,7 @@ function PositionGraphic()
 
   var motorX = null
   var motorY = null
+  var wasMoving = false
 
   var lastX = null
   var lastY = null
@@ -45,13 +48,66 @@ function PositionGraphic()
   var lines = []
 
   var machineCaliration
+  var inputs
 
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Set the state of a status light on the Z image.
+  // Input:
+  //   x - Location in x.
+  //   y - Location in y.
+  //   status - State of light.
+  //   offIsError - False if being off (false) is ok, or true if this is an error.
+  //---------------------------------------------------------------------------
+  var statusLight = function( x, y, status, offIsError )
+  {
+    // Scale locations.
+    x *= scale
+    y *= scale
+
+    // Select the color of the light indicator.
+    if ( status )
+    {
+      zStatusCanvas.fillStyle = "lime";
+      zStatusCanvas.strokeStyle = "green";
+    }
+    else
+    if ( ! offIsError )
+    {
+      zStatusCanvas.fillStyle = "blue";
+      zStatusCanvas.strokeStyle = "darkBlue";
+    }
+    else
+    {
+      zStatusCanvas.fillStyle = "red";
+      zStatusCanvas.strokeStyle = "darkRed";
+    }
+
+    // Draw a circle at the specified location.
+    zStatusCanvas.beginPath()
+    zStatusCanvas.arc( x, y, 8 * scale, 0, 2 * Math.PI )
+
+    // Draw fill (do before border).
+    zStatusCanvas.fill()
+
+    // Draw border.
+    zStatusCanvas.lineWidth = 2 * scale
+    zStatusCanvas.stroke()
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Callback run after machine calibration has been acquired.  Sets up
+  //   periodic function to update graphics.
+  //---------------------------------------------------------------------------
   var setupCallback = function()
   {
     var baseGraphicWidth  = BASE_GRAPHIC_X * scale
     var baseGraphicHeight = BASE_GRAPHIC_Y * scale
 
     // Scale limits of image.
+    Z_GRAPHIC_X   *= scale
+    Z_GRAPHIC_Y   *= scale
     MIN_X         *= scale
     MAX_X         *= scale
     MIN_Y         *= scale
@@ -64,9 +120,25 @@ function PositionGraphic()
     LINE_OFFSET_X *= scale
     LINE_OFFSET_Y *= scale
 
-    $( "#baseCanvas" )
+    // Limits of travel (in mm).
+    var MIN_X_POSITION = machineCaliration[ "limitLeft" ]
+    var MAX_X_POSITION = machineCaliration[ "limitRight" ]
+    var MIN_Y_POSITION = machineCaliration[ "limitBottom" ]
+    var MAX_Y_POSITION = machineCaliration[ "limitTop" ]
+    var MIN_Z_POSITION = machineCaliration[ "zFront" ]
+    var MAX_Z_POSITION = machineCaliration[ "zBack" ]
+
+    $( "#pathCanvas" )
       .attr( "width",  baseGraphicWidth  + "px" )
       .attr( "height", baseGraphicHeight + "px"  )
+
+    $( "#seekCanvas" )
+      .attr( "width",  baseGraphicWidth  + "px" )
+      .attr( "height", baseGraphicHeight + "px"  )
+
+    $( "#zStatusCanvas" )
+      .attr( "width",  Z_GRAPHIC_X  + "px" )
+      .attr( "height", Z_GRAPHIC_Y + "px"  )
 
     // Image position
     winder.addPeriodicEndCallback
@@ -84,7 +156,7 @@ function PositionGraphic()
         // To ensure they stay in step, they both must match their previous
         // value twice in a row.
         if ( ( debounceLastX == debounceX )
-          || ( debounceLastY == debounceY ) )
+          && ( debounceLastY == debounceY ) )
         {
           motorX = debounceX
           motorY = debounceY
@@ -101,14 +173,6 @@ function PositionGraphic()
 
             return result
           }
-
-        // Limits of travel (in mm).
-        var MIN_X_POSITION = machineCaliration[ "limitLeft" ]
-        var MAX_X_POSITION = machineCaliration[ "limitRight" ]
-        var MIN_Y_POSITION = machineCaliration[ "limitBottom" ]
-        var MAX_Y_POSITION = machineCaliration[ "limitTop" ]
-        var MIN_Z_POSITION = machineCaliration[ "zFront" ]
-        var MAX_Z_POSITION = machineCaliration[ "zBack" ]
 
         var xPosition = motorStatus.motor[ "xPosition" ]
         var yPosition = motorStatus.motor[ "yPosition" ]
@@ -137,29 +201,47 @@ function PositionGraphic()
         //
         // Position head (Z image).
         //
-        var z = rescale( zPosition, MIN_HEAD_Z, MAX_HEAD_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
+        var zHead = rescale( zPosition, MIN_HEAD_Z, MAX_HEAD_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
 
         if ( 0 != motorStatus.motor[ "headSide" ] )
-          z = MAX_HEAD_Z
+          zHead = MAX_HEAD_Z
 
         $( "#zHeadImage" )
-          .css( "left", z + "px" )
+          .css( "left", zHead + "px" )
 
         //
         // Position arm (Z image).
         //
-        var z = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
+        var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
 
         $( "#zArmImage" )
-          .css( "left", z + "px" )
+          .css( "left", zArm + "px" )
+
+        //
+        // Update status lights on Z image.
+        // NOTE: Constants come for positions on image.
+        //
+
+        zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
+        statusLight( 485, 150, ! inputs[ "Z_End_of_Travel" ], true )
+        statusLight( 505, 150, inputs[ "Z_Retracted_1A" ] )
+
+        statusLight( 545, 150, ! inputs[ "Z_End_of_Travel" ], true )
+        statusLight( 565, 150, inputs[ "Z_Extended" ] )
+
+        statusLight( 1200, 275, inputs[ "Z_Fixed_Latched" ] )
+        statusLight( 1220, 203, inputs[ "Z_Fixed_Present" ] )
+
+        var armBase = zArm / scale
+        statusLight( armBase + 765, 135, inputs[ "Latch_Actuator_Top" ] )
+        statusLight( armBase + 765, 155, inputs[ "Latch_Actuator_Mid" ] )
+        statusLight( armBase + 770, 235, inputs[ "Z_Stage_Present" ] )
+        statusLight( armBase + 780, 273, inputs[ "Z_Stage_Latched" ] )
+        statusLight( armBase + 767, 305, ( states[ "plcState" ] == "Latching" ) )
 
         //
         // Draw movement history.
         //
-
-        // Get the canvas and clear it.
-        var canvas = document.getElementById( "baseCanvas" ).getContext( "2d" )
-        canvas.clearRect( 0, 0, baseGraphicWidth, baseGraphicHeight )
 
         // If there is a new line segment, the current seek position will be
         // different from the last seek position.
@@ -179,17 +261,9 @@ function PositionGraphic()
           while ( lines.length > ( LINES + 1 ) )
             lines.shift()
 
-          // Update histories.
-          startingX = lastX
-          startingY = lastY
-          lastX = motorX
-          lastY = motorY
-        }
+          // Clear canvas.
+          pathCanvas.clearRect( 0, 0, baseGraphicWidth, baseGraphicHeight )
 
-        // If there is a history to draw...
-        if ( ( null !== lastX )
-          && ( null !== lastY ) )
-        {
           // Draw the previous path.
           var previousX = null
           var previousY = null
@@ -204,11 +278,11 @@ function PositionGraphic()
             if ( 0 != lineIndex )
             {
               // Start line segment.
-              canvas.beginPath()
+              pathCanvas.beginPath()
 
               // Make the line.
-              canvas.moveTo( previousX, previousY )
-              canvas.lineTo( x, y )
+              pathCanvas.moveTo( previousX, previousY )
+              pathCanvas.lineTo( x, y )
 
               // Calculate the gradient alpha transparency for this line segment.
               var numberOfLines = lines.length - 1
@@ -219,13 +293,14 @@ function PositionGraphic()
               // Line color is black with the alpha transparency fading from
               // oldest segment (mostly transparent) to newest (no
               // transparency).
-              var gradient = canvas.createLinearGradient( previousX, previousY, x, y )
-              gradient.addColorStop( 0, 'rgba( 0, 0, 0, ' + alphaStart + ' )' )
-              gradient.addColorStop( 1, 'rgba( 0, 0, 0, ' + alphaFinish + ' )' )
-              canvas.strokeStyle = gradient
+              var gradient = pathCanvas.createLinearGradient( previousX, previousY, x, y )
+              gradient.addColorStop( 0, 'rgba( 139, 69, 19, ' + alphaStart + ' )' )
+              gradient.addColorStop( 1, 'rgba( 139, 69, 19, ' + alphaFinish + ' )' )
+              pathCanvas.lineWidth = 2
+              pathCanvas.strokeStyle = gradient
 
               // Draw line segment.
-              canvas.stroke()
+              pathCanvas.stroke()
             }
 
             // Next starting location is the finishing location of the segment
@@ -233,6 +308,12 @@ function PositionGraphic()
             previousX = x
             previousY = y
           }
+
+          // Update histories.
+          startingX = lastX
+          startingY = lastY
+          lastX = motorX
+          lastY = motorY
         }
 
         // If there is a starting point and X/Y is in motion.
@@ -241,7 +322,10 @@ function PositionGraphic()
           && ( ( motorStatus.motor[ "xMoving" ] )
             || ( motorStatus.motor[ "yMoving" ] ) ) )
         {
-          canvas.beginPath()
+          // Clear canvas.
+          seekCanvas.clearRect( 0, 0, baseGraphicWidth, baseGraphicHeight )
+
+          seekCanvas.beginPath()
 
           var startX =
             rescale( startingX, MIN_X, MAX_X, MIN_X_POSITION, MAX_X_POSITION, LINE_OFFSET_X )
@@ -255,16 +339,27 @@ function PositionGraphic()
           var endY =
             rescale( yPosition, MIN_Y, MAX_Y, MIN_Y_POSITION, MAX_Y_POSITION, LINE_OFFSET_Y )
 
-          canvas.moveTo( startX, startY )
-          canvas.lineTo( endX, endY )
+          seekCanvas.moveTo( startX, startY )
+          seekCanvas.lineTo( endX, endY )
 
-          canvas.strokeStyle = "brown"
-          canvas.stroke()
+          seekCanvas.strokeStyle = "yellow"
+          seekCanvas.lineWidth = 1
+          seekCanvas.stroke()
+
+          wasMoving = true
+        }
+        else
+        if ( wasMoving )
+        {
+          seekCanvas.clearRect( 0, 0, baseGraphicWidth, baseGraphicHeight )
+          wasMoving = false
         }
 
-      }
-    )
-  }
+      } // function
+
+    ) // winder.addPeriodicEndCallback
+
+  } // setupCallback
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -289,7 +384,6 @@ function PositionGraphic()
         setupCallback()
       }
     )
-
   }
 
   //-----------------------------------------------------------------------------
@@ -324,7 +418,7 @@ function PositionGraphic()
   }
 
   //
-  // Load all images.
+  // Load images for X/Y.
   //
 
   $( "<img />" )
@@ -335,8 +429,15 @@ function PositionGraphic()
     .appendTo( "#sideGraphic" )
 
   $( "<canvas />" )
-    .attr( "id", "baseCanvas" )
+    .attr( "id", "pathCanvas" )
     .appendTo( "#sideGraphic" )
+
+  $( "<canvas />" )
+    .attr( "id", "seekCanvas" )
+    .appendTo( "#sideGraphic" )
+
+  var pathCanvas = document.getElementById( "pathCanvas" ).getContext( "2d" )
+  var seekCanvas = document.getElementById( "seekCanvas" ).getContext( "2d" )
 
   $( "<img />" )
     .attr( "src", "Images/Loop.png" )
@@ -351,6 +452,10 @@ function PositionGraphic()
     .attr( "alt", "Head view" )
     .load( rescale )
     .appendTo( "#sideGraphic" )
+
+  //
+  // Load images for Z.
+  //
 
   $( "<img />" )
     .attr( "src", "Images/Z_Base.png" )
@@ -373,6 +478,25 @@ function PositionGraphic()
     .load( rescale )
     .appendTo( "#zGraphic" )
 
-}
+  $( "<canvas />" )
+    .attr( "id", "zStatusCanvas" )
+    .appendTo( "#zGraphic" )
+
+  var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
+
+  // Scaling can take place after machine calibration has been read.
+  // So read the calibration and start the setup when we have this data.
+  winder.addPeriodicCallback
+  (
+    "LowLevelIO.getInputs()",
+    function( data )
+    {
+      inputs = {}
+      for ( var input of data )
+        inputs[ input[ 0 ] ] = input[ 1 ]
+    }
+  )
+
+} // PositionGraphic
 
 var positionGraphic = new PositionGraphic()

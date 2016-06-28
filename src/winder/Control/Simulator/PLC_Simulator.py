@@ -14,10 +14,65 @@ from Machine.MachineGeometry import MachineGeometry
 
 class PLC_Simulator :
 
+  # Enumeration for latch positions.
   class LatchPosition :
     TOP    = 0
     MIDDLE = 1
     BOTTOM = 2
+  # end class
+
+  #=====================================================================
+  # Logical input mapped to a bit of a tag.
+  #=====================================================================
+  class SimulatedInput :
+
+    #-------------------------------------------------------------------
+    def __init__( self, io, tagName, bit, default=False ) :
+      """
+      Constructor.
+
+      Args:
+        io: Instance of IO map.
+        tagName: Name of the tag in which the input resides.
+        bit: The bit of the tag in which the input resides.
+        default: Initial state of input.
+      """
+      self._tagName = tagName
+      self._bit = bit
+      self._io = io
+      self.set( default )
+
+    #-------------------------------------------------------------------
+    def get( self ) :
+      """
+      Return the value of the input.
+
+      Returns:
+        Value of the input.
+      """
+      value = self._io.plc.getTag( self._tagName )
+      value = value >> self._bit
+      value = value & 0x01
+
+      return value
+
+    #-------------------------------------------------------------------
+    def set( self, state ) :
+      """
+      Set the state of this input.
+
+      Args:
+        state: State to set the input.
+      """
+      mask = ( 1 << self._bit )
+      value = self._io.plc.getTag( self._tagName )
+      value = value & ~mask
+
+      if state :
+        value = value | mask
+
+      self._io.plc.setupTag( self._tagName, value )
+
   # end class
 
   #---------------------------------------------------------------------
@@ -92,6 +147,7 @@ class PLC_Simulator :
         velocity = self._zAxis.getSpeedTag()
         acceleration = self._io.plc.getTag( self._maxZ_AccelerationTag )
         deceleration = self._io.plc.getTag( self._maxZ_DecelerationTag )
+
         self._zAxis.startSeek( velocity, acceleration, deceleration )
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_SEEK )
 
@@ -112,7 +168,7 @@ class PLC_Simulator :
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCHING )
 
         # Wait 1 second for transition.
-        #self._latchDelay.set( 1000 )
+        self._latchDelay.set( 500 )
 
       # Re-home latch?
       # (Does nothing.)
@@ -142,7 +198,7 @@ class PLC_Simulator :
         if   ( velocity < 0 and position < positionMin ) \
           or ( velocity > 0 and position > positionMax ) :
 
-          print axisIO.name, "out of range", positionMin, "<=", position, "<=", positionMax
+          print axisIO.getName(), "out of range", positionMin, "<=", position, "<=", positionMax
 
           # Change to an error state.
           self._io.plc.write( self._stateTag, self._io.plcLogic.States.ERROR )
@@ -156,6 +212,46 @@ class PLC_Simulator :
     verifyPositionLimits( self._xAxis, self._io.xAxis, self._xMin, self._xMax )
     verifyPositionLimits( self._yAxis, self._io.yAxis, self._yMin, self._yMax )
     verifyPositionLimits( self._zAxis, self._io.zAxis, self._zMin, self._zMax )
+
+    #
+    # Simulate inputs based on machine state.
+    #
+
+    # Extended and retracted inputs.
+    isExtended = ( self._io.zAxis.getPosition() >= self._machineGeometry.zTravel )
+    isRetected = ( self._io.zAxis.getPosition() <= 0 )
+    self.Z_Extended.set( isExtended )
+    self.Z_Retracted_1A.set( isRetected )
+
+    # End-of-travels.
+    if self._io.zAxis.getPosition() > self._zMax \
+      or self._io.zAxis.getPosition() < self._zMin :
+      self.Z_End_of_Travel.set( True )
+    else :
+      self.Z_End_of_Travel.set( False )
+
+    # Latch and present sensors.
+    if self._latchPosition == self.LatchPosition.TOP :
+      self.Z_Fixed_Latched.set( True )
+      self.Z_Stage_Latched.set( False )
+      self.Latch_Actuator_Top.set( True )
+      self.Latch_Actuator_Mid.set( True )
+      self.Z_Stage_Present.set( isExtended )
+      self.Z_Fixed_Present.set( True )
+    elif self._latchPosition == self.LatchPosition.MIDDLE :
+      self.Z_Fixed_Latched.set( True )
+      self.Z_Stage_Latched.set( False )
+      self.Latch_Actuator_Top.set( False )
+      self.Latch_Actuator_Mid.set( True )
+      self.Z_Stage_Present.set( isExtended )
+      self.Z_Stage_Present.set( isExtended )
+    elif self._latchPosition == self.LatchPosition.BOTTOM :
+      self.Z_Fixed_Latched.set( False )
+      self.Z_Stage_Latched.set( True )
+      self.Latch_Actuator_Top.set( False )
+      self.Latch_Actuator_Mid.set( False )
+      self.Z_Stage_Present.set( True )
+      self.Z_Fixed_Present.set( isExtended )
 
     state = self._io.plc.getTag( self._stateTag )
 
@@ -216,13 +312,47 @@ class PLC_Simulator :
     self._lastZ_Speed = None
 
     self._latchDelay = Delay( self._simulationTime )
-    self._latchPosition = PLC_Simulator.LatchPosition.TOP
+    self._latchPosition = PLC_Simulator.LatchPosition.BOTTOM
 
-    machineGeometry = MachineGeometry()
+    self._machineGeometry = MachineGeometry()
 
-    self._xMin = machineGeometry.limitLeft
-    self._xMax = machineGeometry.limitRight
-    self._yMin = machineGeometry.limitBottom
-    self._yMax = machineGeometry.limitTop
-    self._zMin = machineGeometry.limitRetracted
-    self._zMax = machineGeometry.limitExtended
+    self._xMin = self._machineGeometry.limitLeft
+    self._xMax = self._machineGeometry.limitRight
+    self._yMin = self._machineGeometry.limitBottom
+    self._yMax = self._machineGeometry.limitTop
+    self._zMin = self._machineGeometry.limitRetracted
+    self._zMax = self._machineGeometry.limitExtended
+
+
+
+
+    # self.Z_EndOfTravel    = io.plc.setupTag( "Z_EOT",             False )
+    # self.Z_StageLatched   = io.plc.setupTag( "Z_Stage_Latched",   False )
+    # self.Z_FixedLatched   = io.plc.setupTag( "Z_Fixed_Latched",   False )
+    # self.Z_Retracted_1a   = io.plc.setupTag( "Z_Retracted1A",     False )
+    # self.Z_Retracted_1b   = io.plc.setupTag( "Z_Retracted1B",     False )
+    # self.Z_Retracted_2a   = io.plc.setupTag( "Z_Retracted2A",     False )
+    # self.Z_Retracted_2b   = io.plc.setupTag( "Z_Retracted2B",     False )
+    # self.Z_StagePresent   = io.plc.setupTag( "Z_Stage_Present",   False )
+    # self.Z_FixedPresent   = io.plc.setupTag( "Z_Fixed_Present",   False )
+    # self.Z_Extended       = io.plc.setupTag( "Z_Extended",        False )
+    # self.Z_Compressed     = io.plc.setupTag( "Z_Spring_Comp",     False )
+    # self.Z_StageUnlatched = io.plc.setupTag( "Z_Stage_Unlatched", False )
+    # self.Z_ClearToEngage  = io.plc.setupTag( "Z_OK_To_Engage",    False )
+
+    self._machine_SW_Stat = io.plc.setupTag( "Machine_SW_Stat", 0 )
+
+    self.Latch_Homed          = self.SimulatedInput( io, "Machine_SW_Stat", 0, False )
+    self.Z_Retracted_1A       = self.SimulatedInput( io, "Machine_SW_Stat", 1, False )
+    self.Z_Retracted_2B       = self.SimulatedInput( io, "Machine_SW_Stat", 2, False )
+    self.Z_Retracted_2A       = self.SimulatedInput( io, "Machine_SW_Stat", 3, False )
+    self.Z_Retracted_2B       = self.SimulatedInput( io, "Machine_SW_Stat", 4, False )
+    self.Z_Extended           = self.SimulatedInput( io, "Machine_SW_Stat", 5, False )
+    self.Z_Stage_Latched      = self.SimulatedInput( io, "Machine_SW_Stat", 6, False )
+    self.Z_Fixed_Latched      = self.SimulatedInput( io, "Machine_SW_Stat", 7, False )
+    self.Z_End_of_Travel      = self.SimulatedInput( io, "Machine_SW_Stat", 8, False )
+    self.Z_Stage_Present      = self.SimulatedInput( io, "Machine_SW_Stat", 9, False )
+    self.Z_Fixed_Present      = self.SimulatedInput( io, "Machine_SW_Stat", 10, False )
+    self.Z_Spring_Comp        = self.SimulatedInput( io, "Machine_SW_Stat", 11, False )
+    self.Latch_Actuator_Top   = self.SimulatedInput( io, "Machine_SW_Stat", 12, False )
+    self.Latch_Actuator_Mid   = self.SimulatedInput( io, "Machine_SW_Stat", 13, False )

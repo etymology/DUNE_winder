@@ -9,7 +9,7 @@
   display: none;
 }
 
-#baseCanvas
+#pathCanvas, #seekCanvas, #zStatusCanvas
 {
   position: absolute;
   top: 0;

@@ -14,7 +14,7 @@ class PLC_Input( DigitalInput ) :
   list = []
 
   #---------------------------------------------------------------------
-  def __init__( self, name, plc, tagName=None, bit=0, defaultState = False ) :
+  def __init__( self, name, plc, tagName=None, bit=0, defaultState=False, tagType="DINT" ) :
     """
     Constructor.
 
@@ -25,6 +25,7 @@ class PLC_Input( DigitalInput ) :
         the tag and name are the same.
       bit: Which bit of the tag.  Defaults to bit 0.
       defaultState: Default state if input is unreadable.
+      tagType: Tag data type.  Default is "DINT".
     """
     DigitalInput.__init__( self, name )
     PLC_Input.list.append( self )
@@ -38,7 +39,7 @@ class PLC_Input( DigitalInput ) :
     attributes.canWrite     = False
     attributes.defaultValue = defaultState
     attributes.isPolled     = True
-    self._tag = plc.Tag( plc, tagName, attributes )
+    self._tag = plc.Tag( plc, tagName, attributes, tagType )
 
     self._bit = bit
     self._defaultState = defaultState
