@@ -82,36 +82,41 @@ class PLC_Simulator :
     """
     self._simulationTime.setLocal()
 
+    def speedCheck( axis, last ) :
+
+      speed = axis.getSpeedTag()
+
+      # Speed change?
+      if last != speed :
+        # Speed of 0 means stop request.
+        if 0 == speed :
+          axis.stop()
+        else:
+          # $$$FUTURE - Modify speed
+          pass
+
+      return speed
+
+    # Look for speed changes on both X and Y, and propagate these to the
+    # axies.
     xySpeed = self._io.plc.getTag( self._maxXY_VelocityTag )
     if self._lastXY_Speed != xySpeed :
-
-      if 0 == xySpeed :
-        self._xAxis.stop()
-        self._yAxis.stop()
-      else:
-        # $$$FUTURE - Modify speed
-        pass
-
+      self._xAxis.setSpeedTag( xySpeed )
+      self._yAxis.setSpeedTag( xySpeed )
       self._lastXY_Speed = xySpeed
 
-    zSpeed = self._zAxis.getSpeedTag()
-    if self._lastZ_Speed != zSpeed :
-
-      if 0 == zSpeed :
-        self._zAxis.stop()
-      else:
-        # $$$FUTURE - Modify speed
-        pass
-
-      self._lastZ_Speed = zSpeed
+    # Check for speed changes on each axis.
+    self._lastX_Speed = speedCheck( self._xAxis, self._lastX_Speed )
+    self._lastY_Speed = speedCheck( self._yAxis, self._lastY_Speed )
+    self._lastZ_Speed = speedCheck( self._zAxis, self._lastZ_Speed )
 
     moveType = self._io.plc.getTag( self._moveTypeTag )
     if self._lastMoveType != moveType :
       # Reset?
       if self._io.plcLogic.MoveTypes.RESET == moveType :
-        self._xAxis.stop()
-        self._yAxis.stop()
-        self._zAxis.stop()
+        self._xAxis.hardStop()
+        self._yAxis.hardStop()
+        self._zAxis.hardStop()
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
 
       # Seek in X/Y?
@@ -126,7 +131,10 @@ class PLC_Simulator :
         xVelocity = velocity
         yVelocity = velocity
 
-        if xTime > 0 and yTime > 0 :
+        # If moving in both X and Y, and the times are different, rescale the
+        # motion of the faster axis to use the slower time.  This keeps both
+        # axises arriving at their destination simultaneously.
+        if xTime > 0 and yTime > 0 and xTime != yTime :
           if xTime < yTime :
             xVelocity = self._xAxis.computeVelocity( acceleration, deceleration, yTime )
           else:
@@ -138,8 +146,11 @@ class PLC_Simulator :
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_SEEK )
       # Jog in X/Y?
       elif self._io.plcLogic.MoveTypes.JOG_XY == moveType :
-        self._xAxis.startJog()
-        self._yAxis.startJog()
+        velocity = self._io.plc.getTag( self._maxXY_VelocityTag )
+        acceleration = self._io.plc.getTag( self._maxXY_AccelerationTag )
+        deceleration = self._io.plc.getTag( self._maxXY_DecelerationTag )
+        self._xAxis.startJog( acceleration, deceleration )
+        self._yAxis.startJog( acceleration, deceleration )
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_JOG )
 
       # Seek in Z?
@@ -153,7 +164,9 @@ class PLC_Simulator :
 
       # Jog in Z?
       elif self._io.plcLogic.MoveTypes.JOG_Z == moveType :
-        self._zAxis.startJog()
+        acceleration = self._io.plc.getTag( self._maxZ_AccelerationTag )
+        deceleration = self._io.plc.getTag( self._maxZ_DecelerationTag )
+        self._zAxis.startJog( acceleration, deceleration )
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.Z_JOG )
 
       # Change latch?
@@ -167,7 +180,7 @@ class PLC_Simulator :
         # State is now latching.
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCHING )
 
-        # Wait 1 second for transition.
+        # Wait 1/2 second for transition.
         self._latchDelay.set( 500 )
 
       # Re-home latch?
@@ -204,9 +217,9 @@ class PLC_Simulator :
           self._io.plc.write( self._stateTag, self._io.plcLogic.States.ERROR )
 
           # Stop all motion.
-          self._xAxis.stop()
-          self._yAxis.stop()
-          self._zAxis.stop()
+          self._xAxis.hardStop()
+          self._yAxis.hardStop()
+          self._zAxis.hardStop()
 
     # Verify that all axis potions are within limits.
     verifyPositionLimits( self._xAxis, self._io.xAxis, self._xMin, self._xMax )
@@ -293,9 +306,6 @@ class PLC_Simulator :
     self._yAxis = SimulatedMotor( io.plc, "Y", self._simulationTime )
     self._zAxis = SimulatedMotor( io.plc, "Z", self._simulationTime )
 
-    # Simulated I/O points.
-    io.plc.setupTag( "Point_IO:1:I", 0 )
-
     # Tags for top-level PLC control.
     self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
     self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
@@ -309,6 +319,8 @@ class PLC_Simulator :
     self._lastState = io.plcLogic.States.READY
     self._lastMoveType = io.plcLogic.MoveTypes.RESET
     self._lastXY_Speed = None
+    self._lastX_Speed = None
+    self._lastY_Speed = None
     self._lastZ_Speed = None
 
     self._latchDelay = Delay( self._simulationTime )
@@ -322,23 +334,6 @@ class PLC_Simulator :
     self._yMax = self._machineGeometry.limitTop
     self._zMin = self._machineGeometry.limitRetracted
     self._zMax = self._machineGeometry.limitExtended
-
-
-
-
-    # self.Z_EndOfTravel    = io.plc.setupTag( "Z_EOT",             False )
-    # self.Z_StageLatched   = io.plc.setupTag( "Z_Stage_Latched",   False )
-    # self.Z_FixedLatched   = io.plc.setupTag( "Z_Fixed_Latched",   False )
-    # self.Z_Retracted_1a   = io.plc.setupTag( "Z_Retracted1A",     False )
-    # self.Z_Retracted_1b   = io.plc.setupTag( "Z_Retracted1B",     False )
-    # self.Z_Retracted_2a   = io.plc.setupTag( "Z_Retracted2A",     False )
-    # self.Z_Retracted_2b   = io.plc.setupTag( "Z_Retracted2B",     False )
-    # self.Z_StagePresent   = io.plc.setupTag( "Z_Stage_Present",   False )
-    # self.Z_FixedPresent   = io.plc.setupTag( "Z_Fixed_Present",   False )
-    # self.Z_Extended       = io.plc.setupTag( "Z_Extended",        False )
-    # self.Z_Compressed     = io.plc.setupTag( "Z_Spring_Comp",     False )
-    # self.Z_StageUnlatched = io.plc.setupTag( "Z_Stage_Unlatched", False )
-    # self.Z_ClearToEngage  = io.plc.setupTag( "Z_OK_To_Engage",    False )
 
     self._machine_SW_Stat = io.plc.setupTag( "Machine_SW_Stat", 0 )
 

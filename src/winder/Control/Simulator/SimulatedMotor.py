@@ -83,25 +83,58 @@ class SimulatedMotor :
       )
 
   #---------------------------------------------------------------------
-  def startJog( self ) :
+  def startJog( self, acceleration, deceleration ) :
     """
     Start jogging.
     """
-    self._startTime = self._simulationTime.get()
-    velocity = self._plc.getTag( self._speedTag )
+    velocity = seekPosition = self._plc.getTag( self._speedTag )
+
     if velocity != 0 :
+      direction = self._plc.getTag( self._directionTag )
+
+      if direction :
+        velocity = -velocity
+
+      self._startTime = self._simulationTime.get()
+      self._maxAcceleration = acceleration
+      self._maxDeceleration = deceleration
+
+      self._motion =                                          \
+        TrapezoidalMotion                                     \
+        (                                                     \
+          acceleration,                                       \
+          deceleration,                                       \
+          velocity,                                           \
+          self._position,                                     \
+          None
+        )
+
       self._startPosition = self._position
       self._inMotion = True
       self._isJog = True
 
   #---------------------------------------------------------------------
-  def stop( self ) :
+  def hardStop( self ) :
     """
-    Stop current motion.
+    Hard motion stop.  Used for E-stops.
     """
+    self._isJog = False
     self._inMotion = False
     self._velocity = 0
     self._acceleration = 0
+
+  #---------------------------------------------------------------------
+  def stop( self ) :
+    """
+    Stop current motion.  Use deceleration.
+    """
+
+    if self._isSeek or self._isJog :
+      delta = self._simulationTime.get() - self._startTime
+      time = delta.total_seconds()
+      self._motion.computeStop( self._maxDeceleration, time )
+      self._isJog = False
+      self._isSeek = False
 
   #---------------------------------------------------------------------
   def isInMotion( self ) :
@@ -123,23 +156,10 @@ class SimulatedMotor :
 
     saveMotion = self._inMotion
     if self._inMotion :
-      if self._isSeek :
-        self._inMotion     = self._motion.isMoving( time )
-        self._position     = self._motion.interpolatePosition( time )
-        self._velocity     = self._motion.interpolateVelocity( time )
-        self._acceleration = self._motion.interpolateAcceleration( time )
-
-      if self._isJog :
-        self._velocity = self._plc.getTag( self._speedTag )
-        direction = self._plc.getTag( self._directionTag )
-        if 1 == direction :
-          self._velocity = -self._velocity
-
-        if 0 == self._velocity :
-          self._inMotion = False
-          self._isJog = False
-        else:
-          self._position = self._startPosition + time * self._velocity
+      self._inMotion     = self._motion.isMoving( time )
+      self._position     = self._motion.interpolatePosition( time )
+      self._velocity     = self._motion.interpolateVelocity( time )
+      self._acceleration = self._motion.interpolateAcceleration( time )
 
     elif self._wasEnabled :
       if self._isSeek :
@@ -176,6 +196,8 @@ class SimulatedMotor :
     self._position        = 0
     self._velocity        = 0
     self._acceleration    = 0
+    self._maxAcceleration = 0
+    self._maxDeceleration = 0
     self._maxVelocity     = 0
     self._startTime       = simulationTime.get()
     self._motion          = None
@@ -199,3 +221,13 @@ class SimulatedMotor :
       Desired velocity tag.
     """
     return self._plc.getTag( self._speedTag )
+
+  #---------------------------------------------------------------------
+  def setSpeedTag( self, speed ) :
+    """
+    Set the speed tag.
+
+    Args:
+      speed: New speed to write.
+    """
+    return self._plc.setupTag( self._speedTag, speed )

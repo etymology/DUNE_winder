@@ -70,6 +70,16 @@ class LayerCalibration( HashedSerializable ) :
     return self._locations[ pin ]
 
   #---------------------------------------------------------------------
+  def getPinExists( self, pin ) :
+    """
+    Check to see if a pin name exists in calibration.
+
+    Returns:
+      True if pin exists, False if not.
+    """
+    return pin in self._locations
+
+  #---------------------------------------------------------------------
   def getPinNames( self ) :
     """
     Return a list of pin names.

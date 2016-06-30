@@ -136,7 +136,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.jogZ_Start = function( direction )
   {
-    var velocity = $( "#velocitySlider" ).slider( "value" ) * direction
+    var velocity = this.getVelocity() * direction
     winder.remoteAction( "process.jogZ(" + velocity + ")"  )
   }
 
@@ -207,6 +207,15 @@ function Jog()
   {
     var velocity = this.getVelocity()
     winder.remoteAction( "process.manualHeadPosition( " + position + "," + velocity + " )" )
+  }
+
+  //-----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------
+  this.seekPin = function()
+  {
+    var pin = $( "#seekPin" ).val().toUpperCase()
+    var velocity = this.getVelocity()
+    winder.remoteAction( "process.seekPin( '" + pin + "', " + velocity + " )" )
   }
 
   // Callback function to initialize position graphic.

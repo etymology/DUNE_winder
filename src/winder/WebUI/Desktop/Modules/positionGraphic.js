@@ -17,8 +17,8 @@ function PositionGraphic()
   var Z_GRAPHIC_Y    = 332
   var MIN_X          = 95
   var MAX_X          = 1065
-  var MIN_Y          = 387
-  var MAX_Y          = 32
+  var MIN_Y          = 393
+  var MAX_Y          = 17
   var HEAD_X_OFFSET  = 100
   var MIN_ARM_Z      = 0
   var MAX_ARM_Z      = 281
@@ -26,6 +26,23 @@ function PositionGraphic()
   var MAX_HEAD_Z     = 1064
   var LINE_OFFSET_X  = 129
   var LINE_OFFSET_Y  = 30
+
+  // Images to hide if server stops communicating.
+  var IMAGES_TO_HIDE =
+  [
+    "#pathCanvas",
+    "#seekCanvas",
+    "#zStatusCanvas"
+  ]
+
+  // Images to blur if server stops communicating.
+  var IMAGES_TO_BLUR =
+  [
+    "#loopImage",
+    "#headImage",
+    "#zHeadImage",
+    "#zArmImage",
+  ]
 
   // Scale factor for all images.
   var scale
@@ -380,8 +397,11 @@ function PositionGraphic()
       "machineCalibration.__dict__",
       function( data )
       {
-        machineCaliration = data
-        setupCallback()
+        if ( data )
+        {
+          machineCaliration = data
+          setupCallback()
+        }
       }
     )
   }
@@ -491,9 +511,53 @@ function PositionGraphic()
     "LowLevelIO.getInputs()",
     function( data )
     {
-      inputs = {}
-      for ( var input of data )
-        inputs[ input[ 0 ] ] = input[ 1 ]
+      if ( data )
+      {
+        inputs = {}
+        for ( var input of data )
+          inputs[ input[ 0 ] ] = input[ 1 ]
+      }
+    }
+  )
+
+  winder.addErrorCallback
+  (
+    function()
+    {
+      for ( var index in IMAGES_TO_HIDE )
+      {
+        var image = IMAGES_TO_HIDE[ index ]
+        $( image ).css( "display", "none" )
+      }
+
+      for ( var index in IMAGES_TO_BLUR )
+      {
+        var image = IMAGES_TO_BLUR[ index ]
+        $( image )
+          .css( "opacity", "0.75" )
+          .css( "filter", "blur( 10px )" )
+      }
+    }
+  )
+
+  winder.addErrorClearCallback
+  (
+    function()
+    {
+      for ( var index in IMAGES_TO_HIDE )
+      {
+        var image = IMAGES_TO_HIDE[ index ]
+        $( image )
+          .css( "display", "inline" )
+      }
+
+      for ( var index in IMAGES_TO_BLUR )
+      {
+        var image = IMAGES_TO_BLUR[ index ]
+        $( image )
+          .css( "opacity", "1.0" )
+          .css( "filter", "" )
+      }
     }
   )
 

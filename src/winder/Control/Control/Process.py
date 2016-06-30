@@ -70,6 +70,8 @@ class Process :
     self.gCodeHandler.setLimitVelocity( maxVelocity )
     self.gCodeHandler.setVelocity( maxVelocity )
 
+    self._machineCalibration = machineCalibration
+
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
     """
@@ -693,6 +695,54 @@ class Process :
         "Jog Z request ignored.",
         [ velocity ]
       )
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def seekPin( self, pin, velocity ) :
+    """
+    Manually seek out a pin location.
+
+    Args:
+      pin - Name of pin to seek.
+      velocity: Speed of z axis in m/s.
+
+    Returns:
+      True if there was an error, False if not.
+    """
+    calibration = self.gCodeHandler.getLayerCalibration()
+
+    isError = True
+
+    # Do we have a calibration file?
+    if calibration :
+      # Does request pin exist?
+      if calibration.getPinExists( pin ) :
+        self._log.add(
+          self.__class__.__name__,
+          "SEEK_PIN",
+          "Manual pin seek " + pin + " at " + str( velocity ) +".",
+          [ pin, velocity ]
+        )
+        position = calibration.getPinLocation( pin )
+        position = position.add( calibration.offset )
+        self.manualSeekXY( position.x, position.y, velocity )
+        isError = False
+      else:
+        self._log.add(
+          self.__class__.__name__,
+          "SEEK_PIN",
+          "Manual pin seek request ignored--pin does not exist.",
+          [ pin, velocity ]
+        )
+    else:
+      self._log.add(
+        self.__class__.__name__,
+        "SEEK_PIN",
+        "Manual pin seek request ignored--no calibration loaded.",
+        [ pin, velocity ]
+      )
+
 
     return isError
 

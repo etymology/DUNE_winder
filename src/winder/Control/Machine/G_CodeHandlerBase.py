@@ -239,6 +239,16 @@ class G_CodeHandlerBase :
     self._layerCalibration = layerCalibration
 
   #---------------------------------------------------------------------
+  def getLayerCalibration( self ) :
+    """
+    Return the layer calibration currently in use.
+
+    Returns:
+      Instance of LayerCalibration.  None if no calibration loaded.
+    """
+    return self._layerCalibration
+
+  #---------------------------------------------------------------------
   def setInitialLocation( self, x, y, headLocation ) :
     """
     Set the last machine location.  This is needed when loading a new recipe

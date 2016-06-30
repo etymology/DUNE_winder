@@ -62,22 +62,6 @@ class TrapezoidalMotion( Motion ) :
 
     return v + a * t
 
-  # #---------------------------------------------------------------------
-  # def _calculateA( self, j, a, t ) :
-  #   """
-  #   Calculate ending acceleration given jerk, initial acceleration and time.
-  #
-  #   Args:
-  #     j: Jerk.
-  #     a: Initial acceleration.
-  #     t: Time from initial position.
-  #
-  #   Returns:
-  #     Acceleration after time.
-  #   """
-  #
-  #   return a + j * t
-
   #---------------------------------------------------------------------
   def _nextPoint( self, thisPoint, lastPoint, a, t ) :
     """
@@ -122,11 +106,102 @@ class TrapezoidalMotion( Motion ) :
       acceleration: Maximum acceleration.
       velocity: Maximum velocity.
       startPosition: Starting position.
-      endPosition: Finial position.
-
+      endPosition: Finial position.  Use None for jogging.
     """
     self._point = [ self.Point() for _ in range( self.Point.POINTS ) ]
-    self.compute( maxAcceleration, minAcceleration, velocity, startPosition, endPosition )
+
+    if None == endPosition :
+      self.computeJog( maxAcceleration, velocity, startPosition )
+    else :
+      self.compute( maxAcceleration, minAcceleration, velocity, startPosition, endPosition )
+
+    # for point in self._point :
+    #   print point.t, point.a, point.v, point.x
+    #
+    # print
+    # print
+
+  #---------------------------------------------------------------------
+  def computeStop( self, minAcceleration, currentTime ) :
+    """
+    Used to stop current motion using a deceleration term.
+
+    Args:
+      minAcceleration: Maximum negative acceleration.
+      currentTime: Current simulation time.
+    """
+
+    # Figure out where we are currently.
+    startPosition     = self.interpolatePosition( currentTime )
+    startVelocity     = self.interpolateVelocity( currentTime )
+    startAcceleration = self.interpolateAcceleration( currentTime )
+
+    # Starting point is where the current state of motion.
+    self._point[ self.Point.T0 ].t = currentTime
+    self._point[ self.Point.T0 ].a = startAcceleration
+    self._point[ self.Point.T0 ].v = startVelocity
+    self._point[ self.Point.T0 ].x = startPosition
+
+    # Compute time needed to slow down to zero velocity.
+    decelerationTime = 0
+    if minAcceleration > 0 :
+      decelerationTime = abs( startVelocity ) / minAcceleration
+
+    # Correct for direction of travel.
+    if startVelocity > 0 :
+      minAcceleration = -minAcceleration
+
+    # Compute the next point, and duplicate it for all other points.
+    self._nextPoint( self.Point.T1, self.Point.T0, minAcceleration, decelerationTime )
+    self._point[ self.Point.T2 ] = self._point[ self.Point.T1 ]
+    self._point[ self.Point.T3 ] = self._point[ self.Point.T1 ]
+
+  #---------------------------------------------------------------------
+  def computeJog( self, maxAcceleration, velocity, startPosition ) :
+    """
+    Compute internal poin table for a jog operation.  Call before using
+    'interpolatePosition'.
+
+    Args:
+      maxAcceleration: Maximum positive acceleration.
+      velocity: Maximum velocity.
+      startPosition: Starting position.
+
+    Returns:
+      Modifies self._point. Nothing is returned.
+    """
+
+    # Jerk, acceleration and velocity are magnitudes, so force an absolute value.
+    maxAcceleration = abs( maxAcceleration )
+
+    if None == startPosition :
+      startPosition = 0
+
+    forwardAcceleration =  maxAcceleration
+    if velocity < 0 :
+      forwardAcceleration = -forwardAcceleration
+      velocity = -velocity
+
+    # We must either not be moving or have a acceleration and velocity term.
+    assert ( 0 != maxAcceleration ), "Cannot move without a acceleration term"
+    assert ( 0 != velocity ), "Cannot move without a velocity term"
+
+    # First point is the starting position and no motion.
+    self._point[ self.Point.T0 ].t = 0.0
+    self._point[ self.Point.T0 ].a = 0.0
+    self._point[ self.Point.T0 ].v = 0.0
+    self._point[ self.Point.T0 ].x = startPosition
+
+    accelerationTime = velocity / maxAcceleration
+    self._nextPoint( self.Point.T1, self.Point.T0, forwardAcceleration, accelerationTime )
+
+    # Setup next point with 0 time.  Then force the time to infinite so the motion
+    # never stops.
+    self._nextPoint( self.Point.T2, self.Point.T1, 0, 0 )
+    self._point[ self.Point.T2 ].t = float( "inf" )
+
+    # Last point is the same as previous.
+    self._point[ self.Point.T3 ] = self._point[ self.Point.T2 ]
 
     # for point in self._point :
     #   print point.t, point.a, point.v, point.x
@@ -138,7 +213,8 @@ class TrapezoidalMotion( Motion ) :
   #---------------------------------------------------------------------
   def compute( self, maxAcceleration, minAcceleration, velocity, startPosition, endPosition ) :
     """
-    Compute internal point table using the specified settings. Call before using 'interpolatePosition'.
+    Compute internal point table using the specified settings. Call before using
+    'interpolatePosition'.
 
     Args:
       maxAcceleration: Maximum positive acceleration.
@@ -162,10 +238,10 @@ class TrapezoidalMotion( Motion ) :
     if None == startPosition :
       startPosition = 0
 
-    position = endPosition - startPosition
     forwardAcceleration =  maxAcceleration
     reverseAcceleration = -minAcceleration
     svelocity   = velocity
+    position = endPosition - startPosition
     if position < 0 :
       position = -position
       forwardAcceleration = -forwardAcceleration
@@ -296,7 +372,7 @@ class TrapezoidalMotion( Motion ) :
     accumulator -= 2 * maxAcceleration * minAcceleration**2 * delta
 
     # Can this be accomplished (i.e. radicand greater than 0)?
-    if accumulator > 0 :
+    if accumulator >= 0 :
       accumulator  = sqrt( accumulator )
       accumulator  = maxAcceleration * minAcceleration * desiredTime - accumulator
       accumulator /= maxAcceleration + minAcceleration
@@ -373,7 +449,6 @@ class TrapezoidalMotion( Motion ) :
     Returns:
       Position at this time.
     """
-
 
     # Start with initial position.
     result = self._point[ self.Point.T0 ].x
