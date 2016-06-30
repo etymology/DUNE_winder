@@ -53,3 +53,9 @@
   left: 0;
   display: none;
 }
+
+img.axisFault
+{
+  filter: drop-shadow(0px 0px 5px red);
+  /*filter: blur( 3px );*/
+}

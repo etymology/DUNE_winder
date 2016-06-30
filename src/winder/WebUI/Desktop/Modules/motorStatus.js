@@ -63,6 +63,7 @@ function MotorStatus()
     (
       function()
       {
+        var isFunctional = self.motor[ axis + "Functional" ]
         var isMoving = self.motor[ axis + "Moving" ]
         var rawVelocity = self.motor[ axis + "Velocity" ]
         var acceleration = self.motor[ axis + "Acceleration" ]
@@ -73,10 +74,16 @@ function MotorStatus()
 
         topAcceleration *= Math.sign( acceleration )
 
-        if ( isMoving )
-          $( "#" + axis + "Label" ).addClass( "inMotion" )
+        if ( ! isFunctional )
+          $( "#" + axis + "Label" ).addClass( "inError" )
         else
-          $( "#" + axis + "Label" ).removeClass( "inMotion" )
+        {
+          $( "#" + axis + "Label" ).removeClass( "inError" )
+          if ( isMoving )
+            $( "#" + axis + "Label" ).addClass( "inMotion" )
+          else
+            $( "#" + axis + "Label" ).removeClass( "inMotion" )
+        }
 
         var level = 0
         if ( topAcceleration != 0 )
@@ -163,6 +170,13 @@ function MotorStatus()
   for ( var index in AXIES )
   {
     var axis = AXIES[ index ]
+
+    winder.addPeriodicRead
+    (
+      "io." + axis + "Axis.isFunctional()",
+      this.motor,
+      axis + "Functional"
+    )
 
     winder.addPeriodicRead
     (

@@ -162,6 +162,11 @@ function PositionGraphic()
     (
       function()
       {
+        if ( ! motorStatus.motor[ "yFunctional" ] )
+          $( "#loopImage" ).addClass( "axisFault" )
+        else
+          $( "#loopImage" ).removeClass( "axisFault" )
+
         // Motor position history.
         debounceLastX = debounceX
         debounceLastY = debounceY

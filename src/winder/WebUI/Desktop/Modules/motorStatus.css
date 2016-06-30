@@ -16,6 +16,11 @@
   background-color: rgba( 0, 128, 0, 0.5 ) !important;
 }
 
+#motorStatusTable .inError
+{
+  background-color: rgba( 255, 0, 0, 1 ) !important;
+}
+
 #motorStatusTable
 {
   min-width: 500px;
