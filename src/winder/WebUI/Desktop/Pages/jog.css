@@ -3,6 +3,11 @@ main
   overflow: hidden;
 }
 
+#locationsDiv
+{
+  width: 500px;
+}
+
 #positionGraphic
 {
   margin-left: 10px;
@@ -45,9 +50,9 @@ button.jog
   width: 1025px;
 }
 
-#velocitySlider
+#velocitySlider, #accelerationSlider, #decelerationSlider
 {
-  width: 95%;
+  width: 97%;
 }
 
 #seekX, #seekY, #seekZ, #extendedPosition

@@ -95,7 +95,7 @@ class PLC_Logic :
     self._maxZ_Velocity.set( 0 )
 
   #---------------------------------------------------------------------
-  def setXY_Position( self, x, y, velocity=None ) :
+  def setXY_Position( self, x, y, velocity=None, acceleration=None, deceleration=None ) :
     """
     Make a coordinated move of the X/Y axis.
 
@@ -108,12 +108,18 @@ class PLC_Logic :
     if None != velocity :
       self._velocity = velocity
 
+    if None != acceleration :
+      self._maxXY_Acceleration.set( float( acceleration ) )
+
+    if None != deceleration :
+      self._maxXY_Deceleration.set( float( deceleration ) )
+
     self._maxXY_Velocity.set( self._velocity )
     self._xyAxis.setDesiredPosition( [ x, y ] )
     self._moveType.set( self.MoveTypes.SEEK_XY )
 
   #---------------------------------------------------------------------
-  def jogXY( self, xVelocity, yVelocity ) :
+  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ) :
     """
     Jog the X/Y axis at a given velocity.
 
@@ -123,6 +129,12 @@ class PLC_Logic :
       yVelocity: Speed of travel on y-axis.  0 for no motion or stop, negative
         for seeking in reverse direction.
     """
+
+    if None != acceleration :
+      self._maxXY_Acceleration.set( float( acceleration ) )
+
+    if None != deceleration :
+      self._maxXY_Deceleration.set( float( deceleration ) )
 
     self._xyAxis.setVelocity( [ xVelocity, yVelocity ] )
     self._moveType.set( self.MoveTypes.JOG_XY )

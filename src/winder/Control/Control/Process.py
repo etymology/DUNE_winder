@@ -523,7 +523,7 @@ class Process :
       self.apa = None
 
   #---------------------------------------------------------------------
-  def jogXY( self, xVelocity, yVelocity ) :
+  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ) :
     """
     Jog the X/Y axis at a given velocity.
 
@@ -540,12 +540,13 @@ class Process :
       self._log.add(
         self.__class__.__name__,
         "JOG",
-        "Jog X/Y at " + str( xVelocity ) + ", " + str( yVelocity ) + ".",
-        [ xVelocity, yVelocity ]
+        "Jog X/Y at " + str( xVelocity ) + ", " + str( yVelocity ) + " m/s, "
+          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
+        [ xVelocity, yVelocity, acceleration, deceleration ]
       )
       self.controlStateMachine.manualRequest = True
       self.controlStateMachine.isJogging = True
-      self._io.plcLogic.jogXY( xVelocity, yVelocity )
+      self._io.plcLogic.jogXY( xVelocity, yVelocity, acceleration, deceleration )
     elif 0 == xVelocity and 0 == yVelocity and self.controlStateMachine.isJogging :
       self._log.add(
         self.__class__.__name__,
@@ -560,13 +561,13 @@ class Process :
         self.__class__.__name__,
         "JOG",
         "Jog X/Y request ignored.",
-        [ xVelocity, yVelocity ]
+        [ xVelocity, yVelocity, acceleration, deceleration ]
       )
 
     return isError
 
   #---------------------------------------------------------------------
-  def manualSeekXY( self, xPosition=None, yPosition=None, velocity=None ) :
+  def manualSeekXY( self, xPosition=None, yPosition=None, velocity=None, acceleration=None, deceleration=None ) :
     """
     Seek an X/Y location.
 
@@ -585,19 +586,22 @@ class Process :
         self.__class__.__name__,
         "JOG",
         "Manual move X/Y to (" + str( xPosition )
-          + ", " + str( yPosition ) + ") at " + str( velocity ) + ".",
-        [ xPosition, yPosition, velocity ]
+          + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
+          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
+        [ xPosition, yPosition, velocity, acceleration, deceleration ]
       )
       self.controlStateMachine.seekX = xPosition
       self.controlStateMachine.seekY = yPosition
       self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.seekAcceleration = acceleration
+      self.controlStateMachine.seekDeceleration = deceleration
       self.controlStateMachine.manualRequest = True
     else :
       self._log.add(
         self.__class__.__name__,
         "JOG",
         "Manual move X/Y ignored.",
-        [ xPosition, yPosition, velocity ]
+        [ xPosition, yPosition, velocity, acceleration, deceleration ]
       )
 
     return isError

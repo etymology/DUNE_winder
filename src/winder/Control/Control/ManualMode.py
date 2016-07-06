@@ -54,11 +54,19 @@ class ManualMode( StateMachineState ) :
       if None == y :
         y = self._io.yAxis.getPosition()
 
-      self._io.plcLogic.setXY_Position( x, y, self.stateMachine.seekVelocity )
+      self._io.plcLogic.setXY_Position(
+        x,
+        y,
+        self.stateMachine.seekVelocity,
+        self.stateMachine.seekAcceleration,
+        self.stateMachine.seekDeceleration
+      )
 
       self.stateMachine.seekX = None
       self.stateMachine.seekY = None
       self.stateMachine.seekVelocity = None
+      self.stateMachine.seekAcceleration = None
+      self.stateMachine.seekDeceleration = None
       isError = False
 
     if self.stateMachine.isJogging :

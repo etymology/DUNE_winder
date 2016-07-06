@@ -3,22 +3,83 @@ function Jog()
   var MIN_VELOCITY = 1.0
   var maxVelocity
 
+  var MIN_ACCELERATION = 1.0
+  var maxAcceleration = 200
+  var maxDeceleration = 50
+
+  var lastAcceleration
+  var lastDeceleration
+
+  //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.scaleBar = function( tag, maximum, minimum )
+  {
+    // Start with the level of the velocity slider.
+    var value = parseFloat( $( "#" + tag ).slider( "value" )  )
+
+    // Correctly scale the velocity.
+    value /= 100.0
+    value *= ( maximum - minimum )
+    value += minimum
+
+    return value
+  }
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Get the desired velocity.
   //-----------------------------------------------------------------------------
   this.getVelocity = function()
   {
-    // Start with the level of the velocity slider.
-    var velocity = parseFloat( $( "#velocitySlider" ).slider( "value" )  )
-
-    // Correctly scale the velocity.
-    velocity /= 100.0
-    velocity *= ( maxVelocity - MIN_VELOCITY )
-    velocity += MIN_VELOCITY
-
-    return velocity
+    return this.scaleBar( "velocitySlider", maxVelocity, MIN_VELOCITY )
   }
+
+  //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.getAcceleration = function()
+  {
+    return this.scaleBar( "accelerationSlider", maxAcceleration, MIN_ACCELERATION )
+  }
+
+  //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.getDeceleration = function()
+  {
+    return this.scaleBar( "decelerationSlider", maxDeceleration, MIN_ACCELERATION )
+  }
+
+  // //-----------------------------------------------------------------------------
+  // // $$$DEBUG
+  // //-----------------------------------------------------------------------------
+  // this.updateAcceleration = function()
+  // {
+  //   var acceleration = parseFloat( $( "#accelerationSlider" ).slider( "value" )  )
+  //
+  //   // Correctly scale the acceleration.
+  //   acceleration /= 100.0
+  //   acceleration *= ( maxAcceleration - MIN_ACCELERATION )
+  //   acceleration += MIN_ACCELERATION
+  //
+  //   if ( acceleration != lastAcceleration )
+  //   {
+  //     lastAcceleration = acceleration
+  //   }
+  //
+  //   var deceleration = parseFloat( $( "#decelerationSlider" ).slider( "value" )  )
+  //
+  //   // Correctly scale the acceleration.
+  //   deceleration /= 100.0
+  //   deceleration *= ( maxDeceleration - MIN_ACCELERATION )
+  //   deceleration += MIN_ACCELERATION
+  //
+  //   if ( deceleration != lastDeceleration )
+  //   {
+  //     lastDeceleration = deceleration
+  //   }
+  // }
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -53,7 +114,13 @@ function Jog()
         y = velocity
     }
 
-    winder.remoteAction( "process.jogXY(" + x + "," + y + ")" )
+    var acceleration = this.getAcceleration()
+    var deceleration = this.getDeceleration()
+
+    winder.remoteAction
+    (
+      "process.jogXY(" + x + "," + y + "," + acceleration + "," + deceleration + ")"
+    )
   }
 
   //-----------------------------------------------------------------------------
@@ -78,7 +145,17 @@ function Jog()
       y = $( "#seekY" ).val()
 
     var velocity = this.getVelocity()
-    winder.remoteAction( "process.manualSeekXY(" + x + "," + y + "," + velocity + ")"  )
+    var acceleration = this.getAcceleration()
+    var deceleration = this.getDeceleration()
+    winder.remoteAction
+    (
+      "process.manualSeekXY("
+      + x + ","
+      + y + ","
+      + velocity + ","
+      + acceleration + ","
+      + deceleration + ")"
+    )
   }
 
   //-----------------------------------------------------------------------------
@@ -254,6 +331,118 @@ function Jog()
     }
   )
 
+  // $$$FUTURE var createSlider = function( configId, sliderTag, valueTag, minimum, maximum )
+  // $$$FUTURE {
+  // $$$FUTURE   // Maximum velocity.
+  // $$$FUTURE   winder.remoteAction
+  // $$$FUTURE   (
+  // $$$FUTURE     'configuration.get( "' + configId + '" )',
+  // $$$FUTURE     function( data )
+  // $$$FUTURE     {
+  // $$$FUTURE       maxAcceleration = parseFloat( data )
+  // $$$FUTURE
+  // $$$FUTURE       // Callback when slider is changed.
+  // $$$FUTURE       sliderFunction =
+  // $$$FUTURE         function( event, ui )
+  // $$$FUTURE         {
+  // $$$FUTURE           var velocity = ui.value / 100.0 * ( maxAcceleration - MIN_ACCELERATION ) + MIN_ACCELERATION
+  // $$$FUTURE           var value = Math.round( velocity * 10.0 ) / 10.0
+  // $$$FUTURE           $( "#accelerationValue" ).html( value + " mm/s<sup>2</sup>" )
+  // $$$FUTURE         }
+  // $$$FUTURE
+  // $$$FUTURE       ui = new function() { this.value = 100 }
+  // $$$FUTURE       sliderFunction( null, ui )
+  // $$$FUTURE
+  // $$$FUTURE       // Setup slider.
+  // $$$FUTURE       $( "#accelerationSlider" )
+  // $$$FUTURE         .slider
+  // $$$FUTURE         (
+  // $$$FUTURE           {
+  // $$$FUTURE             min: 0,
+  // $$$FUTURE             max: 100,
+  // $$$FUTURE             value: 100,
+  // $$$FUTURE             change: sliderFunction,
+  // $$$FUTURE             slide: sliderFunction
+  // $$$FUTURE           }
+  // $$$FUTURE         )
+  // $$$FUTURE
+  // $$$FUTURE     }
+  // $$$FUTURE   )
+  // $$$FUTURE
+  // $$$FUTURE }
+
+  // Maximum velocity.
+  winder.remoteAction
+  (
+    'configuration.get( "maxAcceleration" )',
+    function( data )
+    {
+      maxAcceleration = parseFloat( data )
+
+      // Callback when slider is changed.
+      sliderFunction =
+        function( event, ui )
+        {
+          var velocity = ui.value / 100.0 * ( maxAcceleration - MIN_ACCELERATION ) + MIN_ACCELERATION
+          var value = Math.round( velocity * 10.0 ) / 10.0
+          $( "#accelerationValue" ).html( value + " mm/s<sup>2</sup>" )
+        }
+
+      ui = new function() { this.value = 100 }
+      sliderFunction( null, ui )
+
+      // Setup slider.
+      $( "#accelerationSlider" )
+        .slider
+        (
+          {
+            min: 0,
+            max: 100,
+            value: 100,
+            change: sliderFunction,
+            slide: sliderFunction
+          }
+        )
+
+    }
+  )
+
+  // Maximum velocity.
+  winder.remoteAction
+  (
+    'configuration.get( "maxDeceleration" )',
+    function( data )
+    {
+      maxDeceleration = parseFloat( data )
+
+      // Callback when slider is changed.
+      sliderFunction =
+        function( event, ui )
+        {
+          var velocity = ui.value / 100.0 * ( maxDeceleration - MIN_ACCELERATION ) + MIN_ACCELERATION
+          var value = Math.round( velocity * 10.0 ) / 10.0
+          $( "#decelerationValue" ).html( value + " mm/s<sup>2</sup>" )
+        }
+
+      ui = new function() { this.value = 100 }
+      sliderFunction( null, ui )
+
+      // Setup slider.
+      $( "#decelerationSlider" )
+        .slider
+        (
+          {
+            min: 0,
+            max: 100,
+            value: 100,
+            change: sliderFunction,
+            slide: sliderFunction
+          }
+        )
+
+    }
+  )
+
   // Maximum velocity.
   winder.remoteAction
   (
@@ -271,7 +460,6 @@ function Jog()
           $( "#velocityValue" ).html( value + " mm/s" )
         }
 
-      // Run slider callback with initial value.
       ui = new function() { this.value = 100 }
       sliderFunction( null, ui )
 
