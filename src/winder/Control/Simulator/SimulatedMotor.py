@@ -35,17 +35,48 @@ class SimulatedMotor :
     )
 
   #---------------------------------------------------------------------
-  def computeVelocity( self, acceleration, deceleration, desiredTime ) :
+  def computeTimeLimited( self, acceleration, deceleration, maxVelocity, desiredTime ) :
     """
-    Compute travel time of the motion.
+    Calculate a limiting velocity and accelerations that will result in the
+    desired time as well as keep the same acceleration time.  Useful
+    for synchronizing multi-axis motion.
 
     Args:
       acceleration: Maximum positive acceleration.
       deceleration: Maximum negative acceleration.
-      desiredTime: Time to traverse motion.
+      maxVelocity: Maximum velocity.
+      desiredTime: Amount of time to traverse this distance.
 
     Returns:
-      Velocity to traverse the seek distance with the given time.
+      An array with three elements (in order): Limiting positive acceleration,
+      negative acceleration, and velocity.
+    """
+    seekPosition = self._plc.getTag( self._desiredPositionTag )
+
+    return TrapezoidalMotion.computeTimeLimited(
+      acceleration,
+      deceleration,
+      maxVelocity,
+      self._position,
+      seekPosition,
+      desiredTime
+    )
+
+
+  #---------------------------------------------------------------------
+  def computeVelocity( self, acceleration, deceleration, desiredTime ) :
+    """
+    Calculate a limiting velocity that will result in the desired time.  Useful
+    for synchronizing multi-axis motion.
+
+    Args:
+      acceleration: Maximum positive acceleration.
+      deceleration: Maximum negative acceleration.
+      desiredTime: Amount of time to traverse this distance.
+
+    Returns:
+      Limiting velocity needed to obtain this time.  0 if the time needed is
+      greater than desired time denoting the operation cannot be done.
     """
     seekPosition = self._plc.getTag( self._desiredPositionTag )
 

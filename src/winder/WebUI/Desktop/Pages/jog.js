@@ -112,9 +112,9 @@ function Jog()
   this.seekZ = function( position )
   {
     var z = position
-
     if ( null == z )
-      position = $( "#seekZ" ).val()
+      z = $( "#seekZ" ).val()
+
     var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekZ(" + z + "," + velocity + ")"  )
   }

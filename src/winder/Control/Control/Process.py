@@ -152,6 +152,21 @@ class Process :
     self._io.plcLogic.reset()
 
   #---------------------------------------------------------------------
+  def servoDisable( self ) :
+    """
+    Disable motor servo control, thus idling the axises.
+    """
+    if self.controlStateMachine.isInMotion() :
+      self._log.add(
+        self.__class__.__name__,
+        "SERVO",
+        "Idling servo control."
+      )
+      self.controlStateMachine.manualRequest = True
+      self.controlStateMachine.idleServos    = True
+
+
+  #---------------------------------------------------------------------
   def createAPA( self, apaName ) :
     """
     Create a new APA.
@@ -501,7 +516,9 @@ class Process :
     """
 
     if self.apa :
+      print self.controlStateMachine.windTime
       self.apa.addWindTime( self.controlStateMachine.windTime )
+      self.controlStateMachine.windTime = 0
       self.apa.close()
       self.apa = None
 

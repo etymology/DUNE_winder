@@ -27,7 +27,7 @@ class PLC_Logic :
     LATCHING      = 6
     LATCH_HOMEING = 7
     LATCH_RELEASE = 8
-    __UNKNOWN__   = 9
+    UNSERVO       = 9
     ERROR         = 10
   # end class
 
@@ -41,6 +41,7 @@ class PLC_Logic :
     LATCH      = 5
     HOME_LATCH = 6
     LATCH_UNLOCK = 7
+    UNSERVO    = 8
   # end class
 
   class LatchPosition :
@@ -266,6 +267,13 @@ class PLC_Logic :
     self._maxXY_Deceleration.set( self._maxDeceleration )
     self._maxZ_Acceleration.set( self._maxAcceleration )
     self._maxZ_Deceleration.set( self._maxDeceleration )
+
+  #---------------------------------------------------------------------
+  def servoDisable( self ) :
+    """
+    Disable servo control of motors.
+    """
+    self._moveType.set( self.MoveTypes.UNSERVO )
 
   #---------------------------------------------------------------------
   # $$$FUTURE

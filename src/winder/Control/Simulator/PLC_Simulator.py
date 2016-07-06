@@ -128,6 +128,10 @@ class PLC_Simulator :
         xTime = self._xAxis.travelTime( velocity, acceleration, deceleration )
         yTime = self._yAxis.travelTime( velocity, acceleration, deceleration )
 
+        xAcceleration = acceleration
+        xDeceleration = deceleration
+        yAcceleration = acceleration
+        yDeceleration = deceleration
         xVelocity = velocity
         yVelocity = velocity
 
@@ -136,12 +140,14 @@ class PLC_Simulator :
         # axises arriving at their destination simultaneously.
         if xTime > 0 and yTime > 0 and xTime != yTime :
           if xTime < yTime :
-            xVelocity = self._xAxis.computeVelocity( acceleration, deceleration, yTime )
+            [ xAcceleration, xDeceleration, xVelocity ] = \
+              self._xAxis.computeTimeLimited( acceleration, deceleration, velocity, yTime )
           else:
-            yVelocity = self._yAxis.computeVelocity( acceleration, deceleration, xTime )
+            [ yAcceleration, yDeceleration, yVelocity ] = \
+              self._yAxis.computeTimeLimited( acceleration, deceleration, velocity, xTime )
 
-        self._xAxis.startSeek( xVelocity, acceleration, deceleration )
-        self._yAxis.startSeek( yVelocity, acceleration, deceleration )
+        self._xAxis.startSeek( xVelocity, xAcceleration, xDeceleration )
+        self._yAxis.startSeek( yVelocity, yAcceleration, yDeceleration )
 
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_SEEK )
       # Jog in X/Y?

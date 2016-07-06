@@ -86,6 +86,12 @@ class ManualMode( StateMachineState ) :
 
       self.stateMachine.setHeadPosition = None
 
+    # Shutoff servo control.
+    if self.stateMachine.idleServos :
+      self._io.plcLogic.servoDisable()
+      self.stateMachine.idleServos = False
+      isError = False
+
     return isError
 
   #---------------------------------------------------------------------

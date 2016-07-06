@@ -22,7 +22,7 @@ class Settings :
   VERSION_FILE = "version.xml"
   UI_VERSION_FILE = "../WebUI/version.xml"
 
-  G_CODE_LOG_FILE = "_gCode.txt"
+  G_CODE_LOG_FILE = "_gCode.gc"
 
   IO_LOG = "../Data/IO_log.csv"
 

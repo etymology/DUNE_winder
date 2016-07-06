@@ -1,5 +1,4 @@
 // Instance of winder interface.
-//var winder = new WinderInterface()
 var winder
 
 // Software version variables.
@@ -291,7 +290,20 @@ $( document ).ready
       winder.loadSubPage( "/Desktop/Pages/" + page, "#main" )
 
       // Display system time.
-      winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
+      winder.addPeriodicDisplay
+      (
+        "systemTime.get()",
+        "#systemTime",
+        null,
+        null,
+        function( data )
+        {
+          var time = new Date( data + 'Z' )
+          var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+
+          return timeString
+        }
+      )
 
       // Update for primary state machine.
       winder.addPeriodicDisplay

@@ -111,6 +111,7 @@ class ControlStateMachine( LoggedStateMachine ) :
 
     # Manual mode options.
     self.manualRequest = False
+    self.idleServos = False
     self.isJogging = False
     self.seekX = None
     self.seekY = None

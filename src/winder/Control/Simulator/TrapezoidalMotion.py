@@ -384,6 +384,68 @@ class TrapezoidalMotion( Motion ) :
 
   #---------------------------------------------------------------------
   @staticmethod
+  def computeTimeLimited(
+    maxAcceleration,
+    minAcceleration,
+    maxVelocity,
+    startPosition,
+    endPosition,
+    desiredTime
+  ) :
+    """
+    Calculate a limiting velocity and accelerations that will result in the
+    desired time as well as keep the same acceleration time.  Useful
+    for synchronizing multi-axis motion.
+
+    Args:
+      maxAcceleration: Maximum positive acceleration.
+      minAcceleration: Maximum negative acceleration.
+      maxVelocity: Maximum velocity.
+      startPosition: Starting position.
+      endPosition: Finial position.
+      desiredTime: Amount of time to traverse this distance.
+
+    Returns:
+      An array with three elements (in order): Limiting positive acceleration,
+      negative acceleration, and velocity.
+
+    Notes:
+      Desired time should be more than the minimum time needed to reach the destination
+      with given accelerations.  Otherwise, 0 is returned.
+    """
+
+    # Distance traversed.
+    delta = abs( endPosition - startPosition )
+
+    # Time needed to reach full velocity.
+    accelerationTime = maxVelocity / maxAcceleration
+    decelerationTime = maxVelocity / minAcceleration
+
+    # If the time needed to fully accelerate to full speed isn't long enough...
+    if accelerationTime + decelerationTime > desiredTime :
+      # Calculate transition points.
+      t1 = desiredTime * minAcceleration / ( minAcceleration + maxAcceleration )
+      t2 = desiredTime * maxAcceleration / ( minAcceleration + maxAcceleration )
+
+      # Calculate velocity actually achieved.
+      velocity = maxAcceleration * t1
+
+      # Calculate new accelerations.
+      newPositiveAcceleration = 2 * delta / ( t1 * ( t1 + t2 ) )
+      newNegitiveAcceleration = newPositiveAcceleration * t1 / t2
+    else:
+      # New limiting velocity.
+      velocity  = 2 * delta
+      velocity /= ( 2 * desiredTime - accelerationTime - decelerationTime )
+
+      # New accelerations.
+      newPositiveAcceleration = velocity * maxAcceleration / maxVelocity
+      newNegitiveAcceleration = velocity * minAcceleration / maxVelocity
+
+    return [ newPositiveAcceleration, newNegitiveAcceleration, velocity ]
+
+  #---------------------------------------------------------------------
+  @staticmethod
   def computeTravelTime(
     maxAcceleration,
     minAcceleration,
