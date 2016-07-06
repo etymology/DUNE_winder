@@ -314,18 +314,6 @@ $( document ).ready
         "controlState"
       )
 
-      winder.addPeriodicEndCallback
-      (
-        function()
-        {
-          var value = states[ "controlState" ]
-          var isDisabled = ( "StopMode" == value ) || ( "HardwareMode" == value )
-          $( "#fullStopButton" ).prop( "disabled", isDisabled )
-          $( "#controlState" ).text( value )
-          states[ "controlState" ] = value
-        }
-      )
-
       // Update for PLC state machine.
       winder.addPeriodicCallback
       (
@@ -345,7 +333,7 @@ $( document ).ready
               "Latching",      // 6
               "Latch homing",  // 7
               "Latch release", // 8
-              "",              // 9
+              "Unservo",       // 9
               "Error"          // 10
             ]
 
@@ -362,6 +350,22 @@ $( document ).ready
           }
           else
             $( "#plcState" ).html( winder.errorString )
+        }
+      )
+
+      winder.addPeriodicEndCallback
+      (
+        function()
+        {
+          var controlState = states[ "controlState" ]
+          var plcState = states[ "plcState" ]
+          var isDisabled =
+               ( "StopMode" == controlState )
+            || ( "HardwareMode" == controlState )
+            || ( "Unservo" == plcState )
+
+          $( "#fullStopButton" ).prop( "disabled", isDisabled )
+          $( "#controlState" ).text( controlState )
         }
       )
 
