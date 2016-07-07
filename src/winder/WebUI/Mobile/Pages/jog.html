@@ -24,11 +24,11 @@
 
         <article id="headControlDiv">
           <h2>Head Control</h2>
-          <button onclick="zRetract()">Retract</button>
-          <button onclick="">Mid</button>
-          <button onclick="zExtend()">Extend</button>
-          <button onclick="latch()">Latch</button>
-          <button onclick="latchHome()">Home</button>
-          <button onclick="latchUnlock()">Unlock</button>
+          <button onclick="jog.zRetract()">Retract</button>
+          <button onclick="jog.zMid()">Mid</button>
+          <button onclick="jog.zExtend()">Extend</button>
+          <button onclick="jog.headPosition( 0 )">Front</button>
+          <button onclick="jog.headPosition( 3 )">Back</button>
+          <button onclick="jog.latchUnlock()">Unlock</button>
         </article>
 

@@ -99,7 +99,7 @@ $( document ).ready
       winder.loadSubPage( "/Mobile/Pages/" + page, "#main" )
 
       // Initialize winder.
-      winder.initialize()
+      //winder.initialize()
 
       // // Display system time.
       // winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
