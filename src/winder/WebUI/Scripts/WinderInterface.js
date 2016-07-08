@@ -738,10 +738,24 @@ var WinderInterface = function()
 
           $( this ).val( value )
 
+          // If there is a set query to run...
           if ( null != setQuery )
           {
+            // Construct query.
             query = setQuery.replace( "$", value )
-            self.remoteAction( query, setCallback )
+            self.remoteAction
+            (
+              query,
+              function( value )
+              {
+                // Call the update function (make sure the transition took place).
+                updateFunction( value )
+
+                // Run additional callback.
+                if ( setCallback )
+                  setCallback ( value )
+              }
+            )
           }
           else
           if ( setCallback )

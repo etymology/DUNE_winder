@@ -173,7 +173,7 @@ class G_CodeHandlerBase :
       self._x = max( self._x, self._machineCalibration.transferLeft )
       self._x = min( self._x, self._machineCalibration.transferRight )
 
-      self._xyChange = ( oldX != self._x ) or ( oldY != self._y )
+      self._xyChange |= ( oldX != self._x ) or ( oldY != self._y )
 
     # Offset coordinates.
     elif G_Codes.OFFSET == number :

@@ -11,29 +11,10 @@
         </div>
       </article>
 
+      <article>
+        <h2>Special functions</h2>
+        <button id="loggingButton" class="toggle" onclick="configuration.positionLogging()">Log Seek Position</button>
+      </article>
+
       <article id="motorStatusDiv">Loading...</article>
-
-      <article>
-        <h2>Camera Control</h2>
-        <button id="cameraTriggerButton">Trigger</button>
-      </article>
-
-      <article style="position: relative">
-        <img id="cameraImage" alt="Camera image" width="640" height="480" />
-        <div id="cameraStats" style="position: absolute; bottom: 10px; left: 10px;">
-          <p>Result: <span id="cameraResult">-</span></p>
-          <p>Score: <span id="cameraScore">-</span></p>
-          <p>X: <span id="cameraX">-</span></p>
-          <p>Y: <span id="cameraY">-</span></p>
-        </div>
-      </article>
-      <article>
-        <h2>Camera Control</h2>
-        <label for="customCommand">Custom command</label>
-        <input id="customCommand" />
-        <input id="customCommandResult" />
-        <button id="customCommandButton">Run</button>
-
-      </article>
-
     </section>

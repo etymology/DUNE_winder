@@ -6,9 +6,15 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+import math
+import random
 from Simulator.TrapezoidalMotion import TrapezoidalMotion
 
 class SimulatedMotor :
+
+  # Standard deviation for position jitter.  Emulates servo error.
+  # (Currently 0 because machine limits in rest of simulator don't like it).
+  JITTER = 0.025
 
   #---------------------------------------------------------------------
   def travelTime( self, velocity, acceleration, deceleration ) :
@@ -99,6 +105,8 @@ class SimulatedMotor :
       deceleration: Maximum negative acceleration.
     """
     self._inMotion = True
+    self._maxAcceleration = acceleration
+    self._maxDeceleration = deceleration
     self._seekPosition = self._plc.getTag( self._desiredPositionTag )
     self._isSeek = True
 
@@ -149,6 +157,9 @@ class SimulatedMotor :
     """
     Hard motion stop.  Used for E-stops.
     """
+    delta = self._simulationTime.get() - self._startTime
+    time = delta.total_seconds()
+    self._motion.hardStop( time )
     self._isJog = False
     self._inMotion = False
     self._velocity = 0
@@ -178,34 +189,58 @@ class SimulatedMotor :
     return self._inMotion
 
   #---------------------------------------------------------------------
+  def computeJitter( self ) :
+    """
+    Compute a random amount of position jitter.
+    Uses Box-Muller transform.
+
+    Returns:
+      Random amount of error (+/-) to add to position.
+    """
+    r1 = random.random()
+    r2 = random.random()
+
+    result  = math.sqrt( -2 * math.log( r1 ) )
+    result *= math.cos( 2 * math.pi * r2 )
+    result *= SimulatedMotor.JITTER
+
+    return result
+
+  #---------------------------------------------------------------------
   def poll( self ) :
     """
     Update motion. Call after a change to simulation time.
     """
     delta = self._simulationTime.get() - self._startTime
     time = delta.total_seconds()
+    timeDelta = time - self._lastTime
 
     saveMotion = self._inMotion
     if self._inMotion :
-      self._inMotion     = self._motion.isMoving( time )
-      self._position     = self._motion.interpolatePosition( time )
-      self._velocity     = self._motion.interpolateVelocity( time )
-      self._acceleration = self._motion.interpolateAcceleration( time )
-
+      self._inMotion = self._motion.isMoving( time )
     elif self._wasEnabled :
       if self._isSeek :
         self._motion.hardStop( time )
-        self._position     = self._motion.interpolatePosition( time )
-        self._velocity     = self._motion.interpolateVelocity( time )
-        self._acceleration = self._motion.interpolateAcceleration( time )
         self._isSeek = False
 
+    # Interpolate motion.
+    self._position     = self._motion.interpolatePosition( time )
+    self._velocity     = self._motion.interpolateVelocity( time )
+    self._acceleration = self._motion.interpolateAcceleration( time )
+
+    # Simulate servo error.
+    self._position     += self.computeJitter()
+    self._velocity     += self.computeJitter() * timeDelta
+    self._acceleration += 1/2 * self.computeJitter() * timeDelta**2
+
+    # Update the tag data.
     self._plc.write( self._motionTag, self._inMotion )
     self._plc.write( self._positionTag, self._position )
     self._plc.write( self._velocityTag, self._velocity )
     self._plc.write( self._accelerationTag, self._acceleration )
 
     self._wasEnabled = saveMotion
+    self._lastTime   = time
 
 
   #---------------------------------------------------------------------
@@ -231,7 +266,8 @@ class SimulatedMotor :
     self._maxDeceleration = 0
     self._maxVelocity     = 0
     self._startTime       = simulationTime.get()
-    self._motion          = None
+    self._lastTime        = 0
+    self._motion = TrapezoidalMotion( 0, 0, 0, 0, 0 )
 
     self._desiredPositionTag = plc.setupTag( tagBase + "_POSITION", 0                     )
     self._desiredVelocityTag = plc.setupTag( tagBase + "_Axis.CommandVelocity", 0         )

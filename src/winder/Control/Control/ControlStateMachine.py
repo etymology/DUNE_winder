@@ -105,9 +105,10 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.windTime = 0
 
     # Wind mode.
-    self.startRequest = False
-    self.stopRequest  = False
-    self.loopMode     = False  # True to continuously loop the G-Code.
+    self.startRequest    = False
+    self.stopRequest     = False
+    self.loopMode        = False # True to continuously loop the G-Code.
+    self.positionLogging = False # True to log resulting position after each move.
 
     # Manual mode options.
     self.manualRequest = False

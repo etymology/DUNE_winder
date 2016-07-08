@@ -216,6 +216,24 @@ class G_CodeHandler( G_CodeHandlerBase ) :
           else :
             self._pauseCount = 0
             self._nextLine += self._direction
+
+            if self._positionLog :
+              x = self._io.xAxis.getPosition()
+              y = self._io.yAxis.getPosition()
+              z = self._io.zAxis.getPosition()
+              self._z = self._io.head.getTargetAxisPosition()
+              self._positionLog.write(
+                str( self._x )     + "," +
+                str( self._y )     + "," +
+                str( self._z )     + "," +
+                str( x )           + "," +
+                str( y )           + "," +
+                str( z )           + "," +
+                str( self._x - x ) + "," +
+                str( self._y - y ) + "," +
+                str( self._z - z ) + "\n"
+              )
+
             self.runNextLine()
 
     return isDone
@@ -346,6 +364,33 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._gCodeLog = open( gCodeLogFile, "a" )
 
   #---------------------------------------------------------------------
+  def isPositionLogging( self ) :
+    """
+    Check to see if position logging is enabled.
+
+    Returns:
+      True if position logging is enabled.
+    """
+    return None != self._positionLog
+
+  #---------------------------------------------------------------------
+  def startPositionLogging( self, positionLogFileName ) :
+    """
+    Start/stop logging resulting positions after seek completion.
+    Test function--not used in normal operation.
+
+    Args:
+      positionLogFileName: Name of file to log position data.  None to close
+        current log file.
+    """
+    if positionLogFileName :
+      self._positionLog = open( positionLogFileName, 'a' )
+      self._positionLog.write( "Actual x,Actual y,Actual z,Desired x,Desired y,Desired z,Error x,Error y,Error z\n" )
+    elif self._positionLog :
+      self._positionLog.close()
+      self._positionLog = None
+
+  #---------------------------------------------------------------------
   def __init__( self, io, spool, machineCalibration ):
     """
     Constructor.
@@ -367,6 +412,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._currentLine = None
     self._nextLine = None
     self._gCodeLog = None
+    self._positionLog = None
 
     # Add a pause between every G-Code instructions by setting _PAUSE to
     # non-zero value.

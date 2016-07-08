@@ -197,6 +197,31 @@ function Configuration()
   var machineCalibration
   var configuration
 
+  // //---------------------------------------------------------------------------
+  // // $$$DEBUG
+  // //---------------------------------------------------------------------------
+  // this.positionLogging = function()
+  // {
+  //   var isEnabled = $( "#loggingButton" ).val()
+  //
+  //   var fileName = "None"
+  //   if ( isEnabled )
+  //     fileName = '"positionLog.csv"'
+  //
+  //   winder.remoteAction
+  //   (
+  //     "process.apa._gCodeHandler.startPositionLogging( " + fileName + " )"
+  //   )
+  // }
+
+  winder.addToggleButton
+  (
+    "#loggingButton",
+    "process.getPositionLogging()",
+    "process.setPositionLogging( $ )"
+  )
+
+
   //---------------------------------------------------------------------------
   // Uses:
   //   Check for valid IP address in format "nnn.nnn.nnn.nnn".
@@ -325,6 +350,7 @@ function Configuration()
         )
       }
     )
+
 
 }
 

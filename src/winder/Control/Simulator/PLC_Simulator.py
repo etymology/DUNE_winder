@@ -14,6 +14,12 @@ from Machine.MachineGeometry import MachineGeometry
 
 class PLC_Simulator :
 
+  # Error margin (in mm) to allow position (for simulated jitter).
+  POSITION_ERROR = 2
+
+  # Error (in mm/s) to allow in velocity (for simulated jitter).
+  VELOCITY_ERROR = 0.1
+
   # Enumeration for latch positions.
   class LatchPosition :
     TOP    = 0
@@ -214,8 +220,8 @@ class PLC_Simulator :
       if axis.isInMotion() :
         position = axisIO.getPosition()
         velocity = axisIO.getVelocity()
-        if   ( velocity < 0 and position < positionMin ) \
-          or ( velocity > 0 and position > positionMax ) :
+        if   ( ( velocity + self.VELOCITY_ERROR ) < 0 and position < positionMin ) \
+          or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
 
           print axisIO.getName(), "out of range", positionMin, "<=", position, "<=", positionMax
 
@@ -237,8 +243,8 @@ class PLC_Simulator :
     #
 
     # Extended and retracted inputs.
-    isExtended = ( self._io.zAxis.getPosition() >= self._machineGeometry.zTravel )
-    isRetected = ( self._io.zAxis.getPosition() <= 0 )
+    isExtended = ( self._io.zAxis.getPosition() >= self._machineGeometry.zTravel - self.POSITION_ERROR )
+    isRetected = ( self._io.zAxis.getPosition() <= 0 + self.POSITION_ERROR )
     self.Z_Extended.set( isExtended )
     self.Z_Retracted_1A.set( isRetected )
 
@@ -334,12 +340,12 @@ class PLC_Simulator :
 
     self._machineGeometry = MachineGeometry()
 
-    self._xMin = self._machineGeometry.limitLeft
-    self._xMax = self._machineGeometry.limitRight
-    self._yMin = self._machineGeometry.limitBottom
-    self._yMax = self._machineGeometry.limitTop
-    self._zMin = self._machineGeometry.limitRetracted
-    self._zMax = self._machineGeometry.limitExtended
+    self._xMin = self._machineGeometry.limitLeft - self.POSITION_ERROR
+    self._xMax = self._machineGeometry.limitRight + self.POSITION_ERROR
+    self._yMin = self._machineGeometry.limitBottom - self.POSITION_ERROR
+    self._yMax = self._machineGeometry.limitTop + self.POSITION_ERROR
+    self._zMin = self._machineGeometry.limitRetracted - self.POSITION_ERROR
+    self._zMax = self._machineGeometry.limitExtended + self.POSITION_ERROR
 
     self._machine_SW_Stat = io.plc.setupTag( "Machine_SW_Stat", 0 )
 

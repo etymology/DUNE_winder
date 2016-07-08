@@ -257,6 +257,57 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
+  def getPositionLogging( self ) :
+    """
+    Check to see if position logging is enabled.
+
+    Returns:
+      True if position logging is enabled.
+    """
+
+    return self.gCodeHandler.isPositionLogging()
+
+  #---------------------------------------------------------------------
+  def setPositionLogging( self, isEnabled ) :
+    """
+    Enable/disable position logging.  Test function.
+
+    Args:
+      isEnabled: True to enable logging, False to disable/stop.
+
+    Returns:
+      True if logging was enabled, False if not.
+    """
+    fileName = None
+    if isEnabled :
+      if self.apa :
+        fileName = self.apa.getPath() + "positionLog.csv"
+        self._log.add(
+          self.__class__.__name__,
+          "POSITION_LOGGING",
+          "Position logging begins",
+          [ 1, fileName ]
+        )
+      else:
+        self._log.add(
+          self.__class__.__name__,
+          "POSITION_LOGGING",
+          "Position logging request ignored.  No APA loaded.",
+          [ -1 ]
+        )
+    else:
+      self._log.add(
+        self.__class__.__name__,
+        "POSITION_LOGGING",
+        "Position logging ends",
+        [ 0 ]
+      )
+
+    self.gCodeHandler.startPositionLogging( fileName )
+
+    return self.getPositionLogging()
+
+  #---------------------------------------------------------------------
   def getG_CodeDirection( self ) :
     """
     Get the direction of G-Code execution.
@@ -516,7 +567,6 @@ class Process :
     """
 
     if self.apa :
-      print self.controlStateMachine.windTime
       self.apa.addWindTime( self.controlStateMachine.windTime )
       self.controlStateMachine.windTime = 0
       self.apa.close()

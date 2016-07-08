@@ -68,6 +68,7 @@ class Head :
     elif self.States.SECOND_SEEK == self._state :
 
       # Start seek to the finial position.
+      self._desiredPosition = self._lastSeek
       self._plcLogic.setZ_Position( self._lastSeek, self._velocity )
 
       # Always idle after this motion.
@@ -92,6 +93,9 @@ class Head :
     self._velocity  = None
     self._lastSeek  = None
     self._state = self.States.IDLE
+
+    # Desired location of axis.
+    self._desiredPosition = 0
 
   #---------------------------------------------------------------------
   def setFrontAndBack( self, front, back ) :
@@ -138,18 +142,18 @@ class Head :
       self._velocity = velocity
 
       if self.RETRACTED == position :
-        desiredPosition = self._retracted
+        self._desiredPosition = self._retracted
       elif self.FRONT == position :
-        desiredPosition = self._front
+        self._desiredPosition = self._front
       elif self.BACK == position :
-        desiredPosition = self._back
+        self._desiredPosition = self._back
       elif self.EXTENDED == position :
-        desiredPosition = self._extended
+        self._desiredPosition = self._extended
       else:
         raise "Unknown head position request" + str( position )
 
       # No desired position likely means the locations have not been setup.
-      if None != desiredPosition :
+      if None != self._desiredPosition :
 
         # $$$ POSITIONS = [ "RETRACTED", "FRONT", "BACK", "EXTENDED" ]
         # $$$ print "Moving head from", POSITIONS[ self._position ], "to", POSITIONS[ position ]
@@ -163,10 +167,10 @@ class Head :
           if self.EXTENDED == position :
             self._lastSeek = self._retracted
           else :
-            self._lastSeek = desiredPosition
+            self._lastSeek = self._desiredPosition
 
           # First seek is all the way to the back.
-          desiredPosition = self._extended
+          self._desiredPosition = self._extended
 
           # After the seek is complete, begin a latch operation.
           if self.EXTENDED == position :
@@ -178,7 +182,7 @@ class Head :
           self._nextState = self.States.IDLE
 
         # Begin seeking.
-        self._plcLogic.setZ_Position( desiredPosition, self._velocity )
+        self._plcLogic.setZ_Position( self._desiredPosition, self._velocity )
         self._state = self.States.SEEK
 
         # Use the new position as the current position.
@@ -197,6 +201,16 @@ class Head :
       RETRACTED/FRONT/BACK/EXTENDED.
     """
     return self._position
+
+  #---------------------------------------------------------------------
+  def getTargetAxisPosition( self ) :
+    """
+    Get the target location of head axis.
+
+    Returns:
+      Target location of head axis.
+    """
+    return self._desiredPosition
 
   #---------------------------------------------------------------------
   def stop( self ) :

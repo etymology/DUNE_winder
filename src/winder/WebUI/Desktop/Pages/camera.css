@@ -1,0 +1,17 @@
+#cameraDiv
+{
+  position: relative;
+}
+
+#cameraImage
+{
+  width: 640px;
+  height: 480px;
+}
+
+#cameraStats
+{
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}

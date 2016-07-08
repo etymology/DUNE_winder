@@ -151,10 +151,12 @@ class TrapezoidalMotion( Motion ) :
     if startVelocity > 0 :
       minAcceleration = -minAcceleration
 
-    # Compute the next point, and duplicate it for all other points.
+    # Compute the point to slow to stop.
     self._nextPoint( self.Point.T1, self.Point.T0, minAcceleration, decelerationTime )
-    self._point[ self.Point.T2 ] = self._point[ self.Point.T1 ]
-    self._point[ self.Point.T3 ] = self._point[ self.Point.T1 ]
+
+    # Fill remaining points with no motion.
+    self._nextPoint( self.Point.T2, self.Point.T1, 0, 0 )
+    self._nextPoint( self.Point.T3, self.Point.T2, 0, 0 )
 
   #---------------------------------------------------------------------
   def computeJog( self, maxAcceleration, velocity, startPosition ) :
