@@ -17,6 +17,16 @@ class SimulatedMotor :
   JITTER = 0.025
 
   #---------------------------------------------------------------------
+  def positionDelta( self ) :
+    """
+    Return the amount of distance that needs to be traversed for motion.
+
+    Returns:
+      Amount of distance that needs to be traversed for motion.
+    """
+    return self._plc.getTag( self._desiredPositionTag ) - self._position
+
+  #---------------------------------------------------------------------
   def travelTime( self, velocity, acceleration, deceleration ) :
     """
     Compute travel time of the motion.

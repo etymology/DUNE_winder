@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+import math
 from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
 from Simulator.Delay import Delay
@@ -127,34 +128,37 @@ class PLC_Simulator :
 
       # Seek in X/Y?
       elif self._io.plcLogic.MoveTypes.SEEK_XY == moveType :
+        # Start with the linear distance to travel.
+        xDelta = abs( self._xAxis.positionDelta() )
+        yDelta = abs( self._yAxis.positionDelta() )
+        delta = math.sqrt( xDelta**2 + yDelta**2 )
+
+        # Calculate the ratio of total distance handled by each axis.
+        # Each of the limits must be scaled by this ratio such that the
+        # magnitude of each limit is divided evenly amongst both axises.
+        xRatio = xDelta / delta
+        yRatio = yDelta / delta
+
+        # Calculate the limiting velocity for X/Y.
         velocity = self._io.plc.getTag( self._maxXY_VelocityTag )
+        xVelocity = velocity * xRatio
+        yVelocity = velocity * yRatio
+
+        # Calculate the limiting acceleration for X/Y.
         acceleration = self._io.plc.getTag( self._maxXY_AccelerationTag )
+        xAcceleration = acceleration * xRatio
+        yAcceleration = acceleration * yRatio
+
+        # Calculate the limiting deceleration for X/Y.
         deceleration = self._io.plc.getTag( self._maxXY_DecelerationTag )
+        xDeceleration = deceleration * xRatio
+        yDeceleration = deceleration * yRatio
 
-        xTime = self._xAxis.travelTime( velocity, acceleration, deceleration )
-        yTime = self._yAxis.travelTime( velocity, acceleration, deceleration )
-
-        xAcceleration = acceleration
-        xDeceleration = deceleration
-        yAcceleration = acceleration
-        yDeceleration = deceleration
-        xVelocity = velocity
-        yVelocity = velocity
-
-        # If moving in both X and Y, and the times are different, rescale the
-        # motion of the faster axis to use the slower time.  This keeps both
-        # axises arriving at their destination simultaneously.
-        if xTime > 0 and yTime > 0 and xTime != yTime :
-          if xTime < yTime :
-            [ xAcceleration, xDeceleration, xVelocity ] = \
-              self._xAxis.computeTimeLimited( acceleration, deceleration, velocity, yTime )
-          else:
-            [ yAcceleration, yDeceleration, yVelocity ] = \
-              self._yAxis.computeTimeLimited( acceleration, deceleration, velocity, xTime )
-
+        # Move axises at their respective ratios.
         self._xAxis.startSeek( xVelocity, xAcceleration, xDeceleration )
         self._yAxis.startSeek( yVelocity, yAcceleration, yDeceleration )
 
+        # Change state to moving.
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.XY_SEEK )
       # Jog in X/Y?
       elif self._io.plcLogic.MoveTypes.JOG_XY == moveType :
