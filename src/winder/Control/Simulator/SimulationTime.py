@@ -6,12 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Library.TimeSource import TimeSource
+import time
 import datetime
+from Library.TimeSource import TimeSource
 
 class SimulationTime( TimeSource ) :
   #-------------------------------------------------------------------
-  def __init__( self, initialTime = datetime.datetime.utcnow() ) :
+  def __init__( self, initialTime = datetime.datetime.utcnow(), isRealTime=True ) :
     """
     Constructor.
 
@@ -22,6 +23,20 @@ class SimulationTime( TimeSource ) :
 
     # State with system time.
     self._time = initialTime
+    self._isRealTime = isRealTime
+
+  #-------------------------------------------------------------------
+  def sleep( self, sleepTime ) :
+    """
+    Sleep for specified time (in seconds).
+
+    Args:
+      sleepTime: Time to sleep (in seconds and can be fractional).
+    """
+    if self._isRealTime :
+      time.sleep( sleepTime )
+    else:
+      self._time += datetime.timedelta( seconds = sleepTime )
 
   #-------------------------------------------------------------------
   def get( self ) :
@@ -31,6 +46,9 @@ class SimulationTime( TimeSource ) :
     Returns:
       Returns current simulation time.
     """
+
+    if self._isRealTime :
+      self.setLocal()
 
     return self._time
 

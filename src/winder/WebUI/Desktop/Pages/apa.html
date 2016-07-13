@@ -20,7 +20,7 @@
         </article>
 
         <article>
-          <h3>Layer assignment</h3>
+          <h3>G-Code selection</h3>
           <label for="layerSelection">Layer</label>
           <div class="select">
             <select id="layerSelection">
@@ -30,10 +30,6 @@
               <option value="X">X</option>
             </select>
           </div>
-        </article>
-
-        <article>
-          <h3>G-Code selection</h3>
           <label for="gCodeSelection">G-Code selection</label>
           <div class="select">
             <select onchange="apa.selectG_Code()" id="gCodeSelection">
@@ -123,12 +119,6 @@
 
 
       <article id="motorStatusDiv">Loading...</article>
-
-      <article>
-        <h2>Generate random APA</h2>
-        <button onclick="apa.createRandomAPA( 1 )">Go</button>
-        <button onclick="apa.createRandomAPA( 25 )">Create 25</button>
-      </article>
 
       <article id="sliderBox">
         <h2>Scale speeds</h2>

@@ -56,22 +56,40 @@ class MachineCalibration( Serializable ) :
 
   #---------------------------------------------------------------------
   def set( self, item, value ) :
-    """$$$DEBUG"""
+    """
+    Set a calibration item.
+
+    Args:
+      item: Name of item to set.
+      value: Value of this item.
+    """
     self.__dict__[ item ] = value
 
   #---------------------------------------------------------------------
   def get( self, item ) :
-    """$$$DEBUG"""
+    """
+    Get a calibration item.
+
+    Args:
+      item: Name of item to get.
+
+    Returns:
+      Value of the requested item.
+    """
     return self.__dict__[ item ]
 
   #---------------------------------------------------------------------
   def save( self ) :
-    """$$$DEBUG"""
+    """
+    Save data to disk.  Overloaded to correctly name class.
+    """
     Serializable.save( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
 
   #---------------------------------------------------------------------
   def load( self ) :
-    """$$$DEBUG"""
+    """
+    Load data from disk.  Overloaded to correctly name class.
+    """
     Serializable.load( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
 
 

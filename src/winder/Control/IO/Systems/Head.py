@@ -155,9 +155,6 @@ class Head :
       # No desired position likely means the locations have not been setup.
       if None != self._desiredPosition :
 
-        # $$$ POSITIONS = [ "RETRACTED", "FRONT", "BACK", "EXTENDED" ]
-        # $$$ print "Moving head from", POSITIONS[ self._position ], "to", POSITIONS[ position ]
-
         # Do we have to go get/leave the head?
         if self.EXTENDED == self._position or self.EXTENDED == position :
 

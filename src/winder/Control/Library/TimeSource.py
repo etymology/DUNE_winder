@@ -23,6 +23,17 @@ class TimeSource :
 
   #-------------------------------------------------------------------
   @abstractmethod
+  def sleep( self, sleepTime ) :
+    """
+    Sleep for specified time (in seconds).
+
+    Args:
+      sleepTime: Time to sleep (in seconds and can be fractional).
+    """
+    pass
+
+  #-------------------------------------------------------------------
+  @abstractmethod
   def get( self ) :
     """
     Return the current time.

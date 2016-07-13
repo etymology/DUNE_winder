@@ -298,8 +298,12 @@ $( document ).ready
         null,
         function( data )
         {
-          var time = new Date( data + 'Z' )
-          var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+          var timeString = "--"
+          if ( data )
+          {
+            var time = new Date( data + 'Z' )
+            timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+          }
 
           return timeString
         }

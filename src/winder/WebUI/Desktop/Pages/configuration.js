@@ -197,23 +197,6 @@ function Configuration()
   var machineCalibration
   var configuration
 
-  // //---------------------------------------------------------------------------
-  // // $$$DEBUG
-  // //---------------------------------------------------------------------------
-  // this.positionLogging = function()
-  // {
-  //   var isEnabled = $( "#loggingButton" ).val()
-  //
-  //   var fileName = "None"
-  //   if ( isEnabled )
-  //     fileName = '"positionLog.csv"'
-  //
-  //   winder.remoteAction
-  //   (
-  //     "process.apa._gCodeHandler.startPositionLogging( " + fileName + " )"
-  //   )
-  // }
-
   winder.addToggleButton
   (
     "#loggingButton",
@@ -295,6 +278,24 @@ function Configuration()
     }
   )
 
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Used to create random APA entries.  Debug function.
+  //   $$$TEMPORARY
+  //-----------------------------------------------------------------------------
+  this.createRandomAPA = function( number )
+  {
+    winder.remoteAction
+    (
+      'APA_Generator.create( process, ' + number + ' )',
+      function()
+      {
+        self.populateLists()
+      }
+    )
+
+  }
+
   // $$$DEBUG - Temporary
   $( "#cameraTriggerButton" )
     .click
@@ -351,6 +352,47 @@ function Configuration()
       }
     )
 
+  winder.addEditField
+  (
+    "#velocity",
+    "#velocityButton",
+    "process.maxVelocity()",
+    "process.maxVelocity( $ )",
+    $.isNumeric
+  )
+
+  winder.addEditField
+  (
+    "#acceleration",
+    "#accelerationButton",
+    "io.plcLogic.maxAcceleration()",
+    "io.plcLogic.maxAcceleration( $ )"
+  )
+
+  winder.addEditField
+  (
+    "#deceleration",
+    "#decelerationButton",
+    "io.plcLogic.maxDeceleration()",
+    "io.plcLogic.maxDeceleration( $ )"
+  )
+
+  $( "#customCommandButton" )
+    .click
+    (
+      function()
+      {
+        var command = $( "#customCommand" ).val()
+        winder.remoteAction
+        (
+          command,
+          function( data )
+          {
+            $( "#customCommandResult" ).val( data )
+          }
+        )
+      }
+    )
 
 }
 

@@ -5,11 +5,10 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+
 from Machine.Settings import Settings
 from Control.IO_Log import IO_Log
 from Threads.PrimaryThread import PrimaryThread
-
-import time
 
 class ControlThread( PrimaryThread ) :
 
@@ -65,6 +64,6 @@ class ControlThread( PrimaryThread ) :
       sleepTime = Settings.IO_UPDATE_TIME - updateTime
       if sleepTime > 0 :
         # Wait before updating again.
-        time.sleep( sleepTime )
+        self._systemTime.sleep( sleepTime )
 
 # end class

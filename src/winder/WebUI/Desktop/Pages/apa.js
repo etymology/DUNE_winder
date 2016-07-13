@@ -297,24 +297,6 @@ function APA()
     )
   }
 
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Used to create random APA entries.  Debug function.
-  //   $$$TEMPORARY
-  //-----------------------------------------------------------------------------
-  this.createRandomAPA = function( number )
-  {
-    winder.remoteAction
-    (
-      'APA_Generator.create( process, ' + number + ' )',
-      function()
-      {
-        self.populateLists()
-      }
-    )
-
-  }
-
   // Populate lists and have this function run after error recovery.
   this.populateLists()
   winder.addErrorClearCallback( this.populateLists )
@@ -641,19 +623,26 @@ function APA()
         var dataIndex = -1
 
         if ( data )
+        {
           dataIndex = data.length - index - 1
 
-        var row = [ "-", "-", "-", "-" ]
-        if ( dataIndex >= 0 )
-          row = data[ data.length - index - 1 ].split( "\t" )
+          var row = [ "-", "-", "-", "-" ]
+          if ( dataIndex >= 0 )
+            row = data[ data.length - index - 1 ].split( "\t" )
 
-        // Get the time/date of occurrence and format it for local time.
-        var time = new Date( row[ 0 ] + 'Z' )
-        var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+          // Get the time/date of occurrence and format it for local time.
+          var time = new Date( row[ 0 ] + 'Z' )
+          var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
 
-        var description = row[ 3 ]
-        $( "#logTable" + index + "Time" ).text( timeString )
-        $( "#logTable" + index + "Description" ).text( description )
+          var description = row[ 3 ]
+          $( "#logTable" + index + "Time" ).text( timeString )
+          $( "#logTable" + index + "Description" ).text( description )
+        }
+        else
+        {
+          $( "#logTable" + index + "Time" ).text( "--" )
+          $( "#logTable" + index + "Description" ).text( "--" )
+        }
       }
     }
   )

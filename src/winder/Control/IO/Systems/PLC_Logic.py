@@ -256,6 +256,62 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.LATCH_UNLOCK )
 
   #---------------------------------------------------------------------
+  def maxVelocity( self, maxVelocity=None ) :
+    """
+    Set/get the maximum velocity.
+
+    Args:
+      maxVelocity: New maximum velocity (optional).
+
+    Returns:
+      Maximum velocity.
+    """
+    if None != maxVelocity :
+      self._velocity = maxVelocity
+
+    self._maxXY_Velocity.set( self._velocity )
+
+    return self._velocity
+
+  #---------------------------------------------------------------------
+  def maxAcceleration( self, maxAcceleration=None ) :
+    """
+    Set/get the maximum positive acceleration.
+
+    Args:
+      maxVelocity: New maximum positive acceleration (optional).
+
+    Returns:
+      Maximum positive acceleration.
+    """
+    if None != maxAcceleration :
+      self._maxAcceleration = maxAcceleration
+
+    self._maxXY_Acceleration.set( self._maxAcceleration )
+    self._maxZ_Acceleration.set( self._maxAcceleration )
+
+    return self._maxAcceleration
+
+  #---------------------------------------------------------------------
+  def maxDeceleration( self, maxDeceleration=None ) :
+    """
+    Set/get the maximum negative acceleration.
+
+    Args:
+      maxVelocity: New maximum negative acceleration (optional).
+
+    Returns:
+      Maximum positive acceleration.
+    """
+    if None != maxDeceleration :
+      self._maxDeceleration = maxDeceleration
+
+    self._maxXY_Deceleration.set( self._maxDeceleration )
+    self._maxZ_Deceleration.set( self._maxDeceleration )
+
+    return self._maxDeceleration
+
+  #---------------------------------------------------------------------
   def setupLimits( self, maxVelocity=None, maxAcceleration=None, maxDeceleration=None ) :
     """
     Setup the velocity and acceleration limits.

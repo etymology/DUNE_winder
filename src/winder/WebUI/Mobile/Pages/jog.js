@@ -6,86 +6,10 @@ function Jog()
   var maxVelocity
 
   var MIN_ACCELERATION = 1.0
-  var maxAcceleration = 200
-  var maxDeceleration = 50
+  var maxAcceleration
+  var maxDeceleration
 
-  var lastAcceleration
-  var lastDeceleration
   var extendedPosition
-
-  //-----------------------------------------------------------------------------
-  // $$$DEBUG
-  //-----------------------------------------------------------------------------
-  this.scaleBar = function( tag, maximum, minimum )
-  {
-    // Start with the level of the velocity slider.
-    var value = parseFloat( $( "#" + tag ).slider( "value" )  )
-
-    // Correctly scale the velocity.
-    value /= 100.0
-    value *= ( maximum - minimum )
-    value += minimum
-
-    return value
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Get the desired velocity.
-  //-----------------------------------------------------------------------------
-  this.getVelocity = function()
-  {
-    return maxVelocity
-    //this.scaleBar( "velocitySlider", maxVelocity, MIN_VELOCITY )
-  }
-
-  //-----------------------------------------------------------------------------
-  // $$$DEBUG
-  //-----------------------------------------------------------------------------
-  this.getAcceleration = function()
-  {
-    return maxAcceleration
-    //this.scaleBar( "accelerationSlider", maxAcceleration, MIN_ACCELERATION )
-  }
-
-  //-----------------------------------------------------------------------------
-  // $$$DEBUG
-  //-----------------------------------------------------------------------------
-  this.getDeceleration = function()
-  {
-    return maxDeceleration
-    //this.scaleBar( "decelerationSlider", maxDeceleration, MIN_ACCELERATION )
-  }
-
-  // //-----------------------------------------------------------------------------
-  // // $$$DEBUG
-  // //-----------------------------------------------------------------------------
-  // this.updateAcceleration = function()
-  // {
-  //   var acceleration = parseFloat( $( "#accelerationSlider" ).slider( "value" )  )
-  //
-  //   // Correctly scale the acceleration.
-  //   acceleration /= 100.0
-  //   acceleration *= ( maxAcceleration - MIN_ACCELERATION )
-  //   acceleration += MIN_ACCELERATION
-  //
-  //   if ( acceleration != lastAcceleration )
-  //   {
-  //     lastAcceleration = acceleration
-  //   }
-  //
-  //   var deceleration = parseFloat( $( "#decelerationSlider" ).slider( "value" )  )
-  //
-  //   // Correctly scale the acceleration.
-  //   deceleration /= 100.0
-  //   deceleration *= ( maxDeceleration - MIN_ACCELERATION )
-  //   deceleration += MIN_ACCELERATION
-  //
-  //   if ( deceleration != lastDeceleration )
-  //   {
-  //     lastDeceleration = deceleration
-  //   }
-  // }
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -97,7 +21,7 @@ function Jog()
   this.jogXY_Start = function( x, y )
   {
     // Convert direction to velocity.
-    var velocity = this.getVelocity() * 0.1
+    var velocity = maxVelocity * 0.1
     x *= velocity
     y *= velocity
 
@@ -120,8 +44,8 @@ function Jog()
         y = velocity
     }
 
-    var acceleration = this.getAcceleration()
-    var deceleration = this.getDeceleration()
+    var acceleration = maxAcceleration
+    var deceleration = maxDeceleration
 
     winder.remoteAction
     (
@@ -150,9 +74,9 @@ function Jog()
     if ( null == y )
       y = $( "#seekY" ).val()
 
-    var velocity = this.getVelocity()
-    var acceleration = this.getAcceleration()
-    var deceleration = this.getDeceleration()
+    var velocity = maxVelocity
+    var acceleration = maxAcceleration
+    var deceleration = maxDeceleration
     winder.remoteAction
     (
       "process.manualSeekXY("
@@ -173,7 +97,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.seekLocation = function( x, y )
   {
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
 
     if ( x )
       x = "process.apa._gCodeHandler." + x
@@ -198,7 +122,7 @@ function Jog()
     if ( null == z )
       z = $( "#seekZ" ).val()
 
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
     winder.remoteAction( "process.manualSeekZ(" + z + "," + velocity + ")"  )
   }
 
@@ -219,7 +143,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.jogZ_Start = function( direction )
   {
-    var velocity = this.getVelocity() * direction * 0.01
+    var velocity = maxVelocity * direction * 0.01
     winder.remoteAction( "process.jogZ(" + velocity + ")"  )
   }
 
@@ -229,7 +153,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.zRetract = function()
   {
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
     winder.remoteAction( "process.manualSeekZ( 0, " + velocity + " )" )
   }
 
@@ -239,7 +163,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.zExtend = function()
   {
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
     winder.remoteAction( "process.manualSeekZ( " + extendedPosition + ", " + velocity + " )" )
   }
 
@@ -249,7 +173,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.zMid = function()
   {
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
     var position = extendedPosition / 2
     winder.remoteAction( "process.manualSeekZ( " + position + ", " + velocity + " )" )
   }
@@ -287,7 +211,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.headPosition = function( position )
   {
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
     winder.remoteAction( "process.manualHeadPosition( " + position + "," + velocity + " )" )
   }
 
@@ -296,7 +220,7 @@ function Jog()
   this.seekPin = function()
   {
     var pin = $( "#seekPin" ).val().toUpperCase()
-    var velocity = this.getVelocity()
+    var velocity = maxVelocity
     winder.remoteAction( "process.seekPin( '" + pin + "', " + velocity + " )" )
   }
 

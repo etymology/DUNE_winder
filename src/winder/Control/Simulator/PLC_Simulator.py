@@ -87,7 +87,6 @@ class PLC_Simulator :
     """
     Update simulator.  Call periodically.
     """
-    self._simulationTime.setLocal()
 
     def speedCheck( axis, last ) :
 
@@ -301,7 +300,7 @@ class PLC_Simulator :
       self._lastMoveType = None
 
   #---------------------------------------------------------------------
-  def __init__( self, io ) :
+  def __init__( self, io, systemTime ) :
     """
     Construct.
 
@@ -312,7 +311,7 @@ class PLC_Simulator :
 
     # Simulation time.
     # (So we could run at speeds other than real-time.)
-    self._simulationTime = SimulationTime()
+    self._simulationTime = systemTime
 
     # Add self to I/O polling callback list.
     io.pollCallbacks.insert( 0, self.poll )
@@ -367,3 +366,9 @@ class PLC_Simulator :
     self.Z_Spring_Comp        = self.SimulatedInput( io, "Machine_SW_Stat", 11, False )
     self.Latch_Actuator_Top   = self.SimulatedInput( io, "Machine_SW_Stat", 12, False )
     self.Latch_Actuator_Mid   = self.SimulatedInput( io, "Machine_SW_Stat", 13, False )
+
+    # True to use real-time for simulations, False for using a time delta.
+    self._realTime = True
+
+    # When '_realTime' is False, use this time delta between ticks.
+    self._timeDelta = 100

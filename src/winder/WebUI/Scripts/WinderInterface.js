@@ -75,11 +75,14 @@ var WinderInterface = function()
 
   // Enable states of the toggle buttons.  If an error occurs, all the toggle buttons are
   // disabled.  The state they were before being disabled is saved in this map.
-  var toggleButtonStates = {}
+  var buttonStates = {}
 
   // Number of pages currently still loading.
   // Used for triggering fully-loaded event.
   var pagesLoading = 0
+
+  // Current values of the edit fields.  Used to check for changes.
+  var editFieldValues = {}
 
   //---------------------------------------------------------------------------
   // Uses:
@@ -647,6 +650,160 @@ var WinderInterface = function()
 
   //---------------------------------------------------------------------------
   // Uses:
+  //   Add an edit field.  Edit fields have an <input> tag and a button to
+  //   submit the data.
+  // Inputs:
+  //   inputTag - Id of the an <input> tag.
+  //   submitButton - Id of a <button> tag.
+  //   getQuery - Query to get the initial status of button.  Can be undefined.
+  //   setQuery - Query to set state of button.  Use "$" to denote where value
+  //     is placed.
+  //   verifyFunction - Optional function that is called to verify input.
+  //     Function is passed value to test and must return true for valid, false
+  //     for invalid.
+  //   getCallback - Optional callback after updating value.
+  //   setCallback - Optional callback after change.
+  //---------------------------------------------------------------------------
+  this.addEditField = function
+  (
+    inputTag,
+    submitButton,
+    getQuery,
+    setQuery,
+    verifyFunction,
+    getCallback,
+    setCallback
+  )
+  {
+    buttonStates[ inputTag ] = $( inputTag ).prop( "disabled" )
+    buttonStates[ submitButton ] = $( submitButton ).prop( "disabled" )
+
+    if ( null == verifyFunction )
+      verifyFunction = function() { return true }
+
+    var updateFunction =
+      function( value )
+      {
+        $( inputTag ).prop( "disabled", buttonStates[ inputTag ] )
+        $( inputTag ).attr( 'class', "" )
+        //$( submitButton ).prop( "disabled", buttonStates[ submitButton ] )
+        $( submitButton ).prop( "disabled", true )
+
+        buttonStates[ inputTag ] = null
+
+        editFieldValues[ inputTag ] = value
+        $( inputTag ).val( value )
+
+        if ( getCallback )
+          getCallback( data )
+      }
+
+    if ( getQuery )
+    {
+      // Disable button until we know what state (on/off) it should be in.
+      $( inputTag ).prop( "disabled", true )
+
+      // Function to get the current state of button.
+      queryFunction = function()
+      {
+        // Get the initial value.
+        self.remoteAction( getQuery, updateFunction )
+      }
+
+      // Run the query now.
+      queryFunction()
+
+      // Also query the state of the button anytime we go from an error
+      // state to working.
+      self.addErrorClearCallback( queryFunction )
+    }
+
+    // Disable the button if there is a loss of communication to server.
+    self.addErrorCallback
+    (
+      function()
+      {
+        if ( null !== buttonStates[ inputTag ] )
+        {
+          buttonStates[ inputTag ] = $( inputTag ).prop( "disabled" )
+          buttonStates[ submitButton ] = $( inputTag ).prop( "disabled" )
+          $( inputTag ).attr( 'class', "" )
+          $( inputTag ).prop( "disabled", true )
+          $( submitButton ).prop( "disabled", true )
+        }
+      }
+    )
+
+    // Callback when button is clicked.
+    $( submitButton )
+      .prop( "disabled", true )
+      .click
+      (
+        function()
+        {
+          var value = $( inputTag ).val()
+
+          // If there is a set query to run...
+          if ( null != setQuery )
+          {
+            // Construct query.
+            query = setQuery.replace( "$", value )
+            self.remoteAction
+            (
+              query,
+              function( value )
+              {
+                // Call the update function (make sure the transition took place).
+                updateFunction( value )
+
+                // Run additional callback.
+                if ( setCallback )
+                  setCallback ( value )
+              }
+            )
+          }
+          else
+          if ( setCallback )
+            setCallback( value )
+        }
+      )
+
+    $( inputTag )
+      .on
+      (
+        "input",
+        function()
+        {
+          var isError = false
+          var value = $( this ).val()
+          // Different from initial value?
+          if ( value != editFieldValues[ inputTag ] )
+          {
+            // Make sure this is a number
+            if ( verifyFunction( value ) )
+              // The change function will only denote that a change has taken
+              // place--it will not commit this change.
+              $( this ).attr( "class", "changed" )
+            else
+              $( this ).attr( "class", "error" )
+          }
+          else
+          {
+            $( this ).attr( "class", "" )
+          }
+
+          // Set the save button enable/disable based on any whether or not
+          // there are are any modified input fields.
+          var disabled = ( 0 == $( '.changed' ).length )
+          disabled &= ! buttonStates[ submitButton ]
+          $( submitButton ).prop( "disabled", disabled )
+        }
+      )
+  }
+
+
+  //---------------------------------------------------------------------------
+  // Uses:
   //   Turn a button into a true/false toggle button.
   // Input:
   //   tagId - Id of <button> to modify.
@@ -662,14 +819,14 @@ var WinderInterface = function()
   this.addToggleButton = function( tagId, getQuery, setQuery, getCallback, setCallback )
   {
     // Save the enable/disabled state of the button in case we modify it latter.
-    toggleButtonStates[ tagId ] = $( tagId ).prop( "disabled" )
+    buttonStates[ tagId ] = $( tagId ).prop( "disabled" )
 
     // Function that sets the state of button with data being true or false.
     var updateFunction =
       function( data )
       {
-        $( tagId ).prop( "disabled", toggleButtonStates[ tagId ] )
-        toggleButtonStates[ tagId ] = null
+        $( tagId ).prop( "disabled", buttonStates[ tagId ] )
+        buttonStates[ tagId ] = null
 
         value = ( data === true ) || ( data == "1" )
         className = "toggle"
@@ -714,9 +871,9 @@ var WinderInterface = function()
     (
       function()
       {
-        if ( null !== toggleButtonStates[ tagId ] )
+        if ( null !== buttonStates[ tagId ] )
         {
-          toggleButtonStates[ tagId ] = $( tagId ).prop( "disabled" )
+          buttonStates[ tagId ] = $( tagId ).prop( "disabled" )
           $( tagId ).attr( 'class', "" )
           $( tagId ).prop( "disabled", true )
         }

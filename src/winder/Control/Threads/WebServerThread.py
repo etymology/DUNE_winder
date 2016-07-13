@@ -52,8 +52,12 @@ class WebServerThread( PrimaryThread ):
     """
     Send a dummy request to server to cause connection to close.
     """
-    # HEAD request just so thread unblocks.  This will throw an exception.
-    connection = httplib.HTTPConnection( "127.0.0.1" )
-    connection.request( "HEAD","/" )
+
+    try :
+      # HEAD request just so thread unblocks.  This will throw an exception.
+      connection = httplib.HTTPConnection( "127.0.0.1" )
+      connection.request( "HEAD","/" )
+    except :
+      pass
 
 # end class

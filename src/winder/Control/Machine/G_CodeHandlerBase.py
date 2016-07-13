@@ -302,7 +302,7 @@ class G_CodeHandlerBase :
 
     # Velocity.
     self._maxVelocity = float( "inf" )   # <- No limit.
-    self._velocity = 0
+    self._velocity = float( "inf" )
 
     self._layerCalibration = None
     self._machineCalibration = machineCalibration

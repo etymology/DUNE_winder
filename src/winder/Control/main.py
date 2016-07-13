@@ -28,6 +28,8 @@ from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
 from Threads.WebServerThread import WebServerThread
 
+from Simulator.SimulationTime import SimulationTime
+
 # $$$TEMPORARY - Temporary.
 import xml.dom.minidom
 from Debug.APA_Generator import APA_Generator
@@ -51,6 +53,15 @@ isLogEchoed = True
 # True to log I/O.
 # CAUTION: Log file will get large very quickly.
 isIO_Logged = False
+
+# APA file to load.
+loadAPA_File = None
+
+# True to start APA (must be used with 'loadAPA_File'.
+isStartAPA = False
+
+# True if system should run in real-time.  Simulation option.
+isRealTime = True
 
 #==============================================================================
 
@@ -119,8 +130,14 @@ for argument in sys.argv:
   if -1 != argument.find( "=" ) :
     option, value = argument.split( "=" )
 
-  if "SIMULATED" == option or "SIMULATOR" == option :
+  if "APA" == option :
+    loadAPA_File = value
+  elif "START" == option :
+    isStartAPA = ( "TRUE" == value )
+  elif "SIMULATED" == option or "SIMULATOR" == option :
     isSimulated = ( "TRUE" == value )
+  elif "REAL_TIME" == option :
+    isRealTime = ( "TRUE" == value )
   elif "LOG" == option :
     isLogEchoed = ( "TRUE" == value )
   elif "LOG_IO" == option :
@@ -151,7 +168,11 @@ signal.signal( signal.SIGINT, signalHandler )
 # Create various objects.
 #
 
-systemTime = SystemTime()
+if not isSimulated :
+  systemTime = SystemTime()
+else:
+  systemTime = SimulationTime( isRealTime = isRealTime )
+
 startTime = systemTime.get()
 
 # Load configuration and setup default values.
@@ -189,7 +210,13 @@ try:
     from Simulator.PLC_Simulator import PLC_Simulator
     from IO.Maps.SimulatedIO import SimulatedIO
     io = SimulatedIO()
-    plcSimulator = PLC_Simulator( io )
+    plcSimulator = PLC_Simulator( io, systemTime )
+    log.add(
+      "Main",
+      "SIMULATION",
+      "Running in simulation mode, real-time: " + str( isRealTime ) + ".",
+      [ isRealTime ]
+    )
   else:
     from IO.Maps.ProductionIO import ProductionIO
     io = ProductionIO( configuration.get( "plcAddress" ) )
@@ -218,6 +245,13 @@ try:
 
   # Begin operation.
   PrimaryThread.startAllThreads()
+
+  # If there is an APA file from the command line...
+  if loadAPA_File :
+    process.switchAPA( loadAPA_File )
+
+    if isStartAPA :
+      process.start()
 
   # While the program is running...
   while ( PrimaryThread.isRunning ) :

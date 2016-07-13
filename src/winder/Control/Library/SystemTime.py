@@ -6,10 +6,21 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Library.TimeSource import TimeSource
+import time
 import datetime
+from Library.TimeSource import TimeSource
 
 class SystemTime( TimeSource ) :
+  #-------------------------------------------------------------------
+  def sleep( self, sleepTime ) :
+    """
+    Sleep for specified time (in seconds).
+
+    Args:
+      sleepTime: Time to sleep (in seconds and can be fractional).
+    """
+    time.sleep( sleepTime )
+
   #-------------------------------------------------------------------
   def get( self ) :
     """

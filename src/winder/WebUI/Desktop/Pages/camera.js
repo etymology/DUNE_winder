@@ -59,22 +59,6 @@ function Camera()
 
   cameraUpdateFunction()
 
-  $( "#customCommandButton" )
-    .click
-    (
-      function()
-      {
-        var command = $( "#customCommand" ).val()
-        winder.remoteAction
-        (
-          command,
-          function( data )
-          {
-            $( "#customCommandResult" ).val( data )
-          }
-        )
-      }
-    )
 
 }
 

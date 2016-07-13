@@ -54,11 +54,11 @@ class Process :
     self.gCodeHandler = G_CodeHandler( io, self.spool, machineCalibration )
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
-    maxVelocity = float( configuration.get( "maxVelocity" ) )
+    self._maxVelocity = float( configuration.get( "maxVelocity" ) )
 
     # Setup initial limits on velocity and acceleration.
     io.plcLogic.setupLimits(
-      maxVelocity,
+      self._maxVelocity,
       float( configuration.get( "maxAcceleration" ) ),
       float( configuration.get( "maxDeceleration" ) )
     )
@@ -67,8 +67,7 @@ class Process :
     io.head.setExtendedAndRetracted( machineCalibration.zFront, machineCalibration.zBack )
 
     # By default, the G-Code handler will use maximum velocity.
-    self.gCodeHandler.setLimitVelocity( maxVelocity )
-    self.gCodeHandler.setVelocity( maxVelocity )
+    self.gCodeHandler.setLimitVelocity( self._maxVelocity )
 
     self._machineCalibration = machineCalibration
 
@@ -538,6 +537,25 @@ class Process :
       result = self.apa.getStage()
 
     return result
+
+  #---------------------------------------------------------------------
+  def maxVelocity( self, maxVelocity=None ) :
+    """
+    Set/get the maximum velocity used by PLC logic and G-Code handler.
+
+    Args:
+      maxVelocity: New maximum velocity (optional).
+
+    Returns:
+      Maximum velocity.
+    """
+
+    if None != maxVelocity :
+      self._maxVelocity = maxVelocity
+      self._io.plcLogic.maxVelocity( maxVelocity )
+      self.gCodeHandler.setLimitVelocity( maxVelocity )
+
+    return self._maxVelocity
 
   #---------------------------------------------------------------------
   def switchAPA( self, apaName ) :

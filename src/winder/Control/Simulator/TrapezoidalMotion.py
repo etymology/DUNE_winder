@@ -174,7 +174,7 @@ class TrapezoidalMotion( Motion ) :
     """
 
     # Jerk, acceleration and velocity are magnitudes, so force an absolute value.
-    maxAcceleration = abs( maxAcceleration )
+    maxAcceleration = abs( float( maxAcceleration ) )
 
     if None == startPosition :
       startPosition = 0
@@ -230,9 +230,9 @@ class TrapezoidalMotion( Motion ) :
     """
 
     # Jerk, acceleration and velocity are magnitudes, so force an absolute value.
-    maxAcceleration = abs( maxAcceleration )
-    minAcceleration = abs( minAcceleration )
-    velocity        = abs( velocity        )
+    maxAcceleration = abs( float( maxAcceleration ) )
+    minAcceleration = abs( float( minAcceleration ) )
+    velocity        = abs( float( velocity        ) )
 
     if None == endPosition :
       endPosition = 0
