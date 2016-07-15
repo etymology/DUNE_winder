@@ -28,21 +28,6 @@ class LayerGX_Recipe( RecipeGenerator ) :
     """
     RecipeGenerator.__init__( self, geometry )
 
-    self.basePath = Path3d()
-
-    # G-Code path is the motions taken by the machine to wind the layer.
-    self.firstHalf  = None
-    self.secondHalf = None
-
-    # The node path is a path of points that are connect together.  Used to calculate
-    # the amount of wire actually dispensed.
-    frameOffset = \
-      Location( geometry.apaOffsetX, geometry.apaOffsetY, geometry.apaOffsetZ )
-
-    self.nodePath = Path3d( frameOffset )
-
-    self.centering = {}
-
     #
     # Create nodes and net.
     # Nodes are a list of pins starting with the bottom left corner moving in
@@ -105,8 +90,8 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     startLocation = self.location( self.netIndex )
     #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
-    self.nodePath.push( startLocation.x, startLocation.y, 0 )
-    self.basePath.push( startLocation.x, startLocation.y, 0 )
+    self.nodePath.push( startLocation.x, startLocation.y, self.geometry.partialZ_Front )
+    self.basePath.push( startLocation.x, startLocation.y, self.geometry.partialZ_Front )
     lastLocation = startLocation
 
     # To wind half the layer, divide by half and the number of steps in a

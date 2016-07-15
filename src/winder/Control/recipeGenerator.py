@@ -77,12 +77,9 @@ def writeRubyCode( layer, recipe, geometry ) :
   print "  Generate an ideal calibration file for layer."
   calibration = recipe.defaultCalibration( layer + " Layer", geometry )
   if not zeroOffset :
-    calibration.offset = geometry.apaOffset
+    calibration.offset = geometry.apaOffset.add( geometry.apaLocation )
 
   outputFileName = layer + "-Layer.rb"
-
-  startingLocation = \
-    Location( geometry.apaOffsetX, geometry.apaOffsetY, geometry.apaOffsetZ )
 
   # Construct G-Code for first half.
   print "  Construct G-Code for first half."
@@ -97,7 +94,6 @@ def writeRubyCode( layer, recipe, geometry ) :
   gCodePath.writeRubyCode(
     outputFileName,
     "1st",
-    startingLocation,
     enablePathLabels,
     enablePinLabels,
     False
@@ -127,7 +123,6 @@ def writeRubyCode( layer, recipe, geometry ) :
   gCodePath.writeRubyCode(
     outputFileName,
     "2nd",
-    startingLocation,
     enablePathLabels,
     enablePinLabels,
     True
@@ -201,10 +196,10 @@ if __name__ == "__main__":
       enableG = ( "TRUE" == value )
     elif "0" == option :
       zeroOffset = ( "TRUE" == value )
-    elif "BASEPATH" :
+    elif "BASEPATH" == option :
       isRubyBasePath = ( "TRUE" == value )
     else :
-      print "Unknown:", option
+      raise Exception( "Unknown:" + option )
 
   geometryX = X_LayerGeometry()
   geometryV = V_LayerGeometry()

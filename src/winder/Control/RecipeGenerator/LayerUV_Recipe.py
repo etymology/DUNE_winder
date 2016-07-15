@@ -34,23 +34,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     """
     RecipeGenerator.__init__( self, geometry )
 
-    frameOffset = \
-      Location( geometry.apaOffsetX, geometry.apaOffsetY, geometry.apaOffsetZ )
-
-    self.basePath = Path3d()
     self.orientations = {}
-    self.centering = {}
-
-    # G-Code path is the motions taken by the machine to wind the layer.
-    self.gCodePath  = None
-    self.firstHalf  = None
-    self.secondHalf = None
-
-    # The node path is a path of points that are connect together.  Used to calculate
-    # the amount of wire actually dispensed.
-    self.nodePath = Path3d( frameOffset )
-
-    self.z = None
 
   #-------------------------------------------------------------------
   def _createNode( self, grid, orientation, side, depth, startPin, direction ) :
@@ -285,12 +269,13 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
 
   #---------------------------------------------------------------------
-  def _wind( self, startLocation, direction, windsOverride=None ) :
+  def _wind( self, start1, start2, direction, windsOverride=None ) :
     """
     Wind the layer using the class parameters.
 
     Args:
-      startLocation: Point to start from.
+      start1: Starting pin locations for first half.
+      start2: Starting pin locations for second half.
       windsOverride: Set to specify the number to winds to make before stopping.
         Normally left to None.
 
@@ -311,8 +296,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
     )
 
     self.gCodePath = G_CodePath()
-    #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
-    self.basePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
+    self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start1 ) )
+    self.gCodePath.push()
+    self.basePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
     # To wind half the layer, divide by half and the number of steps in a
@@ -334,7 +320,8 @@ class LayerUV_Recipe( RecipeGenerator ) :
       if halfCount == index :
         self.firstHalf = self.gCodePath
         self.gCodePath = G_CodePath()
-        self.gCodePath.push( self.firstHalf.last.x, self.firstHalf.last.y, self.geometry.frontZ )
+        self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start2 ) )
+        self.gCodePath.push()
         self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
     self.secondHalf = self.gCodePath

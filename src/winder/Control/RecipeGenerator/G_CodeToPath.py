@@ -49,7 +49,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self.useLayerCalibration( calibration )
 
   #---------------------------------------------------------------------
-  def toPath( self, startingLocation ) :
+  def toPath( self ) :
     """
     Convert the G-Code into a 3d path.
 
@@ -65,12 +65,10 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     PARTIAL_BACK  = 2
     BACK = 3
 
-    offset = self._calibration.offset
-
     # Set initial location.
-    self._x = startingLocation.x
-    self._y = startingLocation.y
-    self._z = startingLocation.z
+    self._x = 0
+    self._y = 0
+    self._z = 0
 
     self._headZ = self._geometry.frontZ
     latchSide = FRONT
@@ -96,7 +94,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       elif BACK == self._headPosition :
         self._headZ = self._geometry.backZ
 
-      path.push( self._x + offset.x, self._y + offset.y, self._headZ + offset.z )
+      path.push( self._x, self._y, self._headZ )
 
     return path
 
@@ -142,7 +140,6 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self,
     outputFileName,
     layerHalf,
-    startingLocation,
     enablePathLabels=False,
     enablePinLabels=False,
     isAppend=False
@@ -165,7 +162,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
     with open( outputFileName, attributes ) as rubyFile :
 
-      gCodePath = self.toPath( startingLocation )
+      gCodePath = self.toPath()
 
       layerOffset = \
         Location( self._geometry.apaOffsetX, self._geometry.apaOffsetY, self._geometry.apaOffsetZ )

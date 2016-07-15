@@ -78,5 +78,6 @@ class LayerU_Recipe( LayerUV_Recipe ) :
     # Crate motions necessary to wind the above pattern.
     #
 
-    startLocation = Location( 0, 0 )
-    self._wind( startLocation, 1, windsOverride )
+    start1 = [ "F1599", "F1600" ]
+    start2 = [ "F1599", "F1600" ]
+    self._wind( start1, start2, 1, windsOverride )

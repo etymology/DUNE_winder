@@ -32,11 +32,25 @@ class RecipeGenerator :
     self.nodes = {}
     self.gCodePath = None
     self.nodePath = None
+    self.z = None
 
     self.geometry = geometry
     self.headZ = 0
     self.netIndex = 0
     self.centering = {}
+
+    # G-Code path is the motions taken by the machine to wind the layer.
+    self.firstHalf  = None
+    self.secondHalf = None
+
+    # The node path is a path of points that are connect together.  Used to calculate
+    # the amount of wire actually dispensed.
+    # NOTE: Z is ignored because the hand-offs are independent of offset location.
+    frameOffset = geometry.apaOffset.add( geometry.apaLocation )
+    frameOffset.z = 0
+
+    self.basePath = Path3d()
+    self.nodePath = Path3d( frameOffset )
 
   #---------------------------------------------------------------------
   def offsetPin( self, pin, offset ) :
@@ -110,7 +124,7 @@ class RecipeGenerator :
     return self.nodes[ pin ]
 
   #---------------------------------------------------------------------
-  def pinCenterTarget( self, axis="XY" ) :
+  def pinCenterTarget( self, axis="XY", pinNames=None ) :
     """
     Setup the G-Code function class for targeting the left/right of the next
     pin in the net.  Based on the pin this will figure out which side of the
@@ -122,9 +136,11 @@ class RecipeGenerator :
     Returns:
       An instance of PinCenterG_Code (G_CodeFunction).
     """
-    net = self.net[ self.netIndex ]
-    direction = self.centering[ net ]
-    pinNames = self.pinNames( self.netIndex, direction )
+    if None == pinNames :
+      net = self.net[ self.netIndex ]
+      direction = self.centering[ net ]
+      pinNames = self.pinNames( self.netIndex, direction )
+
     return PinCenterG_Code( pinNames, axis )
 
   #---------------------------------------------------------------------

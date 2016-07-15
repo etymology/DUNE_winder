@@ -78,7 +78,6 @@ class LayerV_Recipe( LayerUV_Recipe ) :
     # Crate motions necessary to wind the above pattern.
     #
 
-    startLocation = \
-      Location( geometry.deltaX * geometry.columns, geometry.wireSpacing / 2 )
-
-    self._wind( startLocation, -1, windsOverride )
+    start1 = [ "F1601", "F1602" ]
+    start2 = [ "F1601", "F1602" ]
+    self._wind( start1, start2, -1, windsOverride )

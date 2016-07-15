@@ -40,11 +40,11 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     self.apaOffset = Location( self.apaOffsetX, self.apaOffsetY, self.apaOffsetZ )
 
     # Distance from the layer to the head.
-    self.frontZ = ( self.zTravel - self.depth ) / ( 2 * self.scale )
-    self.backZ  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+    self.frontZ = 0
+    self.backZ  = self.zTravel
     self.zClearance = self.frontZ
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
-    self.partialZ_Front = 0
-    self.partialZ_Back  = self.depth
+    self.partialZ_Front = ( self.zTravel - self.depth ) / ( 2 * self.scale ) #0
+    self.partialZ_Back  = ( self.zTravel + self.depth ) / ( 2 * self.scale ) #self.depth
