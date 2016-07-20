@@ -394,11 +394,24 @@ function Configuration()
       }
     )
 
+  // $$$DEBUG - Temp.
+  this.logout = function()
+  {
+    winder.login
+    (
+      null,
+      function( loginResult )
+      {
+        location.reload( true )
+      }
+    )
+  }
+
 }
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Call when page loads.
+//   Called when page loads.
 //-----------------------------------------------------------------------------
 $( document ).ready
 (

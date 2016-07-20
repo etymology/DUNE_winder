@@ -93,6 +93,8 @@
     <script type="text/javascript" src="/Scripts/Vendor/jquery.blink.js"></script>
     <script type="text/javascript" src="/Scripts/Vendor/dateFormat.js"></script>
     <script type="text/javascript" src="/Scripts/Vendor/jquery.dateFormat.js"></script>
+    <script type="text/javascript" src="/Scripts/Vendor/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/Scripts/Vendor/sha256.js"></script>
     <script type="text/javascript" src="/Scripts/WinderInterface.js"></script>
     <script type="text/javascript" src="/Scripts/FilterTable.js"></script>
     <script type="text/javascript" src="/Scripts/CopyField.js"></script>
@@ -142,7 +144,11 @@
         <p>PLC state: <span id="plcState">--</span></p>
       </article>
 
-      <article>
+      <article id="loginDiv">
+        <button onclick="showLogin()">Login</button>
+      </article>
+
+      <article id="pageSelectDiv">
         <button onclick="load( 'apa' )">APA</button>
         <button onclick="load( 'jog' )">Jog</button>
         <button onclick="load( 'log' )">Log</button>

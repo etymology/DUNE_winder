@@ -328,7 +328,8 @@ var WinderInterface = function()
                   callbackFunction = periodicCallbackTable[ id ]
 
                   // Send the retrieved data to the callback.
-                  callbackFunction( valueString )
+                  if ( callbackFunction )
+                    callbackFunction( valueString )
 
                   // Save the current data.
                   periodicHistory[ id ] = valueString
@@ -472,6 +473,104 @@ var WinderInterface = function()
 
   //---------------------------------------------------------------------------
   // Uses:
+  //   Login to winder server.
+  // Input:
+  //   password - Password to use for login.  'null' to logout.
+  //   callback - Callback to run after login.  Takes one parameter with
+  //     result of login attempt.
+  // Notes:
+  //   All failures to communicate to server run callback with a failed
+  //   result.  If already logged in the callback is true with a passing
+  //   result--even if the password is wrong.
+  //---------------------------------------------------------------------------
+  this.login = function( password, callback )
+  {
+    var fetchField =
+      function( xml, field )
+      {
+        var value = xml.find( field ).text()
+        if ( value )
+          value = jQuery.parseJSON( value )
+
+        return value
+      }
+
+    // Run an empty query to setup login process.
+    $.post
+    (
+      ""
+    )
+    .error
+    (
+      function()
+      {
+        // Any failure is a failure to login.
+        if ( callback )
+          callback( false )
+      }
+    )
+    .done
+    (
+      function( data )
+      {
+        var xml = $( data )
+
+        var loginStatus = fetchField( xml, "loginStatus" )
+
+        // If a login/logout is needed...
+        if ( ( ! loginStatus )
+          || ( null == password ) )
+        {
+          // Get the session Id and salt value.
+          var salt = fetchField( xml, "salt" )
+
+          // Construct a hashed version of password.
+          var hashString = salt + password
+          var hashValue = Sha256.hash( hashString )
+
+          // Send password back to server.
+          $.post
+          (
+            "",
+            {
+              passwordHash: hashValue
+            }
+          )
+          .error
+          (
+            function()
+            {
+              // Any failure is a failure to login.
+              if ( callback )
+                callback( false )
+            }
+          )
+          .done
+          (
+            function( data )
+            {
+              var xml = $( data )
+
+              // See if the login was accepted.
+              var loginResult = fetchField( xml, "loginResult" )
+
+              // Run callback with results.
+              if ( callback )
+                callback( loginResult )
+            }
+          )
+        }
+        else
+          // If we are already logged in, run callback in the affirmative.
+          if ( callback )
+            callback( true )
+      }
+    )
+
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
   //   Execute a remote action.
   // Input:
   //   actionQuery - The action to execute on remote server.
@@ -509,7 +608,8 @@ var WinderInterface = function()
           var xml = $( data )
           var value = xml.find( "action" ).text()
 
-          value = jQuery.parseJSON( value )
+          if ( value )
+            value = jQuery.parseJSON( value )
 
           if ( callback )
             callback( value )

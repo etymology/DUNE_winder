@@ -1,6 +1,7 @@
 function APA_List()
 {
-  self = this
+  var self = this
+
   var STAGES =
   [
     "Uninitialized",
@@ -206,7 +207,7 @@ function APA_List()
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Call when page loads.
+//   Called when page loads.
 //-----------------------------------------------------------------------------
 $( document ).ready
 (

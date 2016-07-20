@@ -225,18 +225,42 @@ function loadVersion()
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Call when page loads.
+//   Called when page loads.
 //-----------------------------------------------------------------------------
 $( document ).ready
 (
   function()
   {
+    // The method of logging in is highly insecure and only meant to
+    // offer rudimentary control.
     var page = getParameterByName( "page" )
+
     if ( ! page )
       window.location = "?page=apa";
     else
     {
       winder = new WinderInterface()
+
+      winder.remoteAction
+      (
+        'RemoteSession.isAuthenticated( "' + $.cookie( "sessionId" ) + '" )',
+        function( status )
+        {
+          if ( ! status )
+          {
+            if ( "grid" != page )
+              window.location = "?page=grid"
+            else
+              $( "#loginDiv" ).css( "display", "block" )
+          }
+          else
+          {
+            $( "#pageSelectDiv" ).css( "display", "block" )
+            $( "#fullStopDiv" ).css( "display", "block" )
+            $( "#loginDiv" ).css( "display", "none" )
+          }
+        }
+      )
 
       // Before sub-pages begin to load, register a callback to run after all
       // have been loaded.
@@ -396,6 +420,23 @@ function showVersionInformation()
     function()
     {
       winder.loadSubPage( "/Desktop/Modules/versionDetails", "#overlayBox" )
+    }
+  )
+}
+
+//-----------------------------------------------------------------------------
+// Uses:
+//   Callback when version information box is clicked.
+//-----------------------------------------------------------------------------
+function showLogin()
+{
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/overlay",
+    "#modalDiv",
+    function()
+    {
+      winder.loadSubPage( "/Desktop/Modules/login", "#overlayBox" )
     }
   )
 }

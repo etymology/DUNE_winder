@@ -10,7 +10,9 @@ main
   overflow: hidden;
 }
 
-#motorStatusDiv
+#motorStatusDiv, #gCodeDiv, #recentLogDiv
 {
+  width: 500px;
   float: right;
+  overflow: hidden;
 }

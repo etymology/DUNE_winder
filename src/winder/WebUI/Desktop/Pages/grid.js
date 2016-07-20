@@ -25,11 +25,32 @@ function Grid()
     "#motorStatusDiv",
     positionGraphicInitialize
   )
+
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/gCode",
+    "#gCodeDiv",
+    function()
+    {
+      gCode.create( 3 )
+    }
+  )
+
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/recentLog",
+    "#recentLogDiv",
+    function()
+    {
+      recentLog.create( 10 )
+    }
+  )
+
 }
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Call when page loads.
+//   Called when page loads.
 //-----------------------------------------------------------------------------
 $( document ).ready
 (

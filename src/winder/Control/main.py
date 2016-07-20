@@ -17,6 +17,7 @@ from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
 from Library.Version import Version
+from Library.RemoteSession import RemoteSession
 
 from Machine.Settings import Settings
 

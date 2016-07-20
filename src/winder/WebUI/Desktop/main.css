@@ -180,3 +180,8 @@ input.error
 {
   background-color: rgb( 99, 99, 129 );
 }
+
+#pageSelectDiv, #fullStopDiv, #loginDiv
+{
+  display: none;
+}

@@ -4,26 +4,9 @@
   width: 3em;
 }
 
-tr.gCodeCurrentLine
+#gCodeDiv
 {
-  background-color: rgba( 0, 128, 128, 0.5 );
-}
-
-tr.gCodeNextLine
-{
-  background-color: rgba( 0, 128, 0, 0.5 );
-}
-
-#gCodeTable
-{
-  margin: 2px;
-  border-radius: 4px;
-  background-color: rgba( 64, 64, 64, 0.5 );
-  border: 2px solid rgba( 96, 96, 96, 0.75 );
-  padding: 2px;
-  border-spacing: 0px;
-  border-collapse: separate;
-  width: 40em;
+  width: 645px;
 }
 
 #velocitySlider, #accelerationSlider, #decelerationSlider
@@ -81,21 +64,6 @@ textarea
 {
   clear: both;
   width: 99%;
-}
-
-#recentLog tr:hover
-{
-  background-color: gray;
-}
-
-#recentLog table
-{
-  width: 100%;
-}
-
-#recentLog th
-{
-  background: dimgray;
 }
 
 #recentLog th:first-child

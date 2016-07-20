@@ -1,7 +1,7 @@
 function MotorStatus()
 {
   // Pointer to self.
-  self = this
+  var self = this
 
   // Public motor status data.
   this.motor = {}

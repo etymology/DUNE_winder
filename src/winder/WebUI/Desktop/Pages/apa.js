@@ -131,10 +131,10 @@ function APA()
   {
     // Get the layer and G-Code recipe.
     var layer = $( "#layerSelection" ).val()
-    var gCode = $( "#gCodeSelection" ).val()
+    var gCodeSelection = $( "#gCodeSelection" ).val()
 
     // If not the null selection...
-    if ( "" != gCode )
+    if ( "" != gCodeSelection )
     {
       // Disable APA interface during loading process.
       apaEnabledInhabit = true
@@ -143,7 +143,7 @@ function APA()
       // Begin loading G-Code.
       winder.remoteAction
       (
-        'process.apa.loadRecipe( "' + layer + '", "' + gCode + '", -1 )',
+        'process.apa.loadRecipe( "' + layer + '", "' + gCodeSelection + '", -1 )',
         self.reenableAPA
       )
     }
@@ -458,71 +458,23 @@ function APA()
 
   )
 
-  winder.addPeriodicEndCallback
-
-
-  var totalRows = G_CODE_ROWS * 2 + 1
-  $( "#gCodeTable" ).empty()
-  var gGodeBody = $( "<tbody/>" ).appendTo( "#gCodeTable" )
-  var gCodeMid = totalRows / 2
-  for ( var rowIndex = 0; rowIndex < totalRows; rowIndex += 1 )
-  {
-    var newRow = $( "<tr/>" ).appendTo( gGodeBody )
-
-    if ( G_CODE_ROWS == rowIndex )
-      newRow.attr( "class", "gCodeCurrentLine" )
-    else
-    if ( G_CODE_ROWS - 1 == rowIndex )
-      newRow.attr( "id", "gCodeReverseRow" )
-    else
-    if ( G_CODE_ROWS + 1 == rowIndex )
-      newRow.attr( "id", "gCodeForwardRow" )
-
-    var newCell = $( "<td/>" ).appendTo( newRow ).html( "&nbsp;" )
-  }
-
-  // Setup G-Code table.
-  winder.addPeriodicCallback
+  winder.loadSubPage
   (
-    "process.getG_CodeList( None, " + G_CODE_ROWS + " )",
-    function( data )
+    "/Desktop/Modules/gCode",
+    "#gCodeDiv",
+    function()
     {
-      // If there is any data.
-      if ( data )
-      {
-        var index = 0
-        // For each row of table...
-        $( "#gCodeTable td" )
-          .each
-          (
-            function()
-            {
-              var isForward = $( "#reverseButton" ).val()
+      gCode.create( G_CODE_ROWS )
+    }
+  )
 
-              if ( "1" == isForward )
-              {
-                $( "#gCodeForwardRow" ).attr( 'class', 'gCodeNextLine')
-                $( "#gCodeReverseRow" ).attr( 'class', '' )
-              }
-              else
-              {
-                $( "#gCodeForwardRow" ).attr( 'class', '')
-                $( "#gCodeReverseRow" ).attr( 'class', 'gCodeNextLine' )
-              }
-
-              // Get text for this row.
-              var text = data[ index ]
-
-              // If there isn't any text, put in a non-breaking space to
-              // preserve the cell.
-              if ( ! text )
-                text = "&nbsp;"
-
-              $( this ).html( text )
-              index += 1
-            }
-          )
-      }
+  winder.loadSubPage
+  (
+    "/Desktop/Modules/recentLog",
+    "#recentLogDiv",
+    function()
+    {
+      recentLog.create( LOG_ENTIRES )
     }
   )
 
@@ -580,9 +532,12 @@ function APA()
           getString + "()",
           function( value )
           {
-            isLoad = true
-            value *= 100
-            $( "#" + slider + "Slider" ).slider( "value", value )
+            if ( value )
+            {
+              isLoad = true
+              value *= 100
+              $( "#" + slider + "Slider" ).slider( "value", value )
+            }
           }
         )
       }
@@ -595,64 +550,17 @@ function APA()
   //createSlider( "acceleration" )
   //createSlider( "deceleration" )
 
-  var table = $( "<table />" ).appendTo( "#recentLog" )
-  var row = $( "<tr />" ).appendTo( table )
-  $( "<th />" ).appendTo( row ).text( "Time" )
-  $( "<th />" ).appendTo( row ).text( "Description" )
-  for ( var index = 0; index < LOG_ENTIRES; index += 1 )
-  {
-    var row = $( "<tr />" ).appendTo( table )
-    $( "<td />" )
-      .appendTo( row )
-      .attr( "id", "logTable" + index + "Time" )
-      .text( "-" )
 
-    $( "<td />" )
-      .appendTo( row )
-      .attr( "id", "logTable" + index + "Description" )
-      .text( "-" )
-  }
 
-  winder.addPeriodicCallback
-  (
-    "log.getRecent()",
-    function( data )
-    {
-      for ( var index = 0; index < LOG_ENTIRES; index += 1 )
-      {
-        var dataIndex = -1
 
-        if ( data )
-        {
-          dataIndex = data.length - index - 1
 
-          var row = [ "-", "-", "-", "-" ]
-          if ( dataIndex >= 0 )
-            row = data[ data.length - index - 1 ].split( "\t" )
-
-          // Get the time/date of occurrence and format it for local time.
-          var time = new Date( row[ 0 ] + 'Z' )
-          var timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
-
-          var description = row[ 3 ]
-          $( "#logTable" + index + "Time" ).text( timeString )
-          $( "#logTable" + index + "Description" ).text( description )
-        }
-        else
-        {
-          $( "#logTable" + index + "Time" ).text( "--" )
-          $( "#logTable" + index + "Description" ).text( "--" )
-        }
-      }
-    }
-  )
 
 
 }
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Call when page loads.
+//   Called when page loads.
 //-----------------------------------------------------------------------------
 $( document ).ready
 (
