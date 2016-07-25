@@ -173,7 +173,7 @@ input.error
  */
 .copySelect
 {
-  border: 2px solid cyan;
+  border: 2px solid cyan !important;
 }
 
 .copySelect:hover

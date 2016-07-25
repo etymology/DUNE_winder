@@ -93,8 +93,8 @@ class DefaultLayerCalibration( LayerCalibration ) :
 
     LayerCalibration.__init__( self, layerName )
     self.offset = SerializableLocation( geometry.toAPA_OffsetX , geometry.toAPA_OffsetY )
-    self.zFront = geometry.frontZ
-    self.zBack  = geometry.backZ
+    self.zFront = geometry.partialZ_Front
+    self.zBack  = geometry.partialZ_Back
 
     for node in recipe.nodes :
       location = recipe.nodes[ node ]

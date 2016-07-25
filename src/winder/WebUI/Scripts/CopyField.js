@@ -30,10 +30,18 @@ function CopyField( dataTag, parentTag )
   //---------------------------------------------------------------------------
   this.enableCopy = function( isEnabled )
   {
+
+    $( ".copySelect" )
+      .each
+      (
+        function()
+        {
+          $( this ).removeClass( "copySelect" )
+        }
+      )
+
     if ( isEnabled )
-      $( dataTag ).addClass( "copySelect" )
-    else
-      $( dataTag ).removeClass( "copySelect" )
+      $( parentTag ).addClass( "copySelect" )
 
     // Loop through all input fields...
     $( "input" )
@@ -82,7 +90,7 @@ function CopyField( dataTag, parentTag )
     (
       function()
       {
-        var isEnabled = $( this ).hasClass( "copySelect" )
+        var isEnabled = $( parentTag ).hasClass( "copySelect" )
         self.enableCopy( ! isEnabled )
       }
     )

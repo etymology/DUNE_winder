@@ -274,7 +274,17 @@ function Jog()
   (
     "/Desktop/Modules/motorStatus",
     "#motorStatusDiv",
-    positionGraphicInitialize
+    function()
+    {
+      // Setup copy fields for motor positions.  Allows current motor positions
+      // to be copied to input fields.
+      var x = new CopyField( "#xPosition", "#xPositionCell" )
+      var y = new CopyField( "#yPosition", "#yPositionCell" )
+      var z = new CopyField( "#zPosition", "#zPositionCell" )
+
+      positionGraphicInitialize()
+    }
+
   )
 
   // Fetch fully extended position from machine calibration.
