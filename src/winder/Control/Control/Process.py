@@ -8,11 +8,13 @@
 
 import os
 import re
+
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
-from Library.Spool import Spool
 from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
+
+from Machine.Spool import Spool
 
 class Process :
 
