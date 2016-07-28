@@ -296,25 +296,6 @@ function Configuration()
 
   }
 
-  // $$$DEBUG - Temporary
-  $( "#cameraTriggerButton" )
-    .click
-    (
-      function()
-      {
-
-        winder.remoteAction
-        (
-          "io.plcLogic.cameraTrigger.set( 1 )",
-          function()
-          {
-            //winder.remoteAction( "io.plcLogic.cameraTrigger.set( 0 )" )
-          }
-        )
-
-      }
-    )
-
   winder.addPeriodicDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
   winder.addPeriodicDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
   winder.addPeriodicDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )
@@ -394,7 +375,7 @@ function Configuration()
       }
     )
 
-  // $$$DEBUG - Temp.
+  // $$$DEBUG - TEMPORARY.
   this.logout = function()
   {
     winder.login

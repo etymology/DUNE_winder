@@ -121,12 +121,16 @@ class AnodePlaneArray( APA_Base ) :
       self._layer = layer
 
     # $$$TEMPORARY
-    self.useDefaultCalibration()
+    if not self._calibrationFile :
+      self.useDefaultCalibration()
 
     # If there is a calibration file, load it.
     if self._calibrationFile :
       self._calibration = LayerCalibration()
-      self._calibration.load( self.getPath(), self._calibrationFile )
+
+      # $$$DEBUG - Temporary.  Put back.
+      #self._calibration.load( self.getPath(), self._calibrationFile )
+      self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
 
       # Make use of calibration.
       self._gCodeHandler.useLayerCalibration( self._calibration )
@@ -207,7 +211,10 @@ class AnodePlaneArray( APA_Base ) :
 
     if self._calibrationFile :
       self._calibration = LayerCalibration()
-      self._calibration.load( self.getPath(), self._calibrationFile )
+
+      # $$$DEBUG - Temporary.  Put back.
+      #self._calibration.load( self.getPath(), self._calibrationFile )
+      self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
 
       if not self._calibration :
         isError = True
@@ -248,7 +255,10 @@ class AnodePlaneArray( APA_Base ) :
     """
     self._calibrationFile = calibrationFile
     self._calibration = LayerCalibration()
-    self._calibration.load( self.getPath(), self._calibrationFile )
+
+    # $$$DEBUG - Temporary.  Put back.
+    #self._calibration.load( self.getPath(), self._calibrationFile )
+    self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
 
     self._gCodeHandler.useLayerCalibration( self._calibration )
 
