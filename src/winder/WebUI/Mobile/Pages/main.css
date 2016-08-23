@@ -1,0 +1,28 @@
+main button
+{
+  width:  125px;
+  height: 100px;
+  font-size: 200%;
+  margin: 5px;
+}
+
+div.jog
+{
+  width: 415px;
+  margin: auto;
+}
+
+
+button.jog
+{
+  height: 125px;
+  width:  125px;
+  font-size: 400%;
+  margin: 5px;
+  float: left;
+}
+
+#headControlDiv
+{
+  width: 415px;
+}

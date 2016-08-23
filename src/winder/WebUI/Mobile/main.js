@@ -92,7 +92,7 @@ $( document ).ready
   {
     var page = getParameterByName( "page" )
     if ( ! page )
-      window.location = "?page=jog";
+      window.location = "?page=increment";
     else
     {
       // Begin loading the requested sub-page.

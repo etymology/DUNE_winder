@@ -72,3 +72,13 @@ button.jog
   float: left;
 }
 
+#smallMotions button
+{
+  width: 60px;
+  margin: 2px;
+}
+
+#smallMotions
+{
+  width: 300px;
+}

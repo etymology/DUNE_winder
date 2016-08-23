@@ -163,6 +163,30 @@ function Jog()
 
   //-----------------------------------------------------------------------------
   // Uses:
+  //   $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.moveX = function( offset )
+  {
+    var velocity = this.getVelocity()
+    var x = motorStatus.motor[ "xPosition" ] + offset
+    var y = "None"
+    winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.moveY = function( offset )
+  {
+    var velocity = this.getVelocity()
+    var x = "None"
+    var y = motorStatus.motor[ "yPosition" ] + offset
+    winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
   //   Callback to start Z axis jogging.
   // Input:
   //   direction - Direction (1,-1, 0) of jog.
