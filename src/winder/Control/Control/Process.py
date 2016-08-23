@@ -9,12 +9,15 @@
 import os
 import re
 
+from Library.Geometry.Location import Location
+
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
 from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
 
 from Machine.Spool import Spool
+from Machine.HeadCompensation import HeadCompensation
 
 class Process :
 
@@ -28,6 +31,7 @@ class Process :
       log: Log file to write state changes.
       configuration: Instance of Configuration.
       systemTime: Instance of TimeSource.
+      machineCalibration: Machine calibration instance.
     """
     self._io = io
     self._log = log
@@ -38,6 +42,7 @@ class Process :
     self.spool = Spool( 27000000, 5000 )
 
     self.controlStateMachine = ControlStateMachine( io, log, systemTime )
+    self.headCompensation = HeadCompensation( machineCalibration )
 
     self.apa = None
 
@@ -53,7 +58,7 @@ class Process :
     if not os.path.exists( path ) :
       raise Exception( "Recipe directory (" + path + ") does not exist." )
 
-    self.gCodeHandler = G_CodeHandler( io, self.spool, machineCalibration )
+    self.gCodeHandler = G_CodeHandler( io, self.spool, machineCalibration, self.headCompensation )
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     self._maxVelocity = float( configuration.get( "maxVelocity" ) )
@@ -834,7 +839,75 @@ class Process :
         [ pin, velocity ]
       )
 
+    return isError
+
+  #---------------------------------------------------------------------
+  def setAnchorPoint( self, pinA, pinB = None ) :
+    """
+    Specify the anchor point--location where the wire is assume to be fixed.
+
+    Args:
+      pinA - Pin name.  First name when using pin centering.
+      pinB - Pin name.  Second name for pin centering, omit to use just one pin.
+    """
+    calibration = self.gCodeHandler.getLayerCalibration()
+
+    isError = True
+
+    # Do we have a calibration file?
+    if calibration :
+
+      # Get first pin location.
+      pinA = calibration.getPinLocation( pinA )
+
+      if pinA :
+        # Do we have a second pin?
+        if pinB :
+          # Center between two pins.
+          pinB = calibration.getPinLocation( pinB )
+
+          if pinB :
+            location = pinA.center( pinB )
+        else :
+          # Use the specified location.
+          location = pinA
+
+        location = location.add( calibration.offset )
+
+        self.headCompensation.anchorPoint( location )
+        isError = False
 
     return isError
+
+  #---------------------------------------------------------------------
+  def getHeadAngle( self ) :
+    """$$$DEBUG"""
+    x = self._io.xAxis.getPosition()
+    y = self._io.yAxis.getPosition()
+    z = self._io.zAxis.getPosition()
+
+    # $$$DEBUG - This doesn't work.  Not too important.  Fix it one day.
+    # $$$ if self._io.head.BACK == self._io.head.getSide() :
+    # $$$   print "Back"
+    # $$$   z = self._io.head.getTargetAxisPosition()
+
+    location = Location( x, y, z )
+
+    return self.headCompensation.getHeadAngle( location )
+
+
+  # #---------------------------------------------------------------------
+  # def getPosition( self ) :
+  #   """
+  #   Get current machine position.
+  #
+  #   Returns:
+  #     Instance of location with machine position.
+  #   """
+  #   x = self._io.xAxis.getPosition()
+  #   y = self._io.yAxis.getPosition()
+  #   z = self._io.zAxis.getPosition()
+  #
+  #   return Location( x, y, z )
 
 # end class

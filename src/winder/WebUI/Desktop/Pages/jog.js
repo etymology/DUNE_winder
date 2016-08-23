@@ -243,12 +243,30 @@ function Jog()
   }
 
   //-----------------------------------------------------------------------------
+  // $$$DEBUG
   //-----------------------------------------------------------------------------
   this.seekPin = function()
   {
     var pin = $( "#seekPin" ).val().toUpperCase()
     var velocity = this.getVelocity()
     winder.remoteAction( "process.seekPin( '" + pin + "', " + velocity + " )" )
+  }
+
+  //-----------------------------------------------------------------------------
+  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  this.setAnchor = function()
+  {
+    var pin = $( "#anchorPin" ).val().toUpperCase()
+
+    var parameters = '"' + pin + '"'
+    if ( pin.indexOf( "," ) >= 0 )
+    {
+      var pins = pin.split( "," )
+      parameters = '"' + pins[ 0 ] + '", "' + pins[ 1 ] + '"'
+    }
+
+    winder.remoteAction( 'process.setAnchorPoint( ' + parameters + ' )' )
   }
 
   // Callback function to initialize position graphic.

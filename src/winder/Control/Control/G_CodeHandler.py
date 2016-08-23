@@ -391,7 +391,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._positionLog = None
 
   #---------------------------------------------------------------------
-  def __init__( self, io, spool, machineCalibration ):
+  def __init__( self, io, spool, machineCalibration, headCompensation ):
     """
     Constructor.
 
@@ -399,8 +399,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       io: Instance of I/O map.
       spool: Instance of Spool.
       machineCalibration: Machine calibration instance.
+      headCompensation: Instance of HeadCompensation.
     """
-    G_CodeHandlerBase.__init__( self, machineCalibration )
+    G_CodeHandlerBase.__init__( self, machineCalibration, headCompensation )
 
     self._gCode = None
 

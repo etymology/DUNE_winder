@@ -26,6 +26,17 @@ function PositionGraphic()
   var MAX_HEAD_Z     = 1064
   var LINE_OFFSET_X  = 129
   var LINE_OFFSET_Y  = 30
+  var Z_HEAD_ARM_X   = 843
+  var Z_HEAD_ARM_Y   = 105
+  var Z_HEAD_ARM_MIN_WIDTH = 20
+  var Z_HEAD_ARM_MAX_WIDTH = 90
+  var Z_HEAD_ARM_HEIGHT    = 20
+  var HEAD_ANGLE_X      = 60
+  var HEAD_ANGLE_Y      = 60
+  var HEAD_ANGLE_RADIUS = 50
+
+  // Storage location for additional variables read for setup.
+  var readData = {}
 
   // Images to hide if server stops communicating.
   var IMAGES_TO_HIDE =
@@ -136,6 +147,14 @@ function PositionGraphic()
     MAX_HEAD_Z    *= scale
     LINE_OFFSET_X *= scale
     LINE_OFFSET_Y *= scale
+    Z_HEAD_ARM_X  *= scale
+    Z_HEAD_ARM_Y  *= scale
+    Z_HEAD_ARM_MIN_WIDTH *= scale
+    Z_HEAD_ARM_MAX_WIDTH *= scale
+    Z_HEAD_ARM_HEIGHT    *= scale
+    HEAD_ANGLE_X         *= scale
+    HEAD_ANGLE_Y         *= scale
+    HEAD_ANGLE_RADIUS    *= scale
 
     // Limits of travel (in mm).
     var MIN_X_POSITION = machineCaliration[ "limitLeft" ]
@@ -239,12 +258,85 @@ function PositionGraphic()
         $( "#zArmImage" )
           .css( "left", zArm + "px" )
 
+        zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
+
+        //
+        // Draw angle of arm on head.
+        // $$$DEBUG
+        //
+        //var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
+        var z = zPosition
+        if ( 0 != motorStatus.motor[ "headSide" ] )
+          z = MAX_Z_POSITION
+
+        var zHeadArm =
+          rescale
+          (
+            z,
+            MIN_ARM_Z,
+            MAX_ARM_Z,
+            MIN_Z_POSITION,
+            MAX_Z_POSITION,
+            Z_HEAD_ARM_X
+          )
+
+        // $$$ var angle = readData[ 'headAngle' ]
+        // $$$ var z = Math.round( Math.sin( angle ) * 10000 ) / 10000
+        // $$$ angle = angle * 180 / Math.PI
+        // $$$ angle = Math.round( angle * 100 ) / 100
+        // $$$ $( "#debug" ).html( angle + "&deg;<br />" + z )
+        var zHeadArmWidth = ( Z_HEAD_ARM_MAX_WIDTH - Z_HEAD_ARM_MIN_WIDTH )
+        zHeadArmWidth *= -Math.sin( readData[ 'headAngle' ] )
+
+        if ( zHeadArmWidth < 0 )
+        {
+          //zHeadArmWidth -= Z_HEAD_ARM_MIN_WIDTH
+          zHeadArm += zHeadArmWidth
+          zHeadArmWidth = Z_HEAD_ARM_MIN_WIDTH - zHeadArmWidth
+        }
+        else
+          zHeadArmWidth += Z_HEAD_ARM_MIN_WIDTH
+
+        // $$$ $( "#debug" ).html( zHeadArmWidth )
+
+        zStatusCanvas.fillStyle = "grey"
+        zStatusCanvas.fillRect
+        (
+          zHeadArm,
+          Z_HEAD_ARM_Y,
+          zHeadArmWidth,
+          Z_HEAD_ARM_HEIGHT
+        )
+        zStatusCanvas.strokeStyle = "black"
+        zStatusCanvas.lineWidth = 1 * scale
+        zStatusCanvas.strokeRect
+        (
+          zHeadArm,
+          Z_HEAD_ARM_Y,
+          zHeadArmWidth,
+          Z_HEAD_ARM_HEIGHT
+        )
+
+        var radius = HEAD_ANGLE_RADIUS
+        zStatusCanvas.beginPath()
+        zStatusCanvas.arc( HEAD_ANGLE_X, HEAD_ANGLE_Y, radius, 0, 2 * Math.PI )
+        zStatusCanvas.lineWidth = 2 * scale
+        zStatusCanvas.stroke()
+
+        zStatusCanvas.beginPath()
+        var x = -Math.sin( readData[ 'headAngle' ] ) * radius
+        var y =  Math.cos( readData[ 'headAngle' ] ) * radius
+        zStatusCanvas.moveTo( HEAD_ANGLE_X, HEAD_ANGLE_Y )
+        zStatusCanvas.lineTo( x + HEAD_ANGLE_X, y + HEAD_ANGLE_Y )
+        //zStatusCanvas.arc( 100, 75, 50, 0, 2 * Math.PI )
+        zStatusCanvas.lineWidth = 2 * scale
+        zStatusCanvas.stroke()
+
         //
         // Update status lights on Z image.
         // NOTE: Constants come for positions on image.
         //
 
-        zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
         statusLight( 485, 150, ! inputs[ "Z_End_of_Travel" ], true )
         statusLight( 505, 150, inputs[ "Z_Retracted_1A" ] )
 
@@ -523,6 +615,13 @@ function PositionGraphic()
           inputs[ input[ 0 ] ] = input[ 1 ]
       }
     }
+  )
+
+  winder.addPeriodicRead
+  (
+    "process.getHeadAngle()",
+    readData,
+    "headAngle"
   )
 
   winder.addErrorCallback

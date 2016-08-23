@@ -54,6 +54,12 @@ class MachineCalibration( Serializable ) :
     self.zLimitFront  = None
     self.zLimitRear   = None
 
+    # Length of arm on winder head.
+    self.headArmLength = None
+
+    # Diameter of U/V layer pin.
+    self.pinDiameter = None
+
   #---------------------------------------------------------------------
   def set( self, item, value ) :
     """

@@ -16,6 +16,8 @@ from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
 from .G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 from .G_CodeFunctions.ClipG_Code import ClipG_Code
 from .G_CodeFunctions.OffsetG_Code import OffsetG_Code
+from .G_CodeFunctions.ArmCorrectG_Code import ArmCorrectG_Code
+from .G_CodeFunctions.AnchorPointG_Code import AnchorPointG_Code
 
 from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
@@ -151,6 +153,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     result = False
 
+    if self.netIndex < len( self.net ) :
+      lastNet = self.net[ self.netIndex ]
+
     # Get the next net.
     self.netIndex += 1
 
@@ -176,6 +181,8 @@ class LayerUV_Recipe( RecipeGenerator ) :
       # amount of wire consumed by this move.
       self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
 
+      self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet ) )
+
       result = True
 
     return result
@@ -190,6 +197,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
+      self.gCodePath.pushG_Code( ArmCorrectG_Code() )
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
@@ -217,6 +225,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
+      self.gCodePath.pushG_Code( ArmCorrectG_Code() )
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 

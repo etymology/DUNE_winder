@@ -60,7 +60,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
       # Rear right.
       location = Location( xRight, y, self.geometry.partialZ_Back )
-      pinNumber = pin + self.geometry.pins / 2 #( self.geometry.pins / 2 + pinNumber + 1 )
+      pinNumber = pin + self.geometry.pins / 2
       pinNameD = "B" + str( pinNumber )
       self.nodes[ pinNameD ] = location
 

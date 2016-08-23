@@ -84,6 +84,11 @@
         <input id="seekPin" />
         <button onclick="jog.seekPin()">Go</button>
       </article>
+      <article>
+        <h2>Anchor pin(s)</h2>
+        <input id="anchorPin" />
+        <button onclick="jog.setAnchor()">Go</button>
+      </article>
 
       <article id="locationsDiv">
         <h2>Locations</h2>
@@ -130,6 +135,8 @@
         <p id="decelerationValue">-</p>
         <div id="decelerationSlider"></div>
       </article>
+
+      <div id="debug"></div>
 
 
     </section>

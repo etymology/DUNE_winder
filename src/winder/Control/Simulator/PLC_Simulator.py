@@ -135,8 +135,12 @@ class PLC_Simulator :
         # Calculate the ratio of total distance handled by each axis.
         # Each of the limits must be scaled by this ratio such that the
         # magnitude of each limit is divided evenly amongst both axises.
-        xRatio = xDelta / delta
-        yRatio = yDelta / delta
+        if 0 != delta :
+          xRatio = xDelta / delta
+          yRatio = yDelta / delta
+        else:
+          xRatio = 0
+          yRatio = 0
 
         # Calculate the limiting velocity for X/Y.
         velocity = self._io.plc.getTag( self._maxXY_VelocityTag )

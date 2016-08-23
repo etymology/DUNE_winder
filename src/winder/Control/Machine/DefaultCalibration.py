@@ -12,7 +12,7 @@ from Library.SerializableLocation import SerializableLocation
 
 from Machine.LayerCalibration import LayerCalibration
 from Machine.MachineCalibration import MachineCalibration
-from Machine.MachineGeometry import MachineGeometry
+from Machine.UV_LayerGeometry import UV_LayerGeometry
 from Machine.X_LayerGeometry import X_LayerGeometry
 from Machine.V_LayerGeometry import V_LayerGeometry
 from Machine.U_LayerGeometry import U_LayerGeometry
@@ -28,11 +28,12 @@ class DefaultMachineCalibration( MachineCalibration ) :
   #---------------------------------------------------------------------
   def __init__( self, outputFilePath=None, outputFileName=None ) :
     """
+    $$$DEBUG
     """
     MachineCalibration.__init__( self, outputFilePath, outputFileName )
-    geometry = MachineGeometry()
+    geometry = UV_LayerGeometry()
 
-    # Location of the park position.  Instance of Location.
+    # Location of the park position.
     self.parkX = 0
     self.parkY = 0
 
@@ -55,6 +56,8 @@ class DefaultMachineCalibration( MachineCalibration ) :
     self.zBack            = geometry.zTravel
     self.zLimitFront      = geometry.limitRetracted
     self.zLimitRear       = geometry.limitExtended
+    self.headArmLength    = geometry.headArmLength
+    self.pinDiameter      = geometry.pinDiameter
 
     if outputFilePath and outputFileName :
       # If there isn't a calibration file, create it.  Otherwise, load what
@@ -98,7 +101,7 @@ class DefaultLayerCalibration( LayerCalibration ) :
 
     for node in recipe.nodes :
       location = recipe.nodes[ node ]
-      newLocation = SerializableLocation( location.x, location.y )
+      newLocation = SerializableLocation( location.x, location.y, location.z )
       self.setPinLocation( node, newLocation )
 
     self.save( outputFilePath, outputFileName, "LayerCalibration" )

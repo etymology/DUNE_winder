@@ -12,7 +12,7 @@ class G_CodeFunction :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, gCode, parameters ) :
+  def __init__( self, gCode, parameters = [] ) :
     """
     Constructor.
 

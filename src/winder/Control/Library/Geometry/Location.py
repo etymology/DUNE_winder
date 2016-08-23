@@ -71,6 +71,16 @@ class Location :
     return [ self.x, self.y, self.z ]
 
   #---------------------------------------------------------------------
+  def copy( self ) :
+    """
+    Return a copy of this location.
+
+    Returns:
+      New instance at the same location.
+    """
+    return Location( self.x, self.y, self.z )
+
+  #---------------------------------------------------------------------
   def __str__( self ) :
     """
     Get a string representation of object.

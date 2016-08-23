@@ -48,6 +48,10 @@ class MachineGeometry :
     # Amount of distance the Z-axis can travel.
     self.zTravel = 434
 
+    # Distance from the inner pulley edge to the outer roller edge on the
+    # winder head arm.
+    self.headArmLength = 132.06424938
+
     # Lines defining the where a Z hand-off can take place.  Used for intercept
     # calculations.
     self.lineTop    = Line( 0, self.top )

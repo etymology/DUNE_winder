@@ -202,6 +202,53 @@ class G_CodeHandlerBase :
     elif G_Codes.DELAY == number :
       self._delay = int( function[ 1 ] )
 
+    # Correct for the arm on the winder head.
+    elif G_Codes.ANCHOR_POINT == number :
+      # Get anchor point.
+      pinNumberA = function[ 1 ]
+      pinNumberB = function[ 2 ]
+      offsetDirection = None
+      if len( function ) > 2 :
+        offsetDirection = function[ 3 ]
+
+      # Get the pin center.
+      pinA = self._layerCalibration.getPinLocation( pinNumberA )
+      pinB = self._layerCalibration.getPinLocation( pinNumberB )
+      center = pinA.center( pinB )
+      center = center.add( self._layerCalibration.offset )
+
+      # Compensate for pin diameter (if requested).
+      if "U" == offsetDirection :
+        center._y += self._machineCalibration.pinDiameter / 2
+      elif "D" == offsetDirection :
+        center._y -= self._machineCalibration.pinDiameter / 2
+      elif "L" == offsetDirection :
+        center._x -= self._machineCalibration.pinDiameter / 2
+      elif "R" == offsetDirection :
+        center._x += self._machineCalibration.pinDiameter / 2
+
+      self._headCompensation.anchorPoint( center )
+
+    # Correct for the arm on the winder head.
+    elif G_Codes.ARM_CORRECT == number :
+
+      z = self._machineCalibration.zFront
+      if 1 == self._headPosition :
+        z = self._layerCalibration.partialZ_Front
+      elif 2 == self._headPosition :
+        z = self._layerCalibration.partialZ_Back
+      elif 3 == self._headPosition :
+        z = self._machineCalibration.zBack
+
+      currentLocation = Location( self._x, self._y, z )
+      y = round( self._y, 4 )
+      top    = round( self._machineCalibration.transferTop, 4 )
+      bottom = round( self._machineCalibration.transferBottom, 4 )
+      if   y == top \
+        or y == bottom :
+          self._x = self._headCompensation.correctX( currentLocation )
+      else :
+        self._y = self._headCompensation.correctY( currentLocation )
 
   #---------------------------------------------------------------------
   def setLimitVelocity( self, maxVelocity ) :
@@ -262,11 +309,14 @@ class G_CodeHandlerBase :
     self._startLocationY = y
     self._startHeadLocation = headLocation
 
-
   #---------------------------------------------------------------------
-  def __init__( self, machineCalibration ):
+  def __init__( self, machineCalibration, headCompensation ):
     """
     Constructor.
+
+    Args:
+      machineCalibration: Machine calibration instance.
+      headCompensation: Instance of HeadCompensation.
     """
     self._callbacks = G_CodeCallbacks()
     self._callbacks.registerCallback( 'X', self._setX )
@@ -306,6 +356,7 @@ class G_CodeHandlerBase :
 
     self._layerCalibration = None
     self._machineCalibration = machineCalibration
+    self._headCompensation = headCompensation
 
     self._startLocationX = None
     self._startLocationY = None
