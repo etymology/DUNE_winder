@@ -246,6 +246,7 @@ function Configuration()
     machineCalibration.display( "Extended",           "zBack",            tag )
     machineCalibration.display( "Limit retracted",    "zLimitFront",      tag )
     machineCalibration.display( "Limit extended",     "zLimitRear",       tag )
+    machineCalibration.display( "Arm length",         "headArmLength",    tag )
     machineCalibration.buttonSet( tag )
 
     // All parameters of machine setup.
