@@ -262,9 +262,7 @@ function PositionGraphic()
 
         //
         // Draw angle of arm on head.
-        // $$$DEBUG
         //
-        //var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
         var z = zPosition
         if ( 0 != motorStatus.motor[ "headSide" ] )
           z = MAX_Z_POSITION
@@ -280,24 +278,16 @@ function PositionGraphic()
             Z_HEAD_ARM_X
           )
 
-        // $$$ var angle = readData[ 'headAngle' ]
-        // $$$ var z = Math.round( Math.sin( angle ) * 10000 ) / 10000
-        // $$$ angle = angle * 180 / Math.PI
-        // $$$ angle = Math.round( angle * 100 ) / 100
-        // $$$ $( "#debug" ).html( angle + "&deg;<br />" + z )
         var zHeadArmWidth = ( Z_HEAD_ARM_MAX_WIDTH - Z_HEAD_ARM_MIN_WIDTH )
         zHeadArmWidth *= -Math.sin( readData[ 'headAngle' ] )
 
         if ( zHeadArmWidth < 0 )
         {
-          //zHeadArmWidth -= Z_HEAD_ARM_MIN_WIDTH
           zHeadArm += zHeadArmWidth
           zHeadArmWidth = Z_HEAD_ARM_MIN_WIDTH - zHeadArmWidth
         }
         else
           zHeadArmWidth += Z_HEAD_ARM_MIN_WIDTH
-
-        // $$$ $( "#debug" ).html( zHeadArmWidth )
 
         zStatusCanvas.fillStyle = "grey"
         zStatusCanvas.fillRect
@@ -328,7 +318,6 @@ function PositionGraphic()
         var y =  Math.cos( readData[ 'headAngle' ] ) * radius
         zStatusCanvas.moveTo( HEAD_ANGLE_X, HEAD_ANGLE_Y )
         zStatusCanvas.lineTo( x + HEAD_ANGLE_X, y + HEAD_ANGLE_Y )
-        //zStatusCanvas.arc( 100, 75, 50, 0, 2 * Math.PI )
         zStatusCanvas.lineWidth = 2 * scale
         zStatusCanvas.stroke()
 

@@ -241,14 +241,45 @@ class G_CodeHandlerBase :
         z = self._machineCalibration.zBack
 
       currentLocation = Location( self._x, self._y, z )
+      # print "Correct", currentLocation, "anchored at", self._headCompensation.anchorPoint(),  # $$$
       y = round( self._y, 4 )
       top    = round( self._machineCalibration.transferTop, 4 )
       bottom = round( self._machineCalibration.transferBottom, 4 )
       if   y == top \
         or y == bottom :
+          #print "Correct X",  # $$$
           self._x = self._headCompensation.correctX( currentLocation )
+
+          edge = None
+
+          # Check to see if the adjusted position shifted past the right/left
+          # transfer area.
+          if self._x > self._machineCalibration.transferRight :
+            edge = Line( Line.VERTICLE_SLOPE, self._machineCalibration.transferRight )
+          elif self._x < self._machineCalibration.transferLeft :
+            edge = Line( Line.VERTICLE_SLOPE, self._machineCalibration.transferLeft )
+
+          # Do correct for transfer area (if needed)...
+          if edge :
+            # Make a line along the path from the anchor point to the
+            # destination.
+            start = self._headCompensation.anchorPoint()
+            line = Line.fromLocations( start, currentLocation )
+
+            #print "Over-travel", end   # $$$
+
+            # Get position where line crosses transfer area.
+            location = line.intersection( edge )
+            #print "Clip", location,  # $$$
+
+            # Compensate for head's arm.
+            self._y = self._headCompensation.correctY( location )
+            self._x = location.x
       else :
+        #print "Correct Y",   # $$$
         self._y = self._headCompensation.correctY( currentLocation )
+
+      #print Location( self._x, self._y, z )   # $$$
 
   #---------------------------------------------------------------------
   def setLimitVelocity( self, maxVelocity ) :

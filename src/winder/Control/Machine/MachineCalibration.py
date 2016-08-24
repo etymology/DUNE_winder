@@ -15,6 +15,10 @@ class MachineCalibration( Serializable ) :
   def __init__( self, outputFilePath, outputFileName ) :
     """
     Constructor.
+
+    Args:
+      outputFilePath - Path to save/load data.
+      outputFileName - Name of data file.
     """
 
     Serializable.__init__( self, exclude=[ "_outputFilePath", "_outputFileName" ] )

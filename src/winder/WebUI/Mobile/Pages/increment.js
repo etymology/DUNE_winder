@@ -40,7 +40,8 @@ function Increment()
   }
 
   //-----------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Callback to seek to specified pin.
   //-----------------------------------------------------------------------------
   this.seekPin = function()
   {
@@ -51,7 +52,9 @@ function Increment()
 
   //-----------------------------------------------------------------------------
   // Uses:
-  //   $$$DEBUG
+  //   Make an incremental move in X.
+  // Input:
+  //   offset - Value (+/-) to move.
   //-----------------------------------------------------------------------------
   this.moveX = function( offset )
   {
@@ -63,7 +66,9 @@ function Increment()
 
   //-----------------------------------------------------------------------------
   // Uses:
-  //   $$$DEBUG
+  //   Make an incremental move in Y.
+  // Input:
+  //   offset - Value (+/-) to move.
   //-----------------------------------------------------------------------------
   this.moveY = function( offset )
   {

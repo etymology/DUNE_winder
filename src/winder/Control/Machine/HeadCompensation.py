@@ -129,7 +129,8 @@ class HeadCompensation :
     while not isDone :
       x = deltaX + lastX * armLength / math.sqrt( lastX**2 + deltaZ**2 )
 
-      isDone = ( x == lastX )
+      change = abs( x - lastX )
+      isDone = ( change < 1e12 )
       lastX = x
 
     x += self._anchorPoint.x

@@ -881,15 +881,24 @@ class Process :
 
   #---------------------------------------------------------------------
   def getHeadAngle( self ) :
-    """$$$DEBUG"""
+    """
+    Get the current angle of the arm based on machine position and the last
+    anchor point.
+
+    Args:
+      location: Location of actual machine position.
+
+    Returns:
+      Angle of the arm (-pi to +pi).
+    """
     x = self._io.xAxis.getPosition()
     y = self._io.yAxis.getPosition()
     z = self._io.zAxis.getPosition()
 
     # $$$DEBUG - This doesn't work.  Not too important.  Fix it one day.
-    # $$$ if self._io.head.BACK == self._io.head.getSide() :
-    # $$$   print "Back"
-    # $$$   z = self._io.head.getTargetAxisPosition()
+    # if self._io.head.BACK == self._io.head.getSide() :
+    #   print "Back"
+    #   z = self._io.head.getTargetAxisPosition()
 
     location = Location( x, y, z )
 

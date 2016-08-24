@@ -28,7 +28,11 @@ class DefaultMachineCalibration( MachineCalibration ) :
   #---------------------------------------------------------------------
   def __init__( self, outputFilePath=None, outputFileName=None ) :
     """
-    $$$DEBUG
+    Constructor.
+
+    Args:
+      outputFilePath - Path to save/load data.
+      outputFileName - Name of data file.
     """
     MachineCalibration.__init__( self, outputFilePath, outputFileName )
     geometry = UV_LayerGeometry()
