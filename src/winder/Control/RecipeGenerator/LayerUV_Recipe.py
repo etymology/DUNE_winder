@@ -199,7 +199,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( ArmCorrectG_Code() )
       self.gCodePath.push()
-      self.z.set( HeadPosition.PARTIAL )
+      self.z.set( HeadPosition.OTHER_SIDE )
 
 
     if self._nextNet() :
@@ -208,7 +208,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
 
       # Go to other side and seek past pin so it is hooked with next move.
-      self.z.set( HeadPosition.OTHER_SIDE )
+      #self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=-self.geometry.overshoot ) )
       self.gCodePath.push()
