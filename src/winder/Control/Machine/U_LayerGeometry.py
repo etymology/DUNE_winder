@@ -37,7 +37,6 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     # Distance from the layer to the head.
     self.frontZ = 0
     self.backZ  = self.zTravel
-    self.zClearance = self.frontZ
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
@@ -50,7 +49,7 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     # maximize the amount of contact of wire to the pin and still clear any
     # neighboring pins.
     overshootAngle = 90 - 18
-    self.overshoot = self.zClearance * math.tan( math.radians( overshootAngle ) )
+    self.overshoot = self.partialZ_Front * math.tan( math.radians( overshootAngle ) )
 
     # The grid parameters are a list of parameters for how the grid is constructed.
     # Columns:

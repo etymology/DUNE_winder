@@ -52,6 +52,9 @@ zeroOffset = False
 # Enable base path (i.e. path without compensation for pin radius).
 isRubyBasePath = False
 
+# Overriding number of loops to complete.
+overrideLaps = None
+
 # Individual layer enables.
 enableX = True
 enableU = True
@@ -141,7 +144,7 @@ def generateLayer( layer, recipeClass, geometry, enable ) :
   """
   if enable :
     print "Generating " + layer + "-layer recipe"
-    recipe = recipeClass( geometry )
+    recipe = recipeClass( geometry, overrideLaps )
     recipe.writeG_Code( recipeDirectory + "/" + layer + "-Layer", "gc", layer + " Layer" )
 
     if isRubyCode :
@@ -198,6 +201,8 @@ if __name__ == "__main__":
       zeroOffset = ( "TRUE" == value )
     elif "BASEPATH" == option :
       isRubyBasePath = ( "TRUE" == value )
+    elif "OVERRIDE" :
+      overrideLaps = int( value )
     else :
       raise Exception( "Unknown:" + option )
 

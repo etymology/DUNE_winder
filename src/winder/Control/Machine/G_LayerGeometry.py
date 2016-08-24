@@ -42,7 +42,6 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     # Distance from the layer to the head.
     self.frontZ = 0
     self.backZ  = self.zTravel
-    self.zClearance = self.frontZ
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.

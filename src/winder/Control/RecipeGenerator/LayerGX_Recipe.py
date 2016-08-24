@@ -101,6 +101,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     if windsOverride :
       totalCount = windsOverride
+      halfCount = totalCount / 2
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.

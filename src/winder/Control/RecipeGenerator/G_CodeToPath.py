@@ -15,6 +15,7 @@ from Library.Geometry.Location import Location
 from Machine.G_Codes import G_Codes
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 from Machine.DefaultCalibration import DefaultMachineCalibration
+from Machine.HeadCompensation import HeadCompensation
 
 from .G_CodePath import G_CodePath
 from .G_CodeFunctions.G_CodeFunction import G_CodeFunction
@@ -31,7 +32,10 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       geometry: Layer/machine geometry.
       calibration: Layer calibration.
     """
-    G_CodeHandlerBase.__init__( self, DefaultMachineCalibration() )
+    machineCalibration = DefaultMachineCalibration()
+    machineCalibration.headArmLength = 0
+    headCompensation = HeadCompensation( machineCalibration )
+    G_CodeHandlerBase.__init__( self, machineCalibration, headCompensation )
 
     # Read input file.
     with open( fileName ) as inputFile :
