@@ -84,7 +84,13 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       self._lastZ = self._z
       self._functions = []
 
-      self._gCode.executeNextLine( line )
+      try :
+        self._gCode.executeNextLine( line )
+      except Exception as exception:
+        #print "Unable to execute line", line
+        #print "  " + self._gCode.lines[ line ]
+        #print "  " + str( exception )
+        raise Exception( "Problems executing G-Code" )
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
@@ -168,14 +174,10 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
       gCodePath = self.toPath()
 
-      layerOffset = \
-        Location( self._geometry.apaOffsetX, self._geometry.apaOffsetY, self._geometry.apaOffsetZ )
-
       rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
       if enablePinLabels :
         for pinName in self._calibration.getPinNames() :
           location = self._calibration.getPinLocation( pinName )
-          location = location.add( layerOffset )
 
           y = 0.1
           x = 0.1

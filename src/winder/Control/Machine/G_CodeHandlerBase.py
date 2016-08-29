@@ -10,12 +10,13 @@
 # specific G-Code functions that modify X/Y or signal other functions.
 ###############################################################################
 
-from Library.G_Code import G_CodeCallbacks
+from Library.MathExtra import MathExtra
+from Library.G_Code    import G_CodeCallbacks
 
 from Library.Geometry.Location import Location
-from Library.Geometry.Line    import Line
-from Library.Geometry.Box     import Box
-from Library.Geometry.Segment import Segment
+from Library.Geometry.Line     import Line
+from Library.Geometry.Box      import Box
+from Library.Geometry.Segment  import Segment
 
 from .G_Codes import G_Codes
 
@@ -120,10 +121,21 @@ class G_CodeHandlerBase :
       self._wireLength = length
 
     # Seek to transfer area
+    # This will maintain the slope of the path between where the wire is
+    # anchored and where the G-Code position is at present.
     elif G_Codes.SEEK_TRANSFER == number :
 
-      startLocation = Location( self._lastX, self._lastY, self._lastZ )
+      # The position thus far.
       endLocation = Location( self._x, self._y, self._z )
+
+      # Starting location based on anchor point.  Actual location has compensation
+      # for pin diameter.
+      startLocation = self._headCompensation.compensatedAnchorPoint( endLocation )
+
+      if None == startLocation :
+        # $$$FUTURE - G-Code should throw a more specialized exception.
+        raise Exception( "G-Code seek transfer could not establish an anchor point." )
+
       segment = Segment( startLocation, endLocation )
 
       # Box that defines the Z hand-off edges.
@@ -148,6 +160,7 @@ class G_CodeHandlerBase :
       axies = function[ 3 ]
 
       if not self._layerCalibration :
+        # $$$FUTURE - G-Code should throw a more specialized exception.
         raise Exception( "G-Code request for calibrated move, but no layer calibration to use." )
 
       pinA = self._layerCalibration.getPinLocation( pinNumberA )
@@ -207,9 +220,9 @@ class G_CodeHandlerBase :
       # Get anchor point.
       pinNumberA = function[ 1 ]
       pinNumberB = function[ 2 ]
-      offsetDirection = None
+      orientation = None
       if len( function ) > 2 :
-        offsetDirection = function[ 3 ]
+        orientation = function[ 3 ]
 
       # Get the pin center.
       pinA = self._layerCalibration.getPinLocation( pinNumberA )
@@ -217,21 +230,17 @@ class G_CodeHandlerBase :
       center = pinA.center( pinB )
       center = center.add( self._layerCalibration.offset )
 
-      # Compensate for pin diameter (if requested).
-      if "U" == offsetDirection :
-        center._y += self._machineCalibration.pinDiameter / 2
-      elif "D" == offsetDirection :
-        center._y -= self._machineCalibration.pinDiameter / 2
-      elif "L" == offsetDirection :
-        center._x -= self._machineCalibration.pinDiameter / 2
-      elif "R" == offsetDirection :
-        center._x += self._machineCalibration.pinDiameter / 2
+      if "0" == orientation :
+        orientation = None
 
       self._headCompensation.anchorPoint( center )
+      self._headCompensation.diameter( self._machineCalibration.pinDiameter / 2 )
+      self._headCompensation.orientation( orientation )
 
     # Correct for the arm on the winder head.
     elif G_Codes.ARM_CORRECT == number :
 
+      # $$$DEBUG - Fix constants.
       z = self._machineCalibration.zFront
       if 1 == self._headPosition :
         z = self._layerCalibration.partialZ_Front
@@ -241,13 +250,9 @@ class G_CodeHandlerBase :
         z = self._machineCalibration.zBack
 
       currentLocation = Location( self._x, self._y, z )
-      # print "Correct", currentLocation, "anchored at", self._headCompensation.anchorPoint(),  # $$$
-      y = round( self._y, 4 )
-      top    = round( self._machineCalibration.transferTop, 4 )
-      bottom = round( self._machineCalibration.transferBottom, 4 )
-      if   y == top \
-        or y == bottom :
-          #print "Correct X",  # $$$
+
+      if   MathExtra.isclose( self._y, self._machineCalibration.transferTop ) \
+        or MathExtra.isclose( self._y, self._machineCalibration.transferBottom ) :
           self._x = self._headCompensation.correctX( currentLocation )
 
           edge = None
@@ -266,20 +271,16 @@ class G_CodeHandlerBase :
             start = self._headCompensation.anchorPoint()
             line = Line.fromLocations( start, currentLocation )
 
-            #print "Over-travel", end   # $$$
-
             # Get position where line crosses transfer area.
             location = line.intersection( edge )
-            #print "Clip", location,  # $$$
 
             # Compensate for head's arm.
             self._y = self._headCompensation.correctY( location )
             self._x = location.x
       else :
-        #print "Correct Y",   # $$$
         self._y = self._headCompensation.correctY( currentLocation )
 
-      #print Location( self._x, self._y, z )   # $$$
+      self._xyChange = True
 
   #---------------------------------------------------------------------
   def setLimitVelocity( self, maxVelocity ) :
@@ -393,3 +394,57 @@ class G_CodeHandlerBase :
     self._startLocationY = None
     self._startHeadLocation = None
 
+# Unit test code.
+if __name__ == "__main__":
+
+  from Library.G_Code import G_Code
+  from Library.MathExtra import MathExtra
+  from Machine.DefaultCalibration import DefaultMachineCalibration, DefaultLayerCalibration
+  from Machine.HeadCompensation import HeadCompensation
+
+  # Child of G-Code handler to do testing.
+  class G_CodeTester( G_CodeHandlerBase ) :
+    def __init__( self ) :
+      # Create default calibrations and setup head compensation.
+      machineCalibration = DefaultMachineCalibration()
+      layerCalibration = DefaultLayerCalibration( None, None, "V" )
+      headCompensation = HeadCompensation( machineCalibration )
+
+      # Some G-Code test lines.
+      lines = [
+        "X10 Y10 Z10",
+        "G103 PF800 PF800 PXY",
+        "G109 PF1 PF1 PTR G103 PF2399 PF2398 PXY G102"
+      ]
+
+      # Construct G-Code handler.
+      G_CodeHandlerBase.__init__( self, machineCalibration, headCompensation )
+      self.useLayerCalibration( layerCalibration )
+
+      # Setup G-Code interpreter.
+      gCode = G_Code( lines, self._callbacks )
+
+      #
+      # Run tests.
+      #
+
+      # Simple X/Y/Z seek.
+      gCode.executeNextLine( 0 )
+      assert( Location( self._x, self._y, self._z ) == Location( 10, 10, 10 ) )
+
+      # Pin seek.
+      gCode.executeNextLine( 1 )
+      location = layerCalibration.getPinLocation( "F800" )
+      location = location.add( layerCalibration.offset )
+      location.z = 0
+      assert( location == Location( self._x, self._y ) )
+
+      # Anchor point to transfer area check.
+      # Anchor on pin F1, then center between F2399 and F2398.  Preserve the slope
+      # of the line and seek to a transfer area.  This should intercept the bottom.
+      gCode.executeNextLine( 2 )
+      assert( MathExtra.isclose( self._x, 887.701845335 ) )
+      assert( MathExtra.isclose( self._y, 0 ) )
+
+  # Create instance of test class, thereby running tests.
+  tester = G_CodeTester()

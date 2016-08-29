@@ -7,7 +7,9 @@
 ###############################################################################
 
 import math
+from Library.MathExtra import MathExtra
 from Library.Geometry.Location import Location
+from Library.Geometry.Circle import Circle
 
 class HeadCompensation :
 
@@ -20,7 +22,43 @@ class HeadCompensation :
       machineCalibration - Instance of MachineCalibration.
     """
     self._machineCalibration = machineCalibration
-    self._anchorPoint = Location()
+    self._anchorPoint = Location( -1 )
+    self._diameter    = 0
+    self._orientation = None
+
+  #---------------------------------------------------------------------
+  def diameter( self, value = None ) :
+    """
+    Get/set diameter.
+
+    Args:
+      value - New diameter (omit to read).
+
+    Returns:
+      The current diameter.
+    """
+
+    if None != value :
+      self._diameter = value
+
+    return self._diameter
+
+  #---------------------------------------------------------------------
+  def orientation( self, value = None ) :
+    """
+    Get/set orientation of connecting wire.
+
+    Args:
+      value - New orientation (omit to read).
+
+    Returns:
+      The current orientation.
+    """
+
+    if None != value :
+      self._orientation = value
+
+    return self._orientation
 
   #---------------------------------------------------------------------
   def anchorPoint( self, location = None ) :
@@ -37,6 +75,30 @@ class HeadCompensation :
       self._anchorPoint = location.copy()
 
     return self._anchorPoint
+
+  #---------------------------------------------------------------------
+  def compensatedAnchorPoint( self, endPoint ) :
+    """
+    Get the anchor position while compensating for the pin diameter.
+    This will compute a point for which the connecting line will run tangent
+    to the anchor point circle.
+
+    Args:
+      endPoint: Target destination to run tangent line.
+
+    Returns:
+      Instance of location.  None if the orientation is incorrect for the
+      target location.
+    """
+
+    result = None
+    if self._diameter and self._orientation :
+      circle = Circle( self._anchorPoint, self._diameter )
+      result = circle.tangentPoint( self._orientation, endPoint )
+    else :
+      result = self._anchorPoint
+
+    return result
 
   #---------------------------------------------------------------------
   def getHeadAngle( self, location ) :
@@ -129,8 +191,7 @@ class HeadCompensation :
     while not isDone :
       x = deltaX + lastX * armLength / math.sqrt( lastX**2 + deltaZ**2 )
 
-      change = abs( x - lastX )
-      isDone = ( change < 1e12 )
+      isDone = MathExtra.isclose( x, lastX )
       lastX = x
 
     x += self._anchorPoint.x

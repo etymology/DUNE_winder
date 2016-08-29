@@ -6,6 +6,8 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from Library.MathExtra import MathExtra
+
 #==============================================================================
 class Location :
 
@@ -85,9 +87,49 @@ class Location :
     """
     Get a string representation of object.
 
-    Returns
+    Returns:
       String representation of object in form (x, y, z) where x/y/z are
       numbers.
     """
 
     return "(" + str( self.x ) + ", " + str( self.y ) + ", " + str( self.z ) + ")"
+
+  #---------------------------------------------------------------------
+  def __eq__( self, other ) :
+    """
+    Check to see if this location is equal to an other.
+
+    Input:
+      other: An other instance of Location to compare.
+
+    Returns:
+      True if equal, False if not.
+    """
+
+    result = False
+    if isinstance( object, Location ) :
+      result = MathExtra.isclose( self.x, other.x ) \
+           and MathExtra.isclose( self.y, other.y ) \
+           and MathExtra.isclose( self.z, other.z )
+
+    return result
+
+  #---------------------------------------------------------------------
+  def __ne__( self, other ) :
+    """
+    Check to see if this location are not equal to an other.
+
+    Input:
+      other: An other instance of Location to compare.
+
+    Returns:
+      False if equal, True if not.
+    """
+
+    result = True
+    if isinstance( object, Location ) :
+      result = not MathExtra.isclose( self.x, other.x ) \
+            or not MathExtra.isclose( self.y, other.y ) \
+            or not MathExtra.isclose( self.z, other.z )
+
+    return result

@@ -100,6 +100,7 @@ class DefaultLayerCalibration( LayerCalibration ) :
 
     LayerCalibration.__init__( self, layerName )
     self.offset = SerializableLocation( geometry.toAPA_OffsetX , geometry.toAPA_OffsetY )
+    self.offset = self.offset.add( geometry.apaOffset )
     self.zFront = geometry.partialZ_Front
     self.zBack  = geometry.partialZ_Back
 
@@ -108,7 +109,8 @@ class DefaultLayerCalibration( LayerCalibration ) :
       newLocation = SerializableLocation( location.x, location.y, location.z )
       self.setPinLocation( node, newLocation )
 
-    self.save( outputFilePath, outputFileName, "LayerCalibration" )
+    if outputFilePath and outputFileName :
+      self.save( outputFilePath, outputFileName, "LayerCalibration" )
 
 # end class
 

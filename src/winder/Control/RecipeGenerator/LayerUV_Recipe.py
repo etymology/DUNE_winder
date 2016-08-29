@@ -37,6 +37,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     RecipeGenerator.__init__( self, geometry )
 
     self.orientations = {}
+    self.anchorOrientations = {}
 
   #-------------------------------------------------------------------
   def _createNode( self, grid, orientation, side, depth, startPin, direction ) :
@@ -58,14 +59,13 @@ class LayerUV_Recipe( RecipeGenerator ) :
       Nothing is returned.
     """
 
-    # A wire can land in one of four locations along a pin: upper/lower
+    # A wire can land in one of four locations along a pin: top/bottom
     # left/right.  The angle of these locations are defined here.
     angle180 = math.radians( 180 )
-    ul = -self.geometry.angle
-    ll = self.geometry.angle + angle180
-    ur = self.geometry.angle
-    lr = -self.geometry.angle + angle180
-
+    tl = -self.geometry.angle
+    bl =  self.geometry.angle + angle180
+    tr =  self.geometry.angle
+    br = -self.geometry.angle + angle180
     if orientation :
       sideA = "F"
       sideB = "B"
@@ -74,10 +74,22 @@ class LayerUV_Recipe( RecipeGenerator ) :
       sideB = "F"
 
     orientations = \
-    {       # Left  Top   Right  Bottom
-      sideA : [ ur,   ll,   ll,    ur ],
-      sideB : [ lr,   lr,   ul,    ul ]
+    {         # Left  Top   Right  Bottom
+      sideA : [ tr,   bl,   bl,    tr ],
+      sideB : [ br,   br,   tl,    tl ]
     }
+
+    # Lookup table for how the wire is oriented around the anchor point.
+    # Start and direction, so "tr" is top going from left to right, and "rb" is
+    # right going from top to bottom.
+    anchorOrientations = \
+    {         # Left  Top   Right  Bottom
+      sideA : [ "TR", "LB", "BL",  "RT" ],
+      sideB : [ "BR", "RB", "TL",  "LT" ]
+    }
+
+    # Lookup table for what pin to center the wire.  Centering is always the
+    # target pin, and the pin to the left or right.
     if orientation :
                   # Left  Top   Right  Bottom
       centering = [ +1,   -1,   +1,    -1     ]
@@ -99,8 +111,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
         location = Location( round( x, 5 ) + 0, round( y, 5 ) + 0, depth )
         pin = side + str( pinNumber )
         self.nodes[ pin ] = location
-        self.orientations[ pin ] = orientations[ side ][ setIndex ]
-        self.centering[ pin ]    = centering[ setIndex ]
+        self.orientations[ pin ]       = orientations[ side ][ setIndex ]
+        self.centering[ pin ]          = centering[ setIndex ]
+        self.anchorOrientations[ pin ] = anchorOrientations[ side ][ setIndex ]
 
         pinNumber += direction
 
@@ -166,6 +179,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       # look-up table.
       net = self.net[ self.netIndex ]
       orientation = self.orientations[ net ]
+      anchorOrientation = self.anchorOrientations[ lastNet ]
 
       # Location of the the next pin.
       location = self.location( self.netIndex )
@@ -181,7 +195,8 @@ class LayerUV_Recipe( RecipeGenerator ) :
       # amount of wire consumed by this move.
       self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
 
-      self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet ) )
+      # Push the anchor point of the last placed wire.
+      self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, offset=anchorOrientation ) )
 
       result = True
 
@@ -199,7 +214,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( ArmCorrectG_Code() )
       self.gCodePath.push()
-      self.z.set( HeadPosition.PARTIAL )
+      self.z.set( HeadPosition.OTHER_SIDE )
 
 
     if self._nextNet() :
@@ -208,7 +223,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
 
       # Go to other side and seek past pin so it is hooked with next move.
-      self.z.set( HeadPosition.OTHER_SIDE )
+      #self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=-self.geometry.overshoot ) )
       self.gCodePath.push()
@@ -222,6 +237,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       direction: -1 for left side, 1 for right side.
     """
 
+    # Column pin.
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
@@ -229,44 +245,20 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
+    # Column, other side.
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
-      offset = ( self.geometry.pinRadius - self.geometry.overshoot ) * direction
-      self.gCodePath.pushG_Code( OffsetG_Code( x=offset ) )
-      self.gCodePath.push()
-      self.gCodePath.pushG_Code( OffsetG_Code( y=-self.geometry.overshoot ) )
-      self.gCodePath.pushG_Code( ClipG_Code() )
       self.gCodePath.push()
 
     if self._nextNet() :
-
-      # Get the angle of the line going directly to the center of the destination
-      # pins.
-      centerA = self.center( self.netIndex - 1, -direction )
-      centerA.y -= self.geometry.overshoot
-      centerB = self.center( self.netIndex, direction )
-      segment = Segment( centerA, centerB )
-      line = Line.fromSegment( segment )
-
-      # If the angle isn't too steep, go directly to the destination.  Otherwise,
-      # just go to the Z-transfer area in Y.
-      # (We could always go to the Z-transfer area in Y, but this allows a
-      # faster path as long as the angle is large enough).
-      angle = direction * line.getAngle()
-      if angle >= self.geometry.minAngle and centerA.y > centerB.y :
-        self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
-        self.gCodePath.pushG_Code( SeekTransferG_Code() )
-        self.gCodePath.push()
-      else:
-        self.gCodePath.pushG_Code( OffsetG_Code( y=-1000 ) )
-        self.gCodePath.pushG_Code( ClipG_Code() )
-        self.gCodePath.push()
-        self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
-        self.gCodePath.push()
-
+      # Anchor point is set--find a path between.
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
+      self.gCodePath.pushG_Code( SeekTransferG_Code() )
+      self.gCodePath.pushG_Code( ArmCorrectG_Code() )
+      self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
     if self._nextNet() :
