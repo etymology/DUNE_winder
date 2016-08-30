@@ -11,7 +11,7 @@
 ###############################################################################
 
 from Library.MathExtra import MathExtra
-from Library.G_Code    import G_CodeCallbacks
+from Library.G_Code    import G_CodeCallbacks, G_CodeException
 
 from Library.Geometry.Location import Location
 from Library.Geometry.Line     import Line
@@ -133,8 +133,14 @@ class G_CodeHandlerBase :
       startLocation = self._headCompensation.compensatedAnchorPoint( endLocation )
 
       if None == startLocation :
-        # $$$FUTURE - G-Code should throw a more specialized exception.
-        raise Exception( "G-Code seek transfer could not establish an anchor point." )
+        data = [
+          str( self._headCompensation.anchorPoint() ),
+          str( self._headCompensation.diameter() ),
+          str( self._headCompensation.orientation() ),
+          str( endLocation )
+        ]
+
+        raise G_CodeException( "G-Code seek transfer could not establish an anchor point.", data )
 
       segment = Segment( startLocation, endLocation )
 
@@ -160,8 +166,7 @@ class G_CodeHandlerBase :
       axies = function[ 3 ]
 
       if not self._layerCalibration :
-        # $$$FUTURE - G-Code should throw a more specialized exception.
-        raise Exception( "G-Code request for calibrated move, but no layer calibration to use." )
+        raise G_CodeException( "G-Code request for calibrated move, but no layer calibration to use." )
 
       pinA = self._layerCalibration.getPinLocation( pinNumberA )
       pinB = self._layerCalibration.getPinLocation( pinNumberB )

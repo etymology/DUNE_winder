@@ -118,6 +118,20 @@ class WindMode( StateMachineState ) :
       # Update G-Code handler.
       isDone = self.stateMachine.gCodeHandler.poll()
 
+      if self.stateMachine.gCodeHandler.isG_CodeError() :
+        # Log message that wind is complete.
+        self._log.add(
+          self.__class__.__name__,
+          "WIND_ERROR",
+          "G-Code error.  " + self.stateMachine.gCodeHandler.getG_CodeErrorMessage(),
+          self.stateMachine.gCodeHandler.getG_CodeErrorData()
+        )
+
+        self.stateMachine.gCodeHandler.clearCodeError()
+
+        isDone = True
+
+
       # Is G-Code execution complete?
       if isDone :
         # Log message that wind is complete.

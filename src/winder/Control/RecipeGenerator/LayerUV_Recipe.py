@@ -84,8 +84,12 @@ class LayerUV_Recipe( RecipeGenerator ) :
     # right going from top to bottom.
     anchorOrientations = \
     {         # Left  Top   Right  Bottom
-      sideA : [ "TR", "LB", "BL",  "RT" ],
-      sideB : [ "BR", "RB", "TL",  "LT" ]
+      # $$$DEBUG - Put back sideA : [ "TR", "LB", "BL",  "RT" ],
+      # $$$DEBUG - Put back sideB : [ "BR", "RB", "TL",  "LT" ]
+
+      sideA : [ "TL", "RB", "BR",  "LT" ],
+      sideB : [ "BL", "LB", "TR",  "RT" ]
+
     }
 
     # Lookup table for what pin to center the wire.  Centering is always the
@@ -259,12 +263,12 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( SeekTransferG_Code() )
       self.gCodePath.pushG_Code( ArmCorrectG_Code() )
       self.gCodePath.push()
-      self.z.set( HeadPosition.PARTIAL )
+      self.z.set( HeadPosition.OTHER_SIDE )
 
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.push()
-      self.z.set( HeadPosition.OTHER_SIDE )
+      # $$$ self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=self.geometry.overshoot ) )
       self.gCodePath.push()

@@ -14,6 +14,15 @@ import re
 #=============================================================================
 #
 #=============================================================================
+class G_CodeException( Exception ) :
+  #---------------------------------------------------------------------
+  def __init__( self, message, data=[] ) :
+    Exception.__init__( self, message )
+    self.data = data
+
+#=============================================================================
+#
+#=============================================================================
 class G_CodeClass :
   #---------------------------------------------------------------------
   def __init__( self, parentLine ) :
@@ -250,7 +259,14 @@ class G_CodeLine :
         if None != lastClass :
           lastClass.addParameter( parameter )
         else:
-          raise Exception( 'Unassigned parameter', parameter )
+          data = [
+            command,
+            code,
+            parameter
+          ]
+
+          raise G_CodeException( 'Unassigned parameter ' + parameter, data )
+
       # Ignore blank lines.
       elif '' != code :
         # Create an object to hold this command.

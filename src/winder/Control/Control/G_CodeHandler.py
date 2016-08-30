@@ -6,7 +6,7 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from Library.G_Code import G_Code
+from Library.G_Code import G_Code, G_CodeException
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 
 class G_CodeHandler( G_CodeHandlerBase ) :
@@ -46,6 +46,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     isDone = False
     isDone |= 1 == self._direction and self._nextLine >= endLine
     isDone |= 1 != self._direction and self._nextLine <= startLine
+    isDone |= self._isG_CodeError
 
     return isDone
 
@@ -234,9 +235,51 @@ class G_CodeHandler( G_CodeHandlerBase ) :
                 str( self._z - z ) + "\n"
               )
 
+            self._isG_CodeError = False
             self.runNextLine()
 
     return isDone
+
+  #---------------------------------------------------------------------
+  def isG_CodeError( self ) :
+    """
+    Check to see if there is an error with the G-Code.
+
+    Returns:
+      True if there is an error, False if not.
+    """
+    return self._isG_CodeError
+
+  #---------------------------------------------------------------------
+  def clearCodeError( self ) :
+    """
+    Clear any existing G-Code error.  Call after error has been debt with.
+    """
+    self._isG_CodeError = False
+    self._isG_CodeErrorMessage = ""
+    self._isG_CodeErrorData = []
+
+  #---------------------------------------------------------------------
+  def getG_CodeErrorMessage( self ) :
+    """
+    If there is an error, this function will return an error message detailing
+    what is wrong with the G-Code.
+
+    Returns:
+      String with error message.
+    """
+    return self._isG_CodeErrorMessage
+
+  #---------------------------------------------------------------------
+  def getG_CodeErrorData( self ) :
+    """
+    If there is an error, this function will return an error data detailing
+    what is wrong with the G-Code.
+
+    Returns:
+      An array of data.
+    """
+    return self._isG_CodeErrorData
 
   #---------------------------------------------------------------------
   def runNextLine( self ):
@@ -252,8 +295,16 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._lastVelocity = self._velocity
     self._functions = []
 
-    # Interpret the next line.
-    self._gCode.executeNextLine( self._nextLine )
+    try :
+      # Interpret the next line.
+      self._gCode.executeNextLine( self._nextLine )
+    except G_CodeException as exception :
+      self._isG_CodeErrorMessage = str( exception )
+
+      self._isG_CodeErrorData = [ self._nextLine, self._gCode.lines[ self._nextLine ] ]
+      self._isG_CodeErrorData += exception.data
+
+      self._isG_CodeError = True
 
     # Account for wire used.
     if self._wireLength :
@@ -426,3 +477,6 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._velocityScale = 1.0
 
     self._firstMove = False
+    self._isG_CodeError = False
+    self._isG_CodeErrorMessage = ""
+    self._isG_CodeErrorData = []
