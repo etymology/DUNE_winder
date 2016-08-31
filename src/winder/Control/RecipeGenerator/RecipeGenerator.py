@@ -174,6 +174,7 @@ class RecipeGenerator :
   #---------------------------------------------------------------------
   def writeRubyCode(
     self,
+    layerName,
     half,
     outputFileName,
     enablePath=True,
@@ -202,12 +203,12 @@ class RecipeGenerator :
 
       if enablePath :
         if 0 == half :
-          self.firstHalf.toSketchUpRuby( rubyFile, "1st", enablePathLabels )
+          self.firstHalf.toSketchUpRuby( rubyFile, layerName, "1st", enablePathLabels )
         else:
-          self.secondHalf.toSketchUpRuby( rubyFile, "2nd", enablePathLabels )
+          self.secondHalf.toSketchUpRuby( rubyFile, layerName, "2nd", enablePathLabels )
 
       if enableWire :
-        self.nodePath.toSketchUpRuby( rubyFile )
+        self.nodePath.toSketchUpRuby( rubyFile, "Path " + layerName )
 
   #---------------------------------------------------------------------
   def writeRubyAnimateCode(

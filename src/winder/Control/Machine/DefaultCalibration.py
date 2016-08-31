@@ -101,6 +101,7 @@ class DefaultLayerCalibration( LayerCalibration ) :
     LayerCalibration.__init__( self, layerName )
     self.offset = SerializableLocation( geometry.toAPA_OffsetX , geometry.toAPA_OffsetY )
     self.offset = self.offset.add( geometry.apaOffset )
+    self.offset = SerializableLocation.fromLocation( self.offset )
     self.zFront = geometry.partialZ_Front
     self.zBack  = geometry.partialZ_Back
 

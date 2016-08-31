@@ -87,9 +87,9 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       try :
         self._gCode.executeNextLine( line )
       except Exception as exception:
-        #print "Unable to execute line", line
-        #print "  " + self._gCode.lines[ line ]
-        #print "  " + str( exception )
+        print "Unable to execute line", line
+        print "  " + self._gCode.lines[ line ]
+        print "  " + str( exception )
         raise Exception( "Problems executing G-Code" )
 
       for function in self._functions :
@@ -149,6 +149,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
   def writeRubyCode(
     self,
     outputFileName,
+    layerName,
     layerHalf,
     enablePathLabels=False,
     enablePinLabels=False,
@@ -174,18 +175,23 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
       gCodePath = self.toPath()
 
-      rubyFile.write( 'layer = Sketchup.active_model.layers.add "Pin labels"' + "\r\n" )
       if enablePinLabels :
+        rubyFile.write(
+          'layer = Sketchup.active_model.layers.add "Pin labels ' + layerName + '"' + "\r\n" )
+
         for pinName in self._calibration.getPinNames() :
           location = self._calibration.getPinLocation( pinName )
+          location = location.add( self._calibration.offset )
+
+          # $$$FUTURE - The offset for Z is added twice.  Figure out how to fix this.
+          location.z -= self._calibration.offset.z
 
           y = 0.1
           x = 0.1
           if "B" == pinName[ 0 ] :
-            location.z = self._geometry.depth + self._geometry.apaOffsetZ
             y = -y
             x = -x
 
           self._pointLabel( rubyFile, location, pinName, 'layer', x, y )
 
-      gCodePath.toSketchUpRuby( rubyFile, layerHalf, enablePathLabels )
+      gCodePath.toSketchUpRuby( rubyFile, layerName, layerHalf, enablePathLabels )

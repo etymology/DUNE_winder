@@ -223,22 +223,17 @@ class G_CodeHandlerBase :
     # Correct for the arm on the winder head.
     elif G_Codes.ANCHOR_POINT == number :
       # Get anchor point.
-      pinNumberA = function[ 1 ]
-      pinNumberB = function[ 2 ]
-      orientation = None
-      if len( function ) > 2 :
-        orientation = function[ 3 ]
+      pinNumber   = function[ 1 ]
+      orientation = function[ 2 ]
 
       # Get the pin center.
-      pinA = self._layerCalibration.getPinLocation( pinNumberA )
-      pinB = self._layerCalibration.getPinLocation( pinNumberB )
-      center = pinA.center( pinB )
-      center = center.add( self._layerCalibration.offset )
+      pin = self._layerCalibration.getPinLocation( pinNumber )
+      pin = pin.add( self._layerCalibration.offset )
 
       if "0" == orientation :
         orientation = None
 
-      self._headCompensation.anchorPoint( center )
+      self._headCompensation.anchorPoint( pin )
       self._headCompensation.diameter( self._machineCalibration.pinDiameter / 2 )
       self._headCompensation.orientation( orientation )
 
@@ -419,7 +414,7 @@ if __name__ == "__main__":
       lines = [
         "X10 Y10 Z10",
         "G103 PF800 PF800 PXY",
-        "G109 PF1 PF1 PTR G103 PF2399 PF2398 PXY G102"
+        "G109 PF1200 PTR G103 PF1199 PF1198 PXY G102"
       ]
 
       # Construct G-Code handler.

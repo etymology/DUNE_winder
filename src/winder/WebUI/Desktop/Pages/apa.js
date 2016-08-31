@@ -90,6 +90,15 @@ function APA()
 
   //-----------------------------------------------------------------------------
   // Uses:
+  //   Execute next line of G-Code, then stop.
+  //-----------------------------------------------------------------------------
+  this.stepG_Code = function()
+  {
+    winder.remoteAction( 'process.step()' )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
   //   Re-enable APA interface.  Callback function.
   //-----------------------------------------------------------------------------
   this.reenableAPA = function()
@@ -429,6 +438,7 @@ function APA()
       // Start button enable.
       var startDisable = ( "StopMode" != controlState ) || apaEnabledInhabit
       $( "#startButton" ).prop( "disabled", startDisable )
+      $( "#stepButton" ).prop( "disabled", startDisable )
 
       var isCloseDisabled = ( "" == currentAPA ) || isRunning()
       $( "#apaCloseButton" ).prop( "disabled", isCloseDisabled )
@@ -549,13 +559,6 @@ function APA()
   createSlider( "velocity", "process.gCodeHandler.getVelocityScale", "process.setG_CodeVelocityScale" )
   //createSlider( "acceleration" )
   //createSlider( "deceleration" )
-
-
-
-
-
-
-
 }
 
 //-----------------------------------------------------------------------------

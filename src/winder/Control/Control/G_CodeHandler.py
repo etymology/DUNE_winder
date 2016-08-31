@@ -207,7 +207,8 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       if not moving :
         self._currentLine = self._nextLine
 
-        isDone = self.isDone() or self.isOutOfWire()
+        isDone = self.isDone() or self.isOutOfWire() or self._stopNextMove
+        self._stopNextMove = False
 
         if not isDone :
           if self._delay > 0 :
@@ -236,7 +237,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
               )
 
             self._isG_CodeError = False
+            self._stopNextMove = self.singleStep
             self.runNextLine()
+            self.singleStep = False
 
     return isDone
 
@@ -465,6 +468,9 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._nextLine = None
     self._gCodeLog = None
     self._positionLog = None
+
+    self._stopNextMove = False
+    self.singleStep = False
 
     # Add a pause between every G-Code instructions by setting _PAUSE to
     # non-zero value.

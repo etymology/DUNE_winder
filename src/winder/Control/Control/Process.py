@@ -144,6 +144,17 @@ class Process :
       self.controlStateMachine.stopRequest = True
 
   #---------------------------------------------------------------------
+  def step( self ) :
+    """
+    Run just one line of G-Code, then stop.
+    """
+    if self.controlStateMachine.isMovementReady() \
+      and self.gCodeHandler.isG_CodeLoaded() :
+        self.gCodeHandler.singleStep = True
+        self.controlStateMachine.startRequest = True
+        self.controlStateMachine.stopRequest = False
+
+  #---------------------------------------------------------------------
   def acknowledgeError( self ) :
     """
     Request that the winding process stop.

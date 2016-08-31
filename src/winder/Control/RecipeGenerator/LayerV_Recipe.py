@@ -46,27 +46,42 @@ class LayerV_Recipe( LayerUV_Recipe ) :
     LayerUV_Recipe.__init__( self, geometry )
 
     # Setup node list.
-    self._createNode( geometry.gridFront, True, "F", geometry.partialZ_Front, 1, 1 )
     self._createNode(
-      geometry.gridBack, True, "B", geometry.partialZ_Back, self.geometry.rows, -1 )
+      geometry.gridFront,
+      True,
+      "F",
+      geometry.partialZ_Front,
+      self.geometry.startPinFront,
+      self.geometry.directionFront
+    )
+
+    self._createNode(
+      geometry.gridBack,
+      True,
+      "B",
+      geometry.partialZ_Back,
+      self.geometry.startPinBack,
+      self.geometry.directionBack
+    )
 
     # Define the first few net locations.
     # All following locations are just modifications of this initial set.
     self.net = \
     [
-      "F" + str( 2 * geometry.rows + geometry.columns ),
-      "F" + str( geometry.columns ),
-      "B" + str( geometry.rows + 2 * geometry.columns ),
-      "B" + str( geometry.rows ),
-      "F" + str( 1 ),
-      "F" + str( 2 * geometry.rows + 2 * geometry.columns - 1 ),
-      "B" + str( geometry.rows + 1 ),
-      "B" + str( geometry.rows + 2 * geometry.columns - 1 ),
-      "F" + str( geometry.columns + 1 ),
-      "F" + str( 2 * geometry.rows + geometry.columns - 1 ),
-      "B" + str( geometry.rows + geometry.columns + 1 ),
-      "B" + str( geometry.rows + geometry.columns - 1 ),
+      "F" + str( geometry.rows ),
+      "F" + str( geometry.rows + 2 * geometry.columns - 1 ),
+      "B" + str( 2 * geometry.rows ),
+      "B" + str( 2 * geometry.columns - 1 ),
+      "F" + str( geometry.rows + geometry.columns ),
+      "F" + str( geometry.rows + geometry.columns - 1 ),
+      "B" + str( 2 * geometry.columns ),
+      "B" + str( geometry.columns - 1 ),
+      "F" + str( geometry.rows + 2 * geometry.columns ),
+      "F" + str( geometry.rows - 1 ),
+      "B" + str( 1 ),
+      "B" + str( 2 * geometry.rows + 2 * geometry.columns - 2 ),
     ]
+
 
     # Total number of steps to do a complete wind.
     windSteps = 4 * geometry.rows + 4 * geometry.columns - 3
@@ -78,6 +93,6 @@ class LayerV_Recipe( LayerUV_Recipe ) :
     # Crate motions necessary to wind the above pattern.
     #
 
-    start1 = [ "F1601", "F1602" ]
-    start2 = [ "F1601", "F1602" ]
+    start1 = [ "F400", "F399" ]
+    start2 = [ "F400", "F399" ]
     self._wind( start1, start2, -1, windsOverride )

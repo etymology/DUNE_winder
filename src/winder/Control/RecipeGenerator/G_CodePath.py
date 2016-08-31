@@ -156,7 +156,7 @@ class G_CodePath( Path3d ) :
       output.write( 'label.layer = ' + layer + "\r\n" )
 
   #---------------------------------------------------------------------
-  def toSketchUpRuby( self, output, half="", enableLables=True ) :
+  def toSketchUpRuby( self, output, layer, half="", enableLables=True ) :
     """
     Turn path into Ruby code for use in SketchUp.  Labels G-Code functions.
     Useful for visualizing paths.
@@ -166,7 +166,7 @@ class G_CodePath( Path3d ) :
       half: Layer label for which half.
       enables: True to enable labels G-Code labels.
     """
-    Path3d.toSketchUpRuby( self, output, "G-Code path " + half )
+    Path3d.toSketchUpRuby( self, output, "G-Code path " + layer + "-" + half )
 
     if enableLables :
       output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\r\n" )

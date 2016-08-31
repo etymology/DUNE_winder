@@ -59,13 +59,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
       Nothing is returned.
     """
 
-    # A wire can land in one of four locations along a pin: top/bottom
-    # left/right.  The angle of these locations are defined here.
-    angle180 = math.radians( 180 )
-    tl = -self.geometry.angle
-    bl =  self.geometry.angle + angle180
-    tr =  self.geometry.angle
-    br = -self.geometry.angle + angle180
     if orientation :
       sideA = "F"
       sideB = "B"
@@ -73,23 +66,19 @@ class LayerUV_Recipe( RecipeGenerator ) :
       sideA = "B"
       sideB = "F"
 
-    orientations = \
-    {         # Left  Top   Right  Bottom
-      sideA : [ tr,   bl,   bl,    tr ],
-      sideB : [ br,   br,   tl,    tl ]
-    }
-
-    # Lookup table for how the wire is oriented around the anchor point.
-    # Start and direction, so "tr" is top going from left to right, and "rb" is
-    # right going from top to bottom.
-    anchorOrientations = \
-    {         # Left  Top   Right  Bottom
-      # $$$DEBUG - Put back sideA : [ "TR", "LB", "BL",  "RT" ],
-      # $$$DEBUG - Put back sideB : [ "BR", "RB", "TL",  "LT" ]
-
-      sideA : [ "TL", "RB", "BR",  "LT" ],
-      sideB : [ "BL", "LB", "TR",  "RT" ]
-
+    # A wire can have 8 orientations, but 4 of these have identical angles.
+    # This is a lookup table to translate wire orientation to an angle.
+    angle180 = math.radians( 180 )
+    orientationAngles = \
+    {
+      "TR" :  self.geometry.angle,
+      "RT" :  self.geometry.angle,
+      "BL" :  self.geometry.angle + angle180,
+      "LB" :  self.geometry.angle + angle180,
+      "TL" : -self.geometry.angle,
+      "LT" : -self.geometry.angle,
+      "BR" : -self.geometry.angle + angle180,
+      "RB" : -self.geometry.angle + angle180,
     }
 
     # Lookup table for what pin to center the wire.  Centering is always the
@@ -110,14 +99,15 @@ class LayerUV_Recipe( RecipeGenerator ) :
       yInc  = parameter[ 2 ]
       x += parameter[ 3 ]
       y += parameter[ 4 ]
+      anchorOrientation = parameter[ 5 ]
 
       for _ in range( 0, count ) :
         location = Location( round( x, 5 ) + 0, round( y, 5 ) + 0, depth )
         pin = side + str( pinNumber )
         self.nodes[ pin ] = location
-        self.orientations[ pin ]       = orientations[ side ][ setIndex ]
-        self.centering[ pin ]          = centering[ setIndex ]
-        self.anchorOrientations[ pin ] = anchorOrientations[ side ][ setIndex ]
+        self.centering[ pin ] = centering[ setIndex ]
+        self.anchorOrientations[ pin ] = anchorOrientation
+        self.orientations[ pin ] = orientationAngles[ anchorOrientation ]
 
         pinNumber += direction
 
@@ -200,7 +190,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
 
       # Push the anchor point of the last placed wire.
-      self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, offset=anchorOrientation ) )
+      self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, anchorOrientation ) )
 
       result = True
 

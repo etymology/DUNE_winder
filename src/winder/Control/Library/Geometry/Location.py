@@ -107,7 +107,7 @@ class Location :
     """
 
     result = False
-    if isinstance( object, Location ) :
+    if isinstance( other, Location ) :
       result = MathExtra.isclose( self.x, other.x ) \
            and MathExtra.isclose( self.y, other.y ) \
            and MathExtra.isclose( self.z, other.z )

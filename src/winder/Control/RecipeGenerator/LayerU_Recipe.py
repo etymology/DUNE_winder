@@ -46,38 +46,53 @@ class LayerU_Recipe( LayerUV_Recipe ) :
     LayerUV_Recipe.__init__( self, geometry )
 
     # Setup node list.
-    self._createNode( geometry.gridFront, False, "F", geometry.partialZ_Front, 1, 1 )
     self._createNode(
-      geometry.gridBack, False, "B", geometry.partialZ_Back, self.geometry.rows + 1, -1 )
+      geometry.gridFront,
+      False,
+      "F",
+      geometry.partialZ_Front,
+      self.geometry.startPinFront,
+      self.geometry.directionFront
+    )
+
+    self._createNode(
+      geometry.gridBack,
+      False,
+      "B",
+      geometry.partialZ_Back,
+      self.geometry.startPinBack,
+      self.geometry.directionBack
+    )
+
 
     # Define the first few net locations.
     # All following locations are just modifications of this initial set.
     self.net = \
     [
-      "F" + str( 2 * geometry.columns + 2 * geometry.rows + 1 ),
-      "F" + str( geometry.columns + 2 ),
-      "B" + str( 2 * geometry.columns + geometry.rows + 1 ),
-      "B" + str( geometry.columns + geometry.rows + 2 ),
-      "F" + str( 2 * geometry.columns + 1 ),
-      "F" + str( 2 * geometry.columns + 2 ),
-      "B" + str( geometry.columns + geometry.rows + 1 ),
-      "B" + str( 2 * geometry.columns + geometry.rows + 2 ),
-      "F" + str( geometry.columns + 1 ),
-      "F" + str( 1 ),
-      "B" + str( geometry.rows ),
-      "B" + str( geometry.rows + 2 ),
+      "F" + str( geometry.columns + geometry.rows + 1 ),
+      "F" + str( 2 * geometry.columns + geometry.rows + 1 ),
+      "B" + str( geometry.columns + 1 ),
+      "B" + str( 2 * geometry.columns + 2 * geometry.rows + 1 ),
+      "F" + str( geometry.rows + 1 ),
+      "F" + str( geometry.rows ),
+      "B" + str( 1 ),
+      "B" + str( geometry.columns ),
+      "F" + str( 2 * geometry.columns + geometry.rows + 2 ),
+      "F" + str( geometry.columns + geometry.rows ),
+      "B" + str( 2 * geometry.columns + 2 ),
+      "B" + str( 2 * geometry.columns ),
     ]
 
     # Total number of steps to do a complete wind.
     windSteps = 4 * geometry.rows + 4 * geometry.columns
 
     # Construct the remaining net list.
-    self._createNet( windSteps, -1 )
+    self._createNet( windSteps, 1 )
 
     #
     # Crate motions necessary to wind the above pattern.
     #
 
-    start1 = [ "F1599", "F1600" ]
-    start2 = [ "F1599", "F1600" ]
+    start1 = [ "F401", "F400" ]
+    start2 = [ "F401", "F400" ]
     self._wind( start1, start2, 1, windsOverride )

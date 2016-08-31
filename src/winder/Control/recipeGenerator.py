@@ -96,6 +96,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   print "  Write 1st wind G-Code path."
   gCodePath.writeRubyCode(
     outputFileName,
+    layer,
     "1st",
     enablePathLabels,
     enablePinLabels,
@@ -105,6 +106,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   # Write wire path.
   print "  Write wire path."
   recipe.writeRubyCode(
+    layer,
     0,
     outputFileName,
     enablePath,
@@ -125,6 +127,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   print "  Write 2nd wind G-Code path."
   gCodePath.writeRubyCode(
     outputFileName,
+    layer,
     "2nd",
     enablePathLabels,
     enablePinLabels,

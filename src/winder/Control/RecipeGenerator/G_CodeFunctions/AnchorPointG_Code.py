@@ -15,20 +15,16 @@ class AnchorPointG_Code( G_CodeFunction ) :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, pinA, pinB=None, offset=None ) :
+  def __init__( self, pin, orientation=None ) :
     """
     Constructor.
 
     Args:
-      pinA: First pin for centering.
-      pinB: Center pin for centering.
-      offset: 0=None, U/D=Up or down, L/R=Left/right.
+      pin: Anchor pin.
+      orientation: Orientation of wire around pin.  0=None, TR/TL/RB/RT/BL/BR/LT/LB.
     """
 
-    if None == pinB :
-      pinB = pinA
+    if None == orientation :
+      orientation = "0"
 
-    if None == offset :
-      offset = "0"
-
-    G_CodeFunction.__init__( self, G_Codes.ANCHOR_POINT, [ pinA, pinB, offset ] )
+    G_CodeFunction.__init__( self, G_Codes.ANCHOR_POINT, [ pin, orientation ] )

@@ -40,8 +40,8 @@ class V_LayerGeometry( UV_LayerGeometry ) :
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
-    self.partialZ_Front = ( self.zTravel - self.depth ) / ( 2 * self.scale ) #0
-    self.partialZ_Back  = ( self.zTravel + self.depth ) / ( 2 * self.scale ) #self.depth
+    self.partialZ_Front = ( self.zTravel - self.depth ) / ( 2 * self.scale )
+    self.partialZ_Back  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
 
     # Distance that must be traveled past a pin to ensure it will be hooked
     # by the wire when moving in an other direction.
@@ -51,6 +51,11 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     overshootAngle = 90 - 18
     self.overshoot = self.partialZ_Front * math.tan( math.radians( overshootAngle ) )
 
+    self.startPinFront  = 1200
+    self.directionFront = 1
+    self.startPinBack   = 1599
+    self.directionBack  = -1
+
     # The grid parameters are a list of parameters for how the grid is constructed.
     # Columns:
     #   Count - Number of pins this row in the table represents.
@@ -58,14 +63,22 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     #   dy - Change in y each iteration.
     #   off.x - Starting x offset for initial position of first pin in this set.
     #   off.y - Starting y offset for initial position of first pin in this set.
+    #   ort - Wire orientation.
     self.gridFront = \
     [
-      # Count                    dx            dy   off.x   off.y
-      [ self.rows,                0,  self.deltaY,      0,  4.463 ],
-      [ self.columns,   self.deltaX,            0,  6.209,  4.462 ],
-      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336 ],
-      [ self.columns,  -self.deltaX,            0, -2.209, -7.339 ]
+      # Count                    dx            dy   off.x   off.y  ort.
+      [ self.rows,                0,  self.deltaY,      0,  4.463, "TR" ],
+      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "LB" ],
+      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "BL" ],
+      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "RT" ]
     ]
 
-    # Back is identical to front.
-    self.gridBack = self.gridFront
+    # Back is identical to front except for orientation.
+    self.gridBack =  \
+    [
+      # Count                    dx            dy   off.x   off.y  ort.
+      [ self.rows,                0,  self.deltaY,      0,  4.463, "BR" ],
+      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "RB" ],
+      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "TL" ],
+      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "LT" ]
+    ]

@@ -16,4 +16,4 @@ class G_Codes :
   HEAD_LOCATION = 106 # 0=front, 1=level front, 2=level back, 3=back.
   DELAY         = 107 # Time (milliseconds).
   ARM_CORRECT   = 108 # No parameters.
-  ANCHOR_POINT  = 109 # Anchor pin 1, anchor pin 2, offset (0/T/B/L/R).
+  ANCHOR_POINT  = 109 # Anchor pin, orientation (0/TR/TL/RB/RT/BL/BR/LT/LB).

@@ -10,4 +10,13 @@ from Library.Serializable import Serializable
 from Library.Geometry.Location import Location
 
 class SerializableLocation( Location, Serializable ) :
-  pass
+
+  #---------------------------------------------------------------------
+  @staticmethod
+  def fromLocation( location ) :
+    result = SerializableLocation()
+    result.x = location.x
+    result.y = location.y
+    result.z = location.z
+
+    return result
