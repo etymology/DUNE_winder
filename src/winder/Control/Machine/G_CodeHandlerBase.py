@@ -241,9 +241,9 @@ class G_CodeHandlerBase :
       # $$$DEBUG - Fix constants.
       z = self._machineCalibration.zFront
       if 1 == self._headPosition :
-        z = self._layerCalibration.partialZ_Front
+        z = self._layerCalibration.zFront
       elif 2 == self._headPosition :
-        z = self._layerCalibration.partialZ_Back
+        z = self._layerCalibration.zBack
       elif 3 == self._headPosition :
         z = self._machineCalibration.zBack
 

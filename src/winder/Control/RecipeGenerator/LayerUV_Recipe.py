@@ -85,9 +85,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
     # target pin, and the pin to the left or right.
     if orientation :
                   # Left  Top   Right  Bottom
-      centering = [ +1,   -1,   +1,    -1     ]
+      centering = [ -1,   +1,   +1,    -1     ]
     else :
-      centering = [ -1,   +1,   -1,    +1     ]
+      centering = [ +1,   -1,   -1,    +1     ]
 
     x = 0
     y = 0
@@ -239,7 +239,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
-    xOffset = direction * -100
+    xOffset = direction * 500
 
     # Column, other side.
     if self._nextNet() :

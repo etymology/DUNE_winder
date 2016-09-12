@@ -67,18 +67,18 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     self.gridFront = \
     [
       # Count                    dx            dy   off.x   off.y  ort.
-      [ self.rows,                0,  self.deltaY,      0,  4.463, "TR" ],
-      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "LB" ],
-      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "BL" ],
-      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "RT" ]
+      [ self.rows,                0,  self.deltaY,      0,  4.463, "TL" ], # Left
+      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "RB" ], # Top
+      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "BR" ], # Right
+      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "LT" ]  # Bottom
     ]
 
     # Back is identical to front except for orientation.
     self.gridBack =  \
     [
       # Count                    dx            dy   off.x   off.y  ort.
-      [ self.rows,                0,  self.deltaY,      0,  4.463, "BR" ],
-      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "RB" ],
-      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "TL" ],
-      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "LT" ]
+      [ self.rows,                0,  self.deltaY,      0,  4.463, "BL" ], # Left
+      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "LB" ], # Top
+      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "TR" ], # Right
+      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "RT" ]  # Bottom
     ]
