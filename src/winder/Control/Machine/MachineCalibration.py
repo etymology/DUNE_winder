@@ -12,7 +12,7 @@ from Library.SerializableLocation import SerializableLocation
 class MachineCalibration( Serializable ) :
 
   #-------------------------------------------------------------------
-  def __init__( self, outputFilePath, outputFileName ) :
+  def __init__( self, outputFilePath = None, outputFileName = None ) :
     """
     Constructor.
 
@@ -60,6 +60,8 @@ class MachineCalibration( Serializable ) :
 
     # Length of arm on winder head.
     self.headArmLength = None
+    self.headRollerRadius = None
+    self.headRollerGap    = None
 
     # Diameter of U/V layer pin.
     self.pinDiameter = None
@@ -93,14 +95,16 @@ class MachineCalibration( Serializable ) :
     """
     Save data to disk.  Overloaded to correctly name class.
     """
-    Serializable.save( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
+    if self._outputFilePath and self._outputFileName :
+      Serializable.save( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
 
   #---------------------------------------------------------------------
   def load( self ) :
     """
     Load data from disk.  Overloaded to correctly name class.
     """
-    Serializable.load( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
+    if self._outputFilePath and self._outputFileName :
+      Serializable.load( self, self._outputFilePath, self._outputFileName, "MachineCalibration" )
 
 
 if __name__ == "__main__":

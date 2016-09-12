@@ -73,14 +73,29 @@ class Location :
     return [ self.x, self.y, self.z ]
 
   #---------------------------------------------------------------------
-  def copy( self ) :
+  def copy( self, x=None, y=None, z=None ) :
     """
     Return a copy of this location.
+
+    Input:
+      x: Override X value.  Omit to copy.
+      y: Override Y value.  Omit to copy.
+      z: Override Z value.  Omit to copy.
 
     Returns:
       New instance at the same location.
     """
-    return Location( self.x, self.y, self.z )
+
+    if None == x :
+      x = self.x
+
+    if None == y :
+      y = self.y
+
+    if None == z :
+      z = self.z
+
+    return Location( x, y, z )
 
   #---------------------------------------------------------------------
   def __str__( self ) :

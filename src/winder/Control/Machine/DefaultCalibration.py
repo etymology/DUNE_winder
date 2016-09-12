@@ -61,6 +61,8 @@ class DefaultMachineCalibration( MachineCalibration ) :
     self.zLimitFront      = geometry.limitRetracted
     self.zLimitRear       = geometry.limitExtended
     self.headArmLength    = geometry.headArmLength
+    self.headRollerRadius = geometry.headRollerRadius
+    self.headRollerGap    = geometry.headRollerGap
     self.pinDiameter      = geometry.pinDiameter
 
     if outputFilePath and outputFileName :

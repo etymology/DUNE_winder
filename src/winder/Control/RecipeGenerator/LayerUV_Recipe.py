@@ -239,12 +239,15 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
+    xOffset = direction * -100
+
     # Column, other side.
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( x=xOffset ) )
       self.gCodePath.push()
 
     if self._nextNet() :
@@ -258,7 +261,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.push()
-      # $$$ self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( y=self.geometry.overshoot ) )
       self.gCodePath.push()

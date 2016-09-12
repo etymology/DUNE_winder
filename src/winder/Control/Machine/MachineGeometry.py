@@ -50,7 +50,9 @@ class MachineGeometry :
 
     # Distance from the inner pulley edge to the outer roller edge on the
     # winder head arm.
-    self.headArmLength = 132.06424938
+    self.headRollerRadius = 6.35 # 1/4"
+    self.headRollerGap    = 1.27 # 0.05"
+    self.headArmLength    = 125.71424938
 
     # Lines defining the where a Z hand-off can take place.  Used for intercept
     # calculations.

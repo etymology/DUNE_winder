@@ -130,12 +130,11 @@ class G_CodeHandlerBase :
 
       # Starting location based on anchor point.  Actual location has compensation
       # for pin diameter.
-      startLocation = self._headCompensation.compensatedAnchorPoint( endLocation )
+      startLocation = self._headCompensation.pinCompensation( endLocation )
 
       if None == startLocation :
         data = [
           str( self._headCompensation.anchorPoint() ),
-          str( self._headCompensation.diameter() ),
           str( self._headCompensation.orientation() ),
           str( endLocation )
         ]
@@ -234,7 +233,6 @@ class G_CodeHandlerBase :
         orientation = None
 
       self._headCompensation.anchorPoint( pin )
-      self._headCompensation.diameter( self._machineCalibration.pinDiameter / 2 )
       self._headCompensation.orientation( orientation )
 
     # Correct for the arm on the winder head.
