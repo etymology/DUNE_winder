@@ -124,8 +124,8 @@ class HeadCompensation :
     # Compute various lengths.
     deltaX = machineLocation.x - self._anchorPoint.x
     deltaZ = machineLocation.z - self._anchorPoint.z
-    deltaXZ = math.sqrt( deltaX**2 + deltaZ**2 )
-    headRatio = self._machineCalibration.headArmLength / deltaXZ
+    lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
+    headRatio = self._machineCalibration.headArmLength / lengthXZ
 
     # Make correction.
     x = machineLocation.x - deltaX * headRatio
@@ -141,16 +141,16 @@ class HeadCompensation :
     deltaX   = x - self._anchorPoint.x
     deltaY   = y - self._anchorPoint.y
     deltaZ   = z - self._anchorPoint.z
-    deltaXZ  = math.sqrt( deltaX**2 + deltaZ**2 )
-    deltaXYZ = math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
+    lengthXZ  = math.sqrt( deltaX**2 + deltaZ**2 )
+    lengthXYZ = math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
 
     # The rollers are in two plans: Y and XZ.
-    rollerOffsetY  = self._machineCalibration.headRollerRadius * deltaXZ / deltaXYZ
-    rollerOffsetXZ = self._machineCalibration.headRollerRadius * deltaY / deltaXYZ
+    rollerOffsetY  = self._machineCalibration.headRollerRadius * lengthXZ / lengthXYZ
+    rollerOffsetXZ = self._machineCalibration.headRollerRadius * deltaY / lengthXYZ
 
     # Get the specific X and Z components out of the combine XZ value.
-    rollerOffsetX = abs( rollerOffsetXZ * deltaX / deltaXZ )
-    rollerOffsetZ = abs( rollerOffsetXZ * deltaZ / deltaXZ )
+    rollerOffsetX = abs( rollerOffsetXZ * deltaX / lengthXZ )
+    rollerOffsetZ = abs( rollerOffsetXZ * deltaZ / lengthXZ )
 
     # Correct for the roller offset made up of the radius, and the gap between
     # them.
@@ -195,15 +195,15 @@ class HeadCompensation :
     deltaX = machineLocation.x - self._anchorPoint.x
     deltaY = machineLocation.y - self._anchorPoint.y
     deltaZ = machineLocation.z - self._anchorPoint.z
-    deltaXZ = math.sqrt( deltaX**2 + deltaZ**2 )
+    lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
 
     # Compute a correction for the arm.
-    headCorrection = -deltaY * self._machineCalibration.headArmLength / deltaXZ
+    headCorrection = -deltaY * self._machineCalibration.headArmLength / lengthXZ
 
     # Compute the new end point.
-    x = machineLocation.x - deltaX * self._machineCalibration.headArmLength / deltaXZ
+    x = machineLocation.x - deltaX * self._machineCalibration.headArmLength / lengthXZ
     y = machineLocation.y + headCorrection
-    z = machineLocation.z - deltaZ * self._machineCalibration.headArmLength / deltaXZ
+    z = machineLocation.z - deltaZ * self._machineCalibration.headArmLength / lengthXZ
 
     #
     # Roller correction.
@@ -213,14 +213,14 @@ class HeadCompensation :
     deltaX = x - self._anchorPoint.x
     deltaY = y - self._anchorPoint.y
     deltaZ = z - self._anchorPoint.z
-    deltaXZ = math.sqrt( deltaX**2 + deltaZ**2 )
-    deltaXYZ = math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
+    lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
+    lengthXYZ = math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
 
     # Offset to Y caused by the roller.
     # NOTE: This correction actually changes the tangent line, but the change
     # is so small (1 part in 1500) it is ignored.  Otherwise an iterative method
     # is required like what is done for the X correction.
-    rollerCorrection  = self._machineCalibration.headRollerRadius * deltaXYZ / deltaXZ
+    rollerCorrection  = self._machineCalibration.headRollerRadius * lengthXYZ / lengthXZ
     rollerCorrection -= self._machineCalibration.headRollerRadius
     rollerCorrection -= self._machineCalibration.headRollerGap / 2
 
@@ -251,6 +251,8 @@ class HeadCompensation :
     deltaY = machineLocation.y - self._anchorPoint.y
     deltaZ = machineLocation.z - self._anchorPoint.z
 
+    lengthY = abs( deltaY )
+
     # Iterative method that converges on the answer.
     # Easier to solve than the exact solution.  Runs until answer no longer
     # changes (i.e. is as exact as precision allows).  Typically only a few
@@ -261,10 +263,12 @@ class HeadCompensation :
     while not isDone :
       # Head arm compensation.
       xzLength = math.sqrt( lastX**2 + deltaZ**2 )
-      x = deltaX + lastX * self._machineCalibration.headArmLength / xzLength
+      x = deltaX
+      if xzLength > 0 :
+        x += lastX * self._machineCalibration.headArmLength / xzLength
 
       # Roller compensation.
-      if self._machineCalibration.headRollerRadius > 0 :
+      if xzLength > 0 :
         scaleFactor = self._machineCalibration.headArmLength / xzLength
         armX = lastX - lastX * scaleFactor
         armZ = deltaZ - deltaZ * scaleFactor
@@ -276,7 +280,7 @@ class HeadCompensation :
         rollerX *= self._machineCalibration.headRollerRadius
         rollerX -= self._machineCalibration.headRollerRadius
         rollerX -= self._machineCalibration.headRollerGap / 2
-        rollerX *= armX / deltaY
+        rollerX *= armX / lengthY
 
         x += rollerX
 

@@ -12,6 +12,8 @@ import os        # <- For streams of random data used for salt generation.
 import hashlib   # <- To hash password.
 import binascii  # <- To turn byte streams to hex.
 
+from Library.SystemSemaphore import SystemSemaphore
+
 #==============================================================================
 class RemoteSession :
 
@@ -30,6 +32,7 @@ class RemoteSession :
 
   # Current sessions.
   sessions = {}
+  sessionsSemaphore = SystemSemaphore( 1 )
 
   #----------------------------------------------------------------------------
   @staticmethod
@@ -43,6 +46,8 @@ class RemoteSession :
     Returns:
       Instance of RemoteSession.
     """
+
+    RemoteSession.sessionsSemaphore.acquire()
 
     # Update all sessions.
     removeQueue = []
@@ -69,6 +74,8 @@ class RemoteSession :
       sessionId = session.getId()
       RemoteSession.sessions[ sessionId ] = session
 
+    RemoteSession.sessionsSemaphore.release()
+
     return session
 
   #----------------------------------------------------------------------------
@@ -83,11 +90,15 @@ class RemoteSession :
     Returns:
       True if authenticated, False if not.
     """
+    RemoteSession.sessionsSemaphore.acquire()
+
     result = False
     if sessionId in RemoteSession.sessions :
       session = RemoteSession.sessions[ sessionId ]
       session._update()
       result = session._authenticated
+
+    RemoteSession.sessionsSemaphore.release()
 
     return result
 
