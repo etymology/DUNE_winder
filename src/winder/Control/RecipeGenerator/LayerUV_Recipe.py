@@ -85,9 +85,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
     # target pin, and the pin to the left or right.
     if orientation :
                   # Left  Top   Right  Bottom
-      centering = [ +1,   -1,   -1,    +1     ]
+      centering = [ +1,   -1,   +1,    -1     ]
     else :
-      centering = [ -1,   +1,   +1,    -1     ]
+      centering = [ -1,   +1,   -1,    +1     ]
 
     x = 0
     y = 0
@@ -293,10 +293,14 @@ class LayerUV_Recipe( RecipeGenerator ) :
     )
 
     self.gCodePath = G_CodePath()
+    self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+    self.z.set( HeadPosition.BACK )
+
+
     self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start1 ) )
     self.gCodePath.push()
     self.basePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
-    self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+    #self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
