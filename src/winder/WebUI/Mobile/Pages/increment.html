@@ -1,37 +1,40 @@
-        <article>
-          <p>X position: <span id="xPosition"></span></p>
-          <p>Y position: <span id="yPosition"></span></p>
-        </article>
+        <div id="position"></div>
 
-        <article>
+        <article id="seekPinDiv">
           <h2>Seek pin</h2>
           <input id="seekPin" />
           <button onclick="increment.seekPin()">Go</button>
         </article>
 
-        <article>
+        <article id="navigationDiv">
+          <h2>Navigation</h2>
+          <button onclick="load( 'menu' )">Menu</button>
+          <button onclick="load( 'jog' )">Jog</button>
+        </article>
+
+        <article class="incrementer">
           <h3>X</h3>
           <button onclick="increment.moveX(  +10 )">+10</button>
           <button onclick="increment.moveX(   +1 )">+1</button>
           <button onclick="increment.moveX( +0.5 )">+0.5</button>
           <button onclick="increment.moveX( +0.1 )">+0.1</button>
 
-          <button onclick="increment.moveX(  -10 )">-10</button>
-          <button onclick="increment.moveX(   -1 )">-1</button>
-          <button onclick="increment.moveX( -0.5 )">-0.5</button>
           <button onclick="increment.moveX( -0.1 )">-0.1</button>
+          <button onclick="increment.moveX( -0.5 )">-0.5</button>
+          <button onclick="increment.moveX(   -1 )">-1</button>
+          <button onclick="increment.moveX(  -10 )">-10</button>
         </article>
 
-        <article>
+        <article class="incrementer">
           <h3>Y</h3>
           <button onclick="increment.moveY(  +10 )">+10</button>
           <button onclick="increment.moveY(   +1 )">+1</button>
           <button onclick="increment.moveY( +0.5 )">+0.5</button>
           <button onclick="increment.moveY( +0.1 )">+0.1</button>
 
-          <button onclick="increment.moveY(  -10 )">-10</button>
-          <button onclick="increment.moveY(   -1 )">-1</button>
-          <button onclick="increment.moveY( -0.5 )">-0.5</button>
           <button onclick="increment.moveY( -0.1 )">-0.1</button>
+          <button onclick="increment.moveY( -0.5 )">-0.5</button>
+          <button onclick="increment.moveY(   -1 )">-1</button>
+          <button onclick="increment.moveY(  -10 )">-10</button>
         </article>
       </article>

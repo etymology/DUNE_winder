@@ -34,19 +34,21 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       True if finished, false if not.
     """
 
-    startLine = 0
-    endLine = self._gCode.getLineCount() - 1
+    isDone = True
+    if self._gCode :
+      startLine = 0
+      endLine = self._gCode.getLineCount() - 1
 
-    if -1 != self.runToLine :
-      if 1 == self._direction :
-        endLine = self.runToLine - 1
-      else :
-        startLine = self.runToLine - 1
+      if -1 != self.runToLine :
+        if 1 == self._direction :
+          endLine = self.runToLine - 1
+        else :
+          startLine = self.runToLine - 1
 
-    isDone = False
-    isDone |= 1 == self._direction and self._nextLine >= endLine
-    isDone |= 1 != self._direction and self._nextLine <= startLine
-    isDone |= self._isG_CodeError
+      isDone = False
+      isDone |= 1 == self._direction and self._nextLine >= endLine
+      isDone |= 1 != self._direction and self._nextLine <= startLine
+      isDone |= self._isG_CodeError
 
     return isDone
 
@@ -148,9 +150,18 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     Stop the running G-Code.  Call when interrupting G-Code sequence.
     """
 
+    self._stopNextMove = False
+
     # If we are interrupting a running line, set it as the next line to run.
     if not self._io.plcLogic.isReady() :
       self._nextLine -= self._direction
+
+  #---------------------------------------------------------------------
+  def stopNext( self ) :
+    """
+    Stop the G-Code after completing the current move.
+    """
+    self._stopNextMove = True
 
   #---------------------------------------------------------------------
   def poll( self ) :
@@ -283,6 +294,32 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       An array of data.
     """
     return self._isG_CodeErrorData
+
+  #---------------------------------------------------------------------
+  def executeG_CodeLine( self, line ) :
+    """
+    Run a line of G-code.
+
+    Args:
+      line: G-Code to execute.
+
+    Returns:
+      Failure data.  None if there was no failure.
+    """
+    errorData = None
+    gCode = G_Code( [], self._callbacks )
+    try :
+      # Interpret the next line.
+      gCode.execute( line )
+      self.poll()
+    except G_CodeException as exception :
+      errorData = {
+        "line" : line,
+        "message" : str( exception ),
+        "data" : exception.data
+      }
+
+    return errorData
 
   #---------------------------------------------------------------------
   def runNextLine( self ):

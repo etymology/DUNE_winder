@@ -1,20 +1,6 @@
 // Instance of winder interface.
 var winder = new WinderInterface()
 
-// Software version variables.
-var softwareVersion =
-{
-  "controlVersion" : 0,
-  "uiVersion" : 0
-}
-
-// Status of state machines.
-var states =
-{
-  "controlState" : 0,
-  "plcState" : 0
-}
-
 //-----------------------------------------------------------------------------
 // Uses:
 //   Get a parameter in the GET portion of the URL.
@@ -55,31 +41,22 @@ function getParameterByName( name, url )
 //-----------------------------------------------------------------------------
 function load( page )
 {
-  window.location = "?page=" + page;
-}
+//  window.location = "?page=" + page;
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Load and display the version information.
-//-----------------------------------------------------------------------------
-function loadVersion()
-{
-  winder.singleRemoteDisplay
-  (
-    "Settings.getVersion()",
-    "#controlVersion",
-    softwareVersion,
-    "controlVersion"
-  )
+  if ( winder )
+    winder.shutdown()
 
-  winder.readXML_Display
-  (
-    "/version.xml",
-    "Major",
-    "#uiVersion",
-    softwareVersion,
-    "uiVersion"
-  )
+  winder = new WinderInterface()
+  $( '#main' ).html( "Loading..." )
+  $( 'head link, head style' ).remove()
+
+  var cssLink =
+    $( "<link rel='stylesheet' type='text/css' href='/Mobile/main.css'>" )
+
+  $( "head" ).append( cssLink )
+  winder.loadSubPage( "/Mobile/Pages/" + page, "#main" )
+
+  winder.periodicUpdate()
 }
 
 //-----------------------------------------------------------------------------
@@ -92,61 +69,11 @@ $( document ).ready
   {
     var page = getParameterByName( "page" )
     if ( ! page )
-      window.location = "?page=increment";
+      window.location = "?page=menu";
     else
     {
       // Begin loading the requested sub-page.
       winder.loadSubPage( "/Mobile/Pages/" + page, "#main" )
-
-      // Initialize winder.
-      //winder.initialize()
-
-      // // Display system time.
-      // winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
-      //
-      // // Update for primary state machine.
-      // winder.addPeriodicDisplay
-      // (
-      //   "process.controlStateMachine.state.__class__.__name__",
-      //   "#controlState",
-      //   states,
-      //   "controlState"
-      // )
-      //
-      // // Update for PLC state machine.
-      // winder.addPeriodicCallback
-      // (
-      //   "io.plcLogic.getState()",
-      //   function( value )
-      //   {
-      //     if ( null !== value )
-      //     {
-      //       stateTranslateTable =
-      //       [
-      //         "Init",
-      //         "Ready",
-      //         "XY jog",
-      //         "XY seek",
-      //         "Z jog",
-      //         "Z seek",
-      //         "Latching",
-      //         "Latch homeing",
-      //         "Latch release"
-      //       ]
-      //
-      //       value = stateTranslateTable[ value ]
-      //       states[ "plcState" ] = value
-      //       $( "#plcState" ).text( value )
-      //
-      //     }
-      //     else
-      //       $( "#plcState" ).html( winder.errorString )
-      //   }
-      // )
-      //
-      // // Load version information and have them reload on error.
-      // loadVersion()
-      // winder.addErrorClearCallback( loadVersion )
 
       // Start the periodic updates.
       winder.periodicUpdate()

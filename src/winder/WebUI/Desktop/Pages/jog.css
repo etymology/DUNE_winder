@@ -82,3 +82,13 @@ button.jog
 {
   width: 300px;
 }
+
+#manualGCode
+{
+  width: 30em;
+}
+
+#manualGCodeDiv
+{
+  width: 500px;
+}

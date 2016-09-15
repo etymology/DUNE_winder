@@ -34,6 +34,7 @@ function APA()
   var stage = null
 
   var currentAPA = ""
+  var isStopping = false
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -306,6 +307,23 @@ function APA()
     )
   }
 
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Stop wind after completing current move.
+  //-----------------------------------------------------------------------------
+  this.stopNext = function()
+  {
+    winder.remoteAction
+    (
+      'process.stopNextLine()',
+      function()
+      {
+        // $$$ $( "#stopButton" ).prop( "disabled", true )
+        isStopping = true
+      }
+    )
+  }
+
   // Populate lists and have this function run after error recovery.
   this.populateLists()
   winder.addErrorClearCallback( this.populateLists )
@@ -447,7 +465,7 @@ function APA()
 
       // Stop button enable.
       var stopDisable = ( "WindMode" != controlState )
-      $( "#stopButton" ).prop( "disabled", stopDisable )
+      $( "#stopButton" ).prop( "disabled", stopDisable | isStopping )
 
       // If the winder was stopped and is now running disable APA selection.
       if ( ( ! stopDisable )
@@ -463,6 +481,7 @@ function APA()
         && ( ! apaEnabledInhabit ) )
       {
         self.enableAPA_Interface()
+        isStopping = false
       }
     }
 

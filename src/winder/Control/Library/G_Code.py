@@ -47,7 +47,6 @@ class G_CodeClass :
       parameter: Data to add.
 
     """
-
     self.parameters.append( float( parameter ) )
 
   #---------------------------------------------------------------------
@@ -257,7 +256,17 @@ class G_CodeLine :
       # If this is a parameter, pass it to the last class.
       if 'P' == code :
         if None != lastClass :
-          lastClass.addParameter( parameter )
+
+          try :
+            lastClass.addParameter( parameter )
+          except ValueError as exception :
+            data = [
+              command,
+              code,
+              parameter
+            ]
+            raise G_CodeException( 'Invalid parameter data ' + parameter, data )
+
         else:
           data = [
             command,
@@ -269,17 +278,35 @@ class G_CodeLine :
 
       # Ignore blank lines.
       elif '' != code :
-        # Create an object to hold this command.
-        lastClass = G_CodeLine.FUNCTION_TABLE[ code ]( self )
 
-        # Add first parameter (everything after the code).
-        lastClass.addParameter( parameter )
+        if code in G_CodeLine.FUNCTION_TABLE :
 
-        # Assign the callback function.
-        lastClass.setCallback( callbacks.getCallback( code ) )
+          # Create an object to hold this command.
+          lastClass = G_CodeLine.FUNCTION_TABLE[ code ]( self )
 
-        # Add this command to list.
-        self.commands.append( lastClass )
+          try :
+            # Add first parameter (everything after the code).
+            lastClass.addParameter( parameter )
+          except ValueError as exception :
+            data = [
+              command,
+              code,
+              parameter
+            ]
+            raise G_CodeException( 'Invalid parameter data ' + parameter, data )
+
+          # Assign the callback function.
+          lastClass.setCallback( callbacks.getCallback( code ) )
+
+          # Add this command to list.
+          self.commands.append( lastClass )
+        else :
+          data = [
+            command,
+            code
+          ]
+          raise G_CodeException( 'Unknown parameter ' + code, data )
+
 
   #---------------------------------------------------------------------
   def execute( self ) :

@@ -299,6 +299,28 @@ function Jog()
     winder.remoteAction( 'process.setAnchorPoint( ' + parameters + ' )' )
   }
 
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback to set the anchor point.
+  //-----------------------------------------------------------------------------
+  this.executeGCode = function()
+  {
+    $( "#gExecutionCodeStatus" ).html( "Request G-Code execution..." )
+
+    var gCode = $( "#manualGCode" ).val()
+    winder.remoteAction
+    (
+      'process.executeG_CodeLine( "' + gCode + '" )',
+      function( data )
+      {
+        if ( ! data )
+          $( "#gExecutionCodeStatus" ).html( "Executed with no errors." )
+        else
+          $( "#gExecutionCodeStatus" ).html( "Error interpreting line: " + data )
+      }
+    )
+  }
+
   // Callback function to initialize position graphic.
   // Called twice--once when the position graphic page is loaded, and again
   // when the motor status page is loaded.  Both must be loaded before

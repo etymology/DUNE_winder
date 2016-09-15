@@ -43,6 +43,11 @@ class ManualMode( StateMachineState ) :
     self._wasJogging = False
     self._noteSeekStop = False
 
+    # If executing a G-Code line.
+    if self.stateMachine.executeGCode :
+      self.stateMachine.executeGCode = False
+      isError = False
+
     # X/Y axis move?
     if None != self.stateMachine.seekX or None != self.stateMachine.seekY :
 

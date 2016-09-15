@@ -1,6 +1,8 @@
 // Instance of winder interface.
 var winder
 
+var baseStylesheets = []
+
 // Software version variables.
 var softwareVersion =
 {
@@ -62,121 +64,6 @@ function getParameterByName( name, url )
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Callback for loading an other page.
-// Input:
-//   page - Desired page to load.
-//-----------------------------------------------------------------------------
-var activeDiv = null
-function load( page )
-{
-  window.location = "?page=" + page;
-
-  /*
-
-  $$$FUTURE - This will load the new page without reloading everything.  Still
-    isn't fully functional.
-
-  if ( winder )
-    winder.shutdown()
-
-  winder = new WinderInterface()
-  winder.loadSubPage( "/Desktop/Pages/" + page, "#main" )
-
-  // Initialize winder.
-  winder.initialize()
-
-  // Display system time.
-  winder.addPeriodicDisplay( "systemTime.get()", "#systemTime" )
-
-  // Update for primary state machine.
-  winder.addPeriodicDisplay
-  (
-    "process.controlStateMachine.state.__class__.__name__",
-    "#controlState",
-    states,
-    "controlState"
-  )
-
-  winder.addPeriodicEndCallback
-  (
-    function()
-    {
-      var value = states[ "controlState" ]
-      var isDisabled = ( "StopMode" == value ) || ( "HardwareMode" == value )
-      $( "#fullStopButton" ).prop( "disabled", isDisabled )
-      $( "#controlState" ).text( value )
-      states[ "controlState" ] = value
-    }
-  )
-
-  // Update for PLC state machine.
-  winder.addPeriodicCallback
-  (
-    "io.plcLogic.getState()",
-    function( value )
-    {
-      if ( null !== value )
-      {
-        var stateTranslateTable =
-        [
-          "Init",          // 0
-          "Ready",         // 1
-          "XY jog",        // 2
-          "XY seek",       // 3
-          "Z jog",         // 4
-          "Z seek",        // 5
-          "Latching",      // 6
-          "Latch homing",  // 7
-          "Latch release"  // 8
-        ]
-
-        var stringValue = stateTranslateTable[ value ]
-        states[ "plcState" ] = stringValue
-        $( "#plcState" ).text( stringValue )
-      }
-      else
-        $( "#plcState" ).html( winder.errorString )
-    }
-  )
-
-  // Load version information and have them reload on error.
-  loadVersion()
-  winder.addErrorClearCallback( loadVersion )
-
-  // Start the periodic updates.
-  winder.periodicUpdate()
-
-  /*if ( activeDiv )
-  {
-    var oldDiv = activeDiv
-    $( activeDiv )
-      .css
-      (
-        {
-          position: "absolute"
-        }
-      )
-      .animate
-      (
-        {
-          width: 0,
-          height: 0
-        },
-        //{
-        //  complete: function()
-        //  {
-        //    $( oldDiv ).remove()
-        //  }
-        //}
-      )
-  }
-
-  activeDiv = $( "<div />" ).appendTo( "#main" )
-  winder.loadSubPage( "/Desktop/Pages/" + page, activeDiv )*/
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
 //   Load and display the version information.
 //-----------------------------------------------------------------------------
 function loadVersion()
@@ -223,6 +110,187 @@ function loadVersion()
 
 }
 
+function setupMainScreen()
+{
+  // Before sub-pages begin to load, register a callback to run after all
+  // have been loaded.
+  winder.addFullyLoadedCallback
+  (
+    function()
+    {
+      $( "main article" ).each
+      (
+        function()
+        {
+          //$( this ).draggable().resizable()
+        }
+      )
+
+      $( "button.makeToggle" )
+        .each
+        (
+          function()
+          {
+            if ( $( this ).val() )
+              $( this ).attr( "class", "toggleDown" )
+            else
+              $( this ).attr( "class", "toggle" )
+
+            //if ( ! $( this ).click() )
+            {
+              $( this )
+                .click
+                (
+                  function()
+                  {
+                    $( this ).toggleClass( "toggle" )
+                    $( this ).toggleClass( "toggleDown" )
+
+                    var value = 0
+                    if ( $( this ).attr( 'class' ) == "toggleDown" )
+                      value = 1
+
+                    $( this ).val( value )
+                  }
+                )
+            }
+
+          }
+        )
+    }
+  )
+
+  // Display system time.
+  winder.addPeriodicDisplay
+  (
+    "systemTime.get()",
+    "#systemTime",
+    null,
+    null,
+    function( data )
+    {
+      var timeString = "--"
+      if ( data )
+      {
+        var time = new Date( data + 'Z' )
+        timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
+      }
+
+      return timeString
+    }
+  )
+
+  // Update for primary state machine.
+  winder.addPeriodicDisplay
+  (
+    "process.controlStateMachine.state.__class__.__name__",
+    "#controlState",
+    states,
+    "controlState"
+  )
+
+  // Update for PLC state machine.
+  winder.addPeriodicCallback
+  (
+    "io.plcLogic.getState()",
+    function( value )
+    {
+      if ( null !== value )
+      {
+        var stateTranslateTable =
+        [
+          "Init",          // 0
+          "Ready",         // 1
+          "XY jog",        // 2
+          "XY seek",       // 3
+          "Z jog",         // 4
+          "Z seek",        // 5
+          "Latching",      // 6
+          "Latch homing",  // 7
+          "Latch release", // 8
+          "Unservo",       // 9
+          "Error"          // 10
+        ]
+
+        var stringValue = stateTranslateTable[ value ]
+        states[ "plcState" ] = stringValue
+        $( "#plcState" ).text( stringValue )
+
+        // Change the CSS class for a PLC state error.
+        if ( 10 == value )
+          $( "#plcState" ).attr( 'class', 'plcError' )
+        else
+          $( "#plcState" ).attr( 'class', '' )
+
+      }
+      else
+        $( "#plcState" ).html( winder.errorString )
+    }
+  )
+
+  winder.addPeriodicEndCallback
+  (
+    function()
+    {
+      var controlState = states[ "controlState" ]
+      var plcState = states[ "plcState" ]
+      var isDisabled =
+           ( "StopMode" == controlState )
+        || ( "HardwareMode" == controlState )
+        || ( "Unservo" == plcState )
+
+      $( "#fullStopButton" ).prop( "disabled", isDisabled )
+      $( "#controlState" ).text( controlState )
+    }
+  )
+
+  // Load version information and have them reload on error.
+  loadVersion()
+  winder.addErrorClearCallback( loadVersion )
+
+  // Start the periodic updates.
+  winder.periodicUpdate()
+}
+
+//-----------------------------------------------------------------------------
+// Uses:
+//   Callback for loading an other page.
+// Input:
+//   page - Desired page to load.
+//-----------------------------------------------------------------------------
+function load( page )
+{
+  if ( winder )
+    winder.shutdown()
+
+  winder = new WinderInterface()
+  $( '#main' ).html( "Loading..." )
+
+  // Remove all styles sheets that are not base styles.
+  $( 'head' )
+    .find( 'link' )
+    .each
+    (
+      function()
+      {
+        // Where did this style sheet come from?
+        var url = $( this ).attr( 'href' )
+
+        // Is it a base style sheet?
+        if ( -1 == baseStylesheets.indexOf( url ) )
+          // Remove it.
+          $( this ).remove()
+      }
+    )
+
+  // Loading sub page and setup main screen after sub page finishes loading.
+  winder.loadSubPage
+  (
+    "/Desktop/Pages/" + page, "#main",
+    setupMainScreen
+  )
+}
+
 //-----------------------------------------------------------------------------
 // Uses:
 //   Called when page loads.
@@ -231,179 +299,49 @@ $( document ).ready
 (
   function()
   {
-    // The method of logging in is highly insecure and only meant to
-    // offer rudimentary control.
+    // Get the requested page.
     var page = getParameterByName( "page" )
 
+    // If there is no page, use default.
     if ( ! page )
-      window.location = "?page=apa";
-    else
-    {
-      winder = new WinderInterface()
+      page = "apa"
 
-      winder.remoteAction
-      (
-        'RemoteSession.isAuthenticated( "' + $.cookie( "sessionId" ) + '" )',
-        function( status )
-        {
-          if ( ! status )
-          {
-            if ( "grid" != page )
-              window.location = "?page=grid"
-            else
-              $( "#loginDiv" ).css( "display", "block" )
-          }
-          else
-          {
-            $( "#pageSelectDiv" ).css( "display", "block" )
-            $( "#fullStopDiv" ).css( "display", "block" )
-            $( "#loginDiv" ).css( "display", "none" )
-          }
-        }
-      )
-
-      // Before sub-pages begin to load, register a callback to run after all
-      // have been loaded.
-      winder.addFullyLoadedCallback
+    // Save all the loaded style sheet URLs.  These need to stay regardless
+    // of what page is loaded.
+    $( 'head' )
+      .find( 'link' )
+      .each
       (
         function()
         {
-          $( "main article" ).each
-          (
-            function()
-            {
-              //$( this ).draggable().resizable()
-            }
-          )
-
-          $( "button.makeToggle" )
-            .each
-            (
-              function()
-              {
-                if ( $( this ).val() )
-                  $( this ).attr( "class", "toggleDown" )
-                else
-                  $( this ).attr( "class", "toggle" )
-
-                //if ( ! $( this ).click() )
-                {
-                  $( this )
-                    .click
-                    (
-                      function()
-                      {
-                        $( this ).toggleClass( "toggle" )
-                        $( this ).toggleClass( "toggleDown" )
-
-                        var value = 0
-                        if ( $( this ).attr( 'class' ) == "toggleDown" )
-                          value = 1
-
-                        $( this ).val( value )
-                      }
-                    )
-                }
-
-              }
-            )
+          // Add to list of base style sheets.
+          baseStylesheets.push( $( this ).attr( 'href' ) )
         }
       )
 
-      // Begin loading the requested sub-page.
-      winder.loadSubPage( "/Desktop/Pages/" + page, "#main" )
-
-      // Display system time.
-      winder.addPeriodicDisplay
-      (
-        "systemTime.get()",
-        "#systemTime",
-        null,
-        null,
-        function( data )
+    // Check authentication either load requested page, or show grid page.
+    winder = new WinderInterface()
+    winder.remoteAction
+    (
+      'RemoteSession.isAuthenticated( "' + $.cookie( "sessionId" ) + '" )',
+      function( status )
+      {
+        if ( ! status )
         {
-          var timeString = "--"
-          if ( data )
-          {
-            var time = new Date( data + 'Z' )
-            timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
-          }
-
-          return timeString
+          load( "grid" )
+          $( "#loginDiv" ).css( "display", "block" )
         }
-      )
-
-      // Update for primary state machine.
-      winder.addPeriodicDisplay
-      (
-        "process.controlStateMachine.state.__class__.__name__",
-        "#controlState",
-        states,
-        "controlState"
-      )
-
-      // Update for PLC state machine.
-      winder.addPeriodicCallback
-      (
-        "io.plcLogic.getState()",
-        function( value )
+        else
         {
-          if ( null !== value )
-          {
-            var stateTranslateTable =
-            [
-              "Init",          // 0
-              "Ready",         // 1
-              "XY jog",        // 2
-              "XY seek",       // 3
-              "Z jog",         // 4
-              "Z seek",        // 5
-              "Latching",      // 6
-              "Latch homing",  // 7
-              "Latch release", // 8
-              "Unservo",       // 9
-              "Error"          // 10
-            ]
+          $( "#pageSelectDiv" ).css( "display", "block" )
+          $( "#fullStopDiv" ).css( "display", "block" )
+          $( "#loginDiv" ).css( "display", "none" )
 
-            var stringValue = stateTranslateTable[ value ]
-            states[ "plcState" ] = stringValue
-            $( "#plcState" ).text( stringValue )
-
-            // Change the CSS class for a PLC state error.
-            if ( 10 == value )
-              $( "#plcState" ).attr( 'class', 'plcError' )
-            else
-              $( "#plcState" ).attr( 'class', '' )
-
-          }
-          else
-            $( "#plcState" ).html( winder.errorString )
+          // Load the requested page.
+          load( page )
         }
-      )
-
-      winder.addPeriodicEndCallback
-      (
-        function()
-        {
-          var controlState = states[ "controlState" ]
-          var plcState = states[ "plcState" ]
-          var isDisabled =
-               ( "StopMode" == controlState )
-            || ( "HardwareMode" == controlState )
-            || ( "Unservo" == plcState )
-
-          $( "#fullStopButton" ).prop( "disabled", isDisabled )
-          $( "#controlState" ).text( controlState )
-        }
-      )
-
-      // Load version information and have them reload on error.
-      loadVersion()
-      winder.addErrorClearCallback( loadVersion )
-
-      // Start the periodic updates.
-      winder.periodicUpdate()
-    }
+      }
+    )
   }
 )
 

@@ -107,6 +107,7 @@ class ControlStateMachine( LoggedStateMachine ) :
     # Wind mode.
     self.startRequest    = False
     self.stopRequest     = False
+    self.stopNextRequest = False # True to stop after completing the current G-Code line.
     self.loopMode        = False # True to continuously loop the G-Code.
     self.positionLogging = False # True to log resulting position after each move.
 
@@ -114,6 +115,7 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.manualRequest = False
     self.idleServos = False
     self.isJogging = False
+    self.executeGCode = False
     self.seekX = None
     self.seekY = None
     self.seekZ = None

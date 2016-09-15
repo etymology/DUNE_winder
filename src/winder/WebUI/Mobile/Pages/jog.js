@@ -11,6 +11,19 @@ function Jog()
 
   var extendedPosition
 
+  var speedLimit = 0.1
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback to set new jog speed.
+  // Input:
+  //   newSpeed - New jog speedLimit (0-1).
+  //-----------------------------------------------------------------------------
+  this.setSpeed = function( newSpeed )
+  {
+    speedLimit = newSpeed
+  }
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Callback to start X/Y axis jog.
@@ -21,7 +34,7 @@ function Jog()
   this.jogXY_Start = function( x, y )
   {
     // Convert direction to velocity.
-    var velocity = maxVelocity * 0.1
+    var velocity = maxVelocity * speedLimit
     x *= velocity
     y *= velocity
 
@@ -143,7 +156,7 @@ function Jog()
   //-----------------------------------------------------------------------------
   this.jogZ_Start = function( direction )
   {
-    var velocity = maxVelocity * direction * 0.01
+    var velocity = maxVelocity * direction * speedLimit
     winder.remoteAction( "process.jogZ(" + velocity + ")"  )
   }
 
@@ -267,59 +280,59 @@ function Jog()
     }
   )
 
+  winder.loadSubPage
+  (
+    "/Mobile/Modules/position",
+    "#position"
+  )
+
+  //
+  // Bind the touch start/end events for each jog button.
+  // (This cannot be done via HTML.)
+  //
+
+  $( "#jogXY_ul" )
+    .bind( 'touchstart', function() { self.jogXY_Start( -1, +1 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
+
+  $( "#jogXY_u" )
+    .bind( 'touchstart', function() { self.jogXY_Start(  0, +1 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
+
+  $( "#jogXY_ur" )
+    .bind( 'touchstart', function() { self.jogXY_Start( +1, +1 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
 
 
+  $( "#jogXY_l" )
+    .bind( 'touchstart', function() { self.jogXY_Start( -1,  0 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
+
+  $( "#jogXY_r" )
+    .bind( 'touchstart', function() { self.jogXY_Start( +1,  0 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
 
 
-    //
-    // Bind the touch start/end events for each jog button.
-    // (This cannot be done via HTML.)
-    //
+  $( "#jogXY_dl" )
+    .bind( 'touchstart', function() { self.jogXY_Start( -1, -1 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
 
-    $( "#jogXY_ul" )
-      .bind( 'touchstart', function() { self.jogXY_Start( -1, +1 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
+  $( "#jogXY_d" )
+    .bind( 'touchstart', function() { self.jogXY_Start(  0, -1 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
 
-    $( "#jogXY_u" )
-      .bind( 'touchstart', function() { self.jogXY_Start(  0, +1 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
-
-    $( "#jogXY_ur" )
-      .bind( 'touchstart', function() { self.jogXY_Start( +1, +1 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
+  $( "#jogXY_dr" )
+    .bind( 'touchstart', function() { self.jogXY_Start( +1, -1 ) } )
+    .bind( 'touchend', self.jogXY_Stop )
 
 
-    $( "#jogXY_l" )
-      .bind( 'touchstart', function() { self.jogXY_Start( -1,  0 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
+  $( "#jogZ_b" )
+    .bind( 'touchstart', function() { self.jogZ_Start( -1 ) } )
+    .bind( 'touchend', self.jogZ_Stop )
 
-    $( "#jogXY_r" )
-      .bind( 'touchstart', function() { self.jogXY_Start( +1,  0 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
-
-
-    $( "#jogXY_dl" )
-      .bind( 'touchstart', function() { self.jogXY_Start( -1, -1 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
-
-    $( "#jogXY_d" )
-      .bind( 'touchstart', function() { self.jogXY_Start(  0, -1 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
-
-    $( "#jogXY_dr" )
-      .bind( 'touchstart', function() { self.jogXY_Start( +1, -1 ) } )
-      .bind( 'touchend', self.jogXY_Stop )
-
-
-    $( "#jogZ_b" )
-      .bind( 'touchstart', function() { self.jogZ_Start( -1 ) } )
-      .bind( 'touchend', self.jogZ_Stop )
-
-    $( "#jogZ_f" )
-      .bind( 'touchstart', function() { self.jogZ_Start( +1 ) } )
-      .bind( 'touchend', self.jogZ_Stop )
-
-
+  $( "#jogZ_f" )
+    .bind( 'touchstart', function() { self.jogZ_Start( +1 ) } )
+    .bind( 'touchend', self.jogZ_Stop )
 }
 
 //-----------------------------------------------------------------------------

@@ -79,15 +79,24 @@
       <div id="positionGraphicDiv"></div>
 
       <article id="motorStatusDiv">Loading...</article>
+
       <article>
         <h2>Seek pin</h2>
         <input id="seekPin" />
         <button onclick="jog.seekPin()">Go</button>
       </article>
+
       <article>
         <h2>Anchor pin(s)</h2>
         <input id="anchorPin" />
         <button onclick="jog.setAnchor()">Go</button>
+      </article>
+
+      <article id="manualGCodeDiv">
+        <h2>Manual G-Code</h2>
+        <input id="manualGCode" />
+        <button onclick="jog.executeGCode()">Execute</button>
+        <p id="gExecutionCodeStatus">Ready.</p>
       </article>
 
       <article id="locationsDiv">

@@ -95,6 +95,43 @@ class G_CodeHandlerBase :
     self._line = line
 
   #---------------------------------------------------------------------
+  def _parameterExtract( self, parameters, start, finish, newType, errorMessage ) :
+    """
+    Extract the parameters and format them, raising an exception if they are
+    incorrect.  Internal function.
+
+    Args:
+      parameters: String with parameters.
+      start: Start location in string.
+      end: End location in string (None to use end of line).
+      newType: Type to cast (int, float, str, ect.)
+      errorMessage: Error message to append if an incorrect format is encountered.
+
+    Returns:
+      An instance of 'newType' with data.
+
+    Throws:
+      G_CodeException if formatting is incorrect.
+    """
+
+    try :
+      if None == finish :
+        value = newType( parameters[ start ] )
+      elif finish == start :
+        value = newType( parameters[ start: ] )
+      else :
+        value = newType( parameters[ start:finish ] )
+    except ( IndexError, AttributeError, ValueError ) as exception :
+      data = [
+        str( parameters )
+      ]
+
+      raise G_CodeException( "G-Code " + errorMessage + " function incorrectly formatted.", data )
+
+    return value
+
+
+  #---------------------------------------------------------------------
   def _runFunction( self, function ) :
     """
     Callback for G-Code function.
@@ -102,10 +139,10 @@ class G_CodeHandlerBase :
     Args:
       function: Function number to execute.
 
-    Returns:
-      None.
+    Throws:
+      G_CodeException if formatting is incorrect.
     """
-    number = int( function[ 0 ] )
+    number = self._parameterExtract( function, 0, None, int, "base" )
     self._functions.append( function )
 
     # Toggle spool latch.
@@ -115,7 +152,7 @@ class G_CodeHandlerBase :
     # Consumed wire for line.
     elif G_Codes.WIRE_LENGTH == number :
       # Get the length from the parameter.
-      length = float( function[ 1 ] )
+      length = self._parameterExtract( function, 1, None, float, "wire length" )
 
       # Account for direction of travel.
       self._wireLength = length
@@ -160,9 +197,9 @@ class G_CodeHandlerBase :
 
     # Seek between pins.
     elif G_Codes.PIN_CENTER == number :
-      pinNumberA = function[ 1 ]
-      pinNumberB = function[ 2 ]
-      axies = function[ 3 ]
+      pinNumberA = self._parameterExtract( function, 1, None, str, "pin center" )
+      pinNumberB = self._parameterExtract( function, 2, None, str, "pin center" )
+      axies = self._parameterExtract( function, 3, None, str, "pin center" )
 
       if not self._layerCalibration :
         raise G_CodeException( "G-Code request for calibrated move, but no layer calibration to use." )
@@ -194,9 +231,10 @@ class G_CodeHandlerBase :
 
     # Offset coordinates.
     elif G_Codes.OFFSET == number :
-      for parameter in function[ 1: ] :
-        axis = parameter[ 0 ]
-        offset = float( parameter[ 1: ] )
+      parameters = function[ 1: ]
+      for parameter in parameters :
+        axis = self._parameterExtract( parameter, 0, None, str, "offset" )
+        offset = self._parameterExtract( parameter, 1, 1, float, "offset" )
 
         if "X" == axis :
           self._x += offset
@@ -212,18 +250,18 @@ class G_CodeHandlerBase :
 
     # Head position.
     elif G_Codes.HEAD_LOCATION == number :
-      self._headPosition = int( function[ 1 ] )
+      self._headPosition = self._parameterExtract( function, 1, None, int, "head location" )
       self._headPositionChange = True
 
     # Delay.
     elif G_Codes.DELAY == number :
-      self._delay = int( function[ 1 ] )
+      self._delay = self._parameterExtract( function, 1, None, int, "delay" )
 
     # Correct for the arm on the winder head.
     elif G_Codes.ANCHOR_POINT == number :
       # Get anchor point.
-      pinNumber   = function[ 1 ]
-      orientation = function[ 2 ]
+      pinNumber   = self._parameterExtract( function, 1, None, str, "anchor point" )
+      orientation = self._parameterExtract( function, 2, None, str, "anchor point" )
 
       # Get the pin center.
       pin = self._layerCalibration.getPinLocation( pinNumber )

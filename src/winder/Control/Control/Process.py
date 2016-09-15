@@ -10,6 +10,7 @@ import os
 import re
 
 from Library.Geometry.Location import Location
+from Library.G_Code import G_Code
 
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
@@ -144,6 +145,15 @@ class Process :
       self.controlStateMachine.stopRequest = True
 
   #---------------------------------------------------------------------
+  def stopNextLine( self ) :
+    """
+    Stop winding process after completing the next line.
+    """
+    if self.controlStateMachine.isInMotion() \
+      and self.gCodeHandler.isG_CodeLoaded() :
+        self.gCodeHandler.stopNext()
+
+  #---------------------------------------------------------------------
   def step( self ) :
     """
     Run just one line of G-Code, then stop.
@@ -181,7 +191,6 @@ class Process :
       )
       self.controlStateMachine.manualRequest = True
       self.controlStateMachine.idleServos    = True
-
 
   #---------------------------------------------------------------------
   def createAPA( self, apaName ) :
@@ -823,23 +832,38 @@ class Process :
 
     # Do we have a calibration file?
     if calibration :
+
+      # Two pins may be specified.  If they are, get both names.  If not, set
+      # both names to the single name given.
+      pinNameA = pin
+      pinNameB = pin
+      if " " in pin :
+        [ pinNameA, pinNameB ] = pin.split( ' ' )
+
       # Does request pin exist?
-      if calibration.getPinExists( pin ) :
-        self._log.add(
-          self.__class__.__name__,
-          "SEEK_PIN",
-          "Manual pin seek " + pin + " at " + str( velocity ) +".",
-          [ pin, velocity ]
-        )
-        position = calibration.getPinLocation( pin )
-        position = position.add( calibration.offset )
-        self.manualSeekXY( position.x, position.y, velocity )
-        isError = False
+      if calibration.getPinExists( pinNameA ) \
+        and calibration.getPinExists( pinNameB ) :
+          self._log.add(
+            self.__class__.__name__,
+            "SEEK_PIN",
+            "Manual pin seek " + pin + " at " + str( velocity ) +".",
+            [ pin, velocity ]
+          )
+
+          # Get the center of the pins.
+          pinA = calibration.getPinLocation( pinNameA )
+          pinB = calibration.getPinLocation( pinNameB )
+          position = pinA.center( pinB )
+          position = position.add( calibration.offset )
+
+          # Run a manual seek to pin/center position.
+          self.manualSeekXY( position.x, position.y, velocity )
+          isError = False
       else:
         self._log.add(
           self.__class__.__name__,
           "SEEK_PIN",
-          "Manual pin seek request ignored--pin does not exist.",
+          "Manual pin seek request ignored--pin(s) does not exist.",
           [ pin, velocity ]
         )
     else:
@@ -915,19 +939,48 @@ class Process :
 
     return self.headCompensation.getHeadAngle( location )
 
+  #---------------------------------------------------------------------
+  def executeG_CodeLine( self, line ) :
+    """
+    Run a line of G-code.
 
-  # #---------------------------------------------------------------------
-  # def getPosition( self ) :
-  #   """
-  #   Get current machine position.
-  #
-  #   Returns:
-  #     Instance of location with machine position.
-  #   """
-  #   x = self._io.xAxis.getPosition()
-  #   y = self._io.yAxis.getPosition()
-  #   z = self._io.zAxis.getPosition()
-  #
-  #   return Location( x, y, z )
+    Args:
+      line: G-Code to execute.
+
+    Returns:
+      Failure data.  None if there was no failure.
+    """
+    error = None
+    if not self.controlStateMachine.isMovementReady() :
+      error = "Machine not ready."
+      self._log.add(
+        self.__class__.__name__,
+        "MANUAL_GCODE",
+        "Failed to execute manual G-Code line as machine was not ready.",
+        [ line ]
+      )
+    else :
+      errorData = self.gCodeHandler.executeG_CodeLine( line )
+
+      if errorData :
+        error = errorData[ "message" ]
+        self._log.add(
+          self.__class__.__name__,
+          "MANUAL_GCODE",
+          "Failed to execute manual G-Code line.",
+          [ line, error ]
+        )
+      else:
+        self.controlStateMachine.manualRequest = True
+        self.controlStateMachine.executeGCode = True
+
+        self._log.add(
+          self.__class__.__name__,
+          "MANUAL_GCODE",
+          "Execute manual G-Code line.",
+          [ line ]
+        )
+
+    return error
 
 # end class

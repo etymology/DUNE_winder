@@ -1,0 +1,20 @@
+          <article id="statesDiv">
+            <h2>Run state</h2>
+            <p>Control: <span id="controlState">--</span></p>
+            <p>PLC: <span id="plcState">--</span></p>
+          </article>
+
+          <article id="systemActionDiv">
+            <h2>Action</h2>
+            <button onclick="process.acknowledgeError()">Reset</button>
+          </article>
+
+          <article id="navigationDiv">
+            <h2>Nav</h2>
+            <button onclick="load( 'menu' )">Menu</button>
+            <button onclick="load( 'jog' )"       >Jog</button>
+            <button onclick="load( 'increment' )" >Inc</button>
+            <button onclick="load( 'gCode' )"     >G-Code</button>
+          </article>
+
+          <article id="recentLogDiv">Loading...</article>

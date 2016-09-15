@@ -189,8 +189,8 @@ function PositionGraphic()
         // Motor position history.
         debounceLastX = debounceX
         debounceLastY = debounceY
-        debounceX = motorStatus.motor[ "xDesiredPosition" ]
-        debounceY = motorStatus.motor[ "yDesiredPosition" ]
+        debounceX = Math.round( motorStatus.motor[ "xDesiredPosition" ] )
+        debounceY = Math.round( motorStatus.motor[ "yDesiredPosition" ] )
 
         // Debounce motor positions.
         // This is done because the X and Y destinations change asynchronously.
@@ -215,9 +215,10 @@ function PositionGraphic()
             return result
           }
 
-        var xPosition = motorStatus.motor[ "xPosition" ]
-        var yPosition = motorStatus.motor[ "yPosition" ]
-        var zPosition = motorStatus.motor[ "zPosition" ]
+        // Axis positions.  Round to keep graphic from jittering.
+        var xPosition = Math.round( motorStatus.motor[ "xPosition" ] )
+        var yPosition = Math.round( motorStatus.motor[ "yPosition" ] )
+        var zPosition = Math.round( motorStatus.motor[ "zPosition" ] )
 
         //
         // Position loop (X/Y image).

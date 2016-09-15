@@ -1,28 +1,24 @@
-main button
+#seekPinDiv, #navigationDiv
 {
-  width:  50px;
+  height: 85px;
+}
+
+#seekPinDiv input
+{
+  width: 75px;
+}
+
+#navigationDiv button
+{
+  width: 65px;
+}
+
+.incrementer h3
+{
+  display: block;
+  width: 20px;
   height: 50px;
-  font-size: 100%;
-  margin: 1px;
-}
-
-div.jog
-{
-  width: 415px;
-  margin: auto;
-}
-
-
-button.jog
-{
-  height: 125px;
-  width:  125px;
-  font-size: 400%;
-  margin: 5px;
+  text-align: center;
+  line-height: 50px;
   float: left;
-}
-
-#headControlDiv
-{
-  width: 415px;
 }
