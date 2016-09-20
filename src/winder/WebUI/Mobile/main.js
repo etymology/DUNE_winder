@@ -15,22 +15,22 @@ var winder = new WinderInterface()
 function getParameterByName( name, url )
 {
   if ( ! url )
-    url = window.location.href;
+    url = window.location.href
 
-  name = name.replace( /[\[\]]/g, "\\$&" );
-  var regex = new RegExp( "[?&]" + name + "(=([^&#]*)|&|#|$)" );
-  var results = regex.exec( url );
+  name = name.replace( /[\[\]]/g, "\\$&" )
+  var regex = new RegExp( "[?&]" + name + "(=([^&#]*)|&|#|$)" )
+  var results = regex.exec( url )
 
-  var returnResult;
+  var returnResult
   if ( ! results )
-    returnResult = null;
+    returnResult = null
   else
   if ( ! results[ 2 ] )
-    returnResult ='';
+    returnResult =''
   else
-    returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) );
+    returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) )
 
-  return returnResult;
+  return returnResult
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ function getParameterByName( name, url )
 //-----------------------------------------------------------------------------
 function load( page )
 {
-//  window.location = "?page=" + page;
+//  window.location = "?page=" + page
 
   if ( winder )
     winder.shutdown()
@@ -69,7 +69,7 @@ $( document ).ready
   {
     var page = getParameterByName( "page" )
     if ( ! page )
-      window.location = "?page=menu";
+      window.location = "?page=menu"
     else
     {
       // Begin loading the requested sub-page.

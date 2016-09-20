@@ -58,4 +58,4 @@ $( document ).ready
   {
     grid = new Grid()
   }
-);
+)

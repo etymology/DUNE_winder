@@ -63,6 +63,22 @@ class Location :
     return Location( self.x + location.x, self.y + location.y, self.z + location.z )
 
   #---------------------------------------------------------------------
+  def sub( self, location ) :
+    """
+    Subtract/offset this location by an other location.
+
+    Args:
+      location: Location to subtract to this instance.
+
+    Returns:
+      Instance of Location with results of subtract.
+
+    Note:
+      Does not modify self.
+    """
+    return Location( self.x - location.x, self.y - location.y, self.z - location.z )
+
+  #---------------------------------------------------------------------
   def asList( self ) :
     """
     Return the location as a list of three floating point values for X/Y/Z.

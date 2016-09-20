@@ -302,6 +302,7 @@ class AnodePlaneArray( APA_Base ) :
       self._gCodeHandler._headPosition
     )
 
+    self._gCodeHandler.closeG_CodeLog()
     self.save()
 
     elapsedTime = self._systemTime.getDelta( self._startTime )

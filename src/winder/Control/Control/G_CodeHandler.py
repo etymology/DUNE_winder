@@ -455,6 +455,15 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._gCodeLog = open( gCodeLogFile, "a" )
 
   #---------------------------------------------------------------------
+  def closeG_CodeLog( self ) :
+    """
+    Close the open G-Code log file.
+    """
+    if self._gCodeLog :
+      self._gCodeLog.close()
+      self._gCodeLog = None
+
+  #---------------------------------------------------------------------
   def isPositionLogging( self ) :
     """
     Check to see if position logging is enabled.

@@ -21,6 +21,9 @@ from Library.Geometry.Segment  import Segment
 from .G_Codes import G_Codes
 
 class G_CodeHandlerBase :
+
+  DEBUG_UNIT = False
+
   #---------------------------------------------------------------------
   def _setX( self, x ) :
     """
@@ -165,9 +168,15 @@ class G_CodeHandlerBase :
       # The position thus far.
       endLocation = Location( self._x, self._y, self._z )
 
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "SEEK_TRANSFER starting at", endLocation,
+
       # Starting location based on anchor point.  Actual location has compensation
       # for pin diameter.
       startLocation = self._headCompensation.pinCompensation( endLocation )
+
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "Pin correction", startLocation,
 
       if None == startLocation :
         data = [
@@ -190,6 +199,8 @@ class G_CodeHandlerBase :
         )
 
       location = edges.intersectSegment( segment )
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "Finial location", location
 
       self._x = location.x
       self._y = location.y
@@ -201,6 +212,9 @@ class G_CodeHandlerBase :
       pinNumberB = self._parameterExtract( function, 2, None, str, "pin center" )
       axies = self._parameterExtract( function, 3, None, str, "pin center" )
 
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "PIN_CENTER", pinNumberA, pinNumberB,
+
       if not self._layerCalibration :
         raise G_CodeException( "G-Code request for calibrated move, but no layer calibration to use." )
 
@@ -208,6 +222,8 @@ class G_CodeHandlerBase :
       pinB = self._layerCalibration.getPinLocation( pinNumberB )
       center = pinA.center( pinB )
       center = center.add( self._layerCalibration.offset )
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print pinA, pinB, center
 
       if "X" in axies :
         self._x = center.x
@@ -286,10 +302,14 @@ class G_CodeHandlerBase :
         z = self._machineCalibration.zBack
 
       currentLocation = Location( self._x, self._y, z )
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "ARM_CORRECT", currentLocation,
 
       if   MathExtra.isclose( self._y, self._machineCalibration.transferTop ) \
         or MathExtra.isclose( self._y, self._machineCalibration.transferBottom ) :
           self._x = self._headCompensation.correctX( currentLocation )
+          if G_CodeHandlerBase.DEBUG_UNIT :
+            print "new X", self._x,
 
           edge = None
 
@@ -313,8 +333,15 @@ class G_CodeHandlerBase :
             # Compensate for head's arm.
             self._y = self._headCompensation.correctY( location )
             self._x = location.x
+            if G_CodeHandlerBase.DEBUG_UNIT :
+              print "Edge", self._x, self._y,
       else :
         self._y = self._headCompensation.correctY( currentLocation )
+        if G_CodeHandlerBase.DEBUG_UNIT :
+          print "new Y", self._y,
+
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print
 
       self._xyChange = True
 

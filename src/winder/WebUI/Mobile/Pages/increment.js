@@ -58,4 +58,4 @@ $( document ).ready
   {
     increment = new Increment()
   }
-);
+)

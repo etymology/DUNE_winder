@@ -100,4 +100,4 @@ $( document ).ready
   {
     position = new Position()
   }
-);
+)

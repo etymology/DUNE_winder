@@ -165,4 +165,4 @@ $( document ).ready
   {
     gCodeControl = new G_CodeControl()
   }
-);
+)

@@ -53,4 +53,4 @@ $( document ).ready
   {
     main = new Main()
   }
-);
+)

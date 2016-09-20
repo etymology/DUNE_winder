@@ -44,22 +44,22 @@ function isRunning()
 function getParameterByName( name, url )
 {
   if ( ! url )
-    url = window.location.href;
+    url = window.location.href
 
-  name = name.replace( /[\[\]]/g, "\\$&" );
-  var regex = new RegExp( "[?&]" + name + "(=([^&#]*)|&|#|$)" );
-  var results = regex.exec( url );
+  name = name.replace( /[\[\]]/g, "\\$&" )
+  var regex = new RegExp( "[?&]" + name + "(=([^&#]*)|&|#|$)" )
+  var results = regex.exec( url )
 
-  var returnResult;
+  var returnResult
   if ( ! results )
-    returnResult = null;
+    returnResult = null
   else
   if ( ! results[ 2 ] )
-    returnResult ='';
+    returnResult = ''
   else
-    returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) );
+    returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) )
 
-  return returnResult;
+  return returnResult
 }
 
 //-----------------------------------------------------------------------------
@@ -319,29 +319,30 @@ $( document ).ready
         }
       )
 
-    // Check authentication either load requested page, or show grid page.
-    winder = new WinderInterface()
-    winder.remoteAction
-    (
-      'RemoteSession.isAuthenticated( "' + $.cookie( "sessionId" ) + '" )',
-      function( status )
-      {
-        if ( ! status )
-        {
-          load( "grid" )
-          $( "#loginDiv" ).css( "display", "block" )
-        }
-        else
-        {
-          $( "#pageSelectDiv" ).css( "display", "block" )
-          $( "#fullStopDiv" ).css( "display", "block" )
-          $( "#loginDiv" ).css( "display", "none" )
+    // $$$FUTURE // Check authentication either load requested page, or show grid page.
+    // $$$FUTURE winder = new WinderInterface()
+    // $$$FUTURE winder.remoteAction
+    // $$$FUTURE (
+    // $$$FUTURE   'RemoteSession.isAuthenticated( "' + $.cookie( "sessionId" ) + '" )',
+    // $$$FUTURE   function( status )
+    // $$$FUTURE   {
+    // $$$FUTURE     console.log( "isAuthenticated = " + status )
+    // $$$FUTURE     if ( ! status )
+    // $$$FUTURE     {
+    // $$$FUTURE       load( "grid" )
+    // $$$FUTURE       $( "#loginDiv" ).css( "display", "block" )
+    // $$$FUTURE     }
+    // $$$FUTURE     else
+    // $$$FUTURE     {
+                       $( "#pageSelectDiv" ).css( "display", "block" )
+                       $( "#fullStopDiv" ).css( "display", "block" )
+                       $( "#loginDiv" ).css( "display", "none" )
 
-          // Load the requested page.
-          load( page )
-        }
-      }
-    )
+                       // Load the requested page.
+                       load( page )
+    // $$$FUTURE     }
+    // $$$FUTURE   }
+    // $$$FUTURE )
   }
 )
 

@@ -81,4 +81,4 @@ $( document ).ready
   {
     log = new Log()
   }
-);
+)

@@ -96,19 +96,19 @@ function PositionGraphic()
     // Select the color of the light indicator.
     if ( status )
     {
-      zStatusCanvas.fillStyle = "lime";
-      zStatusCanvas.strokeStyle = "green";
+      zStatusCanvas.fillStyle = "lime"
+      zStatusCanvas.strokeStyle = "green"
     }
     else
     if ( ! offIsError )
     {
-      zStatusCanvas.fillStyle = "blue";
-      zStatusCanvas.strokeStyle = "darkBlue";
+      zStatusCanvas.fillStyle = "blue"
+      zStatusCanvas.strokeStyle = "darkBlue"
     }
     else
     {
-      zStatusCanvas.fillStyle = "red";
-      zStatusCanvas.strokeStyle = "darkRed";
+      zStatusCanvas.fillStyle = "red"
+      zStatusCanvas.strokeStyle = "darkRed"
     }
 
     // Draw a circle at the specified location.

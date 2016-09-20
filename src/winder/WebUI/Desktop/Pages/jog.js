@@ -566,4 +566,4 @@ $( document ).ready
   {
     jog = new Jog()
   }
-);
+)

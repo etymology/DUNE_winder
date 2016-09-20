@@ -8,8 +8,8 @@
 #   This unit is trigonometric intensive.  The equations are explained in
 #   the development log, verified visually on drawings and with spreadsheets.
 # References:
-#   Spreadsheet file "2016-09-09 -- Roller correction worksheet.ods"
-#   Spreadsheet file "2016-08-25 -- Tangent circle worksheet.ods".
+#   Spreadsheet file "2016-09-15 -- Roller correction worksheet.ods" $$$DEBUG
+#   Spreadsheet file "2016-08-25 -- Tangent circle worksheet.ods". $$$DEBUG
 ###############################################################################
 
 import math
@@ -28,8 +28,14 @@ class HeadCompensation :
       machineCalibration - Instance of MachineCalibration.
     """
     self._machineCalibration = machineCalibration
-    self._anchorPoint = Location( -1 )
-    self._orientation = None
+    self._anchorPoint  = Location( -1 )
+
+    # Anchor offset is used after pin compensation is calculated.
+    # Anytime the anchor point is changed, the offset is set to 0.  If pin
+    # compensation is calculated, the offset is stored here and used in
+    # additional correction.
+    self._anchorOffset = Location()
+    self._orientation  = None
 
   #---------------------------------------------------------------------
   def orientation( self, value = None ) :
@@ -61,6 +67,7 @@ class HeadCompensation :
     """
     if None != location :
       self._anchorPoint = location.copy()
+      self._anchorOffset = Location()
 
     return self._anchorPoint
 
@@ -84,6 +91,7 @@ class HeadCompensation :
       pinRadius = self._machineCalibration.pinDiameter / 2
       circle = Circle( self._anchorPoint, pinRadius )
       result = circle.tangentPoint( self._orientation, endPoint )
+      self._anchorOffset = result.sub( self._anchorPoint )
     else :
       result = self._anchorPoint
 
@@ -117,13 +125,15 @@ class HeadCompensation :
       Location object with the adjusted coordinates.
     """
 
+    anchorPoint = self._anchorPoint.add( self._anchorOffset )
+
     #
     # First compensation is to correct for the angle of the arm on the head.
     #
 
     # Compute various lengths.
-    deltaX = machineLocation.x - self._anchorPoint.x
-    deltaZ = machineLocation.z - self._anchorPoint.z
+    deltaX = machineLocation.x - anchorPoint.x
+    deltaZ = machineLocation.z - anchorPoint.z
     lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
     headRatio = self._machineCalibration.headArmLength / lengthXZ
 
@@ -138,9 +148,9 @@ class HeadCompensation :
     #
 
     # Compute various lengths.
-    deltaX   = x - self._anchorPoint.x
-    deltaY   = y - self._anchorPoint.y
-    deltaZ   = z - self._anchorPoint.z
+    deltaX   = x - anchorPoint.x
+    deltaY   = y - anchorPoint.y
+    deltaZ   = z - anchorPoint.z
     lengthXZ  = math.sqrt( deltaX**2 + deltaZ**2 )
     lengthXYZ = math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
 
@@ -187,45 +197,38 @@ class HeadCompensation :
       Corrected Y value.
     """
 
+    anchorPoint = self._anchorPoint.add( self._anchorOffset )
+
     #
     # Head arm correction.
     #
 
     # Compute various lengths.
-    deltaX = machineLocation.x - self._anchorPoint.x
-    deltaY = machineLocation.y - self._anchorPoint.y
-    deltaZ = machineLocation.z - self._anchorPoint.z
-    lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
+    deltaX = machineLocation.x - anchorPoint.x
+    deltaY = machineLocation.y - anchorPoint.y
 
     # Compute a correction for the arm.
-    headCorrection = -deltaY * self._machineCalibration.headArmLength / lengthXZ
+    headCorrection = -self._machineCalibration.headArmLength * deltaY / abs( deltaX )
 
     # Compute the new end point.
-    x = machineLocation.x - deltaX * self._machineCalibration.headArmLength / lengthXZ
     y = machineLocation.y + headCorrection
-    z = machineLocation.z - deltaZ * self._machineCalibration.headArmLength / lengthXZ
 
     #
     # Roller correction.
     #
 
-    # Compute various lengths.
-    deltaX = x - self._anchorPoint.x
-    deltaY = y - self._anchorPoint.y
-    deltaZ = z - self._anchorPoint.z
-    lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
-    lengthXYZ = math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
-
     # Offset to Y caused by the roller.
     # NOTE: This correction actually changes the tangent line, but the change
     # is so small (1 part in 1500) it is ignored.  Otherwise an iterative method
-    # is required like what is done for the X correction.
-    rollerCorrection  = self._machineCalibration.headRollerRadius * lengthXYZ / lengthXZ
-    rollerCorrection -= self._machineCalibration.headRollerRadius
+    # is required.
+    rollerCorrection  = deltaY**2 / deltaX**2
+    rollerCorrection += 1
+    rollerCorrection  = math.sqrt( rollerCorrection )
+    rollerCorrection -= 1
+    rollerCorrection *= self._machineCalibration.headRollerRadius
     rollerCorrection -= self._machineCalibration.headRollerGap / 2
 
-    # Direction correction.
-    if headCorrection < 0 :
+    if deltaY > 0 :
       rollerCorrection = -rollerCorrection
 
     # Correct the Y position with two offsets.
@@ -246,50 +249,74 @@ class HeadCompensation :
       Corrected X value.
     """
 
+    anchorPoint = self._anchorPoint.add( self._anchorOffset )
+
     # Compute various lengths.
-    deltaX = machineLocation.x - self._anchorPoint.x
-    deltaY = machineLocation.y - self._anchorPoint.y
-    deltaZ = machineLocation.z - self._anchorPoint.z
+    deltaX = machineLocation.x - anchorPoint.x
+    deltaY = machineLocation.y - anchorPoint.y
 
-    lengthY = abs( deltaY )
+    if deltaX > 0 :
+      x = machineLocation.x + self._machineCalibration.headArmLength
+    else:
+      x = machineLocation.x - self._machineCalibration.headArmLength
 
-    # Iterative method that converges on the answer.
-    # Easier to solve than the exact solution.  Runs until answer no longer
-    # changes (i.e. is as exact as precision allows).  Typically only a few
-    # iterations are necessary.  Converges more slowly for small values of
-    # x and z.
-    lastX = deltaX
-    isDone = False
-    while not isDone :
-      # Head arm compensation.
-      xzLength = math.sqrt( lastX**2 + deltaZ**2 )
-      x = deltaX
-      if xzLength > 0 :
-        x += lastX * self._machineCalibration.headArmLength / xzLength
+    rollerX  = deltaY**2
+    rollerX /= deltaX**2
+    rollerX += 1
+    rollerX  = math.sqrt( rollerX )
+    rollerX *= self._machineCalibration.headRollerRadius
+    rollerX -= self._machineCalibration.headRollerRadius
+    rollerX -= self._machineCalibration.headRollerGap / 2
+    rollerX *= deltaX / abs( deltaY )
 
-      # Roller compensation.
-      if xzLength > 0 :
-        scaleFactor = self._machineCalibration.headArmLength / xzLength
-        armX = lastX - lastX * scaleFactor
-        armZ = deltaZ - deltaZ * scaleFactor
-        armXZ = math.sqrt( armX**2 + armZ**2 )
+    # $$$ rollerX  = self._machineCalibration.headArmLength**2 + deltaY**2
+    # $$$ rollerX /= self._machineCalibration.headArmLength**2
+    # $$$ rollerX  = math.sqrt( rollerX )
+    # $$$ rollerX *= self._machineCalibration.headRollerRadius
+    # $$$ rollerX -= self._machineCalibration.headRollerRadius
+    # $$$ rollerX -= self._machineCalibration.headRollerGap / 2
+    # $$$ rollerX *= self._machineCalibration.headArmLength / lengthY
 
-        rollerX  = armXZ**2 + deltaY**2
-        rollerX /= armXZ**2
-        rollerX  = math.sqrt( rollerX )
-        rollerX *= self._machineCalibration.headRollerRadius
-        rollerX -= self._machineCalibration.headRollerRadius
-        rollerX -= self._machineCalibration.headRollerGap / 2
-        rollerX *= armX / lengthY
+    x += rollerX
 
-        x += rollerX
-
-      # See if any changes were made to x.  If not, loop is complete.
-      isDone = MathExtra.isclose( x, lastX )
-      lastX = x
-
-    # Add the correction to the starting point.
-    x += self._anchorPoint.x
+    # $$$
+    # $$$ # Iterative method that converges on the answer.
+    # $$$ # Easier to solve than the exact solution.  Runs until answer no longer
+    # $$$ # changes (i.e. is as exact as precision allows).  Typically only a few
+    # $$$ # iterations are necessary.  Converges more slowly for small values of
+    # $$$ # x and z.
+    # $$$ lastX = deltaX
+    # $$$ isDone = False
+    # $$$ while not isDone :
+    # $$$   # Head arm compensation.
+    # $$$   xzLength = math.sqrt( lastX**2 + deltaZ**2 )
+    # $$$   x = deltaX
+    # $$$   if xzLength > 0 :
+    # $$$     x += lastX * self._machineCalibration.headArmLength / xzLength
+    # $$$
+    # $$$   # Roller compensation.
+    # $$$   if xzLength > 0 :
+    # $$$     scaleFactor = self._machineCalibration.headArmLength / xzLength
+    # $$$     armX = lastX - lastX * scaleFactor
+    # $$$     armZ = deltaZ - deltaZ * scaleFactor
+    # $$$     armXZ = math.sqrt( armX**2 + armZ**2 )
+    # $$$
+    # $$$     rollerX  = armXZ**2 + deltaY**2
+    # $$$     rollerX /= armXZ**2
+    # $$$     rollerX  = math.sqrt( rollerX )
+    # $$$     rollerX *= self._machineCalibration.headRollerRadius
+    # $$$     rollerX -= self._machineCalibration.headRollerRadius
+    # $$$     rollerX -= self._machineCalibration.headRollerGap / 2
+    # $$$     rollerX *= armX / lengthY
+    # $$$
+    # $$$     x += rollerX
+    # $$$
+    # $$$   # See if any changes were made to x.  If not, loop is complete.
+    # $$$   isDone = MathExtra.isclose( x, lastX )
+    # $$$   lastX = x
+    # $$$
+    # $$$ # Add the correction to the starting point.
+    # $$$ x += anchorPoint.x
 
     return x
 
@@ -309,15 +336,16 @@ if __name__ == "__main__":
   # Setup instance of compensation.
   headCompensation = HeadCompensation( machineCalibration )
 
+
   #
   # Above and to the right.
-  # Values come from spreadsheet "2016-09-09 -- Roller correction worksheet",
+  # Values come from spreadsheet "2016-09-15 -- Roller correction worksheet",
   # on sheet "Head_X+++" and "Head_Y+++"
   #
 
   # Setup test values.
-  anchorPoint = Location( 150, 275, 50 )
-  machinePosition = Location( 4000, 2700, 150 )
+  anchorPoint = Location( 6581.6559158273, 113.186368912, 174.15 )
+  machinePosition = Location( 6363.6442868365, 4, 0 )
   headCompensation.anchorPoint( anchorPoint )
 
   # Run tests.
@@ -330,124 +358,160 @@ if __name__ == "__main__":
   wireX = headCompensation.getActualLocation( correctedPositionX )
   wireY = headCompensation.getActualLocation( correctedPositionY )
 
-  desiredCorrectX = 4125.7838871346
-  desiredCorrectY = 2620.7738390836
-  desiredHeadAngleX = 88.5591847231 / 180 * math.pi
-  desiredHeadAngleY = 88.5121324712 / 180 * math.pi
-  desiredWireX = Location( 3997.44147251, 2698.38880455, 146.771896605 )
-  desiredWireY = Location( 3871.6603482718, 2619.1626868611, 146.6665025525 )
+  desiredCorrectX = 6238.4109348003
+  desiredCorrectY = 66.7203926635
+
+  desiredHeadAngleX = -116.9015774072 / 180 * math.pi
+  desiredHeadAngleY = -128.6182306977 / 180 * math.pi
+  desiredWireX = Location( 6352.0774120067, 5.1306535219, 57.6702300097 )
+  #desiredWireY = Location(  )
 
   assert( MathExtra.isclose( desiredCorrectX, correctX ) )
   assert( MathExtra.isclose( desiredCorrectY, correctY ) )
   assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
   assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
   assert( desiredWireX == wireX )
-  assert( desiredWireY == wireY )
+  #assert( desiredWireY == wireY )
 
-  #
-  # Below and to the left.
-  # Values come from spreadsheet "2016-09-09 -- Roller correction worksheet",
-  # on sheet "Head_X---" and "Head_Y---"
-  #
-
-  # Setup test values.
-  anchorPoint = Location( 4000, 2700, 150 )
-  machinePosition = Location( 150, 275, 50 )
-  headCompensation.anchorPoint( anchorPoint )
-
-  # Run tests.
-  correctX = headCompensation.correctX( machinePosition )
-  correctY = headCompensation.correctY( machinePosition )
-  correctedPositionX = machinePosition.copy( x=correctX )
-  correctedPositionY = machinePosition.copy( y=correctY )
-  headAngleX = headCompensation.getHeadAngle( correctedPositionX )
-  headAngleY = headCompensation.getHeadAngle( correctedPositionY )
-  wireX = headCompensation.getActualLocation( correctedPositionX )
-  wireY = headCompensation.getActualLocation( correctedPositionY )
-
-  desiredCorrectX = 25.864056226
-  desiredCorrectY = 354.2261609164
-  desiredHeadAngleX = -91.4414124836 / 180 * math.pi
-  desiredHeadAngleY = -91.4878675288 / 180 * math.pi
-  desiredWireX = Location( 154.2074732952, 276.6118480603, 53.2294672071 )
-  desiredWireY = Location( 278.3396517282, 355.8373131389, 53.3334974475 )
-
-  assert( MathExtra.isclose( desiredCorrectX, correctX ) )
-  assert( MathExtra.isclose( desiredCorrectY, correctY ) )
-  assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
-  assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
-  assert( desiredWireX == wireX )
-  assert( desiredWireY == wireY )
-
-  #
-  # Above and to the left.
-  # Values come from spreadsheet "2016-09-09 -- Roller correction worksheet",
-  # on sheet "Head_X-++" and "Head_Y-++"
-  #
-
-  # Setup test values.
-  anchorPoint = Location( 4000, 275, 50 )
-  machinePosition = Location( 150, 2700, 150 )
-  headCompensation.anchorPoint( anchorPoint )
-
-  # Run tests.
-  correctX = headCompensation.correctX( machinePosition )
-  correctY = headCompensation.correctY( machinePosition )
-  correctedPositionX = machinePosition.copy( x=correctX )
-  correctedPositionY = machinePosition.copy( y=correctY )
-  headAngleX = headCompensation.getHeadAngle( correctedPositionX )
-  headAngleY = headCompensation.getHeadAngle( correctedPositionY )
-  wireX = headCompensation.getActualLocation( correctedPositionX )
-  wireY = headCompensation.getActualLocation( correctedPositionY )
-
-  desiredCorrectX = 24.2161128654
-  desiredCorrectY = 2620.7738390836
-  desiredHeadAngleX = -88.5591847231 / 180 * math.pi
-  desiredHeadAngleY = -88.5121324712 / 180 * math.pi
-  desiredWireX = Location( 152.5585274877, 2698.388804549, 146.7718966054 )
-  desiredWireY = Location( 278.3396517282, 2619.1626868611, 146.6665025525 )
-
-  assert( MathExtra.isclose( desiredCorrectX, correctX ) )
-  assert( MathExtra.isclose( desiredCorrectY, correctY ) )
-  assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
-  assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
-  assert( desiredWireX == wireX )
-  assert( desiredWireY == wireY )
-
-  #
-  # Below and to the right.
-  # Values come from spreadsheet "2016-09-09 -- Roller correction worksheet",
-  # on sheet "Head_X+-+" and "Head_Y+-+"
-  #
-
-  # Setup test values.
-  anchorPoint = Location( 150, 2700, 50 )
-  machinePosition = Location( 4000, 275, 150 )
-  headCompensation.anchorPoint( anchorPoint )
-
-  # Run tests.
-  correctX = headCompensation.correctX( machinePosition )
-  correctY = headCompensation.correctY( machinePosition )
-  correctedPositionX = machinePosition.copy( x=correctX )
-  correctedPositionY = machinePosition.copy( y=correctY )
-  headAngleX = headCompensation.getHeadAngle( correctedPositionX )
-  headAngleY = headCompensation.getHeadAngle( correctedPositionY )
-  wireX = headCompensation.getActualLocation( correctedPositionX )
-  wireY = headCompensation.getActualLocation( correctedPositionY )
-
-  desiredCorrectX = 4124.135943774
-  desiredCorrectY = 354.2261609164
-  desiredHeadAngleX = 88.5585875164 / 180 * math.pi
-  desiredHeadAngleY = 88.5121324712 / 180 * math.pi
-  desiredWireX = Location( 3995.7925267048, 276.6118480603, 146.7705327929 )
-  desiredWireY = Location( 3871.6603482718, 355.8373131389, 146.6665025525 )
-
-  assert( MathExtra.isclose( desiredCorrectX, correctX ) )
-  assert( MathExtra.isclose( desiredCorrectY, correctY ) )
-  assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
-  assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
-  assert( desiredWireX == wireX )
-  assert( desiredWireY == wireY )
+  # $$$UPDATE #
+  # $$$UPDATE # Above and to the right.
+  # $$$UPDATE # Values come from spreadsheet "2016-09-15 -- Roller correction worksheet",
+  # $$$UPDATE # on sheet "Head_X+++" and "Head_Y+++"
+  # $$$UPDATE #
+  # $$$UPDATE
+  # $$$UPDATE # Setup test values.
+  # $$$UPDATE anchorPoint = Location( 150, 275, 50 )
+  # $$$UPDATE machinePosition = Location( 4000, 2700, 150 )
+  # $$$UPDATE headCompensation.anchorPoint( anchorPoint )
+  # $$$UPDATE
+  # $$$UPDATE # Run tests.
+  # $$$UPDATE correctX = headCompensation.correctX( machinePosition )
+  # $$$UPDATE correctY = headCompensation.correctY( machinePosition )
+  # $$$UPDATE correctedPositionX = machinePosition.copy( x=correctX )
+  # $$$UPDATE correctedPositionY = machinePosition.copy( y=correctY )
+  # $$$UPDATE headAngleX = headCompensation.getHeadAngle( correctedPositionX )
+  # $$$UPDATE headAngleY = headCompensation.getHeadAngle( correctedPositionY )
+  # $$$UPDATE wireX = headCompensation.getActualLocation( correctedPositionX )
+  # $$$UPDATE wireY = headCompensation.getActualLocation( correctedPositionY )
+  # $$$UPDATE
+  # $$$UPDATE desiredCorrectX = 4125.7838871346
+  # $$$UPDATE desiredCorrectY = 2620.7738390836
+  # $$$UPDATE desiredHeadAngleX = 88.5591847231 / 180 * math.pi
+  # $$$UPDATE desiredHeadAngleY = 88.5121324712 / 180 * math.pi
+  # $$$UPDATE desiredWireX = Location( 3997.44147251, 2698.38880455, 146.771896605 )
+  # $$$UPDATE desiredWireY = Location( 3871.6603482718, 2619.1626868611, 146.6665025525 )
+  # $$$UPDATE
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectX, correctX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectY, correctY ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
+  # $$$UPDATE assert( desiredWireX == wireX )
+  # $$$UPDATE assert( desiredWireY == wireY )
+  # $$$UPDATE
+  # $$$UPDATE #
+  # $$$UPDATE # Below and to the left.
+  # $$$UPDATE # Values come from spreadsheet "2016-09-15 -- Roller correction worksheet",
+  # $$$UPDATE # on sheet "Head_X---" and "Head_Y---"
+  # $$$UPDATE #
+  # $$$UPDATE
+  # $$$UPDATE # Setup test values.
+  # $$$UPDATE anchorPoint = Location( 4000, 2700, 150 )
+  # $$$UPDATE machinePosition = Location( 150, 275, 50 )
+  # $$$UPDATE headCompensation.anchorPoint( anchorPoint )
+  # $$$UPDATE
+  # $$$UPDATE # Run tests.
+  # $$$UPDATE correctX = headCompensation.correctX( machinePosition )
+  # $$$UPDATE correctY = headCompensation.correctY( machinePosition )
+  # $$$UPDATE correctedPositionX = machinePosition.copy( x=correctX )
+  # $$$UPDATE correctedPositionY = machinePosition.copy( y=correctY )
+  # $$$UPDATE headAngleX = headCompensation.getHeadAngle( correctedPositionX )
+  # $$$UPDATE headAngleY = headCompensation.getHeadAngle( correctedPositionY )
+  # $$$UPDATE wireX = headCompensation.getActualLocation( correctedPositionX )
+  # $$$UPDATE wireY = headCompensation.getActualLocation( correctedPositionY )
+  # $$$UPDATE
+  # $$$UPDATE desiredCorrectX = 24.2161128654
+  # $$$UPDATE desiredCorrectY = 354.2261609164
+  # $$$UPDATE desiredHeadAngleX = -91.4408152769 / 180 * math.pi
+  # $$$UPDATE desiredHeadAngleY = -91.4878675288 / 180 * math.pi
+  # $$$UPDATE desiredWireX = Location( 152.5585274877, 276.611195451, 53.2281033946 )
+  # $$$UPDATE desiredWireY = Location( 278.3396517282, 355.8373131389, 53.3334974475 )
+  # $$$UPDATE
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectX, correctX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectY, correctY ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
+  # $$$UPDATE assert( desiredWireX == wireX )
+  # $$$UPDATE assert( desiredWireY == wireY )
+  # $$$UPDATE
+  # $$$UPDATE #
+  # $$$UPDATE # Above and to the left.
+  # $$$UPDATE # Values come from spreadsheet "2016-09-15 -- Roller correction worksheet",
+  # $$$UPDATE # on sheet "Head_X-++" and "Head_Y-++"
+  # $$$UPDATE #
+  # $$$UPDATE
+  # $$$UPDATE # Setup test values.
+  # $$$UPDATE anchorPoint = Location( 4000, 275, 50 )
+  # $$$UPDATE machinePosition = Location( 150, 2700, 150 )
+  # $$$UPDATE headCompensation.anchorPoint( anchorPoint )
+  # $$$UPDATE
+  # $$$UPDATE # Run tests.
+  # $$$UPDATE correctX = headCompensation.correctX( machinePosition )
+  # $$$UPDATE correctY = headCompensation.correctY( machinePosition )
+  # $$$UPDATE correctedPositionX = machinePosition.copy( x=correctX )
+  # $$$UPDATE correctedPositionY = machinePosition.copy( y=correctY )
+  # $$$UPDATE headAngleX = headCompensation.getHeadAngle( correctedPositionX )
+  # $$$UPDATE headAngleY = headCompensation.getHeadAngle( correctedPositionY )
+  # $$$UPDATE wireX = headCompensation.getActualLocation( correctedPositionX )
+  # $$$UPDATE wireY = headCompensation.getActualLocation( correctedPositionY )
+  # $$$UPDATE
+  # $$$UPDATE desiredCorrectX = 24.2161128654
+  # $$$UPDATE desiredCorrectY = 2620.7738390836
+  # $$$UPDATE desiredHeadAngleX = -88.5591847231 / 180 * math.pi
+  # $$$UPDATE desiredHeadAngleY = -88.5121324712 / 180 * math.pi
+  # $$$UPDATE desiredWireX = Location( 152.5585274877, 2698.388804549, 146.7718966054 )
+  # $$$UPDATE desiredWireY = Location( 278.3396517282, 2619.1626868611, 146.6665025525 )
+  # $$$UPDATE
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectX, correctX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectY, correctY ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
+  # $$$UPDATE assert( desiredWireX == wireX )
+  # $$$UPDATE assert( desiredWireY == wireY )
+  # $$$UPDATE
+  # $$$UPDATE #
+  # $$$UPDATE # Below and to the right.
+  # $$$UPDATE # Values come from spreadsheet "2016-09-15 -- Roller correction worksheet",
+  # $$$UPDATE # on sheet "Head_X+-+" and "Head_Y+-+"
+  # $$$UPDATE #
+  # $$$UPDATE
+  # $$$UPDATE # Setup test values.
+  # $$$UPDATE anchorPoint = Location( 150, 2700, 50 )
+  # $$$UPDATE machinePosition = Location( 4000, 275, 150 )
+  # $$$UPDATE headCompensation.anchorPoint( anchorPoint )
+  # $$$UPDATE
+  # $$$UPDATE # Run tests.
+  # $$$UPDATE correctX = headCompensation.correctX( machinePosition )
+  # $$$UPDATE correctY = headCompensation.correctY( machinePosition )
+  # $$$UPDATE correctedPositionX = machinePosition.copy( x=correctX )
+  # $$$UPDATE correctedPositionY = machinePosition.copy( y=correctY )
+  # $$$UPDATE headAngleX = headCompensation.getHeadAngle( correctedPositionX )
+  # $$$UPDATE headAngleY = headCompensation.getHeadAngle( correctedPositionY )
+  # $$$UPDATE wireX = headCompensation.getActualLocation( correctedPositionX )
+  # $$$UPDATE wireY = headCompensation.getActualLocation( correctedPositionY )
+  # $$$UPDATE
+  # $$$UPDATE desiredCorrectX = 4125.7838871346
+  # $$$UPDATE desiredCorrectY = 354.2261609164
+  # $$$UPDATE desiredHeadAngleX = 88.5591847231 / 180 * math.pi
+  # $$$UPDATE desiredHeadAngleY = 88.5121324712 / 180 * math.pi
+  # $$$UPDATE desiredWireX = Location( 3997.4414725123, 276.611195451, 146.7718966054 )
+  # $$$UPDATE desiredWireY = Location( 3871.6603482718, 355.8373131389, 146.6665025525 )
+  # $$$UPDATE
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectX, correctX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredCorrectY, correctY ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleX, headAngleX ) )
+  # $$$UPDATE assert( MathExtra.isclose( desiredHeadAngleY, headAngleY ) )
+  # $$$UPDATE assert( desiredWireX == wireX )
+  # $$$UPDATE assert( desiredWireY == wireY )
 
   #
   # Pin compensation.
