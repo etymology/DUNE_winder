@@ -18,6 +18,7 @@ from .G_CodeFunctions.ClipG_Code import ClipG_Code
 from .G_CodeFunctions.OffsetG_Code import OffsetG_Code
 from .G_CodeFunctions.ArmCorrectG_Code import ArmCorrectG_Code
 from .G_CodeFunctions.AnchorPointG_Code import AnchorPointG_Code
+from .G_CodeFunctions.TransferCorrectG_Code import TransferCorrectG_Code
 
 from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
@@ -210,16 +211,18 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
 
+    # $$$DEBUG - Rename
+    offset = -200
 
     if self._nextNet() :
       # Hook pin and line up with next pin on other side.
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
+      self.gCodePath.pushG_Code( TransferCorrectG_Code( "X" ) )
       self.gCodePath.push()
 
       # Go to other side and seek past pin so it is hooked with next move.
-      #self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
-      self.gCodePath.pushG_Code( OffsetG_Code( y=-self.geometry.overshoot ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=offset ) )
       self.gCodePath.push()
 
   #---------------------------------------------------------------------
@@ -239,13 +242,18 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
-    xOffset = direction * 500
+    # $$$DEBUG - Rename
+    offset = 200
+    xOffset = direction * offset
 
     # Column, other side.
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
+      self.gCodePath.pushG_Code( TransferCorrectG_Code( "Y" ) )
+      self.gCodePath.push()
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( x=xOffset ) )
       self.gCodePath.push()
@@ -261,8 +269,11 @@ class LayerUV_Recipe( RecipeGenerator ) :
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.push()
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
+      self.gCodePath.pushG_Code( TransferCorrectG_Code( "X" ) )
+      self.gCodePath.push()
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
-      self.gCodePath.pushG_Code( OffsetG_Code( y=self.geometry.overshoot ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=offset ) )
       self.gCodePath.push()
 
   #---------------------------------------------------------------------
@@ -318,6 +329,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self._wrapEdge( direction )
       self._wrapCenter()
       self._wrapEdge( -direction )
+
+      self.gCodePath.pushComment( "Loop " + str( index ) + " of " + str( totalCount + 1 ) )
+      self.gCodePath.push()
 
       if halfCount == index :
         self.firstHalf = self.gCodePath

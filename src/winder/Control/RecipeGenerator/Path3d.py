@@ -95,9 +95,9 @@ class Path3d :
       name: Name of SketchUp layer for output.
     """
 
-    output.write( 'layer = Sketchup.active_model.layers.add "' + name + '"' + "\r\n" )
-    output.write( 'oldLayer = Sketchup.active_model.active_layer' + "\r\n" )
-    output.write( 'Sketchup.active_model.active_layer = layer' + "\r\n" )
+    output.write( 'layer = Sketchup.active_model.layers.add "' + name + '"' + "\n" )
+    output.write( 'oldLayer = Sketchup.active_model.active_layer' + "\n" )
+    output.write( 'Sketchup.active_model.active_layer = layer' + "\n" )
     output.write( "line = Sketchup.active_model.entities.add_line " )
 
     isFirst = True
@@ -116,8 +116,8 @@ class Path3d :
 
       output.write( "[" + str( x ) + "," + str( z ) + "," + str( y ) + "]" )
 
-    output.write( "\r\n" )
-    output.write( 'Sketchup.active_model.active_layer = oldLayer' + "\r\n" )
+    output.write( "\n" )
+    output.write( 'Sketchup.active_model.active_layer = oldLayer' + "\n" )
 
   #---------------------------------------------------------------------
   def totalLength( self ) :

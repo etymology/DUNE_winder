@@ -130,7 +130,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
         + str( x ) + ','
         + str( z ) + ','
         + str( y ) + ' ]'
-        + "\r\n" )
+        + "\n" )
 
     if None == offsetX :
       offsetX = random.uniform( -3, 3 )
@@ -138,12 +138,12 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     if None == offsetY :
       offsetY = random.uniform( -3, 3 )
 
-    output.write( 'vector = Geom::Vector3d.new ' + str( offsetX ) + ',0,' + str( offsetY ) + "\r\n" )
+    output.write( 'vector = Geom::Vector3d.new ' + str( offsetX ) + ',0,' + str( offsetY ) + "\n" )
     output.write( 'label = Sketchup.active_model.entities.add_text "'
-      + text + '", point, vector' + "\r\n" )
+      + text + '", point, vector' + "\n" )
 
     if layer :
-      output.write( 'label.layer = ' + layer + "\r\n" )
+      output.write( 'label.layer = ' + layer + "\n" )
 
   #---------------------------------------------------------------------
   def writeRubyCode(
@@ -177,7 +177,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
       if enablePinLabels :
         rubyFile.write(
-          'layer = Sketchup.active_model.layers.add "Pin labels ' + layerName + '"' + "\r\n" )
+          'layer = Sketchup.active_model.layers.add "Pin labels ' + layerName + '"' + "\n" )
 
         for pinName in self._calibration.getPinNames() :
           location = self._calibration.getPinLocation( pinName )

@@ -30,9 +30,21 @@ class G_CodePath( Path3d ) :
     # The dictionary key is the index into self.path at which the G-Code functions
     # occur.  Each dictionary entry contains a list of G_Code objects.
     self._gCode = {}
+    self._comment = {}
     self._seekForceX = []
     self._seekForceY = []
     self._seekForceZ = []
+
+  #---------------------------------------------------------------------
+  def pushComment( self, comment ) :
+    """
+    Add a comment to line.
+
+    Args:
+      comment: Test of comment.
+    """
+    index = len( self.path )
+    self._comment[ index ] = comment
 
   #---------------------------------------------------------------------
   def pushG_Code( self, gCode ) :
@@ -83,7 +95,7 @@ class G_CodePath( Path3d ) :
     if isCommentOut :
       output.write( "# " )
 
-    output.write( "( " + name + " )\r\n" )
+    output.write( "( " + name + " )\n" )
     lineNumber = 1
 
     lastX = 0
@@ -121,7 +133,10 @@ class G_CodePath( Path3d ) :
         for gCode in self._gCode[ index ] :
           output.write( " " + gCode.toG_Code() )
 
-      output.write( "\r\n" )
+      if index in self._comment :
+        output.write( " ( " + self._comment[ index ] + " )" )
+
+      output.write( "\n" )
       lineNumber += 1
 
   #---------------------------------------------------------------------
@@ -143,17 +158,17 @@ class G_CodePath( Path3d ) :
         + str( x ) + ','
         + str( z ) + ','
         + str( y ) + ' ]'
-        + "\r\n" )
+        + "\n" )
 
     x = random.uniform( -3, 3 )
     y = random.uniform( -3, 3 )
 
-    output.write( 'vector = Geom::Vector3d.new ' + str( x ) + ',0,' + str( y ) + "\r\n" )
+    output.write( 'vector = Geom::Vector3d.new ' + str( x ) + ',0,' + str( y ) + "\n" )
     output.write( 'label = Sketchup.active_model.entities.add_text "'
-      + text + '", point, vector' + "\r\n" )
+      + text + '", point, vector' + "\n" )
 
     if layer :
-      output.write( 'label.layer = ' + layer + "\r\n" )
+      output.write( 'label.layer = ' + layer + "\n" )
 
   #---------------------------------------------------------------------
   def toSketchUpRuby( self, output, layer, half="", enableLables=True ) :
@@ -169,7 +184,7 @@ class G_CodePath( Path3d ) :
     Path3d.toSketchUpRuby( self, output, "G-Code path " + layer + "-" + half )
 
     if enableLables :
-      output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\r\n" )
+      output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\n" )
       for index, gCodeList in self._gCode.iteritems() :
 
         location = self.path[ index ]

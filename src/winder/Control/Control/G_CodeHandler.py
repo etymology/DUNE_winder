@@ -384,7 +384,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       line = line.strip()
 
       # Add line-feed.
-      line += "\r\n"
+      line += "\n"
 
       # Place in G-Code log.
       self._gCodeLog.write( line )

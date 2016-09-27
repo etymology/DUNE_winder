@@ -232,14 +232,19 @@ class G_CodeLine :
     Args:
       callbacks: Instance of G_CodeCallbacks.
       line: G-code text.
-
     """
 
     # List of commands on this line.
     self.commands = []
 
-    # Remove multiple spaces.
-    line = re.sub( " +", " ", line )
+    # Remove comment blocks.
+    line = re.sub( "\(.*?\)", "", line )
+
+    # Replace repeated white space with single space.
+    line = re.sub( "\s+", " ", line )
+
+    # Remove any white space at end of line.
+    line = re.sub( "\s+$", "", line )
 
     # Split the line into individual commands.
     commands = line.split( ' ' )

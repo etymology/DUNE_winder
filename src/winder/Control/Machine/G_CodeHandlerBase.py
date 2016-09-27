@@ -133,6 +133,63 @@ class G_CodeHandlerBase :
 
     return value
 
+  #---------------------------------------------------------------------
+  def _getHeadPosition( self, headPosition ) :
+    """
+    Use the head position to determine the Z position.
+
+    Args:
+      headPosition - 0-3
+
+    Returns:
+      What Z will be at the requested head position.
+
+    Throws:
+      G_CodeException if formatting is incorrect.
+    """
+
+    # $$$DEBUG - Get rid of constants.
+    if 0 == headPosition :
+      z = self._machineCalibration.zFront
+    elif 1 == headPosition :
+      z = self._layerCalibration.zFront
+    elif 2 == headPosition :
+      z = self._layerCalibration.zBack
+    elif 3 == headPosition :
+      z = self._machineCalibration.zBack
+    else:
+      data = [
+        str( headPosition )
+      ]
+
+      raise G_CodeException( "Unknown head position " + str( headPosition ) + ".", data )
+
+    return z
+
+  #---------------------------------------------------------------------
+  def _getPin( self, pinName ) :
+    """
+    Function to fetch specific pin location.
+
+    Args:
+      pinName: Name of pin to fetch.
+
+    Returns:
+      Instance of Location.
+
+    Throws:
+      G_CodeException if pin is not found.
+    """
+    try :
+      result = self._layerCalibration.getPinLocation( pinName )
+    except KeyError :
+      data = [
+        str( pinName )
+      ]
+
+      raise G_CodeException( "Unknown pin " + str( pinName ) + ".", data )
+
+    return result
 
   #---------------------------------------------------------------------
   def _runFunction( self, function ) :
@@ -218,8 +275,8 @@ class G_CodeHandlerBase :
       if not self._layerCalibration :
         raise G_CodeException( "G-Code request for calibrated move, but no layer calibration to use." )
 
-      pinA = self._layerCalibration.getPinLocation( pinNumberA )
-      pinB = self._layerCalibration.getPinLocation( pinNumberB )
+      pinA = self._getPin( pinNumberA )
+      pinB = self._getPin( pinNumberB )
       center = pinA.center( pinB )
       center = center.add( self._layerCalibration.offset )
       if G_CodeHandlerBase.DEBUG_UNIT :
@@ -232,6 +289,10 @@ class G_CodeHandlerBase :
       if "Y" in axies :
         self._y = center.y
         self._xyChange = True
+
+      # Save the Z center location (but don't act on it).
+      # $$$DEBUG - Keep?
+      self._z = center.z
 
     # Clip coordinates.
     elif G_Codes.CLIP == number :
@@ -260,9 +321,9 @@ class G_CodeHandlerBase :
           self._y += offset
           self._xyChange = True
 
-        if "Z" == axis :
-          self._z += offset
-          self._xyChange = True
+        # $$$DEBUG - Won't work.  if "Z" == axis :
+        # $$$DEBUG - Won't work.    self._z += offset
+        # $$$DEBUG - Won't work.    self._xyChange = True
 
     # Head position.
     elif G_Codes.HEAD_LOCATION == number :
@@ -279,8 +340,8 @@ class G_CodeHandlerBase :
       pinNumber   = self._parameterExtract( function, 1, None, str, "anchor point" )
       orientation = self._parameterExtract( function, 2, None, str, "anchor point" )
 
-      # Get the pin center.
-      pin = self._layerCalibration.getPinLocation( pinNumber )
+      # Get pin center.
+      pin = self._getPin( pinNumber )
       pin = pin.add( self._layerCalibration.offset )
 
       if "0" == orientation :
@@ -289,17 +350,13 @@ class G_CodeHandlerBase :
       self._headCompensation.anchorPoint( pin )
       self._headCompensation.orientation( orientation )
 
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "ANCHOR_POINT", pinNumber, pin, orientation
+
     # Correct for the arm on the winder head.
     elif G_Codes.ARM_CORRECT == number :
 
-      # $$$DEBUG - Fix constants.
-      z = self._machineCalibration.zFront
-      if 1 == self._headPosition :
-        z = self._layerCalibration.zFront
-      elif 2 == self._headPosition :
-        z = self._layerCalibration.zBack
-      elif 3 == self._headPosition :
-        z = self._machineCalibration.zBack
+      z = self._getHeadPosition( self._headPosition )
 
       currentLocation = Location( self._x, self._y, z )
       if G_CodeHandlerBase.DEBUG_UNIT :
@@ -344,6 +401,71 @@ class G_CodeHandlerBase :
         print
 
       self._xyChange = True
+    # Correct for hand-off transfer.
+
+    elif G_Codes.TRANSFER_CORRECT == number :
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "TRANSFER_CORRECT",
+
+      # Wire orientation and desired head position.
+      correction = self._parameterExtract( function, 1, None, str, "correction" )
+      correction = correction.upper()
+
+      # $$$ headPosition = self._parameterExtract( function, 2, None, int, "headPosition" )
+
+      # Finial location of head when transfer takes place.
+      # $$$ zDesired = self._getHeadPosition( headPosition )
+      zHead = self._getHeadPosition( self._headPosition )
+
+      # $$$ anchorPoint = self._headCompensation.anchorPoint()
+
+      orientation = self._headCompensation.orientation()
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "correction", correction, "orientation", orientation,
+
+      start = Location( self._x, self._y, self._z )
+      if "X" == correction :
+        # Which side of the anchor point pin the wire sits (left or right).
+        if orientation.find( "L" ) > -1 :
+          direction = -1
+        elif orientation.find( "R" ) > -1 :
+          direction = 1
+        else :
+          data = [
+            str( orientation )
+          ]
+          raise G_CodeException( "Unknown orientation: " + orientation + ".", data )
+
+        self._x = self._headCompensation.transferCorrectX( start, zHead, direction )
+      elif "Y" == correction :
+
+        # Which side of the anchor point pin the wire sits (top or bottom).
+        if orientation.find( "B" ) > -1 :
+          direction = -1
+        elif orientation.find( "T" ) > -1 :
+          direction = 1
+        else :
+          data = [
+            str( orientation )
+          ]
+          raise G_CodeException( "Unknown orientation: " + orientation + ".", data )
+
+        self._y = self._headCompensation.transferCorrectY( start, zHead, direction )
+      else :
+        data = [
+          str( correction )
+        ]
+        raise G_CodeException( "Unknown correction type: " + str( correction ) + ".", data )
+
+      if G_CodeHandlerBase.DEBUG_UNIT :
+        print "x", self._x, "y", self._y
+    else:
+      data = [
+        str( number )
+      ]
+
+      raise G_CodeException( "Unknown G-Code " + str( number ), data )
+
 
   #---------------------------------------------------------------------
   def setLimitVelocity( self, maxVelocity ) :

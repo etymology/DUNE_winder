@@ -81,7 +81,7 @@ class Recipe :
 
       # Rewrite the recipe file with the correct header.
       with open( fileName, "w" ) as outputFile :
-        outputFile.write( "( " + self._description + " " + bodyHash + " " + self._headerHash + ")\r\n" )
+        outputFile.write( "( " + self._description + " " + bodyHash + " " + self._headerHash + ")\n" )
         outputFile.writelines( self._lines )
 
       # Setup correct current and parent hash.

@@ -269,56 +269,87 @@ class HeadCompensation :
     rollerX -= self._machineCalibration.headRollerGap / 2
     rollerX *= deltaX / abs( deltaY )
 
-    # $$$ rollerX  = self._machineCalibration.headArmLength**2 + deltaY**2
-    # $$$ rollerX /= self._machineCalibration.headArmLength**2
-    # $$$ rollerX  = math.sqrt( rollerX )
-    # $$$ rollerX *= self._machineCalibration.headRollerRadius
-    # $$$ rollerX -= self._machineCalibration.headRollerRadius
-    # $$$ rollerX -= self._machineCalibration.headRollerGap / 2
-    # $$$ rollerX *= self._machineCalibration.headArmLength / lengthY
-
     x += rollerX
 
-    # $$$
-    # $$$ # Iterative method that converges on the answer.
-    # $$$ # Easier to solve than the exact solution.  Runs until answer no longer
-    # $$$ # changes (i.e. is as exact as precision allows).  Typically only a few
-    # $$$ # iterations are necessary.  Converges more slowly for small values of
-    # $$$ # x and z.
-    # $$$ lastX = deltaX
-    # $$$ isDone = False
-    # $$$ while not isDone :
-    # $$$   # Head arm compensation.
-    # $$$   xzLength = math.sqrt( lastX**2 + deltaZ**2 )
-    # $$$   x = deltaX
-    # $$$   if xzLength > 0 :
-    # $$$     x += lastX * self._machineCalibration.headArmLength / xzLength
-    # $$$
-    # $$$   # Roller compensation.
-    # $$$   if xzLength > 0 :
-    # $$$     scaleFactor = self._machineCalibration.headArmLength / xzLength
-    # $$$     armX = lastX - lastX * scaleFactor
-    # $$$     armZ = deltaZ - deltaZ * scaleFactor
-    # $$$     armXZ = math.sqrt( armX**2 + armZ**2 )
-    # $$$
-    # $$$     rollerX  = armXZ**2 + deltaY**2
-    # $$$     rollerX /= armXZ**2
-    # $$$     rollerX  = math.sqrt( rollerX )
-    # $$$     rollerX *= self._machineCalibration.headRollerRadius
-    # $$$     rollerX -= self._machineCalibration.headRollerRadius
-    # $$$     rollerX -= self._machineCalibration.headRollerGap / 2
-    # $$$     rollerX *= armX / lengthY
-    # $$$
-    # $$$     x += rollerX
-    # $$$
-    # $$$   # See if any changes were made to x.  If not, loop is complete.
-    # $$$   isDone = MathExtra.isclose( x, lastX )
-    # $$$   lastX = x
-    # $$$
-    # $$$ # Add the correction to the starting point.
-    # $$$ x += anchorPoint.x
+    return x
+
+  #---------------------------------------------------------------------
+  def _transferCorrect( self, machineLocation, zDesired, direction ) :
+    """
+    Calculate correction for a transfer.
+
+    Args:
+      machineLocation - Target machine position.
+      zDesired - Where Z will ultimately end.
+      direction - Direction for pin diameter compensation (1/-1).
+
+    Returns:
+      Array with correction values for x, and y (in that order).
+
+    Notes:
+      This happens when doing hand-offs from side to side.  The anchor point
+      causes a slight angle in the wire path, and X or Y need to be adjusted to
+      compensate.
+
+      There are three Z positions: anchor point, target, and desired.  Both the
+      anchor point and target Z positions are either level front or back side of
+      the current layer with one always opposite the other.  The desired Z will
+      be the fully extended/retracted for the target side.
+    """
+    radius = self._machineCalibration.pinDiameter / 2
+    radius *= direction
+    offset = Location( radius, radius )
+    anchorPoint = self._anchorPoint.add( offset )
+
+    deltaX = machineLocation.x - anchorPoint.x
+    deltaY = machineLocation.y - anchorPoint.y
+    deltaZ = machineLocation.z - anchorPoint.z
+
+    travelZ = abs( zDesired - anchorPoint.z )
+    lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
+    lengthYZ = math.sqrt( deltaY**2 + deltaZ**2 )
+
+    xCorrection = travelZ * deltaX / lengthXZ
+    yCorrection = travelZ * deltaY / lengthYZ
+
+    x = anchorPoint.x + xCorrection
+    y = anchorPoint.y + yCorrection
+
+    return [ x, y ]
+
+  #---------------------------------------------------------------------
+  def transferCorrectX( self, machineLocation, zDesired, direction ) :
+    """
+    Calculate correction to X for a transfer.
+
+    Args:
+      machineLocation - Target machine position.
+      zDesired - Where Z will ultimately end.
+      direction - Direction for pin diameter compensation (1/-1).
+
+    Returns:
+      Corrected X value.
+    """
+    [ x, y ] = self._transferCorrect( machineLocation, zDesired, direction )
 
     return x
+
+  #---------------------------------------------------------------------
+  def transferCorrectY( self, machineLocation, zDesired, direction ) :
+    """
+    Calculate correction to Y for a transfer.
+
+    Args:
+      machineLocation - Target machine position.
+      zDesired - Where Z will ultimately end.
+      direction - Direction for pin diameter compensation (1/-1).
+
+    Returns:
+      Corrected Y value.
+    """
+    [ x, y ] = self._transferCorrect( machineLocation, zDesired, direction )
+
+    return y
 
 # end class
 
