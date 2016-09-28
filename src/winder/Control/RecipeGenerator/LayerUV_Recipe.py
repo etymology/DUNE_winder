@@ -27,6 +27,8 @@ from .G_CodePath import G_CodePath
 
 class LayerUV_Recipe( RecipeGenerator ) :
 
+  OVERSHOOT = 200
+
   #---------------------------------------------------------------------
   def __init__( self, geometry ) :
     """
@@ -72,14 +74,14 @@ class LayerUV_Recipe( RecipeGenerator ) :
     angle180 = math.radians( 180 )
     orientationAngles = \
     {
-      "TR" :  self.geometry.angle,
-      "RT" :  self.geometry.angle,
-      "BL" :  self.geometry.angle + angle180,
-      "LB" :  self.geometry.angle + angle180,
-      "TL" : -self.geometry.angle,
-      "LT" : -self.geometry.angle,
-      "BR" : -self.geometry.angle + angle180,
-      "RB" : -self.geometry.angle + angle180,
+      "TR" : -self.geometry.angle,
+      "RT" : -self.geometry.angle,
+      "TL" :  self.geometry.angle,
+      "LT" :  self.geometry.angle,
+      "BL" : -self.geometry.angle + angle180,
+      "LB" : -self.geometry.angle + angle180,
+      "BR" :  self.geometry.angle + angle180,
+      "RB" :  self.geometry.angle + angle180,
     }
 
     # Lookup table for what pin to center the wire.  Centering is always the
@@ -211,9 +213,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.OTHER_SIDE )
 
-    # $$$DEBUG - Rename
-    offset = -200
-
     if self._nextNet() :
       # Hook pin and line up with next pin on other side.
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
@@ -221,8 +220,8 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
 
       # Go to other side and seek past pin so it is hooked with next move.
-      self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
-      self.gCodePath.pushG_Code( OffsetG_Code( y=offset ) )
+      self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=-LayerUV_Recipe.OVERSHOOT ) )
       self.gCodePath.push()
 
   #---------------------------------------------------------------------
@@ -234,6 +233,9 @@ class LayerUV_Recipe( RecipeGenerator ) :
       direction: -1 for left side, 1 for right side.
     """
 
+    # Direction corrected overshoot.
+    xOffset = direction * LayerUV_Recipe.OVERSHOOT
+
     # Column pin.
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
@@ -242,10 +244,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
       self.z.set( HeadPosition.PARTIAL )
 
-    # $$$DEBUG - Rename
-    offset = 200
-    xOffset = direction * offset
-
     # Column, other side.
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
@@ -253,6 +251,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.pushG_Code( TransferCorrectG_Code( "Y" ) )
+      self.gCodePath.pushComment( "Here" )
       self.gCodePath.push()
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( x=xOffset ) )
@@ -268,12 +267,10 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     if self._nextNet() :
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
-      self.gCodePath.push()
-      self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.pushG_Code( TransferCorrectG_Code( "X" ) )
       self.gCodePath.push()
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
-      self.gCodePath.pushG_Code( OffsetG_Code( y=offset ) )
+      self.gCodePath.pushG_Code( OffsetG_Code( y=LayerUV_Recipe.OVERSHOOT ) )
       self.gCodePath.push()
 
   #---------------------------------------------------------------------
@@ -311,7 +308,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
     self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start1 ) )
     self.gCodePath.push()
     self.basePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
-    #self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
@@ -330,7 +326,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self._wrapCenter()
       self._wrapEdge( -direction )
 
-      self.gCodePath.pushComment( "Loop " + str( index ) + " of " + str( totalCount + 1 ) )
+      self.gCodePath.pushComment( "Loop " + str( index ) + " of " + str( totalCount ) )
       self.gCodePath.push()
 
       if halfCount == index :
@@ -339,6 +335,11 @@ class LayerUV_Recipe( RecipeGenerator ) :
         self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start2 ) )
         self.gCodePath.push()
         self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+        self.z.set( HeadPosition.BACK )
 
-    self.secondHalf = self.gCodePath
+    if self.firstHalf :
+      self.secondHalf = self.gCodePath
+    else :
+      self.firstHalf = self.gCodePath
+
     self.gCodePath = None

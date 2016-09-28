@@ -40,16 +40,8 @@ class U_LayerGeometry( UV_LayerGeometry ) :
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
-    self.partialZ_Front = ( self.zTravel - self.depth ) / ( 2 * self.scale )
-    self.partialZ_Back  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
-
-    # Distance that must be traveled past a pin to ensure it will be hooked
-    # by the wire when moving in an other direction.
-    # Doing some manual checks, I found 18 degrees is a good number that will
-    # maximize the amount of contact of wire to the pin and still clear any
-    # neighboring pins.
-    overshootAngle = 90 - 18
-    self.overshoot = self.partialZ_Front * math.tan( math.radians( overshootAngle ) )
+    self.partialZ_Front = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+    self.partialZ_Back  = ( self.zTravel - self.depth ) / ( 2 * self.scale )
 
     self.startPinFront  = 1201
     self.directionFront = 1

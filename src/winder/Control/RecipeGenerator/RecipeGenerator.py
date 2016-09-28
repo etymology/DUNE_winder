@@ -203,9 +203,11 @@ class RecipeGenerator :
 
       if enablePath :
         if 0 == half :
-          self.firstHalf.toSketchUpRuby( rubyFile, layerName, "1st", enablePathLabels )
-        else:
-          self.secondHalf.toSketchUpRuby( rubyFile, layerName, "2nd", enablePathLabels )
+          if self.firstHalf :
+            self.firstHalf.toSketchUpRuby( rubyFile, layerName, "1st", enablePathLabels )
+        else :
+          if self.secondHalf :
+            self.secondHalf.toSketchUpRuby( rubyFile, layerName, "2nd", enablePathLabels )
 
       if enableWire :
         self.nodePath.toSketchUpRuby( rubyFile, "Path " + layerName )
@@ -278,15 +280,19 @@ class RecipeGenerator :
     """
 
     # Safe G-Code instructions.
-    with open( outputFileName + "_1." + outputExtension, "w" ) as gCodeFile :
-      self.firstHalf.toG_Code( gCodeFile, layerName + " first half" )
+    if self.firstHalf :
+      with open( outputFileName + "_1." + outputExtension, "w" ) as gCodeFile :
+        self.firstHalf.toG_Code( gCodeFile, layerName + " first half" )
 
-    with open( outputFileName + "_2." + outputExtension, "w" ) as gCodeFile :
-      self.secondHalf.toG_Code( gCodeFile, layerName + " second half" )
+      # Create an instance of Recipe to update the header with the correct hash.
+      Recipe( outputFileName + "_1." + outputExtension, None )
 
-    # Create an instance of Recipe to update the header with the correct hash.
-    Recipe( outputFileName + "_1." + outputExtension, None )
-    Recipe( outputFileName + "_2." + outputExtension, None )
+    if self.secondHalf :
+      with open( outputFileName + "_2." + outputExtension, "w" ) as gCodeFile :
+        self.secondHalf.toG_Code( gCodeFile, layerName + " second half" )
+
+      # Create an instance of Recipe to update the header with the correct hash.
+      Recipe( outputFileName + "_2." + outputExtension, None )
 
   #---------------------------------------------------------------------
   def defaultCalibration( self, layerName, geometry ) :
@@ -299,9 +305,6 @@ class RecipeGenerator :
 
     calibration = LayerCalibration( layerName )
     calibration.offset = SerializableLocation( 0, 0 )
-
-    calibration.zFront = geometry.frontZ
-    calibration.zBack  = geometry.backZ
 
     for node in self.nodes :
       location = self.nodes[ node ]
@@ -318,8 +321,11 @@ class RecipeGenerator :
     """
 
     print "Wire consumed:", "{:,.2f}mm".format( self.nodePath.totalLength() )
-    print "G-Code lines (1st half):", len( self.firstHalf )
-    print "G-Code lines (2nd half):", len( self.secondHalf )
+    if self.firstHalf :
+      print "G-Code lines (1st half):", len( self.firstHalf )
+
+    if self.secondHalf :
+      print "G-Code lines (2nd half):", len( self.secondHalf )
 
   #---------------------------------------------------------------------
   @staticmethod

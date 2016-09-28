@@ -30,7 +30,7 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     # Offset from APA's (0,0,0) position.
     self.apaOffsetX = -4.94
     self.apaOffsetY = -1.59
-    self.apaOffsetZ = ( self.apaThickness - self.depth ) / 2
+    self.apaOffsetZ = 0
 
     self.apaOffset = Location( self.apaOffsetX, self.apaOffsetY, self.apaOffsetZ )
 
@@ -40,21 +40,13 @@ class V_LayerGeometry( UV_LayerGeometry ) :
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
-    self.partialZ_Front = ( self.zTravel - self.depth ) / ( 2 * self.scale )
-    self.partialZ_Back  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+    self.partialZ_Front = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+    self.partialZ_Back  = ( self.zTravel - self.depth ) / ( 2 * self.scale )
 
-    # Distance that must be traveled past a pin to ensure it will be hooked
-    # by the wire when moving in an other direction.
-    # Doing some manual checks, I found 18 degrees is a good number that will
-    # maximize the amount of contact of wire to the pin and still clear any
-    # neighboring pins.
-    overshootAngle = 90 - 18
-    self.overshoot = self.partialZ_Front * math.tan( math.radians( overshootAngle ) )
-
-    self.startPinFront  = 1200
-    self.directionFront = 1
-    self.startPinBack   = 1599
-    self.directionBack  = -1
+    self.startPinFront  = 399
+    self.directionFront = -1
+    self.startPinBack   = 1
+    self.directionBack  = 1
 
     # The grid parameters are a list of parameters for how the grid is constructed.
     # Columns:
@@ -67,18 +59,18 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     self.gridFront = \
     [
       # Count                    dx            dy   off.x   off.y  ort.
-      [ self.rows,                0,  self.deltaY,      0,  4.463, "TL" ], # Left
-      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "RB" ], # Top
-      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "BR" ], # Right
-      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "LT" ]  # Bottom
+      [ self.rows - 1,            0,  self.deltaY,      0,  7.339, "BL" ], # Right
+      [ self.columns,   self.deltaX,            0,  2.209,  7.336, "LB" ], # Top
+      [ self.rows,                0, -self.deltaY,  6.209, -4.462, "TR" ], # Left
+      [ self.columns,  -self.deltaX,            0, -6.209, -4.463, "RT" ]  # Bottom
     ]
 
     # Back is identical to front except for orientation.
     self.gridBack =  \
     [
       # Count                    dx            dy   off.x   off.y  ort.
-      [ self.rows,                0,  self.deltaY,      0,  4.463, "BL" ], # Left
-      [ self.columns,   self.deltaX,            0,  6.209,  4.462, "LB" ], # Top
-      [ self.rows - 1,            0, -self.deltaY,  2.209, -7.336, "TR" ], # Right
-      [ self.columns,  -self.deltaX,            0, -2.209, -7.339, "RT" ]  # Bottom
+      [ self.rows - 1,            0,  self.deltaY,      0,  7.339, "TL" ], # Right
+      [ self.columns,   self.deltaX,            0,  2.209,  7.336, "RB" ], # Top
+      [ self.rows,                0, -self.deltaY,  6.209, -4.462, "BR" ], # Left
+      [ self.columns,  -self.deltaX,            0, -6.209, -4.463, "LT" ]  # Bottom
     ]

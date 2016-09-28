@@ -45,5 +45,5 @@ class X_LayerGeometry( GX_LayerGeometry ) :
 
     # Travel for partial Z.  Should place head level with board and below pin
     # height.
-    self.partialZ_Front = ( self.zTravel - self.depth ) / ( 2 * self.scale ) #0
-    self.partialZ_Back  = ( self.zTravel + self.depth ) / ( 2 * self.scale ) #self.depth
+    self.partialZ_Front = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+    self.partialZ_Back  = ( self.zTravel - self.depth ) / ( 2 * self.scale )

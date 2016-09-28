@@ -33,7 +33,10 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       calibration: Layer calibration.
     """
     machineCalibration = DefaultMachineCalibration()
-    machineCalibration.headArmLength = 0
+    machineCalibration.headArmLength    = 0
+    machineCalibration.headRollerRadius = 0
+    machineCalibration.headRollerGap    = 0
+
     headCompensation = HeadCompensation( machineCalibration )
     G_CodeHandlerBase.__init__( self, machineCalibration, headCompensation )
 
