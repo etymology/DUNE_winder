@@ -50,7 +50,7 @@ class LayerV_Recipe( LayerUV_Recipe ) :
       geometry.gridFront,
       True,
       "F",
-      geometry.partialZ_Front,
+      geometry.mostlyExtend,
       self.geometry.startPinFront,
       self.geometry.directionFront
     )
@@ -59,7 +59,7 @@ class LayerV_Recipe( LayerUV_Recipe ) :
       geometry.gridBack,
       True,
       "B",
-      geometry.partialZ_Back,
+      geometry.mostlyRetract,
       self.geometry.startPinBack,
       self.geometry.directionBack
     )

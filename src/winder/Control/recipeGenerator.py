@@ -115,24 +115,25 @@ def writeRubyCode( layer, recipe, geometry ) :
     True
   )
 
-  # Construct G-Code for second half.
-  print "  Construct G-Code for second half."
-  gCodePath = G_CodeToPath(
-    recipeDirectory + "/" + layer + "-Layer_2.gc",
-    geometry,
-    calibration
-  )
+  if overrideLaps > 1 :
+    # Construct G-Code for second half.
+    print "  Construct G-Code for second half."
+    gCodePath = G_CodeToPath(
+      recipeDirectory + "/" + layer + "-Layer_2.gc",
+      geometry,
+      calibration
+    )
 
-  # Write 2nd wind G-Code path.
-  print "  Write 2nd wind G-Code path."
-  gCodePath.writeRubyCode(
-    outputFileName,
-    layer,
-    "2nd",
-    enablePathLabels,
-    enablePinLabels,
-    True
-  )
+    # Write 2nd wind G-Code path.
+    print "  Write 2nd wind G-Code path."
+    gCodePath.writeRubyCode(
+      outputFileName,
+      layer,
+      "2nd",
+      enablePathLabels,
+      enablePinLabels,
+      True
+    )
 
 #------------------------------------------------------------------------------
 def generateLayer( layer, recipeClass, geometry, enable ) :

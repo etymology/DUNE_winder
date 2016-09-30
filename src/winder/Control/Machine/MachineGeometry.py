@@ -48,6 +48,10 @@ class MachineGeometry :
     # Amount of distance the Z-axis can travel.
     self.zTravel = 434
 
+    # Locations for extended and retracted.
+    self.retracted = 0
+    self.extended  = self.zTravel
+
     # Distance from the inner pulley edge to the outer roller edge on the
     # winder head arm.
     self.headRollerRadius = 6.35 # 1/4"

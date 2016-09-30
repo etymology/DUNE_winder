@@ -77,7 +77,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self._y = 0
     self._z = 0
 
-    self._headZ = self._geometry.frontZ
+    self._headZ = self._geometry.retracted
     latchSide = FRONT
     for line in range( 0, totalLines ) :
 
@@ -99,13 +99,13 @@ class G_CodeToPath( G_CodeHandlerBase ) :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
 
       if FRONT == self._headPosition :
-        self._headZ = self._geometry.frontZ
+        self._headZ = self._geometry.retracted
       elif PARTIAL_FRONT == self._headPosition :
-        self._headZ = self._geometry.partialZ_Front
+        self._headZ = self._geometry.mostlyRetract
       elif PARTIAL_BACK == self._headPosition :
-        self._headZ = self._geometry.partialZ_Back
+        self._headZ = self._geometry.mostlyExtend
       elif BACK == self._headPosition :
-        self._headZ = self._geometry.backZ
+        self._headZ = self._geometry.extended
 
       path.push( self._x, self._y, self._headZ )
 

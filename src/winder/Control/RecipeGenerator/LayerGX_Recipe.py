@@ -42,24 +42,24 @@ class LayerGX_Recipe( RecipeGenerator ) :
     for pin in range( 1, self.geometry.pins / 2 + 1 ) :
 
       # Front left.
-      location = Location( xLeft, y, self.geometry.partialZ_Front )
+      location = Location( xLeft, y, self.geometry.mostlyRetract )
       pinNameA = "F" + str( pin )
       self.nodes[ pinNameA ] = location
 
       # Rear left.
-      location = Location( xLeft, y, self.geometry.partialZ_Back )
+      location = Location( xLeft, y, self.geometry.mostlyExtend )
       pinNumber = ( self.geometry.pins / 2 - pin + 1 ) % self.geometry.pins
       pinNameB = "B" + str( pinNumber )
       self.nodes[ pinNameB ] = location
 
       # Front right.
-      location = Location( xRight, y, self.geometry.partialZ_Front )
+      location = Location( xRight, y, self.geometry.mostlyRetract )
       pinNumber = self.geometry.pins - pin + 1
       pinNameC = "F" + str( pinNumber )
       self.nodes[ pinNameC ] = location
 
       # Rear right.
-      location = Location( xRight, y, self.geometry.partialZ_Back )
+      location = Location( xRight, y, self.geometry.mostlyExtend )
       pinNumber = pin + self.geometry.pins / 2
       pinNameD = "B" + str( pinNumber )
       self.nodes[ pinNameD ] = location
@@ -89,9 +89,9 @@ class LayerGX_Recipe( RecipeGenerator ) :
     self.netIndex = 0
 
     startLocation = self.location( self.netIndex )
-    #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.frontZ )
-    self.nodePath.push( startLocation.x, startLocation.y, self.geometry.partialZ_Front )
-    self.basePath.push( startLocation.x, startLocation.y, self.geometry.partialZ_Front )
+    #self.gCodePath.push( startLocation.x, startLocation.y, self.geometry.retracted )
+    self.nodePath.push( startLocation.x, startLocation.y, self.geometry.mostlyRetract )
+    self.basePath.push( startLocation.x, startLocation.y, self.geometry.mostlyRetract )
     lastLocation = startLocation
 
     # To wind half the layer, divide by half and the number of steps in a
@@ -137,7 +137,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
           self.gCodePath.push(
             location.x,
             location.y,
-            self.geometry.frontZ
+            self.geometry.retracted
           )
           self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
