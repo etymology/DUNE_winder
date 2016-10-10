@@ -251,7 +251,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.z.set( HeadPosition.OTHER_SIDE )
       self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
       self.gCodePath.pushG_Code( TransferCorrectG_Code( "Y" ) )
-      self.gCodePath.pushComment( "Here" )
       self.gCodePath.push()
       self.gCodePath.pushG_Code( self.pinCenterTarget( "X" ) )
       self.gCodePath.pushG_Code( OffsetG_Code( x=xOffset ) )
@@ -303,7 +302,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
     self.gCodePath = G_CodePath()
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
     self.z.set( HeadPosition.BACK )
-
 
     self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start1 ) )
     self.gCodePath.push()

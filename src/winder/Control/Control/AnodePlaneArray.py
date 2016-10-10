@@ -128,12 +128,40 @@ class AnodePlaneArray( APA_Base ) :
     if self._calibrationFile :
       self._calibration = LayerCalibration()
 
-      # $$$DEBUG - Temporary.  Put back.
-      #self._calibration.load( self.getPath(), self._calibrationFile )
-      self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
+      try :
+        # $$$TEMPORARY - Put back first line.
+        #self._calibration.load( self.getPath(), self._calibrationFile )
+        self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
 
-      # Make use of calibration.
-      self._gCodeHandler.useLayerCalibration( self._calibration )
+        self._log.add(
+          self.__class__.__name__,
+          "LOAD",
+          "Loaded calibration file " + self._calibrationFile + ".",
+          [ self._calibrationFile, self._calibration.hashValue ]
+        )
+
+        # Make use of calibration.
+        self._gCodeHandler.useLayerCalibration( self._calibration )
+      except LayerCalibration.Error as exception :
+        error = "Invalid calibration file."
+        isError = True
+        self._gCodeHandler.useLayerCalibration( None )
+
+        errorString = "Unable to load calibration for " \
+          + self._calibrationFile                       \
+          + " because "                                 \
+          + str( exception ) + "."
+
+        errorData = [ self._calibrationFile ] + exception.data
+
+        self._log.add(
+          self.__class__.__name__,
+          "LOAD",
+          errorString,
+          errorData
+        )
+
+
     else :
       # If there is no calibration, use none.
       self._gCodeHandler.useLayerCalibration( None )
@@ -144,13 +172,14 @@ class AnodePlaneArray( APA_Base ) :
     if None != startingLine :
       self._lineNumber = startingLine
 
-    self._recipe = \
-      Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
-    self._gCodeHandler.loadG_Code( self._recipe.getLines(), self._calibration )
+    if not isError :
+      self._recipe = \
+        Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
+      self._gCodeHandler.loadG_Code( self._recipe.getLines(), self._calibration )
 
-    # Assign a G-Code log.
-    gCodeLogName = self._getG_CodeLogName( self._layer )
-    self._gCodeHandler.setG_CodeLog( gCodeLogName )
+      # Assign a G-Code log.
+      gCodeLogName = self._getG_CodeLogName( self._layer )
+      self._gCodeHandler.setG_CodeLog( gCodeLogName )
 
     if not isError :
       isError |= self._gCodeHandler.setLine( self._lineNumber )
@@ -208,31 +237,6 @@ class AnodePlaneArray( APA_Base ) :
     if self._recipeFile :
       self.loadRecipe( self._layer )
       self._gCodeHandler.setInitialLocation( self._x, self._y, self._headLocation )
-
-    if self._calibrationFile :
-      self._calibration = LayerCalibration()
-
-      # $$$DEBUG - Temporary.  Put back.
-      #self._calibration.load( self.getPath(), self._calibrationFile )
-      self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
-
-      if not self._calibration :
-        isError = True
-        self._log.add(
-          self.__class__.__name__,
-          "LOAD",
-          "Unable to load calibration for " + self._calibrationFile + ".",
-          [ self._calibrationFile ]
-        )
-      else :
-        self._log.add(
-          self.__class__.__name__,
-          "LOAD",
-          "Loaded calibration file " + self._calibrationFile + ".",
-          [ self._calibrationFile, self._calibration.hashValue ]
-        )
-
-        self._gCodeHandler.useLayerCalibration( self._calibration )
 
   #---------------------------------------------------------------------
   def getCalibrationFile( self ) :

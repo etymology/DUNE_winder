@@ -30,7 +30,7 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     # Offset from APA's (0,0,0) position.
     self.apaOffsetX = -8.29
     self.apaOffsetY = -4.94
-    self.apaOffsetZ = ( self.apaThickness - self.depth ) / 2
+    self.apaOffsetZ = 0
 
     self.apaOffset = Location( self.apaOffsetX, self.apaOffsetY, self.apaOffsetZ )
 
@@ -39,10 +39,10 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     self.mostlyRetract = ( self.zTravel - self.depth ) / ( 2 * self.scale )
     self.mostlyExtend  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
 
-    self.startPinFront  = 1201
-    self.directionFront = 1
-    self.startPinBack   = 1601
-    self.directionBack  = -1
+    self.startPinFront  = 400
+    self.directionFront = -1
+    self.startPinBack   = 1
+    self.directionBack  = 1
 
     # The grid parameters are a list of parameters for how the grid is constructed.
     # Columns:
@@ -54,19 +54,19 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     #   ort - Wire orientation.
     self.gridFront = \
     [
-      # Count                    dx            dy   off.x     off.y
-      [ self.rows + 1,            0,  self.deltaY,  0,        5.4048 , "BR" ],
-      [ self.columns,   self.deltaX,            0,  14.2196,  4.4702 , "RB" ],
-      [ self.rows,                0, -self.deltaY,  0.8979,   -8.2797, "TL" ],
-      [ self.columns,  -self.deltaX,            0,  -10.2197, -7.3453, "LT" ]
+      # Count                    dx            dy     off.x    off.y  ort.
+      [ self.rows,                0,  self.deltaY,   0.0000,  7.3453, "TL" ], # Right
+      [ self.columns,   self.deltaX,            0,   0.8979,  8.2797, "RB" ], # Top
+      [ self.rows + 1,            0, -self.deltaY,  14.2196, -4.4702, "BR" ], # Left
+      [ self.columns,  -self.deltaX,            0,  -4.8979, -5.4048, "LT" ]  # Bottom
     ]
 
     # For back side.
     self.gridBack = \
     [
-      # Count                    dx            dy   off.x     off.y
-      [ self.rows + 1,            0,  self.deltaY,  0,        4.4703 , "TR" ],
-      [ self.columns,   self.deltaX,            0,  4.8979,   5.4047 , "LB" ],
-      [ self.rows,                0, -self.deltaY,  10.2196,  -7.3452, "BL" ],
-      [ self.columns,  -self.deltaX,            0,  -0.898,   -8.2798, "RT" ]
+      # Count                    dx            dy     off.x    off.y  ort.
+      [ self.rows,                0,  self.deltaY,   0.0000,  8.2798, "BL" ], # Right
+      [ self.columns,   self.deltaX,            0,  10.2196,  7.3452, "LB" ], # Top
+      [ self.rows + 1,            0, -self.deltaY,   4.8979, -5.4047, "TR" ], # Left
+      [ self.columns,  -self.deltaX,            0, -14.2196, -4.4703, "RT" ]  # Bottom
     ]

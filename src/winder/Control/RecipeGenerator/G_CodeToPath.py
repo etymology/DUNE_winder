@@ -93,7 +93,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
         print "Unable to execute line", line
         print "  " + self._gCode.lines[ line ]
         print "  " + str( exception )
-        raise Exception( "Problems executing G-Code" )
+        raise Exception( "Problems executing G-Code: " + str( exception ) )
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )

@@ -61,6 +61,9 @@ enableU = True
 enableV = True
 enableG = True
 
+# True to create calibration files for the layers.
+isCalibration = False
+
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -78,9 +81,9 @@ def writeRubyCode( layer, recipe, geometry ) :
 
   # Generate an ideal calibration file for layer.
   print "  Generate an ideal calibration file for layer."
-  calibration = recipe.defaultCalibration( layer + " Layer", geometry )
-  if not zeroOffset :
-    calibration.offset = geometry.apaOffset.add( geometry.apaLocation )
+  calibration = recipe.defaultCalibration( layer, geometry, isCalibration )
+  if zeroOffset :
+    calibration.offset = Location()
 
   outputFileName = layer + "-Layer.rb"
 
@@ -205,8 +208,10 @@ if __name__ == "__main__":
       zeroOffset = ( "TRUE" == value )
     elif "BASEPATH" == option :
       isRubyBasePath = ( "TRUE" == value )
-    elif "OVERRIDE" :
+    elif "OVERRIDE" == option :
       overrideLaps = int( value )
+    elif "CALIBRATION" == option :
+      isCalibration = ( "TRUE" == value )
     else :
       raise Exception( "Unknown:" + option )
 

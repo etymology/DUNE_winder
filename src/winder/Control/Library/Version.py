@@ -9,9 +9,8 @@
 import xml.dom.minidom
 import re
 import os
-import hashlib
-import base64
 import datetime
+from Hash import Hash
 
 class Version :
   #-------------------------------------------------------------------
@@ -153,9 +152,9 @@ class Version :
     Compute a hash value for all files.
 
     Returns:
-      Base-32 hash value for version.
+      Hash string value for version.
     """
-    hashValue = hashlib.sha256()
+    hashValue = Hash()
     for root, directoryNames, fileNames in os.walk( self._path ):
       for fileName in fileNames :
         if re.match( self._includeMask, fileName ) \
@@ -173,10 +172,10 @@ class Version :
             # different hash.
             buffer = buffer.replace( "\r", "" )
 
-            hashValue.update( buffer )
+            hashValue += buffer
 
-    # Turn hash into base 32 encoding.
-    self._computedHash = base64.b32encode( hashValue.digest() )
+    # Turn hash into string.
+    self._computedHash = str( hashValue )
 
     return self._computedHash
 

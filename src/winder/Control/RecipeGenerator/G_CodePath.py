@@ -8,10 +8,10 @@
 
 import random
 
-from .Path3d import Path3d
-
+from Library.Geometry.Location import Location
 from Machine.G_Codes import G_Codes
 
+from .Path3d import Path3d
 from .G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
 
 class G_CodePath( Path3d ) :
@@ -20,11 +20,11 @@ class G_CodePath( Path3d ) :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self ) :
+  def __init__( self, offset=Location() ) :
     """
     Constructor.
     """
-    Path3d.__init__( self )
+    Path3d.__init__( self, offset )
 
     # Dictionary of what G-Code functions are mapped to what path locations.
     # The dictionary key is the index into self.path at which the G-Code functions

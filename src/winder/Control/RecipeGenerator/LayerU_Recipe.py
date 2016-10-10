@@ -50,7 +50,7 @@ class LayerU_Recipe( LayerUV_Recipe ) :
       geometry.gridFront,
       False,
       "F",
-      geometry.mostlyRetract,
+      geometry.mostlyExtend,
       self.geometry.startPinFront,
       self.geometry.directionFront
     )
@@ -59,28 +59,27 @@ class LayerU_Recipe( LayerUV_Recipe ) :
       geometry.gridBack,
       False,
       "B",
-      geometry.mostlyExtend,
+      geometry.mostlyRetract,
       self.geometry.startPinBack,
       self.geometry.directionBack
     )
-
 
     # Define the first few net locations.
     # All following locations are just modifications of this initial set.
     self.net = \
     [
-      "F" + str( geometry.columns + geometry.rows + 1 ),
-      "F" + str( 2 * geometry.columns + geometry.rows + 1 ),
-      "B" + str( geometry.columns + 1 ),
-      "B" + str( 2 * geometry.columns + 2 * geometry.rows + 1 ),
-      "F" + str( geometry.rows + 1 ),
-      "F" + str( geometry.rows ),
-      "B" + str( 1 ),
-      "B" + str( geometry.columns ),
-      "F" + str( 2 * geometry.columns + geometry.rows + 2 ),
-      "F" + str( geometry.columns + geometry.rows ),
-      "B" + str( 2 * geometry.columns + 2 ),
-      "B" + str( 2 * geometry.columns ),
+      "F" + str( geometry.columns + geometry.rows + 1 ),         # 1201
+      "F" + str( 2 * geometry.columns + geometry.rows + 1 ),     # 2001
+      "B" + str( geometry.columns + 1 ),                         # 801
+      "B" + str( 2 * geometry.columns + 2 * geometry.rows + 1 ), # 2401
+      "F" + str( geometry.rows + 1 ),                            # 401
+      "F" + str( geometry.rows ),                                # 400
+      "B" + str( 1 ),                                            # 1
+      "B" + str( geometry.columns ),                             # 800
+      "F" + str( 2 * geometry.columns + geometry.rows + 2 ),     # 2002
+      "F" + str( geometry.columns + geometry.rows ),             # 1200
+      "B" + str( 2 * geometry.columns + 2 ),                     # 1602
+      "B" + str( 2 * geometry.columns ),                         # 1600
     ]
 
     # Total number of steps to do a complete wind.
@@ -93,6 +92,6 @@ class LayerU_Recipe( LayerUV_Recipe ) :
     # Crate motions necessary to wind the above pattern.
     #
 
-    start1 = [ "F401", "F400" ]
-    start2 = [ "F401", "F400" ]
+    start1 = [ "F1201", "F1200" ]
+    start2 = [ "F1201", "F1200" ]
     self._wind( start1, start2, 1, windsOverride )

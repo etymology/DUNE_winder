@@ -9,12 +9,29 @@
 import xml.dom.minidom
 import os.path
 import re
-import hashlib
-import base64
 
+from Hash import Hash
 from Serializable import Serializable
 
 class HashedSerializable( Serializable ) :
+
+  #===================================================================
+  class Error( ValueError ) :
+    """
+    Exception on hash match failure.
+    """
+
+    #-----------------------------------------------------------------
+    def __init__( self, message, data=[] ) :
+      """
+      Constructor.
+
+      Args:
+        message: Error message.
+        data: An array of data related to the exception.
+      """
+      ValueError.__init__( self, message )
+      self.data = data
 
   #-------------------------------------------------------------------
   def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ) :
@@ -54,14 +71,10 @@ class HashedSerializable( Serializable ) :
     lines = re.sub( '[\s]+', '', lines )
 
     # Ignore the hash entry completely.
-    lines = re.sub( '(<strname="hashValue">[a-zA-Z0-9=]*</str>)', '', lines )
+    lines = re.sub( '(<strname="hashValue">' + Hash.HASH_PATTERN + '?</str>)', '', lines )
 
     # Create hash of G-Code, including description.
-    hashValue = hashlib.sha256()
-    hashValue.update( lines )
-
-    # Turn hash into base 32 encoding.
-    hashValue = base64.b32encode( hashValue.digest() )
+    hashValue = Hash.singleLine( lines )
 
     return hashValue
 
@@ -79,6 +92,10 @@ class HashedSerializable( Serializable ) :
 
     Returns:
       True if there was an error, False if not.
+
+    Throws:
+      HashedSerializable.Error if hashes do not match (only when
+      exceptionForMismatch is True).
     """
 
     # Load the serialized XML data as usual.
@@ -89,14 +106,17 @@ class HashedSerializable( Serializable ) :
       lines = inputFile.read()
 
     # Extract the hash from the raw XML.
-    body = re.search( '<str[\s]*?name="hashValue"[\s]*?>([a-zA-Z0-9=]*)</str>', lines )
+    body = re.search( '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>', lines )
     self.hashValue = body.group( 1 )
 
     hashValue = self._calculateStringHash( lines )
 
     isError = hashValue != self.hashValue
     if isError and exceptionForMismatch :
-      raise ValueError( str( hashValue ) + " does not match " + str( self.hashValue ) )
+      raise HashedSerializable.Error(
+        str( hashValue ) + " does not match " + str( self.hashValue ),
+        [ str( hashValue ), str( self.hashValue ) ]
+      )
 
     return isError
 
@@ -120,7 +140,7 @@ class HashedSerializable( Serializable ) :
     # Replace hash value with updated value.
     outputText = \
       re.sub(
-        '<str[\s]*?name="hashValue"[\s]*?>([a-zA-Z0-9=]*)</str>',
+        '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>',
         '<str name="hashValue">' + bodyHash + '</str>' ,
         outputText
       )
@@ -134,7 +154,7 @@ class HashedSerializable( Serializable ) :
 # Unit test.
 if __name__ == "__main__":
 
-  class SomeClass2( Serializable ) :
+  class TestClass2( Serializable ) :
 
     #-------------------------------------------------------------------
     def __init__( self ) :
@@ -152,7 +172,7 @@ if __name__ == "__main__":
   class Unserializable :
     pass
 
-  class SomeClass( HashedSerializable ) :
+  class TestClass( HashedSerializable ) :
 
     #-------------------------------------------------------------------
     def __init__( self ) :
@@ -162,7 +182,7 @@ if __name__ == "__main__":
       self.b = None
       self.c = None
       self.d = None
-      self.someClass2 = SomeClass2()
+      self.testClass2 = TestClass2()
       self.e = []
       self.f = {}
       self.g = Unserializable()
@@ -174,31 +194,29 @@ if __name__ == "__main__":
       pass
 
 
-  someClass = SomeClass()
-  someClass.a = 11.0
-  someClass.b = 12
-  someClass.c = 13L
-  someClass.d = "14"
-  someClass.e = [ 100, 200.0, 300L, "400", 3.14e9 ]
-  someClass.f = { 'apple': 1, "orange": 2 }
-  someClass.someClass2.aa = 11
-  someClass.someClass2.bb = 22
-  someClass.someClass2.cc = 33
-  someClass.someClass2.dd = 44
-  someClass.save( ".", "test.xml" )
+  testClass = TestClass()
+  testClass.a = 11.0
+  testClass.b = 12
+  testClass.c = 13L
+  testClass.d = "14"
+  testClass.e = [ 100, 200.0, 300L, "400", 3.14e9 ]
+  testClass.f = { 'apple': 1, "orange": 2 }
+  testClass.testClass2.aa = 11
+  testClass.testClass2.bb = 22
+  testClass.testClass2.cc = 33
+  testClass.testClass2.dd = 44
+  testClass.save( ".", "test.xml" )
 
-  someClassCopy = SomeClass()
-  someClassCopy.load( ".", "test.xml" )
+  testClassCopy = TestClass()
+  testClassCopy.load( ".", "test.xml" )
 
-  assert( someClassCopy.a == someClass.a )
-  assert( someClassCopy.b == someClass.b )
-  assert( someClassCopy.c == someClass.c )
-  assert( someClassCopy.d == someClass.d )
-  assert( someClassCopy.e == someClass.e )
-  assert( someClassCopy.f == someClass.f )
-  assert( someClassCopy.someClass2.aa == someClass.someClass2.aa )
-  assert( someClassCopy.someClass2.bb == someClass.someClass2.bb )
-  assert( someClassCopy.someClass2.cc == someClass.someClass2.cc )
-  assert( someClassCopy.someClass2.dd == someClass.someClass2.dd )
-
-  print "Good"
+  assert( testClassCopy.a == testClass.a )
+  assert( testClassCopy.b == testClass.b )
+  assert( testClassCopy.c == testClass.c )
+  assert( testClassCopy.d == testClass.d )
+  assert( testClassCopy.e == testClass.e )
+  assert( testClassCopy.f == testClass.f )
+  assert( testClassCopy.testClass2.aa == testClass.testClass2.aa )
+  assert( testClassCopy.testClass2.bb == testClass.testClass2.bb )
+  assert( testClassCopy.testClass2.cc == testClass.testClass2.cc )
+  assert( testClassCopy.testClass2.dd == testClass.testClass2.dd )

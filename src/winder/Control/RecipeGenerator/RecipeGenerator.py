@@ -14,7 +14,6 @@ from .Path3d import Path3d
 
 from Machine.LayerCalibration import LayerCalibration
 
-
 class RecipeGenerator :
   """
   Base recipe class.
@@ -46,11 +45,11 @@ class RecipeGenerator :
     # The node path is a path of points that are connect together.  Used to calculate
     # the amount of wire actually dispensed.
     # NOTE: Z is ignored because the hand-offs are independent of offset location.
-    frameOffset = geometry.apaOffset.add( geometry.apaLocation )
-    frameOffset.z = 0
+    self._frameOffset = geometry.apaOffset.add( geometry.apaLocation )
+    self._frameOffset.z = 0
 
     self.basePath = Path3d()
-    self.nodePath = Path3d( frameOffset )
+    self.nodePath = Path3d( self._frameOffset )
 
   #---------------------------------------------------------------------
   def offsetPin( self, pin, offset ) :
@@ -295,23 +294,29 @@ class RecipeGenerator :
       Recipe( outputFileName + "_2." + outputExtension, None )
 
   #---------------------------------------------------------------------
-  def defaultCalibration( self, layerName, geometry ) :
+  def defaultCalibration( self, layerName, geometry, saveCalibration=False ) :
     """
     Export node list to calibration file.  Debug function.
 
     Args:
       layerName: Name of recipe.
+      geometry: Geometry for layer.
+      saveCalibration: True to save calibration file to disk.
+
+    Returns:
+      Instance of calibration.
     """
 
     calibration = LayerCalibration( layerName )
-    calibration.offset = SerializableLocation( 0, 0 )
+    offset = geometry.apaLocation.add( geometry.apaOffset )
+    calibration.offset = SerializableLocation.fromLocation( offset )
 
     for node in self.nodes :
-      location = self.nodes[ node ]
-      newLocation = SerializableLocation( location.x, location.y )
-      calibration.setPinLocation( node, location )
+      calibration.setPinLocation( node, self.nodes[ node ] )
 
-    #calibration.save( ".", layerName + ".xml" )
+    if saveCalibration :
+      calibration.save( ".", layerName + "_Calibration.xml" )
+
     return calibration
 
   #---------------------------------------------------------------------

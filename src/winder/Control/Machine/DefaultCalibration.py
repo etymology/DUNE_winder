@@ -101,8 +101,7 @@ class DefaultLayerCalibration( LayerCalibration ) :
       raise "Unknown layer: " + str( layerName )
 
     LayerCalibration.__init__( self, layerName )
-    self.offset = SerializableLocation( geometry.toAPA_OffsetX , geometry.toAPA_OffsetY )
-    self.offset = self.offset.add( geometry.apaOffset )
+    self.offset = geometry.apaLocation.add( geometry.apaOffset )
     self.offset = SerializableLocation.fromLocation( self.offset )
     self.zFront = geometry.mostlyRetract
     self.zBack  = geometry.mostlyExtend

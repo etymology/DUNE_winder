@@ -67,3 +67,6 @@ class MachineGeometry :
 
     # Box that defines the Z hand-off edges.
     self.edges = Box( self.left, self.top, self.right, self.bottom )
+
+    # Diameter of the wire (in mm).
+    self.wireDiameter = 0.15

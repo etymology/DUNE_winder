@@ -103,7 +103,6 @@ class LayerCalibration( HashedSerializable ) :
 
     node = HashedSerializable.serialize( self, xmlDocument, nameOverride )
 
-    #node = xmlDocument.createElement( "LayerCalibration" )
     node.setAttribute( "layer", str( self._layer ) )
 
     offsetNode = self.serializeObject( xmlDocument, "Offset", self.offset )
@@ -133,7 +132,7 @@ class LayerCalibration( HashedSerializable ) :
 
     HashedSerializable.unserialize( self, node )
 
-    self._layer = node.getAttribute( "layer" )
+    self._layer = str( node.getAttribute( "layer" ) )
 
     nodes = node.getElementsByTagName( "SerializableLocation" )
     for node in nodes :

@@ -23,10 +23,10 @@
 #   the G-Code.
 ###############################################################################
 import re
-import hashlib
-import base64
 import os.path
 import shutil
+
+from Hash import Hash
 
 class Recipe :
   #---------------------------------------------------------------------
@@ -49,11 +49,11 @@ class Recipe :
     # Regular expression for header.  Headings must be in the following format:
     #   ( Description hash parentHash )
     # Where the description is a text field ending with a comma, and the hash
-    # fields conforms to a 56-byte Base32 encoded format.
-    headerCheck = \
-      '\( (.+?)[ ]+(?:([0-9A-Z=]{56})[ ]+)?(?:([0-9A-Z=]{56})[ ]+)?\)'
+    # fields.
+    headerCheck = '\( (.+?)[ ]+(?:' \
+      + Hash.HASH_PATTERN + '[ ]+)?(?:' + Hash.HASH_PATTERN + '[ ]+)?\)'
 
-    expression = re.search( headerCheck, header )
+    expression = re.search( headerCheck, header, re.IGNORECASE )
     if not expression :
       raise Exception( "Recipe contains no heading." )
 
@@ -62,13 +62,13 @@ class Recipe :
     self._parentHash  = expression.group( 3 )
 
     # Create hash of G-Code, including description.
-    bodyHash = hashlib.sha256()
-    bodyHash.update( self._description )
+    bodyHash = Hash()
+    bodyHash += self._description
     for line in self._lines :
-      bodyHash.update( line )
+      bodyHash += line
 
     # Turn hash into base 32 encoding.
-    bodyHash = base64.b32encode( bodyHash.digest() )
+    bodyHash = str( bodyHash )
 
     # Does the caclulated hash not match the hash from the header?
     if bodyHash != self._headerHash :
