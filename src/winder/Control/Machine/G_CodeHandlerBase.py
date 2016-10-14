@@ -490,7 +490,16 @@ class G_CodeHandlerBase :
     if G_CodeHandlerBase.DEBUG_UNIT :
       print "x", self._x, "y", self._y
 
+  #---------------------------------------------------------------------
+  def _break( self, function ) :
+    """
+    Break point.  Stop G-Code execution.
+    """
+    self._stopRequest = True
+
+  #------------------------------------
   # Look-up table of all G-Code functions.
+  #------------------------------------
   G_CODE_FUNCTION_TABLE = {
     G_Codes.LATCH            : _latch,
     G_Codes.WIRE_LENGTH      : _wireLength,
@@ -502,7 +511,8 @@ class G_CodeHandlerBase :
     G_Codes.DELAY            : _delay,
     G_Codes.ANCHOR_POINT     : _anchorPoint,
     G_Codes.ARM_CORRECT      : _armCorrect,
-    G_Codes.TRANSFER_CORRECT : _transferCorrect
+    G_Codes.TRANSFER_CORRECT : _transferCorrect,
+    G_Codes.BREAK_POINT      : _break
   }
 
   #---------------------------------------------------------------------
@@ -617,6 +627,7 @@ class G_CodeHandlerBase :
     self._xyChange = False
     self._zChange = False
     self._headPositionChange = False
+    self._stopRequest = False
 
     self._latchRequest = False
 

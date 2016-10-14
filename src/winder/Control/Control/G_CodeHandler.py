@@ -214,6 +214,10 @@ class G_CodeHandler( G_CodeHandlerBase ) :
         self._latchRequest = False
         moving = True
 
+      if self._stopRequest :
+        self._stopRequest = False
+        self._stopNextMove = True
+
       # If there are no more moves, run the next line of G-Code.
       if not moving :
         self._currentLine = self._nextLine

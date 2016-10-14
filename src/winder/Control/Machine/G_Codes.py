@@ -18,3 +18,4 @@ class G_Codes :
   ARM_CORRECT      = 108 # No parameters.
   ANCHOR_POINT     = 109 # Anchor pin, orientation (0/TR/TL/RB/RT/BL/BR/LT/LB).
   TRANSFER_CORRECT = 110 # Axis (X/Y), finial head location (0-3).
+  BREAK_POINT      = 111 # No parameters.

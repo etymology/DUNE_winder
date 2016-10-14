@@ -16,3 +16,14 @@ class LayerGeometry( APA_Geometry ) :
     """
 
     APA_Geometry.__init__( self )
+
+    # Diameter of the wire (in mm).
+    self.wireDiameter = 0.15
+    self.wireRadius = self.wireDiameter / 2
+
+    # Thickness of each layer board.
+    self.boardThickness = 3.175  # 1/8"
+    self.boardHalfThickness = self.boardThickness / 2
+
+    # Spacing between board.
+    self.boardSpacing   = 3.35

@@ -20,28 +20,35 @@ class UV_LayerGeometry( LayerGeometry ) :
 
     LayerGeometry.__init__( self )
 
-    self.rows    = 400 / self.scale
+    # The APA frame is divided into pitches--a place were two wires cross.
+    self.pitches = 400
+
+    self.rows    = self.pitches / self.scale
     self.columns = 2 * self.rows
 
-    # Data about the pins.
-    self.pinDiameter = 2.43
-    self.pinRadius   = self.pinDiameter / 2
-    self.pinHeight   = 2
-
     # Spacing between pins and front to back.
-    self.deltaX      = 8.0
-    self.deltaY      = 5.75
+    self.deltaX = 8.0
+    self.deltaY = 5.75
 
-    # Typical slope of lines.
+    # Nominal slope of lines.
     self.slope = self.deltaY / self.deltaX
+
+    # Diagonal length of pitch.
+    self.lengthXY = math.sqrt( self.deltaX**2 + self.deltaY**2 )
 
     # Primary angle (in radians) between wires.
     self.angle = math.atan( self.deltaY / self.deltaX )
 
-    # When crossing between pins, this is the minimum allowable angle.  Less
-    # than this the wire risks hitting the pins on either side.
-    self.minAngle = math.radians( 30 )
-
     # Distance between wires.
     self.wireSpacing = \
       self.deltaY / math.sqrt( self.deltaY**2 / self.deltaX**2 + 1 )
+
+    #
+    # Data about the pins.
+    #
+
+    # Nominal pin diameter is based on the board thickness and the X/Y ratio.
+    # The manufactured diameter is 2.43mm.
+    self.pinRadius = self.deltaX * self.boardHalfThickness / self.lengthXY - self.wireRadius
+    self.pinDiameter = self.pinRadius * 2
+    self.pinHeight   = 2
