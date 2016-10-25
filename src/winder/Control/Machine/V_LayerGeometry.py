@@ -24,6 +24,10 @@ class V_LayerGeometry( UV_LayerGeometry ) :
     # Total number of pins.
     self.pins = 2 * self.rows + 2 * self.columns - 1
 
+    # Values to translate front/back pin numbers.
+    self.frontBackOffset  = self.rows - 1
+    self.frontBackModulus = self.pins
+
     # Spacing between pins and front to back.
     self.depth = 95.2 / self.scale
 

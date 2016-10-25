@@ -300,23 +300,6 @@ function Configuration( modules )
 
   }
 
-  $( "#customCommandButton" )
-    .click
-    (
-      function()
-      {
-        var command = $( "#customCommand" ).val()
-        winder.remoteAction
-        (
-          command,
-          function( data )
-          {
-            $( "#customCommandResult" ).val( data )
-          }
-        )
-      }
-    )
-
   winder.addEditField
   (
     "#velocity",
@@ -372,4 +355,5 @@ function Configuration( modules )
     )
   }
 
+  window[ "configuration" ] = this
 }

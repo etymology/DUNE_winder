@@ -10,6 +10,7 @@ from Library.Geometry.Location import Location
 
 from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
 from .G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
+from .G_CodeFunctions.AnchorPointG_Code import AnchorPointG_Code
 
 from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
@@ -123,6 +124,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
     self.nodePath.push( startLocation.x, startLocation.y, self.geometry.mostlyRetract )
     self.basePath.push( startLocation.x, startLocation.y, self.geometry.mostlyRetract )
     lastLocation = startLocation
+    lastNet = self.net[ 0 ]
 
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
@@ -135,9 +137,12 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for self.netIndex in range( 1, totalCount + 1 ) :
+    for self.netIndex in xrange( 1, totalCount + 1, 2 ) :
 
       if self.netIndex < len( self.net ) :
+
+        # Push the anchor point of the last placed wire.
+        self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, "0" ) )
 
         # Location of the the next pinOffset.
         location = self.location( self.netIndex )
@@ -172,6 +177,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
           self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
 
         lastLocation = location
+        lastNet = self.net[ self.netIndex ]
 
     self.secondHalf = self.gCodePath
     self.gCodePath = None

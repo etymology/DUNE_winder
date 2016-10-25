@@ -21,8 +21,15 @@ class X_LayerGeometry( GX_LayerGeometry ) :
 
     GX_LayerGeometry.__init__( self )
 
+    # Number of rows.
+    self.rows = int( 480 / self.scale )
+
     # Total number of pins.
-    self.pins = int( 480 * 2 / self.scale )
+    self.pins = self.rows * 2
+
+    # Values to translate front/back pin numbers.
+    self.frontBackOffset  = self.rows
+    self.frontBackModulus = self.pins
 
     # Spacing between pins and front to back.
     self.depth = 85.7 / self.scale

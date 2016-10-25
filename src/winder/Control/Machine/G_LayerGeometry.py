@@ -21,8 +21,15 @@ class G_LayerGeometry( GX_LayerGeometry ) :
 
     GX_LayerGeometry.__init__( self )
 
+    # Number of rows.
+    self.rows = int( 481 / self.scale )
+
     # Total number of pins.
-    self.pins = int( 481 * 2 / self.scale )
+    self.pins = self.rows * 2
+
+    # Values to translate front/back pin numbers.
+    self.frontBackOffset  = self.rows
+    self.frontBackModulus = self.pins
 
     # Spacing between pins and front to back.
     self.depth = 114.2 / self.scale
@@ -43,3 +50,7 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     # height.
     self.mostlyRetract = ( self.zTravel - self.depth ) / ( 2 * self.scale )
     self.mostlyExtend  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+
+    # Values to translate front/back pin numbers.
+    self.frontBackOffset  = geometry.rows - 1
+    self.frontBackModulus

@@ -94,6 +94,7 @@ class HeadCompensation :
       self._anchorOffset = result.sub( self._anchorPoint )
     else :
       result = self._anchorPoint
+      self._anchorOffset = Location()
 
     return result
 
