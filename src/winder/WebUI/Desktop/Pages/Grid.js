@@ -1,61 +1,45 @@
-function Grid()
+function Grid( modules )
 {
-  // Callback function to initialize position graphic.
-  // Called twice--once when the position graphic page is loaded, and again
-  // when the motor status page is loaded.  Both must be loaded before
-  // initialization can take place, and either could load first.
-  var positionGraphicCount = 2
-  positionGraphicInitialize = function()
-  {
-    positionGraphicCount -= 1
-    if ( 0 == positionGraphicCount )
-      positionGraphic.initialize()
-  }
+  var page = modules.get( "Page" )
+  var winder = modules.get( "Winder" )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/positionGraphic",
+    "/Desktop/Modules/PositionGraphic",
     "#positionGraphicDiv",
-    positionGraphicInitialize
+    function()
+    {
+      var positionGraphic = modules.get( "PositionGraphic" )
+      positionGraphic.initialize()
+    }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/motorStatus",
-    "#motorStatusDiv",
-    positionGraphicInitialize
+    "/Desktop/Modules/MotorStatus",
+    "#motorStatusDiv"
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/gCode",
+    "/Desktop/Modules/G_Code",
     "#gCodeDiv",
     function()
     {
+      var gCode = modules.get( "G_Code" )
       gCode.create( 3 )
     }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/recentLog",
+    "/Desktop/Modules/RecentLog",
     "#recentLogDiv",
     function()
     {
+      var recentLog = modules.get( "RecentLog" )
       recentLog.create( 10 )
     }
   )
 
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    grid = new Grid()
-  }
-)
