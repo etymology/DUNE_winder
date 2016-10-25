@@ -1,4 +1,9 @@
-#closeButton
+.badVersion
+{
+  color: red;
+}
+
+#versionCloseButton
 {
   display: block;
   width: 100px;

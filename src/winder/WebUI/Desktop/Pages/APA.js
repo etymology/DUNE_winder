@@ -1,4 +1,4 @@
-function APA()
+function APA( modules )
 {
   var self = this
 
@@ -324,6 +324,10 @@ function APA()
     )
   }
 
+  var page = modules.get( "Page" )
+  var winder = modules.get( "Winder" )
+  var runStatus = modules.get( "RunStatus" )
+
   // Populate lists and have this function run after error recovery.
   this.populateLists()
   winder.addErrorClearCallback( this.populateLists )
@@ -417,30 +421,21 @@ function APA()
     }
   )
 
-  // Callback function to initialize position graphic.
-  // Called twice--once when the position graphic page is loaded, and again
-  // when the motor status page is loaded.  Both must be loaded before
-  // initialization can take place, and either could load first.
-  var positionGraphicCount = 2
-  positionGraphicInitialize = function()
-  {
-    positionGraphicCount -= 1
-    if ( 0 == positionGraphicCount )
-      positionGraphic.initialize( 0.465 )
-  }
-
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/positionGraphic",
+    "/Desktop/Modules/PositionGraphic",
     "#positionGraphicDiv",
-    positionGraphicInitialize
+    function()
+    {
+      var positionGraphic = modules.get( "PositionGraphic" )
+      positionGraphic.initialize( 0.465 )
+    }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/motorStatus",
-    "#motorStatusDiv",
-    positionGraphicInitialize
+    "/Desktop/Modules/MotorStatus",
+    "#motorStatusDiv"
   )
 
   // Callback run after period updates happen to enable/disable APA controls
@@ -450,7 +445,7 @@ function APA()
     function()
     {
       // Display control state.
-      var controlState = states[ "controlState" ]
+      var controlState = runStatus.states[ "controlState" ]
       $( "#controlState" ).text( controlState )
 
       // Start button enable.
@@ -458,7 +453,7 @@ function APA()
       $( "#startButton" ).prop( "disabled", startDisable )
       $( "#stepButton" ).prop( "disabled", startDisable )
 
-      var isCloseDisabled = ( "" == currentAPA ) || isRunning()
+      var isCloseDisabled = ( "" == currentAPA ) || runStatus.isRunning()
       $( "#apaCloseButton" ).prop( "disabled", isCloseDisabled )
 
       //$( "#apaCloseButton" ).prop( "disabled", startDisable )
@@ -487,22 +482,24 @@ function APA()
 
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/gCode",
+    "/Desktop/Modules/G_Code",
     "#gCodeDiv",
     function()
     {
+      var gCode = modules.get( "G_Code" )
       gCode.create( G_CODE_ROWS )
     }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/recentLog",
+    "/Desktop/Modules/RecentLog",
     "#recentLogDiv",
     function()
     {
+      var recentLog = modules.get( "RecentLog" )
       recentLog.create( LOG_ENTIRES )
     }
   )
@@ -572,24 +569,52 @@ function APA()
       }
 
       readSlider()
-      winder.addErrorClearCallback( readSlider )
+      // winder.addErrorClearCallback
+      // (
+      //   function()
+      //   {
+      //     createSlider
+      //     (
+      //       "velocity",
+      //       "process.gCodeHandler.getVelocityScale",
+      //       "process.setG_CodeVelocityScale"
+      //     )
+      //
+      //     readSlider()
+      //   }
+      // )
   }
 
-  createSlider( "velocity", "process.gCodeHandler.getVelocityScale", "process.setG_CodeVelocityScale" )
-  //createSlider( "acceleration" )
-  //createSlider( "deceleration" )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
+  var createSliders = function()
   {
-    //winder.inhibitUpdates()
-    apa = new APA()
-  }
-)
+    createSlider
+    (
+      "velocity",
+      "process.gCodeHandler.getVelocityScale",
+      "process.setG_CodeVelocityScale"
+    )
 
+    //createSlider( "acceleration" )
+    //createSlider( "deceleration" )
+  }
+
+  createSliders()
+  winder.addErrorClearCallback( createSliders )
+
+  window[ "apa" ] = self
+}
+//
+// //-----------------------------------------------------------------------------
+// // Uses:
+// //   Called when page loads.
+// //-----------------------------------------------------------------------------
+// $( document ).ready
+// (
+//   function()
+//   {
+//     //winder.inhibitUpdates()
+//     apa = new APA()
+//   }
+// )
+//
+//

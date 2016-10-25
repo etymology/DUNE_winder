@@ -1,7 +1,9 @@
-function RecentLog()
+function RecentLog( modules )
 {
   // Pointer to self.
   var self = this
+
+  var winder = modules.get( "Winder" )
 
   this.create = function( LOG_ENTIRES )
   {
@@ -59,4 +61,4 @@ function RecentLog()
   }
 }
 
-var recentLog = new RecentLog()
+//var recentLog = new RecentLog()

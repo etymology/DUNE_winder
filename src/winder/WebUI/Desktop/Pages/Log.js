@@ -1,5 +1,7 @@
-function Log()
+function Log( modules )
 {
+  var winder = modules.get( "Winder" )
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Load the log data into a filtered table.
@@ -67,17 +69,19 @@ function Log()
 
   // Load initial data.
   this.loadData( false )
+
+  window[ "log" ] = this
 }
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    log = new Log()
-  }
-)
+// //-----------------------------------------------------------------------------
+// // Uses:
+// //   Called when page loads.
+// //-----------------------------------------------------------------------------
+// $( document ).ready
+// (
+//   function()
+//   {
+//     log = new Log()
+//   }
+// )
 

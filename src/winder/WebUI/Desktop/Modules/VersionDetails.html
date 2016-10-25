@@ -6,7 +6,7 @@
   <p>Version hash: <span id="controlVersionHash">--</span></p>
   <p>Version date: <span id="controlVersionDate">--</span></p>
   <p>Is valid? : <span id="controlVersionValid">--</span></p>
-  <button onclick="versionControlRecompute()">Recompute</button>
+  <button onclick="versionDetails.versionControlRecompute()">Recompute</button>
 </article>
 
 <article>
@@ -15,7 +15,7 @@
   <p>Version hash: <span id="uiVersionHash">--</span></p>
   <p>Version date: <span id="uiVersionDate">--</span></p>
   <p>Is valid? : <span id="uiVersionValid">--</span></p>
-  <button onclick="versionUI_Recompute()">Recompute</button>
+  <button onclick="versionDetails.versionUI_Recompute()">Recompute</button>
 </article>
 
-<button id="closeButton" onclick="versionClose()">Close</button>
+<button id="versionCloseButton" onclick="versionDetails.close()">Close</button>

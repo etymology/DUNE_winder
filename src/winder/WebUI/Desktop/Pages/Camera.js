@@ -1,15 +1,16 @@
-
-//=============================================================================
-// Master class for screen.
-//=============================================================================
-function Camera()
+function Camera( modules )
 {
   var self = this
 
+  var page = modules.get( "Page" )
+  var winder = modules.get( "Winder" )
+
+  var cameraTimer
+
   // Motor status.
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/motorStatus",
+    "/Desktop/Modules/MotorStatus",
     "#motorStatusDiv",
     function()
     {
@@ -54,23 +55,33 @@ function Camera()
     count += 1
     $( "#debugText" ).text( count )
 
-    setTimeout( cameraUpdateFunction, 100 )
+    cameraTimer = setTimeout( cameraUpdateFunction, 100 )
   }
+
+  // Shutdown/restart function to stop/restart camera updates.
+  modules
+    .registerShutdownCallback
+    (
+      function()
+      {
+        clearTimeout( cameraTimer )
+      }
+    )
+    .registerRestoreCallback( cameraUpdateFunction )
 
   cameraUpdateFunction()
-
-
 }
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    //winder.inhibitUpdates()
-    camera = new Camera()
-  }
-)
+// //-----------------------------------------------------------------------------
+// // Uses:
+// //   Called when page loads.
+// //-----------------------------------------------------------------------------
+// $( document ).ready
+// (
+//   function()
+//   {
+//     //winder.inhibitUpdates()
+//     camera = new Camera()
+//   }
+// )
+//

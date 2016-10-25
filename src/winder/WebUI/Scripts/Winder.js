@@ -1,25 +1,25 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name: WinderInterface.js
+// Name: Winder.js
 // Uses: Interface to winder control.
 // Date: 2016-05-03
 // Author(s):
 //   Andrew Que <aque@bb7.com>
 // Example:
 //   Creating an instance:
-//     var winder = new WinterInterface()
+//     var winder = new Winder()
 // Notes:
 //   Avoid uses ECMAScript 6 functions (let, const, class, etc.) because not all
 //   mobile browers support these functions.
 ///////////////////////////////////////////////////////////////////////////////
 
-var WinderInterface = function()
+var Winder = function( modules )
 {
   // Reference to ourselves.
   var self = this
 
   // Set to true in order to always force a reload (rather than used cached
   // loads).  Should be false for production for best performance.
-  var FORCE_RELOAD = true
+  var FORCE_RELOAD = false
 
   // Set to true to shutdown periodic updates.
   var periodicShutdown = false
@@ -29,6 +29,13 @@ var WinderInterface = function()
 
   // True when unable to communicate to winder.
   var isInError = false
+
+  // Instance of timer for periodic updates.  Used to stop timer.
+  var periodicTimer
+
+  // Instance of data loading in periodic updates.  Used to stop load during
+  // shutdown.
+  var periodicLoadInstance
 
   // List of remote commands that are updated periodically, and the callbacks run
   // when they have new data.
@@ -67,19 +74,12 @@ var WinderInterface = function()
   // Callbacks to run when periodic functions have all been run.
   var onPeriodicEndCallbacks = []
 
-  // Callbacks run once pages is completely loaded.
-  var onFullyLoadedCallbacks = []
-
   // Default error string.
   this.errorString = '<span class="error">X</span>'
 
   // Enable states of the toggle buttons.  If an error occurs, all the toggle buttons are
   // disabled.  The state they were before being disabled is saved in this map.
   var buttonStates = {}
-
-  // Number of pages currently still loading.
-  // Used for triggering fully-loaded event.
-  var pagesLoading = 0
 
   // Current values of the edit fields.  Used to check for changes.
   var editFieldValues = {}
@@ -151,66 +151,6 @@ var WinderInterface = function()
 
   //---------------------------------------------------------------------------
   // Uses:
-  //   Add a sub-page to current page.
-  // Input:
-  //   page - Filename (less extension) to load.
-  //   tag - The id of the location to append this data.  Typically a <article>.
-  //   callback - Function to run after everything has loaded.
-  //   callbackParameters - Parameters to pass to callback.
-  // Notes:
-  //   The page must have the extension "html".  In addition this function will
-  //   also load the page with the extension ".js".
-  //---------------------------------------------------------------------------
-  this.loadSubPage = function( page, tag, callback, callbackParameters )
-  {
-    // The random line is added to the end of a URL to force the browser to
-    // actually load the data.  Otherwise, the browser may used a cached
-    // version.
-    var randomLine = ""
-    if ( FORCE_RELOAD )
-      randomLine = "?random=" + Math.random()
-
-    var cssLink =
-      $( "<link rel='stylesheet' type='text/css' href='" + page + ".css" + randomLine + "'>" )
-
-    $( "head" ).append( cssLink )
-
-    // Denote an other page is loading.
-    pagesLoading += 1
-
-    $( tag )
-      .load
-      (
-        page + ".html" + randomLine ,
-        function()
-        {
-          // Load the Javascipt for this page.
-          // NOTE: Done after the page loads so that all elements have been
-          // created before Javascript runs.
-          $.getScript
-          (
-            page + ".js",
-            function()
-            {
-              // If there is a callback once page is finished loading, run it.
-              if ( callback )
-                callback( callbackParameters )
-
-              // One more page is finished loading.
-              pagesLoading -= 1
-
-              // If all pages have been loaded, run fully loaded callbacks.
-              if ( 0 == pagesLoading )
-                for ( var index in onFullyLoadedCallbacks )
-                  onFullyLoadedCallbacks[ index ]()
-            }
-          )
-        }
-      )
-  }
-
-  //---------------------------------------------------------------------------
-  // Uses:
   //   Get updated values for all data read periodically and run their callbacks
   //   if any of the data has changed.  Internal function--no need to call
   //   externally.
@@ -220,12 +160,13 @@ var WinderInterface = function()
     // Use a semaphore to prevent a stack-up of multiple instances.  Could
     // happen if there are long network delays.
     if ( ( 0 == periodicUpdateSemaphore )
+      && ( ! self.periodicShutdown )
       && ( Object.keys( periodicQuery ).length > 0 ) )
     {
       periodicUpdateSemaphore += 1
 
       // Make the request to the remote server.
-      $.post
+      periodicLoadInstance = $.post
       (
         "",
         periodicQuery
@@ -354,7 +295,7 @@ var WinderInterface = function()
     // NOTE: This needs to happen even if the function was skipped due to
     // the semaphore being in use.
     if ( ! self.periodicShutdown )
-      setTimeout( self.periodicUpdate, updateRate )
+      periodicTimer = setTimeout( self.periodicUpdate, updateRate )
   }
 
   //---------------------------------------------------------------------------
@@ -631,7 +572,7 @@ var WinderInterface = function()
   //   formatParameters - Parameter to pass to the format function. (Optional)
   // Example:
   //   var savedValue = {}
-  //   winderInterface.displayCallback
+  //   winder.displayCallback
   //   (
   //     1234,
   //     "#tag",
@@ -1061,17 +1002,6 @@ var WinderInterface = function()
 
   //---------------------------------------------------------------------------
   // Uses:
-  //   Add a callback to be run after the entire pages has finished loading.
-  // Input:
-  //   callback - Function to run.
-  //---------------------------------------------------------------------------
-  this.addFullyLoadedCallback = function( callback )
-  {
-    onFullyLoadedCallbacks.push( callback )
-  }
-
-  //---------------------------------------------------------------------------
-  // Uses:
   //   Allows periodic updates to be inhibited.
   // Input:
   //   isInhibit - True to inhibit, false to uninhibit.
@@ -1094,7 +1024,42 @@ var WinderInterface = function()
   //---------------------------------------------------------------------------
   this.shutdown = function()
   {
+    // Shutdown timer.
+    if ( periodicTimer )
+      clearTimeout( periodicTimer )
+
+    // Abort any running loads in progress.
+    if ( periodicLoadInstance )
+      periodicLoadInstance.abort()
+
+    periodicLoadInstance = null
+    periodicTimer = null
     this.periodicShutdown = true
   }
 
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Start periodic updates.
+  //---------------------------------------------------------------------------
+  this.start = function()
+  {
+    var wasShutdown = this.periodicShutdown
+    self.periodicShutdown = false
+
+    if ( ! periodicTimer )
+      self.periodicUpdate()
+
+    if ( wasShutdown )
+      // Run error-clear callbacks.
+      for ( var index in onErrorClearCallbacks )
+        onErrorClearCallbacks[ index ]()
+  }
+
+  //---------------------------------------------------------------------------
+  // Constructor.
+  //---------------------------------------------------------------------------
+  modules.registerShutdownCallback( this.shutdown )
+  modules.registerRestoreCallback( this.start )
+
+  this.start()
 }

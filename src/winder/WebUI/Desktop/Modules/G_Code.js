@@ -1,4 +1,4 @@
-function G_Code()
+function G_Code( modules )
 {
   // Pointer to self.
   var self = this
@@ -11,6 +11,8 @@ function G_Code()
   //-----------------------------------------------------------------------------
   this.create = function( G_CODE_ROWS )
   {
+    var winder = modules.get( "Winder" )
+
     var totalRows = G_CODE_ROWS * 2 + 1
     $( "#gCodeTable" ).empty()
     var gGodeBody = $( "<tbody/>" ).appendTo( "#gCodeTable" )
@@ -80,4 +82,4 @@ function G_Code()
 
 }
 
-var gCode = new G_Code()
+//var gCode = new G_Code()

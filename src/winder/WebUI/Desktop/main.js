@@ -1,34 +1,4 @@
-// Instance of winder interface.
-var winder
-
-var baseStylesheets = []
-
-// Software version variables.
-var softwareVersion =
-{
-  "controlVersion" : 0,
-  "uiVersion" : 0
-}
-
-// Status of state machines.
-var states =
-{
-  "controlState" : 0,
-  "plcState" : 0
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   See if machine is running based on control state.
-// Output:
-//   True if running, false if not.
-//-----------------------------------------------------------------------------
-function isRunning()
-{
-  var state = states[ "controlState" ]
-  var result = ( "StopMode" != state ) && ( "HardwareMode" != state )
-  return result
-}
+var USE_FULL_PAGE_CACHE = false
 
 //-----------------------------------------------------------------------------
 // Uses:
@@ -64,57 +34,18 @@ function getParameterByName( name, url )
 
 //-----------------------------------------------------------------------------
 // Uses:
-//   Load and display the version information.
+//   Setup main screen.
+//
+// $$$FUTURE - Remove this function and merge it into cache callback.  Only
+//   needed for old system.
 //-----------------------------------------------------------------------------
-function loadVersion()
-{
-  winder.singleRemoteDisplay
-  (
-    "version.getVersion()",
-    "#controlVersion",
-    softwareVersion,
-    "controlVersion"
-  )
-
-  winder.remoteAction
-  (
-    "version.isValid()",
-    function( data )
-    {
-      if ( data )
-        $( "#controlVersion" ).attr( 'class', "" )
-      else
-        $( "#controlVersion" ).attr( 'class', "badVersion"  )
-    }
-  )
-
-  winder.singleRemoteDisplay
-  (
-    "uiVersion.getVersion()",
-    "#uiVersion",
-    softwareVersion,
-    "uiVersion"
-  )
-
-  winder.remoteAction
-  (
-    "uiVersion.isValid()",
-    function( data )
-    {
-      if ( data )
-        $( "#uiVersion" ).attr( 'class', "" )
-      else
-        $( "#uiVersion" ).attr( 'class', "badVersion" )
-    }
-  )
-
-}
-
 function setupMainScreen()
 {
+  var page = window[ "page" ]
+
   // Before sub-pages begin to load, register a callback to run after all
   // have been loaded.
-  winder.addFullyLoadedCallback
+  page.addFullyLoadedCallback
   (
     function()
     {
@@ -159,97 +90,6 @@ function setupMainScreen()
         )
     }
   )
-
-  // Display system time.
-  winder.addPeriodicDisplay
-  (
-    "systemTime.get()",
-    "#systemTime",
-    null,
-    null,
-    function( data )
-    {
-      var timeString = "--"
-      if ( data )
-      {
-        var time = new Date( data + 'Z' )
-        timeString = $.format.date( time, "yyyy-MM-dd HH:mm:ss.SSS")
-      }
-
-      return timeString
-    }
-  )
-
-  // Update for primary state machine.
-  winder.addPeriodicDisplay
-  (
-    "process.controlStateMachine.state.__class__.__name__",
-    "#controlState",
-    states,
-    "controlState"
-  )
-
-  // Update for PLC state machine.
-  winder.addPeriodicCallback
-  (
-    "io.plcLogic.getState()",
-    function( value )
-    {
-      if ( null !== value )
-      {
-        var stateTranslateTable =
-        [
-          "Init",          // 0
-          "Ready",         // 1
-          "XY jog",        // 2
-          "XY seek",       // 3
-          "Z jog",         // 4
-          "Z seek",        // 5
-          "Latching",      // 6
-          "Latch homing",  // 7
-          "Latch release", // 8
-          "Unservo",       // 9
-          "Error"          // 10
-        ]
-
-        var stringValue = stateTranslateTable[ value ]
-        states[ "plcState" ] = stringValue
-        $( "#plcState" ).text( stringValue )
-
-        // Change the CSS class for a PLC state error.
-        if ( 10 == value )
-          $( "#plcState" ).attr( 'class', 'plcError' )
-        else
-          $( "#plcState" ).attr( 'class', '' )
-
-      }
-      else
-        $( "#plcState" ).html( winder.errorString )
-    }
-  )
-
-  winder.addPeriodicEndCallback
-  (
-    function()
-    {
-      var controlState = states[ "controlState" ]
-      var plcState = states[ "plcState" ]
-      var isDisabled =
-           ( "StopMode" == controlState )
-        || ( "HardwareMode" == controlState )
-        || ( "Unservo" == plcState )
-
-      $( "#fullStopButton" ).prop( "disabled", isDisabled )
-      $( "#controlState" ).text( controlState )
-    }
-  )
-
-  // Load version information and have them reload on error.
-  loadVersion()
-  winder.addErrorClearCallback( loadVersion )
-
-  // Start the periodic updates.
-  winder.periodicUpdate()
 }
 
 //-----------------------------------------------------------------------------
@@ -258,37 +98,56 @@ function setupMainScreen()
 // Input:
 //   page - Desired page to load.
 //-----------------------------------------------------------------------------
-function load( page )
+var baseStylesheets = []
+function load( pageName )
 {
-  if ( winder )
+  if ( ! USE_FULL_PAGE_CACHE )
+  {
+    var page = window[ "page" ]
+    var modules = page.getModules()
+    var winder = modules.get( "Winder" )
     winder.shutdown()
 
-  winder = new WinderInterface()
-  $( '#main' ).html( "Loading..." )
+    $( '#main' ).html( "Loading..." )
 
-  // Remove all styles sheets that are not base styles.
-  $( 'head' )
-    .find( 'link' )
-    .each
+    // Remove all styles sheets that are not base styles.
+    $( 'head' )
+      .find( 'link' )
+      .each
+      (
+        function()
+        {
+          // Where did this style sheet come from?
+          var url = $( this ).attr( 'href' )
+
+          // Is it a base style sheet?
+          if ( -1 == baseStylesheets.indexOf( url ) )
+            // Remove it.
+            $( this ).remove()
+        }
+      )
+
+    var page = new Page()
+    window[ "page" ] = page
+
+    // Winder module is used on every page.
+    page.addCommonModule( "/Scripts/Winder" )
+
+    page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
+    page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
+    page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
+    page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
+
+    // Loading sub page and setup main screen after sub page finishes loading.
+    page.load
     (
-      function()
-      {
-        // Where did this style sheet come from?
-        var url = $( this ).attr( 'href' )
-
-        // Is it a base style sheet?
-        if ( -1 == baseStylesheets.indexOf( url ) )
-          // Remove it.
-          $( this ).remove()
-      }
+      pageName,
+      "#main",
+      setupMainScreen
     )
-
-  // Loading sub page and setup main screen after sub page finishes loading.
-  winder.loadSubPage
-  (
-    "/Desktop/Pages/" + page, "#main",
-    setupMainScreen
-  )
+  }
+  else
+    page.load( page )
 }
 
 //-----------------------------------------------------------------------------
@@ -300,11 +159,11 @@ $( document ).ready
   function()
   {
     // Get the requested page.
-    var page = getParameterByName( "page" )
+    var pageName = getParameterByName( "page" )
 
     // If there is no page, use default.
-    if ( ! page )
-      page = "apa"
+    if ( ! pageName )
+      pageName = "APA"
 
     // Save all the loaded style sheet URLs.  These need to stay regardless
     // of what page is loaded.
@@ -318,6 +177,34 @@ $( document ).ready
           baseStylesheets.push( $( this ).attr( 'href' ) )
         }
       )
+
+    var page = new Page()
+    window[ "page" ] = page
+
+    $( "#pageSelectDiv" ).css( "display", "block" )
+    $( "#fullStopDiv" ).css( "display", "block" )
+    $( "#loginDiv" ).css( "display", "none" )
+
+    // Winder module is used on every page.
+    page.addCommonModule( "/Scripts/Winder" )
+
+    page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
+    page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
+    page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
+    page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
+
+    // Load the requested page.
+    page.load
+    (
+      "/Desktop/Pages/" + pageName,
+      "#main",
+      setupMainScreen,
+      null,
+      function( error )
+      {
+        alert( "Error loading page. " + error )
+      }
+    )
 
     // $$$FUTURE // Check authentication either load requested page, or show grid page.
     // $$$FUTURE winder = new WinderInterface()
@@ -334,57 +221,32 @@ $( document ).ready
     // $$$FUTURE     }
     // $$$FUTURE     else
     // $$$FUTURE     {
-                       $( "#pageSelectDiv" ).css( "display", "block" )
-                       $( "#fullStopDiv" ).css( "display", "block" )
-                       $( "#loginDiv" ).css( "display", "none" )
-
-                       // Load the requested page.
-                       load( page )
+    // $$$FUTURE       $( "#pageSelectDiv" ).css( "display", "block" )
+    // $$$FUTURE       $( "#fullStopDiv" ).css( "display", "block" )
+    // $$$FUTURE       $( "#loginDiv" ).css( "display", "none" )
+    // $$$FUTURE
+    // $$$FUTURE       // Load the requested page.
+    // $$$FUTURE       page.load( page )
     // $$$FUTURE     }
     // $$$FUTURE   }
     // $$$FUTURE )
   }
 )
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback when version information box is clicked.
-//-----------------------------------------------------------------------------
-function showVersionInformation()
-{
-  winder.loadSubPage
-  (
-    "/Desktop/Modules/overlay",
-    "#modalDiv",
-    function()
-    {
-      winder.loadSubPage( "/Desktop/Modules/versionDetails", "#overlayBox" )
-    }
-  )
-}
+// $$$FUTURE //-----------------------------------------------------------------------------
+// $$$FUTURE // Uses:
+// $$$FUTURE //   Callback when version information box is clicked.
+// $$$FUTURE //-----------------------------------------------------------------------------
+// $$$FUTURE function showLogin()
+// $$$FUTURE {
+// $$$FUTURE   winder.loadSubPage
+// $$$FUTURE   (
+// $$$FUTURE     "/Desktop/Modules/overlay",
+// $$$FUTURE     "#modalDiv",
+// $$$FUTURE     function()
+// $$$FUTURE     {
+// $$$FUTURE       winder.loadSubPage( "/Desktop/Modules/login", "#overlayBox" )
+// $$$FUTURE     }
+// $$$FUTURE   )
+// $$$FUTURE }
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback when version information box is clicked.
-//-----------------------------------------------------------------------------
-function showLogin()
-{
-  winder.loadSubPage
-  (
-    "/Desktop/Modules/overlay",
-    "#modalDiv",
-    function()
-    {
-      winder.loadSubPage( "/Desktop/Modules/login", "#overlayBox" )
-    }
-  )
-}
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Callback for global stop button.
-//-----------------------------------------------------------------------------
-function fullStop()
-{
-  winder.remoteAction( 'process.stop()' )
-}

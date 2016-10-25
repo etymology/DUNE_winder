@@ -1,6 +1,8 @@
-function APA_List()
+function APA_List( modules )
 {
   var self = this
+
+  var winder = modules.get( "Winder" )
 
   var STAGES =
   [
@@ -204,16 +206,16 @@ function APA_List()
 
   this.loadData()
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    apaList = new APA_List()
-  }
-)
+//
+// //-----------------------------------------------------------------------------
+// // Uses:
+// //   Called when page loads.
+// //-----------------------------------------------------------------------------
+// $( document ).ready
+// (
+//   function()
+//   {
+//     apaList = new APA_List()
+//   }
+// )
 

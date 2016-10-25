@@ -1,5 +1,17 @@
-function Jog()
+function Jog( modules )
 {
+  var winder = modules.get( "Winder" )
+  var page = modules.get( "Page" )
+  var motorStatus
+  modules.load
+  (
+    "/Desktop/Modules/MotorStatus",
+    function()
+    {
+      motorStatus = modules.get( "Modules" )
+    }
+  )
+
   var MIN_VELOCITY = 1.0
   var maxVelocity
 
@@ -9,6 +21,24 @@ function Jog()
 
   var lastAcceleration
   var lastDeceleration
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback for reset button.
+  //-----------------------------------------------------------------------------
+  this.reset = function()
+  {
+    winder.remoteAction( 'process.acknowledgeError()' )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback for servo disable button.
+  //-----------------------------------------------------------------------------
+  this.servoDisable = function()
+  {
+    winder.remoteAction( 'process.servoDisable()' )
+  }
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -321,28 +351,32 @@ function Jog()
     )
   }
 
-  // Callback function to initialize position graphic.
-  // Called twice--once when the position graphic page is loaded, and again
-  // when the motor status page is loaded.  Both must be loaded before
-  // initialization can take place, and either could load first.
-  var positionGraphicCount = 2
-  positionGraphicInitialize = function()
-  {
-    positionGraphicCount -= 1
-    if ( 0 == positionGraphicCount )
-      positionGraphic.initialize( 0.7 )
-  }
+  // // Callback function to initialize position graphic.
+  // // Called twice--once when the position graphic page is loaded, and again
+  // // when the motor status page is loaded.  Both must be loaded before
+  // // initialization can take place, and either could load first.
+  // var positionGraphicCount = 2
+  // positionGraphicInitialize = function()
+  // {
+  //   positionGraphicCount -= 1
+  //   if ( 0 == positionGraphicCount )
+  //     positionGraphic.initialize( 0.7, motorStatus )
+  // }
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/positionGraphic",
+    "/Desktop/Modules/PositionGraphic",
     "#positionGraphicDiv",
-    positionGraphicInitialize
+    function()
+    {
+      var positionGraphic = modules.get( "PositionGraphic" )
+      positionGraphic.initialize( 0.7, motorStatus )
+    }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/motorStatus",
+    "/Desktop/Modules/MotorStatus",
     "#motorStatusDiv",
     function()
     {
@@ -352,7 +386,7 @@ function Jog()
       var y = new CopyField( "#yPosition", "#yPositionCell" )
       var z = new CopyField( "#zPosition", "#zPositionCell" )
 
-      positionGraphicInitialize()
+      //positionGraphicInitialize()
     }
 
   )
@@ -366,6 +400,13 @@ function Jog()
       $( "#extendedPosition" ).val( data )
     }
   )
+
+  var sliderValues =
+  {
+   "velocitySlider"     : 100,
+   "accelerationSlider" : 100,
+   "decelerationSlider" : 100
+  }
 
   var createSlider = function( query, sliderTag, valueTag, valueUnits, minimum )
   {
@@ -381,12 +422,13 @@ function Jog()
         sliderFunction =
           function( event, ui )
           {
+            sliderValues[ sliderTag ] = ui.value
             var value = ui.value / 100.0 * ( maximum - minimum ) + minimum
             value = Math.round( value * 10.0 ) / 10.0
             $( "#" + valueTag ).html( value + " " + valueUnits )
           }
 
-        ui = new function() { this.value = 100 }
+        ui = new function() { this.value = sliderValues[ sliderTag ] }
         sliderFunction( null, ui )
 
         // Function to get the scaled value of slider.
@@ -410,7 +452,7 @@ function Jog()
             {
               min: 0,
               max: 100,
-              value: 100,
+              value: sliderValues[ sliderTag ],
               change: sliderFunction,
               slide: sliderFunction
             }
@@ -421,32 +463,40 @@ function Jog()
 
   }
 
-  createSlider
-  (
-    'process.maxVelocity()',
-    "velocitySlider",
-    "velocityValue",
-    "mm/s",
-    MIN_VELOCITY
-  )
+  var createSliders = function()
+  {
+    createSlider
+    (
+      'process.maxVelocity()',
+      "velocitySlider",
+      "velocityValue",
+      "mm/s",
+      MIN_VELOCITY
+    )
 
-  createSlider
-  (
-    'io.plcLogic.maxAcceleration()',
-    "accelerationSlider",
-    "accelerationValue",
-    "mm/s<sup>2</sup>",
-    MIN_ACCELERATION
-  )
+    createSlider
+    (
+      'io.plcLogic.maxAcceleration()',
+      "accelerationSlider",
+      "accelerationValue",
+      "mm/s<sup>2</sup>",
+      MIN_ACCELERATION
+    )
 
-  createSlider
-  (
-    'io.plcLogic.maxDeceleration()',
-    "decelerationSlider",
-    "decelerationValue",
-    "mm/s<sup>2</sup>",
-    MIN_ACCELERATION
-  )
+    createSlider
+    (
+      'io.plcLogic.maxDeceleration()',
+      "decelerationSlider",
+      "decelerationValue",
+      "mm/s<sup>2</sup>",
+      MIN_ACCELERATION
+    )
+  }
+
+  createSliders()
+  winder.addErrorClearCallback( createSliders )
+
+
   // // Maximum velocity.
   // winder.remoteAction
   // (
@@ -554,16 +604,18 @@ function Jog()
   //   }
   // )
 
+  window[ "jog" ] = this
 }
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    jog = new Jog()
-  }
-)
+// //-----------------------------------------------------------------------------
+// // Uses:
+// //   Called when page loads.
+// //-----------------------------------------------------------------------------
+// $( document ).ready
+// (
+//   function()
+//   {
+//     jog = new Jog()
+//   }
+// )
+//

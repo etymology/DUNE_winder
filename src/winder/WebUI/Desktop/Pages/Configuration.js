@@ -3,7 +3,7 @@
 // Deal with serializeable configuration values.  These must come from a class
 // that has a get, put, and save function.
 //=============================================================================
-function ConfigurationList( remotePrefix, tagPrefix )
+function ConfigurationList( winder, remotePrefix, tagPrefix )
 {
   var self = this
 
@@ -190,9 +190,12 @@ function ConfigurationList( remotePrefix, tagPrefix )
 //=============================================================================
 // Master class for screen.
 //=============================================================================
-function Configuration()
+function Configuration( modules )
 {
   var self = this
+
+  var winder = modules.get( "Winder" )
+  var page = modules.get( "Page" )
 
   var machineCalibration
   var configuration
@@ -227,7 +230,7 @@ function Configuration()
     // All parameters of machine calibration.
     var tag = $( "#machineCalibration" )
     tag.empty()
-    machineCalibration = new ConfigurationList( "machineCalibration" )
+    machineCalibration = new ConfigurationList( winder, "machineCalibration" )
     machineCalibration.display( "Park x",             "parkX",            tag )
     machineCalibration.display( "Park y",             "parkY",            tag )
     machineCalibration.display( "Spool load x",       "spoolLoadX",       tag )
@@ -252,7 +255,7 @@ function Configuration()
     // All parameters of machine setup.
     var tag = $( "#configuration" )
     tag.empty()
-    configuration = new ConfigurationList( "configuration" )
+    configuration = new ConfigurationList( winder, "configuration" )
     configuration.display( "PLC address",        "plcAddress",       tag, self.isIP_Address )
     configuration.display( "Max velocity",       "maxVelocity",      tag )
     configuration.display( "Slow velocity",      "maxSlowVelocity",  tag )
@@ -265,9 +268,9 @@ function Configuration()
   winder.addErrorClearCallback( this.loadConfiguration )
 
   // Motor status.
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/motorStatus",
+    "/Desktop/Modules/MotorStatus",
     "#motorStatusDiv",
     function()
     {
@@ -296,26 +299,6 @@ function Configuration()
     )
 
   }
-
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultY.get()", "#cameraY" )
-
-  var count = 0
-  var cameraUpdateFunction = function()
-  {
-    var url = "ftp://admin@192.168.16.55/image.bmp?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
-    $( "#cameraImage" )
-      .attr( "src", url )
-
-    count += 1
-    $( "#debugText" ).text( count )
-
-    setTimeout( cameraUpdateFunction, 100 )
-  }
-
-  cameraUpdateFunction()
 
   $( "#customCommandButton" )
     .click
@@ -390,16 +373,3 @@ function Configuration()
   }
 
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    //winder.inhibitUpdates()
-    configuration = new Configuration()
-  }
-)

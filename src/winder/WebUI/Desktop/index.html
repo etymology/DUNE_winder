@@ -52,14 +52,6 @@
         float: right;
       }
 
-      #fullStopButton
-      {
-        width: 300px;
-        height: 50px;
-        border-radius: 5px;
-        font-size: 150%;
-      }
-
       main
       {
         clear: both;
@@ -81,10 +73,6 @@
         margin: 5px;
       }
 
-      .badVersion, .plcError
-      {
-        color: red;
-      }
 
     </style>
 
@@ -98,6 +86,8 @@
     <script type="text/javascript" src="/Scripts/WinderInterface.js"></script>
     <script type="text/javascript" src="/Scripts/FilterTable.js"></script>
     <script type="text/javascript" src="/Scripts/CopyField.js"></script>
+    <script type="text/javascript" src="/Scripts/Modules.js"></script>
+    <script type="text/javascript" src="/Scripts/Page.js"></script>
     <script type="text/javascript" src="/Desktop/main.js"></script>
 
     <script type="text/javascript">
@@ -112,12 +102,9 @@
     <!-- Heading, used for stop button, tittle, and system time. -->
     <header>
       <article id="fullStopDiv">
-        <button id="fullStopButton" onclick="fullStop()" id="fullStopButton">Stop &#9995;</button>
       </article>
 
       <article id="timeDiv">
-        <h2>Time</h2>
-        <p id="systemTime">--</p>
       </article>
 
       <article id="titleDiv">
@@ -132,16 +119,10 @@
 
     <!-- Footer, used for navigation, state information, and version. -->
     <footer>
-      <article id="versionDiv" onclick="showVersionInformation()">
-        <h2>Version</h2>
-        <p>Web interface: <span id="uiVersion">--</span></p>
-        <p>Control software: <span id="controlVersion">--</span></p>
+      <article id="versionDiv" onclick="version.showVersionInformation()">
       </article>
 
       <article id="statesDiv">
-        <h2>Running state</h2>
-        <p>Control state: <span id="controlState">--</span></p>
-        <p>PLC state: <span id="plcState">--</span></p>
       </article>
 
       <article id="loginDiv">
@@ -149,14 +130,14 @@
       </article>
 
       <article id="pageSelectDiv">
-        <button onclick="load( 'apa' )">APA</button>
-        <button onclick="load( 'jog' )">Jog</button>
-        <button onclick="load( 'log' )">Log</button>
-        <button onclick="load( 'io' )">I/O</button>
-        <button onclick="load( 'grid' )">Grid</button>
-        <button onclick="load( 'apaList' )">APA list</button>
-        <button onclick="load( 'camera' )">Camera</button>
-        <button onclick="load( 'configuration' )">Configuration</button>
+        <button onclick="load( '/Desktop/Pages/APA', '#main' )">APA</button>
+        <button onclick="load( '/Desktop/Pages/Jog', '#main' )">Jog</button>
+        <button onclick="load( '/Desktop/Pages/Log', '#main' )">Log</button>
+        <button onclick="load( '/Desktop/Pages/IO', '#main' )">I/O</button>
+        <button onclick="load( '/Desktop/Pages/Grid', '#main' )">Grid</button>
+        <button onclick="load( '/Desktop/Pages/APA_List', '#main' )">APA list</button>
+        <button onclick="load( '/Desktop/Pages/Camera', '#main' )">Camera</button>
+        <button onclick="load( '/Desktop/Pages/Configuration', '#main' )">Configuration</button>
       </article>
     </footer>
 

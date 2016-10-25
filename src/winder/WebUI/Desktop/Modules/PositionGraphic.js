@@ -1,4 +1,4 @@
-function PositionGraphic()
+function PositionGraphic( modules )
 {
   var self = this
 
@@ -34,6 +34,10 @@ function PositionGraphic()
   var HEAD_ANGLE_X      = 60
   var HEAD_ANGLE_Y      = 60
   var HEAD_ANGLE_RADIUS = 50
+
+  var winder
+  var motorStatus
+  var runStatus
 
   // Storage location for additional variables read for setup.
   var readData = {}
@@ -87,7 +91,7 @@ function PositionGraphic()
   //   status - State of light.
   //   offIsError - False if being off (false) is ok, or true if this is an error.
   //---------------------------------------------------------------------------
-  var statusLight = function( x, y, status, offIsError )
+  var statusLight = function( zStatusCanvas, x, y, status, offIsError )
   {
     // Scale locations.
     x *= scale
@@ -259,6 +263,7 @@ function PositionGraphic()
         $( "#zArmImage" )
           .css( "left", zArm + "px" )
 
+        var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
         zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
 
         //
@@ -327,21 +332,21 @@ function PositionGraphic()
         // NOTE: Constants come for positions on image.
         //
 
-        statusLight( 485, 150, ! inputs[ "Z_End_of_Travel" ], true )
-        statusLight( 505, 150, inputs[ "Z_Retracted_1A" ] )
+        statusLight( zStatusCanvas, 485, 150, ! inputs[ "Z_End_of_Travel" ], true )
+        statusLight( zStatusCanvas, 505, 150, inputs[ "Z_Retracted_1A" ] )
 
-        statusLight( 545, 150, ! inputs[ "Z_End_of_Travel" ], true )
-        statusLight( 565, 150, inputs[ "Z_Extended" ] )
+        statusLight( zStatusCanvas, 545, 150, ! inputs[ "Z_End_of_Travel" ], true )
+        statusLight( zStatusCanvas, 565, 150, inputs[ "Z_Extended" ] )
 
-        statusLight( 1200, 275, inputs[ "Z_Fixed_Latched" ] )
-        statusLight( 1220, 203, inputs[ "Z_Fixed_Present" ] )
+        statusLight( zStatusCanvas, 1200, 275, inputs[ "Z_Fixed_Latched" ] )
+        statusLight( zStatusCanvas, 1220, 203, inputs[ "Z_Fixed_Present" ] )
 
         var armBase = zArm / scale
-        statusLight( armBase + 765, 135, inputs[ "Latch_Actuator_Top" ] )
-        statusLight( armBase + 765, 155, inputs[ "Latch_Actuator_Mid" ] )
-        statusLight( armBase + 770, 235, inputs[ "Z_Stage_Present" ] )
-        statusLight( armBase + 780, 273, inputs[ "Z_Stage_Latched" ] )
-        statusLight( armBase + 767, 305, ( states[ "plcState" ] == "Latching" ) )
+        statusLight( zStatusCanvas, armBase + 765, 135, inputs[ "Latch_Actuator_Top" ] )
+        statusLight( zStatusCanvas, armBase + 765, 155, inputs[ "Latch_Actuator_Mid" ] )
+        statusLight( zStatusCanvas, armBase + 770, 235, inputs[ "Z_Stage_Present" ] )
+        statusLight( zStatusCanvas, armBase + 780, 273, inputs[ "Z_Stage_Latched" ] )
+        statusLight( zStatusCanvas, armBase + 767, 305, ( runStatus.states[ "plcState" ] == "Latching" ) )
 
         //
         // Draw movement history.
@@ -364,6 +369,8 @@ function PositionGraphic()
           // Get rid of the oldest line segments.
           while ( lines.length > ( LINES + 1 ) )
             lines.shift()
+
+          var pathCanvas = document.getElementById( "pathCanvas" ).getContext( "2d" )
 
           // Clear canvas.
           pathCanvas.clearRect( 0, 0, baseGraphicWidth, baseGraphicHeight )
@@ -420,6 +427,8 @@ function PositionGraphic()
           lastY = motorY
         }
 
+        var seekCanvas = document.getElementById( "seekCanvas" ).getContext( "2d" )
+
         // If there is a starting point and X/Y is in motion.
         if ( ( null !== startingX )
           && ( null !== startingY )
@@ -465,18 +474,9 @@ function PositionGraphic()
 
   } // setupCallback
 
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Setup periodic callback that will reposition images.  Don't call until
-  //   page is fully loaded.
-  //-----------------------------------------------------------------------------
-  this.initialize = function( scaleParameter )
+  var isSetup = false
+  var startSetup = function()
   {
-    if ( scaleParameter )
-      scale = scaleParameter
-    else
-      scale = DEFAULT_SCALE
-
     // Scaling can take place after machine calibration has been read.
     // So read the calibration and start the setup when we have this data.
     winder.remoteAction
@@ -491,6 +491,22 @@ function PositionGraphic()
         }
       }
     )
+  }
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Setup periodic callback that will reposition images.  Don't call until
+  //   page is fully loaded.
+  //-----------------------------------------------------------------------------
+  this.initialize = function( scaleParameter )
+  {
+    if ( scaleParameter )
+      scale = scaleParameter
+    else
+      scale = DEFAULT_SCALE
+
+    if ( winder )
+      startSetup()
   }
 
   //-----------------------------------------------------------------------------
@@ -524,137 +540,149 @@ function PositionGraphic()
     $( this ).css( "display", "inline" )
   }
 
-  //
-  // Load images for X/Y.
-  //
-
-  $( "<img />" )
-    .attr( "src", "Images/Base.png" )
-    .attr( "id", "baseImage" )
-    .attr( "alt", "Front view" )
-    .load( rescale )
-    .appendTo( "#sideGraphic" )
-
-  $( "<canvas />" )
-    .attr( "id", "pathCanvas" )
-    .appendTo( "#sideGraphic" )
-
-  $( "<canvas />" )
-    .attr( "id", "seekCanvas" )
-    .appendTo( "#sideGraphic" )
-
-  var pathCanvas = document.getElementById( "pathCanvas" ).getContext( "2d" )
-  var seekCanvas = document.getElementById( "seekCanvas" ).getContext( "2d" )
-
-  $( "<img />" )
-    .attr( "src", "Images/Loop.png" )
-    .attr( "id", "loopImage" )
-    .attr( "alt", "Loop view" )
-    .load( rescale )
-    .appendTo( "#sideGraphic" )
-
-  $( "<img />" )
-    .attr( "src", "Images/Head.png" )
-    .attr( "id", "headImage" )
-    .attr( "alt", "Head view" )
-    .load( rescale )
-    .appendTo( "#sideGraphic" )
-
-  //
-  // Load images for Z.
-  //
-
-  $( "<img />" )
-    .attr( "src", "Images/Z_Base.png" )
-    .attr( "id", "zBaseImage" )
-    .attr( "alt", "Z-Base view" )
-    .load( rescale )
-    .appendTo( "#zGraphic" )
-
-  $( "<img />" )
-    .attr( "src", "Images/Z_Head.png" )
-    .attr( "id", "zHeadImage" )
-    .attr( "alt", "Z-Head view" )
-    .load( rescale )
-    .appendTo( "#zGraphic" )
-
-  $( "<img />" )
-    .attr( "src", "Images/Z_Arm.png" )
-    .attr( "id", "zArmImage" )
-    .attr( "alt", "Z-Arm view" )
-    .load( rescale )
-    .appendTo( "#zGraphic" )
-
-  $( "<canvas />" )
-    .attr( "id", "zStatusCanvas" )
-    .appendTo( "#zGraphic" )
-
-  var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
-
-  // Scaling can take place after machine calibration has been read.
-  // So read the calibration and start the setup when we have this data.
-  winder.addPeriodicCallback
+  modules.load
   (
-    "LowLevelIO.getInputs()",
-    function( data )
-    {
-      if ( data )
-      {
-        inputs = {}
-        for ( var input of data )
-          inputs[ input[ 0 ] ] = input[ 1 ]
-      }
-    }
-  )
-
-  winder.addPeriodicRead
-  (
-    "process.getHeadAngle()",
-    readData,
-    "headAngle"
-  )
-
-  winder.addErrorCallback
-  (
+    [ "/Scripts/Winder", "/Desktop/Modules/MotorStatus", "/Desktop/Modules/RunStatus" ],
     function()
     {
-      for ( var index in IMAGES_TO_HIDE )
-      {
-        var image = IMAGES_TO_HIDE[ index ]
-        $( image ).css( "display", "none" )
-      }
+      winder = modules.get( "Winder" )
+      motorStatus = modules.get( "MotorStatus" )
+      runStatus = modules.get( "RunStatus" )
 
-      for ( var index in IMAGES_TO_BLUR )
-      {
-        var image = IMAGES_TO_BLUR[ index ]
-        $( image )
-          .css( "opacity", "0.75" )
-          .css( "filter", "blur( 10px )" )
-      }
+      //
+      // Load images for X/Y.
+      //
+
+      $( "<img />" )
+        .attr( "src", "Images/Base.png" )
+        .attr( "id", "baseImage" )
+        .attr( "alt", "Front view" )
+        .load( rescale )
+        .appendTo( "#sideGraphic" )
+
+      $( "<canvas />" )
+        .attr( "id", "pathCanvas" )
+        .addClass( "pathCanvas" )
+        .appendTo( "#sideGraphic" )
+
+      $( "<canvas />" )
+        .attr( "id", "seekCanvas" )
+        .addClass( "seekCanvas" )
+        .appendTo( "#sideGraphic" )
+
+      $( "<img />" )
+        .attr( "src", "Images/Loop.png" )
+        .attr( "id", "loopImage" )
+        .attr( "alt", "Loop view" )
+        .load( rescale )
+        .appendTo( "#sideGraphic" )
+
+      $( "<img />" )
+        .attr( "src", "Images/Head.png" )
+        .attr( "id", "headImage" )
+        .attr( "alt", "Head view" )
+        .load( rescale )
+        .appendTo( "#sideGraphic" )
+
+      //
+      // Load images for Z.
+      //
+
+      $( "<img />" )
+        .attr( "src", "Images/Z_Base.png" )
+        .attr( "id", "zBaseImage" )
+        .attr( "alt", "Z-Base view" )
+        .load( rescale )
+        .appendTo( "#zGraphic" )
+
+      $( "<img />" )
+        .attr( "src", "Images/Z_Head.png" )
+        .attr( "id", "zHeadImage" )
+        .attr( "alt", "Z-Head view" )
+        .load( rescale )
+        .appendTo( "#zGraphic" )
+
+      $( "<img />" )
+        .attr( "src", "Images/Z_Arm.png" )
+        .attr( "id", "zArmImage" )
+        .attr( "alt", "Z-Arm view" )
+        .load( rescale )
+        .appendTo( "#zGraphic" )
+
+      $( "<canvas />" )
+        .attr( "id", "zStatusCanvas" )
+        .addClass( "zStatusCanvas" )
+        .appendTo( "#zGraphic" )
+
+      var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
+
+      // Scaling can take place after machine calibration has been read.
+      // So read the calibration and start the setup when we have this data.
+      winder.addPeriodicCallback
+      (
+        "LowLevelIO.getInputs()",
+        function( data )
+        {
+          if ( data )
+          {
+            inputs = {}
+            for ( var input of data )
+              inputs[ input[ 0 ] ] = input[ 1 ]
+          }
+        }
+      )
+
+      winder.addPeriodicRead
+      (
+        "process.getHeadAngle()",
+        readData,
+        "headAngle"
+      )
+
+      winder.addErrorCallback
+      (
+        function()
+        {
+          for ( var index in IMAGES_TO_HIDE )
+          {
+            var image = IMAGES_TO_HIDE[ index ]
+            $( image ).css( "display", "none" )
+          }
+
+          for ( var index in IMAGES_TO_BLUR )
+          {
+            var image = IMAGES_TO_BLUR[ index ]
+            $( image )
+              .css( "opacity", "0.75" )
+              .css( "filter", "blur( 10px )" )
+          }
+        }
+      )
+
+      winder.addErrorClearCallback
+      (
+        function()
+        {
+          for ( var index in IMAGES_TO_HIDE )
+          {
+            var image = IMAGES_TO_HIDE[ index ]
+            $( image )
+              .css( "display", "inline" )
+          }
+
+          for ( var index in IMAGES_TO_BLUR )
+          {
+            var image = IMAGES_TO_BLUR[ index ]
+            $( image )
+              .css( "opacity", "1.0" )
+              .css( "filter", "" )
+          }
+        }
+      )
+
+      if ( scale )
+        startSetup()
+
     }
   )
-
-  winder.addErrorClearCallback
-  (
-    function()
-    {
-      for ( var index in IMAGES_TO_HIDE )
-      {
-        var image = IMAGES_TO_HIDE[ index ]
-        $( image )
-          .css( "display", "inline" )
-      }
-
-      for ( var index in IMAGES_TO_BLUR )
-      {
-        var image = IMAGES_TO_BLUR[ index ]
-        $( image )
-          .css( "opacity", "1.0" )
-          .css( "filter", "" )
-      }
-    }
-  )
-
 } // PositionGraphic
-
-var positionGraphic = new PositionGraphic()

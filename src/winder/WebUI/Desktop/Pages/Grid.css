@@ -15,4 +15,5 @@ main
   width: 500px;
   float: right;
   overflow: hidden;
+  white-space: nowrap;
 }

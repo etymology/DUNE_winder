@@ -1,10 +1,12 @@
-function MotorStatus()
+function MotorStatus( modules )
 {
   // Pointer to self.
   var self = this
 
   // Public motor status data.
   this.motor = {}
+
+  var winder = modules.get( "Winder" )
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -232,5 +234,3 @@ function MotorStatus()
   }
 
 }
-
-var motorStatus = new MotorStatus()
