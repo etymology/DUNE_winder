@@ -11,6 +11,7 @@ from Library.Geometry.Location import Location
 from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
 from .G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 from .G_CodeFunctions.AnchorPointG_Code import AnchorPointG_Code
+from .G_CodeFunctions.TransferCorrectG_Code import TransferCorrectG_Code
 
 from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
@@ -114,16 +115,22 @@ class LayerGX_Recipe( RecipeGenerator ) :
     # connected.
     #
 
+    start1 = [ "B1", "B1" ]
+    start2 = [ "F240", "F240" ]
+
     self.gCodePath = G_CodePath()
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+    self.z.set( HeadPosition.BACK )
+
+    self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start1 ) )
+    self.gCodePath.push()
 
     # Current net.
     self.netIndex = 0
 
-    startLocation = self.location( self.netIndex )
-    self.nodePath.push( startLocation.x, startLocation.y, self.geometry.mostlyRetract )
-    self.basePath.push( startLocation.x, startLocation.y, self.geometry.mostlyRetract )
-    lastLocation = startLocation
+    self.nodePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
+    self.basePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
+    lastLocation = self.gCodePath.last
     lastNet = self.net[ 0 ]
 
     # To wind half the layer, divide by half and the number of steps in a
@@ -137,15 +144,15 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for self.netIndex in xrange( 1, totalCount + 1, 2 ) :
+    for self.netIndex in xrange( 1, totalCount ) :
 
-      if self.netIndex < len( self.net ) :
+      # Location of the the next pinOffset.
+      location = self.location( self.netIndex )
 
+      # For even lines...
+      if self.netIndex < len( self.net ) and 0 == ( self.netIndex % 2 ) :
         # Push the anchor point of the last placed wire.
         self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, "0" ) )
-
-        # Location of the the next pinOffset.
-        location = self.location( self.netIndex )
 
         # Add the pinOffset location to the base path and node path (they are
         # identical for these layers).
@@ -157,27 +164,29 @@ class LayerGX_Recipe( RecipeGenerator ) :
         self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
         self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
         self.gCodePath.pushG_Code( SeekTransferG_Code() )
+        self.gCodePath.pushG_Code( TransferCorrectG_Code( "Y" ) )
         self.gCodePath.push()
 
+      # For odd lines...
+      if self.netIndex < len( self.net ) and 1 == ( self.netIndex % 2 ) :
         self.z.set( HeadPosition.OTHER_SIDE )
 
-        if lastLocation.y != location.y :
-          self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
-          self.gCodePath.push()
+      # Half way?
+      if halfCount == self.netIndex :
+        # Transition to second half of wind.
+        self.firstHalf = self.gCodePath
+        self.gCodePath = G_CodePath()
+        self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start2 ) )
+        self.gCodePath.push()
+        self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+        self.z.set( HeadPosition.FRONT )
 
-        if halfCount == self.netIndex :
-          self.firstHalf = self.gCodePath
-          self.gCodePath = G_CodePath()
-          self.gCodePath.last = lastLocation
-          self.gCodePath.push(
-            location.x,
-            location.y,
-            self.geometry.retracted
-          )
-          self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
+      lastLocation = location
+      lastNet = self.net[ self.netIndex ]
 
-        lastLocation = location
-        lastNet = self.net[ self.netIndex ]
+    if self.firstHalf :
+      self.secondHalf = self.gCodePath
+    else :
+      self.firstHalf = self.gCodePath
 
-    self.secondHalf = self.gCodePath
     self.gCodePath = None

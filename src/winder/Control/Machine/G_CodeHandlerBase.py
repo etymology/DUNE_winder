@@ -462,7 +462,9 @@ class G_CodeHandlerBase :
 
     if "X" == correction :
       # Which side of the anchor point pin the wire sits (left or right).
-      if orientation.find( "L" ) > -1 :
+      if None == orientation :
+        direction = 0  # <- No pin compensation.
+      elif orientation.find( "L" ) > -1 :
         direction = 1
       elif orientation.find( "R" ) > -1 :
         direction = -1
@@ -472,9 +474,10 @@ class G_CodeHandlerBase :
 
       self._x = self._headCompensation.transferCorrectX( start, zHead, direction )
     elif "Y" == correction :
-
       # Which side of the anchor point pin the wire sits (top or bottom).
-      if orientation.find( "B" ) > -1 :
+      if None == orientation :
+        direction = 0  # <- No pin compensation.
+      elif orientation.find( "B" ) > -1 :
         direction = -1
       elif orientation.find( "T" ) > -1 :
         direction = 1

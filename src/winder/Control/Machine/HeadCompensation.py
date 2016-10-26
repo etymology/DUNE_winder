@@ -282,7 +282,7 @@ class HeadCompensation :
     Args:
       machineLocation - Target machine position.
       zDesired - Where Z will ultimately end.
-      direction - Direction for pin diameter compensation (1/-1).
+      direction - Direction for pin diameter compensation (1/-1/0).
 
     Returns:
       Array with correction values for x, and y (in that order).
@@ -326,7 +326,7 @@ class HeadCompensation :
     Args:
       machineLocation - Target machine position.
       zDesired - Where Z will ultimately end.
-      direction - Direction for pin diameter compensation (1/-1).
+      direction - Direction for pin diameter compensation (1/-1/0).
 
     Returns:
       Corrected X value.
@@ -343,7 +343,7 @@ class HeadCompensation :
     Args:
       machineLocation - Target machine position.
       zDesired - Where Z will ultimately end.
-      direction - Direction for pin diameter compensation (1/-1).
+      direction - Direction for pin diameter compensation (1/-1/0).
 
     Returns:
       Corrected Y value.

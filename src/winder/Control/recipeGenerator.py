@@ -118,7 +118,7 @@ def writeRubyCode( layer, recipe, geometry ) :
     True
   )
 
-  if overrideLaps > 1 :
+  if overrideLaps > 1 or None == overrideLaps :
     # Construct G-Code for second half.
     print "  Construct G-Code for second half."
     gCodePath = G_CodeToPath(

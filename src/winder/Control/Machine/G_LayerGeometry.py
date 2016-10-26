@@ -50,7 +50,3 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     # height.
     self.mostlyRetract = ( self.zTravel - self.depth ) / ( 2 * self.scale )
     self.mostlyExtend  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
-
-    # Values to translate front/back pin numbers.
-    self.frontBackOffset  = geometry.rows - 1
-    self.frontBackModulus
