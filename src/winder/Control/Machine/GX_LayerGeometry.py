@@ -12,6 +12,9 @@ class GX_LayerGeometry( LayerGeometry ) :
 
   #-------------------------------------------------------------------
   def __init__( self ) :
+    """
+    $$$DEBUG
+    """
 
     LayerGeometry.__init__( self )
 

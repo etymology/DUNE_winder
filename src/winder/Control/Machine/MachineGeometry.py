@@ -9,7 +9,7 @@
 from Library.Geometry.Line import Line
 from Library.Geometry.Box import Box
 
-class MachineGeometry :
+class MachineGeometry( object ) :
 
   #-------------------------------------------------------------------
   def __init__( self ) :

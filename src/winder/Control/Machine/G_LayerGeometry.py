@@ -35,12 +35,13 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     self.depth = 114.2 / self.scale
 
     # Locations of the two columns of pins.
-    self.boardWidth = 3.18
-    self.leftEdge  = -self.boardWidth
-    self.rightEdge = 6410.37 / self.scale + self.boardWidth
+    self.leftEdge  = -self.boardThickness
+    self.rightEdge = self.layerLength / self.scale + self.boardSpacing + self.boardThickness
+    # $$$ self.leftEdge  = -self.boardWidth
+    # $$$ self.rightEdge = 6410.37 / self.scale + self.boardWidth
 
     # Offset from APA's (0,0,0) position.
-    self.apaOffsetX = -13.23 + self.boardWidth
+    self.apaOffsetX = -13.23 + self.boardThickness
     self.apaOffsetY = 0
     self.apaOffsetZ = ( self.apaThickness - self.depth ) / 2
 
@@ -50,3 +51,28 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     # height.
     self.mostlyRetract = ( self.zTravel - self.depth ) / ( 2 * self.scale )
     self.mostlyExtend  = ( self.zTravel + self.depth ) / ( 2 * self.scale )
+
+    self.startPinFront  = self.pins / 2 + 1
+    self.directionFront = 1
+    self.startPinBack   = 1
+    self.directionBack  = 1
+
+    # The grid parameters are a list of parameters for how the grid is constructed.
+    # Columns:
+    #   Count - Number of pins this row in the table represents.
+    #   dx - Change in x each iteration.
+    #   dy - Change in y each iteration.
+    #   off.x - Starting x offset for initial position of first pin in this set.
+    #   off.y - Starting y offset for initial position of first pin in this set.
+    #   ort - Wire orientation.
+    self.gridFront = \
+    [
+      # Count      dx                dy  off.x  off.y  ort.
+      [ self.rows,  0,  self.pinSpacing,     0,     0, "0" ], # Right
+      [ 0,          0,                0,     0,     0, "0" ], # Top
+      [ self.rows,  0, -self.pinSpacing,     0,     0, "0" ], # Left
+      [ 0,          0,                0,     0,     0, "0" ]  # Bottom
+    ]
+
+    # Back is identical to front.
+    self.gridBack = self.gridFront

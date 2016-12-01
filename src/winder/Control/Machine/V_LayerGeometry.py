@@ -58,14 +58,14 @@ class V_LayerGeometry( UV_LayerGeometry ) :
 
     # Offsets of pins.
     offsetX0 =  0
-    offsetX1 =  t * x / y
-    offsetX2 =  t * x / y + x / 2
-    offsetX3 = -t * x / y - x / 2
+    offsetX1 =  t * x / y         # ~2.2086956522
+    offsetX2 =  t * x / y + x / 2 # ~6.2086956522
+    offsetX3 = -t * x / y - x / 2 # ~-6.2086956522
 
-    offsetY0 =  t + y
-    offsetY1 =  t + y
-    offsetY2 = -t - y / 2
-    offsetY3 = -t - y / 2
+    offsetY0 =  t + y             # 7.3375
+    offsetY1 =  t + y             # 7.3375
+    offsetY2 = -t - y / 2         # -4.4625
+    offsetY3 = -t - y / 2         # -4.4625
 
     # The grid parameters are a list of parameters for how the grid is constructed.
     # Columns:

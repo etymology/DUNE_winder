@@ -17,6 +17,13 @@ class LayerGeometry( APA_Geometry ) :
 
     APA_Geometry.__init__( self )
 
+    # Pitches are the number of wire crossings.
+    self.pitches = 400
+
+    # Spacing between pins and X/Y.
+    self.pitchX = 8.0
+    self.pitchY = 5.75
+
     # Diameter of the wire (in mm).
     self.wireDiameter = 0.15
     self.wireRadius = self.wireDiameter / 2
@@ -26,4 +33,11 @@ class LayerGeometry( APA_Geometry ) :
     self.boardHalfThickness = self.boardThickness / 2
 
     # Spacing between board.
-    self.boardSpacing   = 3.35
+    self.boardSpacing = 3.35
+
+    # Length of the layer on the frame.
+    # Around 6393.8923913044
+    self.layerLength =                                          \
+      ( 2 * self.pitches - 0.5 ) * self.pitchX                  \
+      + self.boardThickness * ( self.pitchX / self.pitchY - 1 ) \
+      - self.boardSpacing

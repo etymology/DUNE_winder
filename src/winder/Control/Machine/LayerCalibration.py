@@ -5,8 +5,6 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-import math
-
 from Library.HashedSerializable import HashedSerializable
 from Library.SerializableLocation import SerializableLocation
 
@@ -43,6 +41,24 @@ class LayerCalibration( HashedSerializable ) :
 
     # Look-up table that correlates pin names to their locations.
     self._locations = {}
+
+  #-------------------------------------------------------------------
+  def copy( self ) :
+    """
+    Duplicate calibration.
+
+    Returns:
+      New instance of LayerCalibration with identical values.
+    """
+    newLayer = LayerCalibration( self._layer )
+    newLayer.offset = self.offset
+    newLayer.zFront = self.zFront
+    newLayer.zBack  = self.zBack
+    for pinName in self._locations :
+      location = self._locations[ pinName ]
+      newLayer._locations[ pinName ] = location.copy()
+
+    return newLayer
 
   #-------------------------------------------------------------------
   def setPinLocation( self, pin, location ) :
@@ -89,6 +105,16 @@ class LayerCalibration( HashedSerializable ) :
       List of pin names.
     """
     return self._locations.keys()
+
+  #---------------------------------------------------------------------
+  def getLayerNames( self ) :
+    """
+    Return name of layer.
+
+    Returns:
+      Name of layer (X/V/U/G).
+    """
+    return self._layer
 
   #---------------------------------------------------------------------
   def serialize( self, xmlDocument, nameOverride=None ) :
@@ -145,57 +171,6 @@ class LayerCalibration( HashedSerializable ) :
         self.offset = location
       else:
         self._locations[ name ] = location
-
-
-  #---------------------------------------------------------------------
-  def rotate( self, angle ) :
-    """
-    Introduce rotational error into pin positions.  Debug function.
-
-    Args:
-      angle: Amount of rotational error (in degrees).
-
-    Notes:
-      Rotates clockwise about pin center.
-    """
-
-    # Convert angle to radians.
-    angle = math.radians( angle )
-
-    # Min/max values for pin locations.
-    minX = float( 'inf' )
-    maxX = float( '-inf' )
-    minY = float( 'inf' )
-    maxY = float( '-inf' )
-
-    # Get the min/max values for all pin locations.
-    pins = self.getPinNames()
-    for pinName in pins :
-      pin = self.getPinLocation( pinName )
-      minX = min( minX, pin.x )
-      maxX = max( maxX, pin.x )
-      minY = min( minY, pin.y )
-      maxY = max( maxY, pin.y )
-
-    # Find the center of all pins.
-    centerX = ( maxX - minX ) / 2 + minX
-    centerY = ( maxY - minY ) / 2 + minY
-
-    # Rotate each pin about the center.
-    for pinName in pins :
-      pin = self.getPinLocation( pinName )
-
-      # Delta from center location.
-      deltaX = pin.x - centerX
-      deltaY = pin.y - centerY
-
-      # Rotate point.
-      # We use the rotation matrix:
-      #  [ x' ] = [  cos  sin ][ x ]
-      #  [ y' ] = [ -sin  cos ][ y ]
-      # (in expanded form) and then correct for center.
-      pin.x = centerX + deltaX * math.cos( angle ) + deltaY * math.sin( angle )
-      pin.y = centerY - deltaX * math.sin( angle ) + deltaY * math.cos( angle )
 
 # Unit test.
 if __name__ == "__main__":
