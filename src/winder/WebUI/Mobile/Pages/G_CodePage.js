@@ -1,4 +1,4 @@
-function G_Code( modules )
+function G_CodePage( modules )
 {
   var self = this
   var winder = modules.get( "Winder" )
@@ -97,13 +97,13 @@ function G_Code( modules )
     }
   }
 
-  pages.loadSubPage
+  page.loadSubPage
   (
     "/Mobile/Modules/Position",
     "#position"
   )
 
-  pages.loadSubPage
+  page.loadSubPage
   (
     "/Mobile/Modules/G_Code",
     "#gCodeDiv",
@@ -157,16 +157,6 @@ function G_Code( modules )
       $( "#stepButton"     ).prop( "disabled", isRunning )
     }
   )
-}
 
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    gCodeControl = new G_CodeControl()
-  }
-)
+  window[ "gCodePage" ] = this
+}

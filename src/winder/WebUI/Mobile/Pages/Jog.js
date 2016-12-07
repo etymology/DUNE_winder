@@ -1,8 +1,10 @@
 function Jog( modules )
 {
   var self = this
+  window[ "jog" ] = this
 
   var winder = modules.get( "Winder" )
+  var page = modules.get( "Page" )
 
   var MIN_VELOCITY = 1.0
   var maxVelocity
@@ -282,9 +284,9 @@ function Jog( modules )
     }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Mobile/Modules/position",
+    "/Mobile/Modules/Position",
     "#position"
   )
 
@@ -335,4 +337,5 @@ function Jog( modules )
   $( "#jogZ_f" )
     .bind( 'touchstart', function() { self.jogZ_Start( +1 ) } )
     .bind( 'touchend', self.jogZ_Stop )
+
 }

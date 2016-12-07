@@ -2,10 +2,10 @@
 
         <article id="gCodeControlDiv">
           <h2>G-Code Control</h2>
-          <button id="startButton" onclick="gCodeControl.start()">Start</button>
-          <button id="stopButton" onclick="gCodeControl.stop()">Stop now</button>
-          <button id="stopNextButton" onclick="gCodeControl.stopNext()">Stop next</button>
-          <button id="stepButton" onclick="gCodeControl.step()">Step</button>
+          <button id="startButton" onclick="gCodePage.start()">Start</button>
+          <button id="stopButton" onclick="gCodePage.stop()">Stop now</button>
+          <button id="stopNextButton" onclick="gCodePage.stopNext()">Stop next</button>
+          <button id="stepButton" onclick="gCodePage.step()">Step</button>
         </article>
 
         <article id="navigationDiv">
@@ -15,15 +15,15 @@
         </article>
 
         <article id="manualG_CodeDiv">
-          <button onclick="gCodeControl.executeGCode()">Run</button>
+          <button onclick="gCodePage.executeGCode()">Run</button>
           <h2>Manual G-Code</h2>
           <input id="manualGCode" />
         </article>
 
         <article id="gCodeAdvanceDiv">
           <h2>G-Code</h2>
-          <button onclick="gCodeControl.nextLine()">+</button>
-          <button onclick="gCodeControl.previousLine()">-</button>
+          <button onclick="gCodePage.nextLine()">+</button>
+          <button onclick="gCodePage.previousLine()">-</button>
         </article>
 
         <article id="gCodeDiv">Loading...</article>

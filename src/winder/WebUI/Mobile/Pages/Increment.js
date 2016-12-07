@@ -4,6 +4,7 @@ function Increment( modules )
 
   var winder = modules.get( "Winder" )
   var page = modules.get( "Page" )
+  var position
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -47,6 +48,12 @@ function Increment( modules )
   page.loadSubPage
   (
     "/Mobile/Modules/Position",
-    "#position"
+    "#position",
+    function()
+    {
+      position = modules.get( "Position" )
+    }
   )
+
+  window[ "increment" ] = this
 }

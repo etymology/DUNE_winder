@@ -22,6 +22,15 @@ function Log( modules )
     "controlState"
   )
 
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Acknowledge errors button callback.
+  //-----------------------------------------------------------------------------
+  this.acknowledgeErrors = function()
+  {
+    winder.remoteAction( 'process.acknowledgeError()' )
+  }
+
   // Update for PLC state machine.
   winder.addPeriodicCallback
   (
@@ -72,4 +81,5 @@ function Log( modules )
     }
   )
 
+  window[ "log" ] = this
 }

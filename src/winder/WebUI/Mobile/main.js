@@ -1,5 +1,4 @@
-// Instance of winder interface.
-var winder = new WinderInterface()
+var USE_FULL_PAGE_CACHE = false
 
 //-----------------------------------------------------------------------------
 // Uses:
@@ -26,7 +25,7 @@ function getParameterByName( name, url )
     returnResult = null
   else
   if ( ! results[ 2 ] )
-    returnResult =''
+    returnResult = ''
   else
     returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) )
 
@@ -35,28 +34,120 @@ function getParameterByName( name, url )
 
 //-----------------------------------------------------------------------------
 // Uses:
+//   Setup main screen.
+//
+// $$$FUTURE - Remove this function and merge it into cache callback.  Only
+//   needed for old system.
+//-----------------------------------------------------------------------------
+function setupMainScreen()
+{
+  var page = window[ "page" ]
+
+  // Before sub-pages begin to load, register a callback to run after all
+  // have been loaded.
+  page.addFullyLoadedCallback
+  (
+    function()
+    {
+      $( "main article" ).each
+      (
+        function()
+        {
+          //$( this ).draggable().resizable()
+        }
+      )
+
+      $( "button.makeToggle" )
+        .each
+        (
+          function()
+          {
+            if ( $( this ).val() )
+              $( this ).attr( "class", "toggleDown" )
+            else
+              $( this ).attr( "class", "toggle" )
+
+            //if ( ! $( this ).click() )
+            {
+              $( this )
+                .click
+                (
+                  function()
+                  {
+                    $( this ).toggleClass( "toggle" )
+                    $( this ).toggleClass( "toggleDown" )
+
+                    var value = 0
+                    if ( $( this ).attr( 'class' ) == "toggleDown" )
+                      value = 1
+
+                    $( this ).val( value )
+                  }
+                )
+            }
+
+          }
+        )
+    }
+  )
+}
+
+//-----------------------------------------------------------------------------
+// Uses:
 //   Callback for loading an other page.
 // Input:
 //   page - Desired page to load.
 //-----------------------------------------------------------------------------
-function load( page )
+var baseStylesheets = []
+function load( pageName )
 {
-//  window.location = "?page=" + page
-
-  if ( winder )
+  if ( ! USE_FULL_PAGE_CACHE )
+  {
+    var page = window[ "page" ]
+    var modules = page.getModules()
+    var winder = modules.get( "Winder" )
     winder.shutdown()
 
-  winder = new WinderInterface()
-  $( '#main' ).html( "Loading..." )
-  $( 'head link, head style' ).remove()
+    $( '#main' ).html( "Loading..." )
 
-  var cssLink =
-    $( "<link rel='stylesheet' type='text/css' href='/Mobile/main.css'>" )
+    // Remove all styles sheets that are not base styles.
+    $( 'head' )
+      .find( 'link' )
+      .each
+      (
+        function()
+        {
+          // Where did this style sheet come from?
+          var url = $( this ).attr( 'href' )
 
-  $( "head" ).append( cssLink )
-  winder.loadSubPage( "/Mobile/Pages/" + page, "#main" )
+          // Is it a base style sheet?
+          if ( -1 == baseStylesheets.indexOf( url ) )
+            // Remove it.
+            $( this ).remove()
+        }
+      )
 
-  winder.periodicUpdate()
+    var page = new Page()
+    window[ "page" ] = page
+
+    // Winder module is used on every page.
+    page.addCommonModule( "/Scripts/Winder" )
+
+    // page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
+    // page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
+    // page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
+    // page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
+
+    // Loading sub page and setup main screen after sub page finishes loading.
+    page.load
+    (
+      pageName,
+      "#main",
+      setupMainScreen
+    )
+  }
+  else
+    page.load( page )
 }
 
 //-----------------------------------------------------------------------------
@@ -67,16 +158,52 @@ $( document ).ready
 (
   function()
   {
-    var page = getParameterByName( "page" )
-    if ( ! page )
-      window.location = "?page=menu"
-    else
-    {
-      // Begin loading the requested sub-page.
-      winder.loadSubPage( "/Mobile/Pages/" + page, "#main" )
+    // Get the requested page.
+    var pageName = getParameterByName( "page" )
 
-      // Start the periodic updates.
-      winder.periodicUpdate()
-    }
+    // If there is no page, use default.
+    if ( ! pageName )
+      pageName = "Menu"
+
+    // Save all the loaded style sheet URLs.  These need to stay regardless
+    // of what page is loaded.
+    $( 'head' )
+      .find( 'link' )
+      .each
+      (
+        function()
+        {
+          // Add to list of base style sheets.
+          baseStylesheets.push( $( this ).attr( 'href' ) )
+        }
+      )
+
+    var page = new Page()
+    window[ "page" ] = page
+
+    $( "#pageSelectDiv" ).css( "display", "block" )
+    $( "#fullStopDiv" ).css( "display", "block" )
+    $( "#loginDiv" ).css( "display", "none" )
+
+    // Winder module is used on every page.
+    page.addCommonModule( "/Scripts/Winder" )
+
+    // page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
+    // page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
+    // page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
+    // page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
+
+    // Load the requested page.
+    page.load
+    (
+      "/Mobile/Pages/" + pageName,
+      "#main",
+      setupMainScreen,
+      null,
+      function( error )
+      {
+        alert( "Error loading page. " + error )
+      }
+    )
   }
 )
