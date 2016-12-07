@@ -1,6 +1,9 @@
-function G_CodeControl()
+function G_Code( modules )
 {
   var self = this
+  var winder = modules.get( "Winder" )
+  var page = modules.get( "Page" )
+
   var G_CODE_ROWS = 2
 
   var gCodeLine = {}
@@ -94,18 +97,19 @@ function G_CodeControl()
     }
   }
 
-  winder.loadSubPage
+  pages.loadSubPage
   (
-    "/Mobile/Modules/position",
+    "/Mobile/Modules/Position",
     "#position"
   )
 
-  winder.loadSubPage
+  pages.loadSubPage
   (
-    "/Mobile/Modules/gCode",
+    "/Mobile/Modules/G_Code",
     "#gCodeDiv",
     function()
     {
+      var gCode = modules.get( "G_Code" )
       gCode.create( G_CODE_ROWS )
     }
   )

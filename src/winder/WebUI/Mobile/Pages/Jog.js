@@ -1,6 +1,8 @@
-function Jog()
+function Jog( modules )
 {
   var self = this
+
+  var winder = modules.get( "Winder" )
 
   var MIN_VELOCITY = 1.0
   var maxVelocity
@@ -334,15 +336,3 @@ function Jog()
     .bind( 'touchstart', function() { self.jogZ_Start( +1 ) } )
     .bind( 'touchend', self.jogZ_Stop )
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    jog = new Jog()
-  }
-)

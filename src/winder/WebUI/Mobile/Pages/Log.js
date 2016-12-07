@@ -1,6 +1,8 @@
-function Log()
+function Log( modules )
 {
   var self = this
+  var winder = modules.get( "Winder" )
+  var page = modules.get( "Page" )
 
   var LOG_ENTIRES = 8
 
@@ -59,26 +61,15 @@ function Log()
     }
   )
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Desktop/Modules/recentLog",
+    "/Desktop/Modules/RecentLog",
     "#recentLogDiv",
     function()
     {
+      var recentLog = modules.get( "RecentLog" )
       recentLog.create( LOG_ENTIRES )
     }
   )
 
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    log = new Log()
-  }
-)

@@ -1,7 +1,9 @@
-function G_Code()
+function G_Code( modules )
 {
   // Pointer to self.
   var self = this
+
+  var winder = modules.get( "Winder" )
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -79,5 +81,3 @@ function G_Code()
   }
 
 }
-
-var gCode = new G_Code()

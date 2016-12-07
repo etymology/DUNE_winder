@@ -1,6 +1,8 @@
-function Position()
+function Position( modules )
 {
   var self = this
+
+  var winder = modules.get( "Winder" )
 
   // Public motor status data.
   this.motor = {}
@@ -89,15 +91,3 @@ function Position()
     )
   }
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    position = new Position()
-  }
-)

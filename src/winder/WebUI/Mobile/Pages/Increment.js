@@ -1,6 +1,9 @@
-function Increment()
+function Increment( modules )
 {
   var self = this
+
+  var winder = modules.get( "Winder" )
+  var page = modules.get( "Page" )
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -41,21 +44,9 @@ function Increment()
     winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
   }
 
-  winder.loadSubPage
+  page.loadSubPage
   (
-    "/Mobile/Modules/position",
+    "/Mobile/Modules/Position",
     "#position"
   )
 }
-
-//-----------------------------------------------------------------------------
-// Uses:
-//   Called when page loads.
-//-----------------------------------------------------------------------------
-$( document ).ready
-(
-  function()
-  {
-    increment = new Increment()
-  }
-)
