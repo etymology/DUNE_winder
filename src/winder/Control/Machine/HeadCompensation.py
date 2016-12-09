@@ -310,11 +310,16 @@ class HeadCompensation :
     lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
     lengthYZ = math.sqrt( deltaY**2 + deltaZ**2 )
 
-    xCorrection = travelZ * deltaX / lengthXZ
-    yCorrection = travelZ * deltaY / lengthYZ
+    x = anchorPoint.x
+    y = anchorPoint.y
 
-    x = anchorPoint.x + xCorrection
-    y = anchorPoint.y + yCorrection
+    if 0 != lengthXZ :
+      xCorrection = travelZ * deltaX / lengthXZ
+      x += xCorrection
+
+    if 0 != lengthYZ :
+      yCorrection = travelZ * deltaY / lengthYZ
+      y += yCorrection
 
     return [ x, y ]
 

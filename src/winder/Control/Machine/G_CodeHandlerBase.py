@@ -259,6 +259,14 @@ class G_CodeHandlerBase :
     if G_CodeHandlerBase.DEBUG_UNIT :
       print "Finial location", location
 
+    if None == location :
+      data = [
+        str( edges ),
+        str( segment )
+      ]
+
+      raise G_CodeException( "G-Code seek transfer could not establish a finial location.", data )
+
     self._x = location.x
     self._y = location.y
     self._xyChange = True

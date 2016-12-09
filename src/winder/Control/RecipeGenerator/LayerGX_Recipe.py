@@ -12,6 +12,7 @@ from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
 from .G_CodeFunctions.SeekTransferG_Code import SeekTransferG_Code
 from .G_CodeFunctions.AnchorPointG_Code import AnchorPointG_Code
 from .G_CodeFunctions.TransferCorrectG_Code import TransferCorrectG_Code
+from .G_CodeFunctions.OffsetG_Code import OffsetG_Code
 
 from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
@@ -19,6 +20,8 @@ from .Path3d import Path3d
 from .G_CodePath import G_CodePath
 
 class LayerGX_Recipe( RecipeGenerator ) :
+
+  OVERSHOOT = 200
 
   #---------------------------------------------------------------------
   def _pinName( self, side, startingPin, offset ) :
@@ -63,10 +66,6 @@ class LayerGX_Recipe( RecipeGenerator ) :
     zSideB = self.geometry.mostlyExtend
 
     # Starting pinOffset numbers, side/column.
-    # startAA = 0
-    # startBA = self.geometry.pins / 2 - 1
-    # startAB = self.geometry.pins - 1
-    # startBB = self.geometry.pins / 2
     startAA = self.geometry.pins / 2
     startBA = self.geometry.pins - 1
     startAB = self.geometry.pins / 2 - 1
@@ -104,9 +103,9 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
       # Add pins to the net list.
       self.net.append( pinNameAA )
-      self.net.append( pinNameBA )
       self.net.append( pinNameAB )
       self.net.append( pinNameBB )
+      self.net.append( pinNameBA )
 
       y += self.geometry.pinSpacing
 
@@ -118,20 +117,22 @@ class LayerGX_Recipe( RecipeGenerator ) :
     start1 = [ "B1", "B1" ]
     start2 = [ "F240", "F240" ]
 
+    lastNet = self.net[ 0 ]
+
     self.gCodePath = G_CodePath()
     self.z = HeadPosition( self.gCodePath, self.geometry, HeadPosition.FRONT )
-    self.z.set( HeadPosition.BACK )
 
-    self.gCodePath.pushG_Code( self.pinCenterTarget( "XY", start1 ) )
+    self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, "0" ) )
+    self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
     self.gCodePath.push()
 
     # Current net.
     self.netIndex = 0
 
-    self.nodePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
-    self.basePath.push( self.gCodePath.last.x, self.gCodePath.last.y, self.gCodePath.last.z )
-    lastLocation = self.gCodePath.last
-    lastNet = self.net[ 0 ]
+    location = self.location( self.netIndex )
+    self.nodePath.push( location.x, location.y, location.z )
+    self.basePath.push( location.x, location.y, location.z )
+    lastLocation = Location()
 
     # To wind half the layer, divide by half and the number of steps in a
     # circuit.
@@ -149,27 +150,36 @@ class LayerGX_Recipe( RecipeGenerator ) :
       # Location of the the next pinOffset.
       location = self.location( self.netIndex )
 
+      # Add the pinOffset location to the base path and node path (they are
+      # identical for these layers).
+      self.basePath.push( location.x, location.y, location.z )
+      length = self.nodePath.push( location.x, location.y, location.z )
+
       # For even lines...
-      if self.netIndex < len( self.net ) and 0 == ( self.netIndex % 2 ) :
+      if self.netIndex < len( self.net ) and 1 == ( self.netIndex % 2 ) :
         # Push the anchor point of the last placed wire.
         self.gCodePath.pushG_Code( AnchorPointG_Code( lastNet, "0" ) )
-
-        # Add the pinOffset location to the base path and node path (they are
-        # identical for these layers).
-        self.basePath.push( location.x, location.y, location.z )
-        length = self.nodePath.push( location.x, location.y, location.z )
 
         # Push a G-Code length function to the next G-Code command to specify the
         # amount of wire consumed by this move.
         self.gCodePath.pushG_Code( WireLengthG_Code( length ) )
         self.gCodePath.pushG_Code( self.pinCenterTarget( "XY" ) )
         self.gCodePath.pushG_Code( SeekTransferG_Code() )
-        self.gCodePath.pushG_Code( TransferCorrectG_Code( "Y" ) )
         self.gCodePath.push()
 
       # For odd lines...
-      if self.netIndex < len( self.net ) and 1 == ( self.netIndex % 2 ) :
+      if self.netIndex < len( self.net ) and 0 == ( self.netIndex % 2 ) :
         self.z.set( HeadPosition.OTHER_SIDE )
+
+        # If we indexed up a pin, correctly seat the wire before running to
+        # other side.  Not needed if pin is at the same Y.
+        if lastLocation.y != location.y :
+          self.gCodePath.pushG_Code( self.pinCenterTarget( "Y" ) )
+          self.gCodePath.pushG_Code( TransferCorrectG_Code( "Y" ) )
+          self.gCodePath.push()
+          self.gCodePath.pushG_Code( OffsetG_Code( x=LayerGX_Recipe.OVERSHOOT ) )
+          self.gCodePath.push()
+
 
       # Half way?
       if halfCount == self.netIndex :
