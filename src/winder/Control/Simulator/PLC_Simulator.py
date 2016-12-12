@@ -192,9 +192,11 @@ class PLC_Simulator :
       elif self._io.plcLogic.MoveTypes.LATCH == moveType :
         # Change latch position.
         # (Currently change is instantaneous.)
-        self._latchPosition += 1
-        if self._latchPosition > self.LatchPosition.BOTTOM :
-          self._latchPosition = 0
+        latchPosition = self._io.plc.getTag( self._actuatorPosition ) + 1
+        if latchPosition > self.LatchPosition.BOTTOM :
+          latchPosition = 0
+
+        self._io.plc.write( self._actuatorPosition, latchPosition )
 
         # State is now latching.
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.LATCHING )
@@ -263,21 +265,22 @@ class PLC_Simulator :
       self.Z_End_of_Travel.set( False )
 
     # Latch and present sensors.
-    if self._latchPosition == self.LatchPosition.TOP :
+    latchPosition = self._io.plc.getTag( self._actuatorPosition )
+    if latchPosition == self.LatchPosition.TOP :
       self.Z_Fixed_Latched.set( True )
       self.Z_Stage_Latched.set( False )
       self.Latch_Actuator_Top.set( True )
       self.Latch_Actuator_Mid.set( True )
       self.Z_Stage_Present.set( isExtended )
       self.Z_Fixed_Present.set( True )
-    elif self._latchPosition == self.LatchPosition.MIDDLE :
+    elif latchPosition == self.LatchPosition.MIDDLE :
       self.Z_Fixed_Latched.set( True )
       self.Z_Stage_Latched.set( False )
       self.Latch_Actuator_Top.set( False )
       self.Latch_Actuator_Mid.set( True )
       self.Z_Stage_Present.set( isExtended )
       self.Z_Stage_Present.set( isExtended )
-    elif self._latchPosition == self.LatchPosition.BOTTOM :
+    elif latchPosition == self.LatchPosition.BOTTOM :
       self.Z_Fixed_Latched.set( False )
       self.Z_Stage_Latched.set( True )
       self.Latch_Actuator_Top.set( False )
@@ -326,6 +329,7 @@ class PLC_Simulator :
     self._zAxis = SimulatedMotor( io.plc, "Z", self._simulationTime )
 
     # Tags for top-level PLC control.
+    self._actuatorPosition   = io.plc.setupTag( "actuator_pos", io.plcLogic.LatchPosition.DOWN )
     self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
     self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
     self._maxXY_VelocityTag     = io.plc.setupTag( "XY_SPEED", 0.0 )
@@ -343,7 +347,6 @@ class PLC_Simulator :
     self._lastZ_Speed = None
 
     self._latchDelay = Delay( self._simulationTime )
-    self._latchPosition = PLC_Simulator.LatchPosition.BOTTOM
 
     self._machineGeometry = MachineGeometry()
 

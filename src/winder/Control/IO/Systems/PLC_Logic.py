@@ -50,11 +50,6 @@ class PLC_Logic :
     DOWN       = 2
   # end class
 
-  class HeadSide :
-    FRONT = 0
-    BACK  = 1
-  # end class
-
   #---------------------------------------------------------------------
   def isReady( self ) :
     """
@@ -173,37 +168,17 @@ class PLC_Logic :
   def getLatchPosition( self ) :
     """
     Get the current latch position.
-    $$$FUTURE - Use inputs to determine side.
 
     Returns:
       One of the PLC_Logic.LatchPosition elements.
     """
-    return self._latchPosition
-
-  #---------------------------------------------------------------------
-  def getHeadSide( self ) :
-    """
-    Get the side of the machine the head is located.
-    $$$FUTURE - Use inputs to determine side.
-
-    Returns:
-      PLC_Logic.HeadSide.FRONT/BACK.
-    """
-    return self._headSide
+    return self._actuatorPosition.get()
 
   #---------------------------------------------------------------------
   def latch( self ) :
     """
     Start a latching operation.
     """
-    self._latchPosition += 1
-    self._latchPosition %= 3
-
-    if self._latchPosition == 0 :
-      self._headSide = self.HeadSide.FRONT
-    else:
-      self._headSide = self.HeadSide.BACK
-
     self._moveType.set( self.MoveTypes.LATCH )
 
   #---------------------------------------------------------------------
@@ -395,7 +370,6 @@ class PLC_Logic :
     self._xyAxis = xyAxis
     self._zAxis = zAxis
     self._latchPosition = 0
-    self._headSide = self.HeadSide.FRONT
 
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
@@ -407,6 +381,7 @@ class PLC_Logic :
     self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
     self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
 
+    self._actuatorPosition   = PLC.Tag( plc, "actuator_pos",    tagType="INT" )
     self._moveType           = PLC.Tag( plc, "MOVE_TYPE",       tagType="INT" )
     self._maxXY_Velocity     = PLC.Tag( plc, "XY_SPEED",        tagType="REAL" )
     self._maxXY_Acceleration = PLC.Tag( plc, "XY_ACCELERATION", tagType="REAL" )

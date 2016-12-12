@@ -15,7 +15,6 @@ class Head :
     LATCH       = 2
 
     # Momentary states.
-    #FIRST_SEEK  = 3
     START_DOUBLE_LATCH = 3
     START_LATCH = 4
     SECOND_SEEK = 5

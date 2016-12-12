@@ -161,10 +161,20 @@ function MotorStatus( modules )
 
   winder.addPeriodicCallback
   (
-    "io.plcLogic.getHeadSide()",
+    "[ io.Z_Stage_Present.get(), io.Z_Fixed_Present.get() ]",
     function( value )
     {
-      self.motor[ "headSide" ] = value
+      var headPosition = 0
+      if ( value )
+      {
+        if ( value[ 0 ] )
+          headPosition += 1
+
+        if ( value[ 1 ] )
+          headPosition += 2
+      }
+
+      self.motor[ "headSide" ] = headPosition
     }
   )
 

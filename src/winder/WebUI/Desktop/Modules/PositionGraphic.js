@@ -247,85 +247,92 @@ function PositionGraphic( modules )
         //
         // Position head (Z image).
         //
-        var zHead = rescale( zPosition, MIN_HEAD_Z, MAX_HEAD_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
-
-        if ( 0 != motorStatus.motor[ "headSide" ] )
-          zHead = MAX_HEAD_Z
-
-        $( "#zHeadImage" )
-          .css( "left", zHead + "px" )
-
-        //
-        // Position arm (Z image).
-        //
-        var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
-
-        $( "#zArmImage" )
-          .css( "left", zArm + "px" )
-
         var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
         zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
 
-        //
-        // Draw angle of arm on head.
-        //
-        var z = zPosition
         if ( 0 != motorStatus.motor[ "headSide" ] )
-          z = MAX_Z_POSITION
+        {
+          var zHead =
+            rescale( zPosition, MIN_HEAD_Z, MAX_HEAD_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
 
-        var zHeadArm =
-          rescale
+          if ( 1 != motorStatus.motor[ "headSide" ] )
+            zHead = MAX_HEAD_Z
+
+          $( "#zHeadImage" )
+            .show()
+            .css( "left", zHead + "px" )
+
+          //
+          // Position arm (Z image).
+          //
+          var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
+
+          $( "#zArmImage" )
+            .css( "left", zArm + "px" )
+
+          //
+          // Draw angle of arm on head.
+          //
+          var z = zPosition
+          if ( 1 != motorStatus.motor[ "headSide" ] )
+            z = MAX_Z_POSITION
+
+          var zHeadArm =
+            rescale
+            (
+              z,
+              MIN_ARM_Z,
+              MAX_ARM_Z,
+              MIN_Z_POSITION,
+              MAX_Z_POSITION,
+              Z_HEAD_ARM_X
+            )
+
+          var zHeadArmWidth = ( Z_HEAD_ARM_MAX_WIDTH - Z_HEAD_ARM_MIN_WIDTH )
+          zHeadArmWidth *= -Math.sin( readData[ 'headAngle' ] )
+
+          if ( zHeadArmWidth < 0 )
+          {
+            zHeadArm += zHeadArmWidth
+            zHeadArmWidth = Z_HEAD_ARM_MIN_WIDTH - zHeadArmWidth
+          }
+          else
+            zHeadArmWidth += Z_HEAD_ARM_MIN_WIDTH
+
+          zStatusCanvas.fillStyle = "grey"
+          zStatusCanvas.fillRect
           (
-            z,
-            MIN_ARM_Z,
-            MAX_ARM_Z,
-            MIN_Z_POSITION,
-            MAX_Z_POSITION,
-            Z_HEAD_ARM_X
+            zHeadArm,
+            Z_HEAD_ARM_Y,
+            zHeadArmWidth,
+            Z_HEAD_ARM_HEIGHT
+          )
+          zStatusCanvas.strokeStyle = "black"
+          zStatusCanvas.lineWidth = 1 * scale
+          zStatusCanvas.strokeRect
+          (
+            zHeadArm,
+            Z_HEAD_ARM_Y,
+            zHeadArmWidth,
+            Z_HEAD_ARM_HEIGHT
           )
 
-        var zHeadArmWidth = ( Z_HEAD_ARM_MAX_WIDTH - Z_HEAD_ARM_MIN_WIDTH )
-        zHeadArmWidth *= -Math.sin( readData[ 'headAngle' ] )
+          var radius = HEAD_ANGLE_RADIUS
+          zStatusCanvas.beginPath()
+          zStatusCanvas.arc( HEAD_ANGLE_X, HEAD_ANGLE_Y, radius, 0, 2 * Math.PI )
+          zStatusCanvas.lineWidth = 2 * scale
+          zStatusCanvas.stroke()
 
-        if ( zHeadArmWidth < 0 )
-        {
-          zHeadArm += zHeadArmWidth
-          zHeadArmWidth = Z_HEAD_ARM_MIN_WIDTH - zHeadArmWidth
+          zStatusCanvas.beginPath()
+          var x = -Math.sin( readData[ 'headAngle' ] ) * radius
+          var y =  Math.cos( readData[ 'headAngle' ] ) * radius
+          zStatusCanvas.moveTo( HEAD_ANGLE_X, HEAD_ANGLE_Y )
+          zStatusCanvas.lineTo( x + HEAD_ANGLE_X, y + HEAD_ANGLE_Y )
+          zStatusCanvas.lineWidth = 2 * scale
+          zStatusCanvas.stroke()
         }
         else
-          zHeadArmWidth += Z_HEAD_ARM_MIN_WIDTH
-
-        zStatusCanvas.fillStyle = "grey"
-        zStatusCanvas.fillRect
-        (
-          zHeadArm,
-          Z_HEAD_ARM_Y,
-          zHeadArmWidth,
-          Z_HEAD_ARM_HEIGHT
-        )
-        zStatusCanvas.strokeStyle = "black"
-        zStatusCanvas.lineWidth = 1 * scale
-        zStatusCanvas.strokeRect
-        (
-          zHeadArm,
-          Z_HEAD_ARM_Y,
-          zHeadArmWidth,
-          Z_HEAD_ARM_HEIGHT
-        )
-
-        var radius = HEAD_ANGLE_RADIUS
-        zStatusCanvas.beginPath()
-        zStatusCanvas.arc( HEAD_ANGLE_X, HEAD_ANGLE_Y, radius, 0, 2 * Math.PI )
-        zStatusCanvas.lineWidth = 2 * scale
-        zStatusCanvas.stroke()
-
-        zStatusCanvas.beginPath()
-        var x = -Math.sin( readData[ 'headAngle' ] ) * radius
-        var y =  Math.cos( readData[ 'headAngle' ] ) * radius
-        zStatusCanvas.moveTo( HEAD_ANGLE_X, HEAD_ANGLE_Y )
-        zStatusCanvas.lineTo( x + HEAD_ANGLE_X, y + HEAD_ANGLE_Y )
-        zStatusCanvas.lineWidth = 2 * scale
-        zStatusCanvas.stroke()
+          $( "#zHeadImage" ).hide()
 
         //
         // Update status lights on Z image.

@@ -869,22 +869,34 @@ var Winder = function( modules )
         $( tagId ).prop( "disabled", buttonStates[ tagId ] )
         buttonStates[ tagId ] = null
 
-        value = ( data === true ) || ( data == "1" )
-        className = "toggle"
+        // See if value is true or false.
+        // (Check for each of the possible true states).
+        var value = ( data === true ) || ( data == "1" ) || ( data == 1 )
+
+        // Get appropriate class name and button value.
+        var className = "toggle"
         if ( value )
+        {
           className = "toggleDown"
+          value = 1
+        }
+        else
+          value = 0
 
         $( tagId ).attr( 'class', className )
-
-        var value = 0
-        if ( $( this ).attr( 'class' ) == "toggleDown" )
-          value = 1
-
         $( tagId ).val( value )
 
         if ( getCallback )
           getCallback( data )
       }
+
+    // Function to get the current state of button.
+    var queryFunction = function()
+    {
+      // Query (if there is a query to run).
+      if ( getQuery )
+        self.remoteAction( getQuery, updateFunction )
+    }
 
     // If there is a function that can query the current state of button...
     if ( getQuery )
@@ -892,14 +904,7 @@ var Winder = function( modules )
       // Disable button until we know what state (on/off) it should be in.
       $( tagId ).prop( "disabled", true )
 
-      // Function to get the current state of button.
-      queryFunction = function()
-      {
-        // Get the initial value.
-        self.remoteAction( getQuery, updateFunction )
-      }
-
-      // Run the query now.
+      // Get the initial value.
       queryFunction()
 
       // Also query the state of the button anytime we go from an error
@@ -940,14 +945,18 @@ var Winder = function( modules )
           if ( null != setQuery )
           {
             // Construct query.
-            query = setQuery.replace( "$", value )
+            var query = setQuery.replace( "$", value )
             self.remoteAction
             (
               query,
               function( value )
               {
-                // Call the update function (make sure the transition took place).
-                updateFunction( value )
+                // Call query function to make sure the transition took place.
+                if ( getQuery )
+                  queryFunction()
+                else
+                  // If there isn't a query to run, just update using the new value.
+                  update( value )
 
                 // Run additional callback.
                 if ( setCallback )
