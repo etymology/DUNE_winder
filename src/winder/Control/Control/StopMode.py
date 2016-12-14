@@ -42,7 +42,7 @@ class StopMode( StateMachineState ) :
       # Check for E-Stop.
       if self.io.estop.get() :
         self.changeState( self.stateMachine.States.ESTOP )
-      elif self.io.park.get() :
+      elif self.io.X_Park_OK.get() :
         self.changeState( self.stateMachine.States.PARK )
       #elif self.io.start.get() :
       elif self.control.startRequest :
@@ -125,7 +125,7 @@ class StopMode( StateMachineState ) :
       if self.io.estop.get() :
         self.changeState( self.stateMachine.States.ESTOP )
       # See if still in park.
-      elif not self.io.park.get() :
+      elif not self.io.X_Park_OK.get() :
         self.changeState( self.stateMachine.States.IDLE )
 
   #=====================================================================

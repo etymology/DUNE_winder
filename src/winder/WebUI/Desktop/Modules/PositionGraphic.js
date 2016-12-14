@@ -13,6 +13,7 @@ function PositionGraphic( modules )
   // scaled at class creation.
   var BASE_GRAPHIC_X = 1286
   var BASE_GRAPHIC_Y = 463
+  var SIDE_GRAPHIC_Y = BASE_GRAPHIC_Y + 80
   var Z_GRAPHIC_X    = 1500
   var Z_GRAPHIC_Y    = 332
   var MIN_X          = 95
@@ -47,7 +48,8 @@ function PositionGraphic( modules )
   [
     "#pathCanvas",
     "#seekCanvas",
-    "#zStatusCanvas"
+    "#zStatusCanvas",
+    "#xyStatusCanvas"
   ]
 
   // Images to blur if server stops communicating.
@@ -91,7 +93,7 @@ function PositionGraphic( modules )
   //   status - State of light.
   //   offIsError - False if being off (false) is ok, or true if this is an error.
   //---------------------------------------------------------------------------
-  var statusLight = function( zStatusCanvas, x, y, status, offIsError )
+  var statusLight = function( statusCanvas, x, y, status, offIsError )
   {
     // Scale locations.
     x *= scale
@@ -100,31 +102,31 @@ function PositionGraphic( modules )
     // Select the color of the light indicator.
     if ( status )
     {
-      zStatusCanvas.fillStyle = "lime"
-      zStatusCanvas.strokeStyle = "green"
+      statusCanvas.fillStyle = "lime"
+      statusCanvas.strokeStyle = "green"
     }
     else
     if ( ! offIsError )
     {
-      zStatusCanvas.fillStyle = "blue"
-      zStatusCanvas.strokeStyle = "darkBlue"
+      statusCanvas.fillStyle = "blue"
+      statusCanvas.strokeStyle = "darkBlue"
     }
     else
     {
-      zStatusCanvas.fillStyle = "red"
-      zStatusCanvas.strokeStyle = "darkRed"
+      statusCanvas.fillStyle = "red"
+      statusCanvas.strokeStyle = "darkRed"
     }
 
     // Draw a circle at the specified location.
-    zStatusCanvas.beginPath()
-    zStatusCanvas.arc( x, y, 8 * scale, 0, 2 * Math.PI )
+    statusCanvas.beginPath()
+    statusCanvas.arc( x, y, 8 * scale, 0, 2 * Math.PI )
 
     // Draw fill (do before border).
-    zStatusCanvas.fill()
+    statusCanvas.fill()
 
     // Draw border.
-    zStatusCanvas.lineWidth = 2 * scale
-    zStatusCanvas.stroke()
+    statusCanvas.lineWidth = 2 * scale
+    statusCanvas.stroke()
   }
 
   //---------------------------------------------------------------------------
@@ -136,6 +138,7 @@ function PositionGraphic( modules )
   {
     var baseGraphicWidth  = BASE_GRAPHIC_X * scale
     var baseGraphicHeight = BASE_GRAPHIC_Y * scale
+    var sideGraphicHeight = SIDE_GRAPHIC_Y * scale
 
     // Scale limits of image.
     Z_GRAPHIC_X   *= scale
@@ -175,6 +178,10 @@ function PositionGraphic( modules )
     $( "#seekCanvas" )
       .attr( "width",  baseGraphicWidth  + "px" )
       .attr( "height", baseGraphicHeight + "px"  )
+
+    $( "#xyStatusCanvas" )
+      .attr( "width",  baseGraphicWidth  + "px" )
+      .attr( "height", sideGraphicHeight + "px"  )
 
     $( "#zStatusCanvas" )
       .attr( "width",  Z_GRAPHIC_X  + "px" )
@@ -228,17 +235,16 @@ function PositionGraphic( modules )
         // Position loop (X/Y image).
         //
 
-        var x = rescale( xPosition, MIN_X, MAX_X, MIN_X_POSITION, MAX_X_POSITION, 0 )
+        var loopX = rescale( xPosition, MIN_X, MAX_X, MIN_X_POSITION, MAX_X_POSITION, 0 )
 
         $( "#loopImage" )
-          .css( "left", x + "px" )
-
-        var y = rescale( yPosition, MIN_Y, MAX_Y, MIN_Y_POSITION, MAX_Y_POSITION, 0 )
+          .css( "left", loopX + "px" )
 
         //
         // Position head (X/Y image).
         //
-        x += HEAD_X_OFFSET
+        var y = rescale( yPosition, MIN_Y, MAX_Y, MIN_Y_POSITION, MAX_Y_POSITION, 0 )
+        var x = loopX + HEAD_X_OFFSET
 
         $( "#headImage" )
           .css( "left", x + "px" )
@@ -334,6 +340,38 @@ function PositionGraphic( modules )
         else
           $( "#zHeadImage" ).hide()
 
+
+        var xyStatusCanvas = document.getElementById( "xyStatusCanvas" ).getContext( "2d" )
+        xyStatusCanvas.clearRect( 0, 0, baseGraphicWidth, sideGraphicHeight )
+
+        statusLight( xyStatusCanvas,   30, 350, ! inputs[ "plcFunctional" ], true )
+        statusLight( xyStatusCanvas,   30, 375, ! inputs[ "estop" ], true )
+
+        statusLight( xyStatusCanvas, 1225, 275, inputs[ "Rotation_Lock_key" ], true )
+
+        statusLight( xyStatusCanvas, 1225, 485, ! inputs[ "endOfTravel_Xp" ], true )
+        statusLight( xyStatusCanvas,  100, 485, ! inputs[ "endOfTravel_Xm" ], true )
+
+        statusLight( xyStatusCanvas,  120, 485, inputs[ "X_Park_OK" ] )
+
+        // X-motor status.
+        statusLight( xyStatusCanvas,   50, 485, inputs[ "xFunctional" ], true )
+
+        // X transfer.
+        statusLight( xyStatusCanvas,  280, 485, inputs[ "X_Transfer_OK" ] )
+        statusLight( xyStatusCanvas, 1185, 485, inputs[ "X_Transfer_OK" ] )
+
+        // Y transfers (drawn on loop).
+        var x = 100 + loopX / scale
+        statusLight( xyStatusCanvas, x, 440, inputs[ "Y_Mount_Transfer_OK" ] )
+        statusLight( xyStatusCanvas, x,  40, inputs[ "Y_Transfer_OK" ] )
+
+        statusLight( xyStatusCanvas, x, 460, inputs[ "endOfTravel_Yp" ] )
+        statusLight( xyStatusCanvas, x,  20, inputs[ "endOfTravel_Ym" ] )
+
+        // Y-motor status.
+        statusLight( xyStatusCanvas, x + 20, 460, inputs[ "yFunctional" ] )
+
         //
         // Update status lights on Z image.
         // NOTE: Constants come for positions on image.
@@ -354,6 +392,9 @@ function PositionGraphic( modules )
         statusLight( zStatusCanvas, armBase + 770, 235, inputs[ "Z_Stage_Present" ] )
         statusLight( zStatusCanvas, armBase + 780, 273, inputs[ "Z_Stage_Latched" ] )
         statusLight( zStatusCanvas, armBase + 767, 305, ( runStatus.states[ "plcState" ] == "Latching" ) )
+
+        // Z-motor status.
+        statusLight( zStatusCanvas, armBase + 50, 220, inputs[ "zFunctional" ], true )
 
         //
         // Draw movement history.
@@ -559,7 +600,6 @@ function PositionGraphic( modules )
       //
       // Load images for X/Y.
       //
-
       $( "<img />" )
         .attr( "src", "Images/Base.png" )
         .attr( "id", "baseImage" )
@@ -589,6 +629,11 @@ function PositionGraphic( modules )
         .attr( "id", "headImage" )
         .attr( "alt", "Head view" )
         .load( rescale )
+        .appendTo( "#sideGraphic" )
+
+      $( "<canvas />" )
+        .attr( "id", "xyStatusCanvas" )
+        .addClass( "xyStatusCanvas" )
         .appendTo( "#sideGraphic" )
 
       //
@@ -621,19 +666,21 @@ function PositionGraphic( modules )
         .addClass( "zStatusCanvas" )
         .appendTo( "#zGraphic" )
 
-      var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
-
       // Scaling can take place after machine calibration has been read.
       // So read the calibration and start the setup when we have this data.
       winder.addPeriodicCallback
       (
-        "LowLevelIO.getInputs()",
+        "[ io.plc.isNotFunctional(), io.xAxis.isFunctional(), io.yAxis.isFunctional(), io.zAxis.isFunctional(), LowLevelIO.getInputs() ]",
         function( data )
         {
           if ( data )
           {
             inputs = {}
-            for ( var input of data )
+            inputs[ "plcFunctional" ] = data[ 0 ]
+            inputs[ "xFunctional" ]   = data[ 1 ]
+            inputs[ "yFunctional" ]   = data[ 2 ]
+            inputs[ "zFunctional" ]   = data[ 3 ]
+            for ( var input of data[ 4 ] )
               inputs[ input[ 0 ] ] = input[ 1 ]
           }
         }

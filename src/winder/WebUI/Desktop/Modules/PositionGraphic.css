@@ -3,13 +3,21 @@
   position: relative;
 }
 
+/*#sideGraphic
+{
+  height: 543px;
+}*/
+
 #baseImage
 {
+  /*position: absolute;
+  top: 80px;
+  left: 0;*/
   margin-top: 80px;
   display: none;
 }
 
-.pathCanvas, .seekCanvas, .zStatusCanvas
+.pathCanvas, .seekCanvas, .zStatusCanvas, .xyStatusCanvas
 {
   position: absolute;
   top: 0;

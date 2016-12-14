@@ -381,7 +381,7 @@ class PLC_Logic :
     self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
     self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
 
-    self._actuatorPosition   = PLC.Tag( plc, "actuator_pos",    tagType="INT" )
+    self._actuatorPosition   = PLC.Tag( plc, "ACTUATOR_POS",    tagType="DINT" )
     self._moveType           = PLC.Tag( plc, "MOVE_TYPE",       tagType="INT" )
     self._maxXY_Velocity     = PLC.Tag( plc, "XY_SPEED",        tagType="REAL" )
     self._maxXY_Acceleration = PLC.Tag( plc, "XY_ACCELERATION", tagType="REAL" )

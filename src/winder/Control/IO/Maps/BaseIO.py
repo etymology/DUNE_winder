@@ -76,22 +76,31 @@ class BaseIO:
 
     # $$$DEBUG - Restore default to True
     self.estop = PLC_Input( "estop", self.plc, "Point_IO:1:I", 0, False )
-    self.park  = PLC_Input( "park",  self.plc, "Point_IO:1:I", 1 )
 
     # Z-Stage sensors.
-    self.Latch_Homed          = PLC_Input( "Latch_Homed",        self.plc, "Machine_SW_Stat", 0 )
-    self.Z_Retracted_1A       = PLC_Input( "Z_Retracted_1A",     self.plc, "Machine_SW_Stat", 1 )
-    self.Z_Retracted_2B       = PLC_Input( "Z_Retracted_2B",     self.plc, "Machine_SW_Stat", 2 )
-    self.Z_Retracted_2A       = PLC_Input( "Z_Retracted_2A",     self.plc, "Machine_SW_Stat", 3 )
-    self.Z_Retracted_2B       = PLC_Input( "Z_Retracted_2B",     self.plc, "Machine_SW_Stat", 4 )
-    self.Z_Extended           = PLC_Input( "Z_Extended",         self.plc, "Machine_SW_Stat", 5 )
-    self.Z_Stage_Latched      = PLC_Input( "Z_Stage_Latched",    self.plc, "Machine_SW_Stat", 6 )
-    self.Z_Fixed_Latched      = PLC_Input( "Z_Fixed_Latched",    self.plc, "Machine_SW_Stat", 7 )
-    self.Z_End_of_Travel      = PLC_Input( "Z_End_of_Travel",    self.plc, "Machine_SW_Stat", 8 )
-    self.Z_Stage_Present      = PLC_Input( "Z_Stage_Present",    self.plc, "Machine_SW_Stat", 9 )
-    self.Z_Fixed_Present      = PLC_Input( "Z_Fixed_Present",    self.plc, "Machine_SW_Stat", 10 )
-    self.Z_Spring_Comp        = PLC_Input( "Z_Spring_Comp",      self.plc, "Machine_SW_Stat", 11 )
-    self.Latch_Actuator_Top   = PLC_Input( "Latch_Actuator_Top", self.plc, "Machine_SW_Stat", 12 )
-    self.Latch_Actuator_Mid   = PLC_Input( "Latch_Actuator_Mid", self.plc, "Machine_SW_Stat", 13 )
+    self.Latch_Homed         = PLC_Input( "Latch_Homed",        self.plc, "Machine_SW_Stat", 0 )  # LATCH_ACTUATOR_HOMED
+    self.Z_Retracted_1A      = PLC_Input( "Z_Retracted_1A",     self.plc, "Machine_SW_Stat", 1 )  # Z_RETRACTED_1A
+    self.Z_Retracted_2B      = PLC_Input( "Z_Retracted_2B",     self.plc, "Machine_SW_Stat", 2 )  # Z_RETRACTED_1B
+    self.Z_Retracted_2A      = PLC_Input( "Z_Retracted_2A",     self.plc, "Machine_SW_Stat", 3 )  # Z_RETRACTED_2A
+    self.Z_Retracted_2B      = PLC_Input( "Z_Retracted_2B",     self.plc, "Machine_SW_Stat", 4 )  # Z_RETRACTED_2B
+    self.Z_Extended          = PLC_Input( "Z_Extended",         self.plc, "Machine_SW_Stat", 5 )  # Z_EXTENDED
+    self.Z_Stage_Latched     = PLC_Input( "Z_Stage_Latched",    self.plc, "Machine_SW_Stat", 6 )  # Z_STAGE_LATCHED
+    self.Z_Fixed_Latched     = PLC_Input( "Z_Fixed_Latched",    self.plc, "Machine_SW_Stat", 7 )  # Z_FIXED_LATCHED
+    self.Z_End_of_Travel     = PLC_Input( "Z_End_of_Travel",    self.plc, "Machine_SW_Stat", 8 )  # Z_EOT
+    self.Z_Stage_Present     = PLC_Input( "Z_Stage_Present",    self.plc, "Machine_SW_Stat", 9 )  # Z_STAGE_PRESENT
+    self.Z_Fixed_Present     = PLC_Input( "Z_Fixed_Present",    self.plc, "Machine_SW_Stat", 10 ) # Z_FIXED_PRESENT
+    self.Z_Spring_Comp       = PLC_Input( "Z_Spring_Comp",      self.plc, "Machine_SW_Stat", 11 ) #
+    self.Latch_Actuator_Top  = PLC_Input( "Latch_Actuator_Top", self.plc, "Machine_SW_Stat", 12 ) # LATCH_ACTUATOR_TOP
+    self.Latch_Actuator_Mid  = PLC_Input( "Latch_Actuator_Mid", self.plc, "Machine_SW_Stat", 13 ) # LATCH_ACTUATOR_MID
+
+    self.X_Park_OK           = PLC_Input( "X_Park_OK",           self.plc, "Machine_SW_Stat", 14 ) # X_PARK_OK
+    self.X_Transfer_OK       = PLC_Input( "X_Transfer_OK",       self.plc, "Machine_SW_Stat", 15 ) # X_XFER_OK
+    self.Y_Mount_Transfer_OK = PLC_Input( "Y_Mount_Transfer_OK", self.plc, "Machine_SW_Stat", 16 ) # Y_MOUNT_XFER_OK
+    self.Y_Transfer_OK       = PLC_Input( "Y_Transfer_OK",       self.plc, "Machine_SW_Stat", 17 ) # Y_XFER_OK
+    self.endOfTravel_Yp      = PLC_Input( "endOfTravel_Yp",      self.plc, "Machine_SW_Stat", 18 ) # PLUS_Y_EOT
+    self.endOfTravel_Ym      = PLC_Input( "endOfTravel_Ym",      self.plc, "Machine_SW_Stat", 19 ) # MINUS_Y_EOT
+    self.endOfTravel_Xp      = PLC_Input( "endOfTravel_Xp",      self.plc, "Machine_SW_Stat", 20 ) # PLUS_X_EOT
+    self.endOfTravel_Xm      = PLC_Input( "endOfTravel_Xm",      self.plc, "Machine_SW_Stat", 21 ) # MINUS_X_EOT
+    self.Rotation_Lock_key   = PLC_Input( "Rotation_Lock_key",   self.plc, "Machine_SW_Stat", 22 ) # ROT_LOCK_KEY
 
 # end class

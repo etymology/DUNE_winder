@@ -23,8 +23,10 @@ class MachineGeometry( object ) :
 
     # Handles on either side of the APA.
     self.handleWidth  = 330.2 / self.scale
-    self.leftHandle   = ( 300.764 - 25.4 / 2) / self.scale
-    self.rightHandle  = ( 7109.333 - 25.4 / 2) / self.scale
+
+    # $$$DEBUG - Remove 440/515
+    self.leftHandle   = ( ( 300.764 - 25.4 / 2)  - 440 ) / self.scale
+    self.rightHandle  = ( ( 7109.333 - 25.4 / 2) - 515 ) / self.scale
 
     # Hard machine limits.
     self.limitTop       = 2827.752 / self.scale
@@ -36,8 +38,8 @@ class MachineGeometry( object ) :
 
     # Location of Z-Transfer areas.
     # Top/bottom for Y, left/right for X.
-    self.top    = 2800  / self.scale
-    self.bottom = 0     / self.scale
+    self.top    = 2771.5  / self.scale  # $$$DEBUG - 2800
+    self.bottom = 4     / self.scale    # $$$DEBUG - 4
     self.left   = ( self.leftHandle + self.handleWidth / 2 ) / self.scale
     self.right  = ( self.rightHandle + self.handleWidth / 2 ) / self.scale
 

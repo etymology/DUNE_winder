@@ -288,6 +288,27 @@ class PLC_Simulator :
       self.Z_Stage_Present.set( True )
       self.Z_Fixed_Present.set( isExtended )
 
+    #
+    # Transfer enables.
+    #
+    def transferCheck( axis, target ) :
+
+      halfWindor = self._machineGeometry.zWindow / 2
+      # $$$DEBUG print target - halfWindor, axis.getPosition(), target + halfWindor
+
+      result = False
+      if target - halfWindor < axis.getPosition() < target + halfWindor :
+        result = True
+
+      return result
+
+    status  = transferCheck( self._io.xAxis, self._machineGeometry.left )
+    status |= transferCheck( self._io.xAxis, self._machineGeometry.right )
+    self.X_Transfer_OK.set( status )
+
+    self.Y_Mount_Transfer_OK.set( transferCheck( self._io.yAxis, self._machineGeometry.bottom ) )
+    self.Y_Transfer_OK.set( transferCheck( self._io.yAxis, self._machineGeometry.top ) )
+
     state = self._io.plc.getTag( self._stateTag )
 
     # All motions and delays finished?
@@ -329,7 +350,7 @@ class PLC_Simulator :
     self._zAxis = SimulatedMotor( io.plc, "Z", self._simulationTime )
 
     # Tags for top-level PLC control.
-    self._actuatorPosition   = io.plc.setupTag( "actuator_pos", io.plcLogic.LatchPosition.DOWN )
+    self._actuatorPosition   = io.plc.setupTag( "ACTUATOR_POS", io.plcLogic.LatchPosition.DOWN )
     self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
     self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
     self._maxXY_VelocityTag     = io.plc.setupTag( "XY_SPEED", 0.0 )
@@ -373,6 +394,17 @@ class PLC_Simulator :
     self.Z_Spring_Comp        = self.SimulatedInput( io, "Machine_SW_Stat", 11, False )
     self.Latch_Actuator_Top   = self.SimulatedInput( io, "Machine_SW_Stat", 12, False )
     self.Latch_Actuator_Mid   = self.SimulatedInput( io, "Machine_SW_Stat", 13, False )
+
+    self.X_Park_OK           = self.SimulatedInput( io, "Machine_SW_Stat", 14, False )
+    self.X_Transfer_OK       = self.SimulatedInput( io, "Machine_SW_Stat", 15, False )
+    self.Y_Mount_Transfer_OK = self.SimulatedInput( io, "Machine_SW_Stat", 16, False )
+    self.Y_Transfer_OK       = self.SimulatedInput( io, "Machine_SW_Stat", 17, False )
+    self.endOfTravel_Yp      = self.SimulatedInput( io, "Machine_SW_Stat", 18, False )
+    self.endOfTravel_Ym      = self.SimulatedInput( io, "Machine_SW_Stat", 19, False )
+    self.endOfTravel_Xp      = self.SimulatedInput( io, "Machine_SW_Stat", 20, False )
+    self.endOfTravel_Xm      = self.SimulatedInput( io, "Machine_SW_Stat", 21, False )
+    self.Rotation_Lock_key   = self.SimulatedInput( io, "Machine_SW_Stat", 22, True  )
+
 
     # True to use real-time for simulations, False for using a time delta.
     self._realTime = True

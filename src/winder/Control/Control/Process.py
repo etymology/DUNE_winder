@@ -926,18 +926,23 @@ class Process :
     Returns:
       Angle of the arm (-pi to +pi).
     """
-    x = self._io.xAxis.getPosition()
-    y = self._io.yAxis.getPosition()
-    z = self._io.zAxis.getPosition()
 
-    # $$$DEBUG - This doesn't work.  Not too important.  Fix it one day.
-    # if self._io.head.BACK == self._io.head.getSide() :
-    #   print "Back"
-    #   z = self._io.head.getTargetAxisPosition()
+    result = 0
+    if self._io.isFunctional() :
+      x = self._io.xAxis.getPosition()
+      y = self._io.yAxis.getPosition()
+      z = self._io.zAxis.getPosition()
 
-    location = Location( x, y, z )
+      # $$$DEBUG - This doesn't work.  Not too important.  Fix it one day.
+      # if self._io.head.BACK == self._io.head.getSide() :
+      #   print "Back"
+      #   z = self._io.head.getTargetAxisPosition()
 
-    return self.headCompensation.getHeadAngle( location )
+      location = Location( x, y, z )
+
+      result = self.headCompensation.getHeadAngle( location )
+
+    return result
 
   #---------------------------------------------------------------------
   def executeG_CodeLine( self, line ) :
