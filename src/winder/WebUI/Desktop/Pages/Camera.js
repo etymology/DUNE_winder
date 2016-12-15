@@ -40,6 +40,67 @@ function Camera( modules )
       }
     )
 
+  $( "#moveStart" )
+    .click
+    (
+      function()
+      {
+        winder.remoteAction( "process.manualSeekXY( 110., 300., 400., 200., 200. )" )
+      }
+    )
+
+  $( "#moveEnd" )
+    .click
+    (
+      function()
+      {
+        winder.remoteAction( "process.manualSeekXY( 110., 600., 400., 200., 200. )" )
+      }
+    )
+
+  $( "#reset" )
+    .click
+    (
+      function()
+      {
+        winder.remoteAction( "io.plcLogic.cameraDeltaEnable.set( 0 )" )
+      }
+    )
+
+  $( "#startUp" )
+    .click
+    (
+      function()
+      {
+        var command = "[" +
+          "io.plcLogic.cameraDeltaEnable.set( 0 )," +
+          "io.plcLogic.cameraTriggerEnable.set( 1 )," +
+          "io.plcLogic.cameraX_Delta.set( 0 )," +
+          "io.plcLogic.cameraY_Delta.set( 8 )," +
+          "io.plcLogic.cameraDeltaEnable.set( 1 )," +
+          "process.manualSeekXY( 110., 600., 50., 200., 200. ) ]"
+
+        winder.remoteAction( command )
+      }
+    )
+
+  $( "#startDown" )
+    .click
+    (
+      function()
+      {
+        var command = "[" +
+          "io.plcLogic.cameraDeltaEnable.set( 0 )," +
+          "io.plcLogic.cameraTriggerEnable.set( 1 )," +
+          "io.plcLogic.cameraX_Delta.set( 0 )," +
+          "io.plcLogic.cameraY_Delta.set( -8 )," +
+          "io.plcLogic.cameraDeltaEnable.set( 1 )," +
+          "process.manualSeekXY( 110., 300., 50., 200., 200. ) ]"
+
+        winder.remoteAction( command )
+      }
+    )
+
   winder.addPeriodicDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
   winder.addPeriodicDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
   winder.addPeriodicDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )

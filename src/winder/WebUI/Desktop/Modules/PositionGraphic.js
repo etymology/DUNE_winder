@@ -256,6 +256,8 @@ function PositionGraphic( modules )
         var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
         zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
 
+        var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
+
         if ( 0 != motorStatus.motor[ "headSide" ] )
         {
           var zHead =
@@ -271,8 +273,6 @@ function PositionGraphic( modules )
           //
           // Position arm (Z image).
           //
-          var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
-
           $( "#zArmImage" )
             .css( "left", zArm + "px" )
 

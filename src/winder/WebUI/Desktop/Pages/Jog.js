@@ -8,7 +8,7 @@ function Jog( modules )
     "/Desktop/Modules/MotorStatus",
     function()
     {
-      motorStatus = modules.get( "Modules" )
+      motorStatus = modules.get( "MotorStatus" )
     }
   )
 
@@ -144,6 +144,14 @@ function Jog( modules )
     )
   }
 
+  // $$$DEBUG
+  this.seekXY_Set = function( setName )
+  {
+    var x = $( "#seekX_" + setName ).val()
+    var y = $( "#seekY_" + setName ).val()
+    this.seekXY( x, y )
+  }
+
   //-----------------------------------------------------------------------------
   // Uses:
   //   Seek a point in machine geometry.
@@ -202,6 +210,7 @@ function Jog( modules )
     var velocity = this.getVelocity()
     var x = motorStatus.motor[ "xPosition" ] + offset
     var y = "None"
+
     winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
   }
 

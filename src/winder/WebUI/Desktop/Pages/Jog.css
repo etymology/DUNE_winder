@@ -55,7 +55,10 @@ button.jog
   width: 97%;
 }
 
-#seekX, #seekY, #seekZ, #extendedPosition
+#seekX_1, #seekY_1,
+#seekX_2, #seekY_2,
+#seekX_3, #seekY_3,
+#seekZ, #extendedPosition
 {
   width: 3em;
 }

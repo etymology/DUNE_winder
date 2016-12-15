@@ -18,11 +18,29 @@
 
         <article>
           <h3>Seek</h3>
-          <input type="text" id="seekX" value="100.0" />
-          <label for="query">X</label>
-          <input type="text" id="seekY" value="150.0" />
-          <label for="query">Y</label>
-          <button onclick="jog.seekXY()">Seek X/Y</button>
+          <div>
+            <input type="text" id="seekX_1" value="100.0" />
+            <label for="query">X</label>
+            <input type="text" id="seekY_1" value="150.0" />
+            <label for="query">Y</label>
+            <button onclick="jog.seekXY_Set( 1 )">Seek X/Y</button>
+          </div>
+
+          <div>
+            <input type="text" id="seekX_2" value="200.0" />
+            <label for="query">X</label>
+            <input type="text" id="seekY_2" value="250.0" />
+            <label for="query">Y</label>
+            <button onclick="jog.seekXY_Set( 2 )">Seek X/Y</button>
+          </div>
+
+          <div>
+            <input type="text" id="seekX_3" value="300.0" />
+            <label for="query">X</label>
+            <input type="text" id="seekY_3" value="350.0" />
+            <label for="query">Y</label>
+            <button onclick="jog.seekXY_Set( 3 )">Seek X/Y</button>
+          </div>
         </article>
 
       </article>
