@@ -385,36 +385,6 @@ class PLC_Logic :
     self._maxZ_Deceleration  = PLC.Tag( plc, "Z_DECELLERATION", tagType="REAL" )
     self.errorCode           = PLC.Tag( plc, "ERROR_CODE",      tagType="DINT" )
 
-    #
-    # $$$DEBUG - Move to own unit.
-    #
-    self.cameraTrigger        = PLC.Tag( plc, "Cam_F_Trigger", tagType="BOOL" )
-    #self.cameraTriggerEnable  = PLC.Tag( plc, "Cam_F:O.Control.TriggerEnable", tagType="BOOL" )
-    self.cameraTriggerEnable  = PLC.Tag( plc, "Cam_F_En", tagType="BOOL" )
-
-    self.cameraFIFO_MotorX     = PLC.Tag( plc, "FIFO_Data[0]", tagType="REAL" )
-    self.cameraFIFO_MotorY     = PLC.Tag( plc, "FIFO_Data[1]", tagType="REAL" )
-    self.cameraFIFO_Status     = PLC.Tag( plc, "FIFO_Data[2]", tagType="REAL" )
-    self.cameraFIFO_MatchLevel = PLC.Tag( plc, "FIFO_Data[3]", tagType="REAL" )
-    self.cameraFIFO_CameraX    = PLC.Tag( plc, "FIFO_Data[4]", tagType="REAL" )
-    self.cameraFIFO_CameraY    = PLC.Tag( plc, "FIFO_Data[5]", tagType="REAL" )
-
-    self.cameraFIFO_Clock      = PLC.Tag( plc, "READ_FIFOS", tagType="BOOL" )
-
-    self.cameraDeltaEnable     = PLC.Tag( plc, "EN_POS_TRIGGERS", tagType="BOOL" )
-    self.cameraX_Delta         = PLC.Tag( plc, "X_DELTA", tagType="REAL" )
-    self.cameraY_Delta         = PLC.Tag( plc, "Y_DELTA", tagType="REAL" )
-
-    # EN_POS_TRIGGER - Enable camera position trigger. BOOL
-    # X_DELTA - Offset to trigger REAL
-    # Y_DELTA - Offset to trigger REAL
-
-    # $$$DEBUG - Temporary
-    self.cameraResultStatus = PLC.Tag( plc, "Cam_F:I.InspectionResults[0]", attributes, tagType="REAL" )
-    self.cameraResultScore  = PLC.Tag( plc, "Cam_F:I.InspectionResults[1]", attributes, tagType="REAL" )
-    self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
-    self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
-
     self._velocity = 0.0
     self._maxAcceleration = 0
     self._maxDeceleration = 0

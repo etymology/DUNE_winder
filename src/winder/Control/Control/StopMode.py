@@ -44,17 +44,15 @@ class StopMode( StateMachineState ) :
         self.changeState( self.stateMachine.States.ESTOP )
       elif self.io.X_Park_OK.get() :
         self.changeState( self.stateMachine.States.PARK )
-      #elif self.io.start.get() :
       elif self.control.startRequest :
         self.control.changeState( self.control.States.WIND )
         self.control.startRequest = False
       elif self.control.manualRequest:
         self.control.changeState( self.control.States.MANUAL )
         self.control.manualRequest = False
-        #
-        # $$$ DEBUG - Allowed to change to other modes.
-        #
-        pass
+      elif self.control.calibrationRequest :
+        self.control.changeState( self.control.States.CALIBRATE )
+        self.control.calibrationRequest = False
 
   #====================================
   # Emergency stop.

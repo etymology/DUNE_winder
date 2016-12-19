@@ -80,10 +80,10 @@ class U_LayerGeometry( UV_LayerGeometry ) :
     # The grid parameters are a list of parameters for how the grid is constructed.
     # Columns:
     #   Count - Number of pins this row in the table represents.
-    #   dx - Change in self.deltaX each iteration.
-    #   dy - Change in self.deltaY each iteration.
-    #   off.self.deltaX - Starting self.deltaX offset for initial position of first pin in this set.
-    #   off.self.deltaY - Starting self.deltaY offset for initial position of first pin in this set.
+    #   dx - Change in x each iteration.
+    #   dy - Change in y each iteration.
+    #   off.x - Starting x offset for initial position of first pin in this set.
+    #   off.y - Starting y offset for initial position of first pin in this set.
     #   ort - Wire orientation.
     self.gridFront = \
     [

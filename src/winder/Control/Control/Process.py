@@ -19,6 +19,7 @@ from Control.ControlStateMachine import ControlStateMachine
 
 from Machine.Spool import Spool
 from Machine.HeadCompensation import HeadCompensation
+from Machine.GeometrySelection import GeometrySelection
 
 class Process :
 
@@ -625,7 +626,8 @@ class Process :
     Args:
       xVelocity: Speed of x axis in m/s.  Allows negative for reverse, 0 to stop.
       yVelocity: Speed of y axis in m/s.  Allows negative for reverse, 0 to stop.
-
+      acceleration: Maximum positive acceleration.  None for default.
+      deceleration: Maximum negative acceleration.  None for default.
     Returns:
       True if there was an error, False if not.
     """
@@ -670,6 +672,8 @@ class Process :
       xPosition: New position in meters of x.
       yPosition: New position in meters of y.
       velocity: Maximum velocity.  None for last velocity used.
+      acceleration: Maximum positive acceleration.  None for default.
+      deceleration: Maximum negative acceleration.  None for default.
     Returns:
       True if there was an error, False if not.
     """
@@ -987,5 +991,106 @@ class Process :
         )
 
     return error
+
+  #---------------------------------------------------------------------
+  def startCalibrationScanEdge( self, travel, velocity=None, acceleration=None, deceleration=None ) :
+    """
+    To a calibration scan of a single edge on the current layer.
+
+    Args:
+      travel: Edge and direction to scan. (T/B/L/R)
+      velocity: Maximum velocity.  None for last velocity used.
+      acceleration: Maximum positive acceleration.  None for default.
+      deceleration: Maximum negative acceleration.  None for default.
+    Returns:
+      True if there was an error, False if not.
+    Notes:
+      Edge and direction two characters from the set (T/B/L/R) that specify
+      the edge, and direction of travel.
+      Example:
+        TR - Top edge, moving from left to right.
+        LB - Left edge, moving from top to bottom.
+        LR - Invalid.  Left edge moving to the right is an incorrect combination.
+    """
+
+    # Deconstruct travel into edge and direction of travel.
+    travel = travel.upper()
+    edge = travel[ 0 ]
+    direction = travel[ 1 ]
+
+    # Make sure the combination of edge and travel are valid.
+    isError = (
+      ( ( "T" == edge or "B" == edge ) and ( "T" == direction or "B" == direction ) )
+      or
+      ( ( "L" == edge or "R" == edge ) and ( "L" == direction or "R" == direction ) )
+    )
+
+    if isError :
+      error = "invalid travel"
+    # If there is no APA loaded...
+    elif None == self.apa :
+      isError = True
+      error = "no APA loaded"
+    # If machine isn't ready to move...
+    elif not self.controlStateMachine.isMovementReady() :
+      isError = True
+      error = "machine not idle"
+
+    if isError :
+      self._log.add(
+        self.__class__.__name__,
+        "CALIBRATION_ERROR",
+        "Calibration edge scan error--" + error + ".",
+        [ travel, velocity, acceleration, deceleration ]
+      )
+    else :
+      # Get the geometry for current layer.
+      geometry = GeometrySelection( self.apa.getLayer() )
+
+      # Get the layout of the selected edge.
+      index = geometry.edgeToGridIndex[ edge ]
+      edgeGrid = geometry.gridFront[ index ] # $$$DEBUG - Always front?
+
+      # Number of pins on this edge.
+      pins = edgeGrid[ 0 ]
+
+      xPosition = None
+      yPosition = None
+      deltaX = 0
+      deltaY = 0
+      if "T" == edge or "B" == edge :
+        if "L" == direction :
+          deltaX = geometry.deltaX
+        else :
+          deltaX = -geometry.deltaX
+
+        xPosition = deltaX * pins
+      else :
+        if "T" == direction :
+          deltaY = geometry.deltaY
+        else :
+          deltaY = -geometry.deltaY
+
+        yPosition = deltaY * pins
+
+      self._io.camera.startScan( deltaX, deltaY )
+
+      self._log.add(
+        self.__class__.__name__,
+        "CALIBRATION",
+        "Scan " + str( travel ) + ". X/Y to (" + str( xPosition )
+          + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
+          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
+        [ edge, xPosition, yPosition, velocity, acceleration, deceleration ]
+      )
+
+      self.controlStateMachine.seekX = xPosition
+      self.controlStateMachine.seekY = yPosition
+      self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.seekAcceleration = acceleration
+      self.controlStateMachine.seekDeceleration = deceleration
+      self.controlStateMachine.calibrationRequest = True
+
+    return isError
 
 # end class

@@ -82,6 +82,45 @@ class PLC_Simulator :
 
   # end class
 
+  def pollCamera( self ) :
+    isEnabled = self._io.plc.getTag( self._cameraDeltaEnable )
+
+    if isEnabled :
+      x = self._io.xAxis.getPosition()
+      y = self._io.yAxis.getPosition()
+      deltaX = self._io.plc.getTag( self._cameraX_Delta )
+      deltaY = self._io.plc.getTag( self._cameraY_Delta )
+
+      if not self._cameraEnabled :
+        self._cameraStartX = x
+        self._cameraStartY = y
+        self._cameraLastX = x
+        self._cameraLastY = y
+        print "Camera enabled at " + str( x ) + ", " + str( y )
+        print "Deltas " + str( deltaX ) + ", " + str( deltaY )
+
+      self._cameraDeltaX += x - self._cameraLastX
+      self._cameraDeltaY += y - self._cameraLastY
+
+      while ( ( deltaX > 0 and self._cameraDeltaX > deltaX ) \
+           or ( deltaX < 0 and self._cameraDeltaX < deltaX ) ) :
+        #print "Trigger X " + str( self._cameraDeltaX )
+        # $$$DEBUG - Trigger
+        self._cameraDeltaX -= deltaX
+
+      while ( ( deltaY > 0 and self._cameraDeltaY > deltaY ) \
+           or ( deltaY < 0 and self._cameraDeltaY < deltaY ) ) :
+
+        #print "Trigger Y " + str( self._cameraDeltaY )
+        # $$$DEBUG - Trigger
+        self._cameraDeltaY -= deltaY
+
+      self._cameraLastX = x
+      self._cameraLastY = y
+
+
+    self._cameraEnabled = isEnabled
+
   #---------------------------------------------------------------------
   def poll( self ) :
     """
@@ -327,6 +366,9 @@ class PLC_Simulator :
       # move, putting the move type back to where it was.
       self._lastMoveType = None
 
+    # Update camera.
+    self.pollCamera()
+
   #---------------------------------------------------------------------
   def __init__( self, io, systemTime ) :
     """
@@ -359,6 +401,19 @@ class PLC_Simulator :
     self._maxZ_AccelerationTag  = io.plc.setupTag( "Z_ACCELERATION", 0.0 )
     self._maxZ_DecelerationTag  = io.plc.setupTag( "Z_DECELLERATION", 0.0 )
 
+    # Camera tags.
+    self._cameraFIFO_MotorX     = io.plc.setupTag( "FIFO_Data[0]", 0.0 )
+    self._cameraFIFO_MotorY     = io.plc.setupTag( "FIFO_Data[1]", 0.0 )
+    self._cameraFIFO_Status     = io.plc.setupTag( "FIFO_Data[2]", 0.0 )
+    self._cameraFIFO_MatchLevel = io.plc.setupTag( "FIFO_Data[3]", 0.0 )
+    self._cameraFIFO_CameraX    = io.plc.setupTag( "FIFO_Data[4]", 0.0 )
+    self._cameraFIFO_CameraY    = io.plc.setupTag( "FIFO_Data[5]", 0.0 )
+    self._cameraFIFO_Clock      = io.plc.setupTag( "READ_FIFOS", False )
+    self._cameraDeltaEnable     = io.plc.setupTag( "EN_POS_TRIGGERS", False )
+    self._cameraX_Delta         = io.plc.setupTag( "X_DELTA", 0.0 )
+    self._cameraY_Delta         = io.plc.setupTag( "Y_DELTA", 0.0 )
+
+
     # Initial states of PLC state machine.
     self._lastState = io.plcLogic.States.READY
     self._lastMoveType = io.plcLogic.MoveTypes.RESET
@@ -366,6 +421,14 @@ class PLC_Simulator :
     self._lastX_Speed = None
     self._lastY_Speed = None
     self._lastZ_Speed = None
+
+    self._cameraEnabled = False
+    self._cameraStartX = None
+    self._cameraStartY = None
+    self._cameraDeltaX = 0.0
+    self._cameraDeltaY = 0.0
+    self._cameraLastX = None
+    self._cameraLastY = None
 
     self._latchDelay = Delay( self._simulationTime )
 
@@ -405,9 +468,9 @@ class PLC_Simulator :
     self.endOfTravel_Xm      = self.SimulatedInput( io, "Machine_SW_Stat", 21, False )
     self.Rotation_Lock_key   = self.SimulatedInput( io, "Machine_SW_Stat", 22, True  )
 
-
     # True to use real-time for simulations, False for using a time delta.
     self._realTime = True
 
     # When '_realTime' is False, use this time delta between ticks.
     self._timeDelta = 100
+28

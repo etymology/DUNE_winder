@@ -41,3 +41,11 @@ class LayerGeometry( APA_Geometry ) :
       ( 2 * self.pitches - 0.5 ) * self.pitchX                  \
       + self.boardThickness * ( self.pitchX / self.pitchY - 1 ) \
       - self.boardSpacing
+
+    # Edge name to grid index.
+    self.edgeToGridIndex = {
+      "L": 0,
+      "T": 1,
+      "R": 2,
+      "B": 3
+    }

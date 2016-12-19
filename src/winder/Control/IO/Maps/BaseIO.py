@@ -13,6 +13,7 @@ from IO.Types.PLC_Motor import PLC_Motor
 from IO.Systems.MultiAxisMotor import MultiAxisMotor
 from IO.Systems.PLC_Logic import PLC_Logic
 from IO.Systems.Head import Head
+from IO.Systems.Camera import Camera
 
 class BaseIO:
 
@@ -68,6 +69,9 @@ class BaseIO:
     self.plcLogic = PLC_Logic( self.plc, self.xyAxis, self.zAxis )
     self.pollCallbacks.append( self.plcLogic.poll )
     self.head = Head( self.plcLogic )
+
+    # Camera pin location capture control.
+    self.camera = Camera( self.plc )
 
     #
     # Inputs

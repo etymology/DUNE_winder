@@ -30,10 +30,10 @@ function Camera( modules )
 
         winder.remoteAction
         (
-          "io.plcLogic.cameraTrigger.set( 1 )",
+          "io.camera.cameraTrigger.set( 1 )",
           function()
           {
-            //winder.remoteAction( "io.plcLogic.cameraTrigger.set( 0 )" )
+            //winder.remoteAction( "io.camera.cameraTrigger.set( 0 )" )
           }
         )
 
@@ -63,7 +63,7 @@ function Camera( modules )
     (
       function()
       {
-        winder.remoteAction( "io.plcLogic.cameraDeltaEnable.set( 0 )" )
+        winder.remoteAction( "io.camera.cameraDeltaEnable.set( 0 )" )
       }
     )
 
@@ -72,13 +72,14 @@ function Camera( modules )
     (
       function()
       {
-        var command = "[" +
-          "io.plcLogic.cameraDeltaEnable.set( 0 )," +
-          "io.plcLogic.cameraTriggerEnable.set( 1 )," +
-          "io.plcLogic.cameraX_Delta.set( 0 )," +
-          "io.plcLogic.cameraY_Delta.set( 8 )," +
-          "io.plcLogic.cameraDeltaEnable.set( 1 )," +
-          "process.manualSeekXY( 110., 600., 50., 200., 200. ) ]"
+        // var command = "[" +
+        //   "io.camera.cameraDeltaEnable.set( 0 )," +
+        //   "io.camera.cameraTriggerEnable.set( 1 )," +
+        //   "io.camera.cameraX_Delta.set( 0 )," +
+        //   "io.camera.cameraY_Delta.set( 8 )," +
+        //   "io.camera.cameraDeltaEnable.set( 1 )," +
+        //   "process.manualSeekXY( 110., 600., 50., 200., 200. ) ]"
+        var command = 'process.startCalibrationScanEdge( "LT", 150 )'
 
         winder.remoteAction( command )
       }
@@ -90,21 +91,21 @@ function Camera( modules )
       function()
       {
         var command = "[" +
-          "io.plcLogic.cameraDeltaEnable.set( 0 )," +
-          "io.plcLogic.cameraTriggerEnable.set( 1 )," +
-          "io.plcLogic.cameraX_Delta.set( 0 )," +
-          "io.plcLogic.cameraY_Delta.set( -8 )," +
-          "io.plcLogic.cameraDeltaEnable.set( 1 )," +
+          "io.camera.cameraDeltaEnable.set( 0 )," +
+          "io.camera.cameraTriggerEnable.set( 1 )," +
+          "io.camera.cameraX_Delta.set( 0 )," +
+          "io.camera.cameraY_Delta.set( -8 )," +
+          "io.camera.cameraDeltaEnable.set( 1 )," +
           "process.manualSeekXY( 110., 300., 50., 200., 200. ) ]"
 
         winder.remoteAction( command )
       }
     )
 
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultStatus.get()", "#cameraResult" )
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultScore.get()", "#cameraScore" )
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultX.get()", "#cameraX" )
-  winder.addPeriodicDisplay( "io.plcLogic.cameraResultY.get()", "#cameraY" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultStatus.get()", "#cameraResult" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultScore.get()", "#cameraScore" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultX.get()", "#cameraX" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultY.get()", "#cameraY" )
 
   var count = 0
   var cameraUpdateFunction = function()
@@ -130,19 +131,43 @@ function Camera( modules )
     )
     .registerRestoreCallback( cameraUpdateFunction )
 
-  cameraUpdateFunction()
-}
 
-// //-----------------------------------------------------------------------------
-// // Uses:
-// //   Called when page loads.
-// //-----------------------------------------------------------------------------
-// $( document ).ready
-// (
-//   function()
-//   {
-//     //winder.inhibitUpdates()
-//     camera = new Camera()
-//   }
-// )
-//
+  // Filter table object with columns for the log file.
+  var filteredTable =
+      new FilteredTable
+      (
+        [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ],
+        [ false, false, false, false, false, false ],
+        []
+      )
+
+  //$( "#calibrationTable" ).replaceWith( loadingText )
+
+  winder.remoteAction
+  (
+    "io.camera.captureFIFO",
+    function( data )
+    {
+      var dataSet = []
+      for ( var row of data )
+      {
+        var rowData =
+          [
+            row.MotorX,
+            row.MotorY,
+            row.Status,
+            row.MatchLevel,
+            row.CameraX,
+            row.CameraY,
+          ]
+
+        dataSet.push( rowData )
+      }
+
+      filteredTable.loadFromArray( dataSet )
+      filteredTable.display( "#calibrationTable" )
+    }
+  )
+
+  // $$$DEBUG - Put back  cameraUpdateFunction()
+}

@@ -11,6 +11,7 @@ from Control.HardwareMode import HardwareMode
 from Control.StopMode import StopMode
 from Control.WindMode import WindMode
 from Control.ManualMode import ManualMode
+from Control.CalibrationMode import CalibrationMode
 
 class ControlStateMachine( LoggedStateMachine ) :
 
@@ -84,16 +85,15 @@ class ControlStateMachine( LoggedStateMachine ) :
     Args:
       io: Instance of I/O map.
       log: Log file to write state changes.
-      gCodeHandler: Instance of GCodeHandler.
-      manualCommand: Instance of ManualCommand.
       systemTime: Instance of TimeSource.
     """
 
     LoggedStateMachine.__init__( self, log )
-    self.hardwareMode = HardwareMode( self, self.States.HARDWARE, io, log )
-    self.stopMode     = StopMode(     self, self.States.STOP,     io, log )
-    self.windMode     = WindMode(     self, self.States.WIND,     io, log )
-    self.manualMode   = ManualMode(   self, self.States.MANUAL,   io, log )
+    self.hardwareMode    = HardwareMode(    self, self.States.HARDWARE,  io, log )
+    self.stopMode        = StopMode(        self, self.States.STOP,      io, log )
+    self.windMode        = WindMode(        self, self.States.WIND,      io, log )
+    self.manualMode      = ManualMode(      self, self.States.MANUAL,    io, log )
+    self.calibrationMode = CalibrationMode( self, self.States.CALIBRATE, io, log )
 
     self.changeState( self.States.HARDWARE )
 
@@ -111,8 +111,9 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.loopMode        = False # True to continuously loop the G-Code.
     self.positionLogging = False # True to log resulting position after each move.
 
-    # Manual mode options.
+    # Manual/calibration mode options.
     self.manualRequest = False
+    self.calibrationRequest = False
     self.idleServos = False
     self.isJogging = False
     self.executeGCode = False
@@ -123,6 +124,5 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.seekAcceleration = None
     self.seekDeceleration = None
     self.setHeadPosition = None
-
 
 # end class

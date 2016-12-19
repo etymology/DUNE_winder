@@ -19,7 +19,10 @@ class ControlThread( PrimaryThread ) :
 
     Args:
       io: Instance of I/O map.
+      log: Instance of system log.
       stateMachine: Instance of state machine.
+      systemTime: Instance of SystemTime.
+      isIO_Logged: True if I/O should be logged (typically False).
     """
 
     PrimaryThread.__init__( self, "ControlThread", log )

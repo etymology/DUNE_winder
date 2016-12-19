@@ -6,57 +6,70 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Machine.Settings import Settings
-from Control.IO_Log import IO_Log
+from Library.SystemSemaphore import SystemSemaphore
 from Threads.PrimaryThread import PrimaryThread
 
-class ControlThread( PrimaryThread ) :
+class CameraThread( PrimaryThread ) :
+
+  # Amount of time to sleep if FIFO is empty.
+  SLEEP_TIME = 50
 
   #---------------------------------------------------------------------
-  def __init__( self, io ) :
+  def __init__( self, camera, log, systemTime ) :
     """
     Constructor.
 
     Args:
-      io: Instance of I/O map.
+      camera: Instance of IO.Systems.Camera.
+      log: Instance of system log.
+      systemTime: Instance of SystemTime.
     """
-
     PrimaryThread.__init__( self, "CameraThread", log )
-    self._io = io
+    self._camera = camera
+    self._isRunning = False
+    self._semaphore = SystemSemaphore( 0 )
+    self._systemTime = systemTime
+    camera.setCallback( self._setEnable )
+
+  #---------------------------------------------------------------------
+  def _setEnable( self, isEnabled ) :
+    """
+    Camera trigger enable callback.  Private.
+
+    Args:
+      isEnabled: True if enabling camera trigger, False if disabling.
+    """
+    self._isRunning = isEnabled
+
+    if isEnabled :
+      self._semaphore.release()
 
   #---------------------------------------------------------------------
   def body( self ) :
     """
     Body of camera thread.
     """
-
     while PrimaryThread.isRunning :
-      io.camera.poll()
-      # # Mark the start of this update.
-      # startTime = self._systemTime.get()
-      #
-      # # Update I/O.
-      # self._io.pollInputs()
-      #
-      # # Update state machine.
-      # self._stateMachine.update()
-      #
-      # # Mark time at end of update.
-      # endTime = self._systemTime.get()
-      #
-      # # Measure time update took.
-      # updateTime = endTime - startTime
-      # updateTime = updateTime.total_seconds()
-      #
-      # # Update I/O log.
-      # if self._isIO_Logged :
-      #   self._ioLog.log( startTime, updateTime )
-      #
-      # # Calculate how long to sleep before updating again.
-      # # Roughly creates intervals of Settings.IO_UPDATE_TIME.
-      # sleepTime = Settings.IO_UPDATE_TIME - updateTime
-      # if sleepTime > 0 :
-      #   # Wait before updating again.
-      #   self._systemTime.sleep( sleepTime )
+
+      # If not running, wait.
+      if not self._isRunning :
+        self._semaphore.acquire()
+
+      # If not shutting down...
+      if PrimaryThread.isRunning :
+        # Assume there will be no sleep (a yield only).
+        sleepTime = 0
+
+        # Update camera if running...
+        if self._isRunning :
+          hasData = self._camera.poll()
+
+          # If there was no data to read, sleep for awhile.  Otherwise, read
+          # again soon.
+          if not hasData :
+            sleepTime = CameraThread.SLEEP_TIME
+
+        # Yield thread time.
+        self._systemTime.sleep( sleepTime )
 
 # end class

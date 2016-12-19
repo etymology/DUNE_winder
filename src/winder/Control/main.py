@@ -28,6 +28,7 @@ from Threads.PrimaryThread import PrimaryThread
 from Threads.UI_ServerThread import UI_ServerThread
 from Threads.ControlThread import ControlThread
 from Threads.WebServerThread import WebServerThread
+from Threads.CameraThread import CameraThread
 
 from Simulator.SimulationTime import SimulationTime
 
@@ -241,8 +242,8 @@ try:
 
   uiServer = UI_ServerThread( commandHandler, log )
   webServerThread = WebServerThread( commandHandler, log )
-
   controlThread = ControlThread( io, log, process.controlStateMachine, systemTime, isIO_Logged )
+  cameraThread = CameraThread( io.camera, log, systemTime )
 
   # Begin operation.
   PrimaryThread.startAllThreads()
@@ -265,8 +266,6 @@ try:
 
   # Save configuration.
   configuration.save()
-
-  # $$$DEBUG - Shutdown I/O.
 
 except Exception as exception:
   PrimaryThread.stopAllThreads()
