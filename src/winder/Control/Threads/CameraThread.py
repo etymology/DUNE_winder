@@ -12,7 +12,7 @@ from Threads.PrimaryThread import PrimaryThread
 class CameraThread( PrimaryThread ) :
 
   # Amount of time to sleep if FIFO is empty.
-  SLEEP_TIME = 50
+  SLEEP_TIME = 0.050
 
   #---------------------------------------------------------------------
   def __init__( self, camera, log, systemTime ) :
@@ -39,6 +39,7 @@ class CameraThread( PrimaryThread ) :
     Args:
       isEnabled: True if enabling camera trigger, False if disabling.
     """
+
     self._isRunning = isEnabled
 
     if isEnabled :
@@ -57,6 +58,7 @@ class CameraThread( PrimaryThread ) :
 
       # If not shutting down...
       if PrimaryThread.isRunning :
+
         # Assume there will be no sleep (a yield only).
         sleepTime = 0
 

@@ -108,13 +108,12 @@ class Camera:
     # Clock FIFO.
     self.cameraFIFO_Clock.set( 1 )
 
-    # Start with just polling single value to see if there is any data in the FIFO.
-    self.cameraFIFO_MotorX.poll()
-
     # Any data in FIFO?
     isData = self.cameraFIFO_MotorX.poll()
 
-    if isData :
+    #print self.cameraFIFO_MotorX.get()
+
+    if self.cameraFIFO_MotorX.get() > 0 :
 
       print "Got data"
 
@@ -141,6 +140,13 @@ class Camera:
     return isData
 
   #---------------------------------------------------------------------
+  def reset( self ) :
+    """$$$DEBUG"""
+    self.captureFIFO = []
+    self.cameraDeltaEnable.set( 0 )
+    self.cameraTriggerEnable.set( 0 )
+
+  #---------------------------------------------------------------------
   def startScan( self, deltaX, deltaY ) :
     """
     Begin a pin scan.
@@ -158,7 +164,7 @@ class Camera:
     # Flush capture FIFO.
     self.captureFIFO = []
 
-    self.cameraDeltaEnable.set( 0 )
+    #self.cameraDeltaEnable.set( 0 )
     self.cameraTriggerEnable.set( 1 )
     self.cameraX_Delta.set( deltaX )
     self.cameraY_Delta.set( deltaY )
@@ -174,6 +180,17 @@ class Camera:
     Disables PLC camera trigger logic.
     """
     self.cameraDeltaEnable.set( 0 )
+    self.cameraTriggerEnable.set( 0 )
+
+    # $$$DEBUG - Temporary.
+    with open( "cameraDump.txt", 'a' ) as outputFile :
+      for row in self.captureFIFO :
+        for key in row :
+          outputFile.write( str( row[ key ] ) + "," )
+
+        outputFile.write( "\n" )
+
+      outputFile.write( "\n\n" )
 
     if self._callback :
       self._callback( False )

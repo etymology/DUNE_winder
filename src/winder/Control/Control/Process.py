@@ -1073,7 +1073,8 @@ class Process :
 
         yPosition = deltaY * pins
 
-      self._io.camera.startScan( deltaX, deltaY )
+      # $$$DEBUG - Put back self._io.camera.startScan( deltaX, deltaY )
+      self._io.camera.startScan( 0, 8 )
 
       self._log.add(
         self.__class__.__name__,

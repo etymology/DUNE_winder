@@ -44,7 +44,8 @@ class SystemSemaphore :
     """
 
     self._semaphore.release()
-    SystemSemaphore._activeList.remove( self )
+    if self in SystemSemaphore._activeList :
+      SystemSemaphore._activeList.remove( self )
 
   #---------------------------------------------------------------------
   @staticmethod

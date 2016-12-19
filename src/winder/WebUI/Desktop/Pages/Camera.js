@@ -63,7 +63,8 @@ function Camera( modules )
     (
       function()
       {
-        winder.remoteAction( "io.camera.cameraDeltaEnable.set( 0 )" )
+        //winder.remoteAction( "io.camera.cameraDeltaEnable.set( False )" )
+        winder.remoteAction( "io.camera.reset()" )
       }
     )
 
@@ -79,7 +80,7 @@ function Camera( modules )
         //   "io.camera.cameraY_Delta.set( 8 )," +
         //   "io.camera.cameraDeltaEnable.set( 1 )," +
         //   "process.manualSeekXY( 110., 600., 50., 200., 200. ) ]"
-        var command = 'process.startCalibrationScanEdge( "LT", 150 )'
+        var command = 'process.startCalibrationScanEdge( "LT", 50 )'
 
         winder.remoteAction( command )
       }
@@ -141,33 +142,70 @@ function Camera( modules )
         []
       )
 
-  //$( "#calibrationTable" ).replaceWith( loadingText )
 
-  winder.remoteAction
+  function round( value, decimals )
+  {
+    var multiplier = Math.pow( 10, decimals )
+    return Math.round( value * multiplier ) / multiplier
+  }
+
+
+  winder.addPeriodicCallback
   (
     "io.camera.captureFIFO",
     function( data )
     {
-      var dataSet = []
+      var table = $( "<table />" )
+        .attr( "id", "calibrationTable" )
+
+      var rowTag = $( "<tr />" ).appendTo( table )
+      var heading = [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ]
+      for ( var headingText of heading )
+          $( "<th />" )
+            .text( headingText )
+            .appendTo( rowTag )
+
+
       for ( var row of data )
       {
         var rowData =
           [
-            row.MotorX,
-            row.MotorY,
+            round( row.MotorX, 2 ),
+            round( row.MotorY, 2 ),
             row.Status,
             row.MatchLevel,
-            row.CameraX,
-            row.CameraY,
+            round( row.CameraX, 2 ),
+            round( row.CameraY, 2 ),
           ]
 
-        dataSet.push( rowData )
+        var rowTag = $( "<tr />" ).appendTo( table )
+        for ( var columnIndex in rowData )
+        {
+          var column = rowData[ columnIndex ]
+          $( "<td />" )
+            .appendTo( rowTag )
+            .text( column )
+        }
+
+        // $( "<td />" )
+        //   .appendTo( rowTag )
+        //   .text( "-" )
       }
 
-      filteredTable.loadFromArray( dataSet )
-      filteredTable.display( "#calibrationTable" )
+      $( "#calibrationTable" ).replaceWith( table )
+
+
+      // var dataSet = []
+      // for ( var row of data )
+      // {
+      //
+      //   dataSet.push( rowData )
+      // }
+      //
+      // filteredTable.loadFromArray( dataSet )
+      // filteredTable.display( "#calibrationTable" )
     }
   )
 
-  // $$$DEBUG - Put back  cameraUpdateFunction()
+  cameraUpdateFunction()
 }

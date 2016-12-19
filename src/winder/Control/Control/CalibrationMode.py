@@ -102,6 +102,7 @@ class CalibrationMode( StateMachineState ) :
           [ x, y, z ]
         )
 
+      self._io.camera.endScan()
       self.changeState( self.stateMachine.States.STOP )
 
 
