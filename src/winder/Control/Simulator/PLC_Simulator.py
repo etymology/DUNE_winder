@@ -473,4 +473,3 @@ class PLC_Simulator :
 
     # When '_realTime' is False, use this time delta between ticks.
     self._timeDelta = 100
-28
