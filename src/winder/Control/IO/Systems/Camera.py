@@ -308,8 +308,9 @@ class Camera:
     with open( "cameraDump.txt", 'a' ) as outputFile :
 
       # Write header.
-      for key in self.captureFIFO[ 0 ] :
-        outputFile.write( str( key ) + "," )
+      if len( self.captureFIFO ) > 0 :
+        for key in self.captureFIFO[ 0 ] :
+          outputFile.write( str( key ) + "," )
 
       # Write data.
       for row in self.captureFIFO :
