@@ -105,8 +105,7 @@ function load( pageName )
   {
     var page = window[ "page" ]
     var modules = page.getModules()
-    var winder = modules.get( "Winder" )
-    winder.shutdown()
+    modules.shutdown()
 
     $( '#main' ).html( "Loading..." )
 

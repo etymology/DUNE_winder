@@ -163,6 +163,7 @@ class PLC_Simulator :
         self._yAxis.hardStop()
         self._zAxis.hardStop()
         self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
+        self._io.plc.write( self._errorCodeTag, 0 )
 
       # Seek in X/Y?
       elif self._io.plcLogic.MoveTypes.SEEK_XY == moveType :
@@ -271,7 +272,8 @@ class PLC_Simulator :
         if   ( ( velocity + self.VELOCITY_ERROR ) < 0 and position < positionMin ) \
           or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
 
-          print axisIO.getName(), "out of range", positionMin, "<=", position, "<=", positionMax
+          #print axisIO.getName(), "out of range", positionMin, "<=", position, "<=", positionMax
+          self._io.plc.write( self._errorCodeTag, 2002 )
 
           # Change to an error state.
           self._io.plc.write( self._stateTag, self._io.plcLogic.States.ERROR )
@@ -392,9 +394,10 @@ class PLC_Simulator :
     self._zAxis = SimulatedMotor( io.plc, "Z", self._simulationTime )
 
     # Tags for top-level PLC control.
-    self._actuatorPosition   = io.plc.setupTag( "ACTUATOR_POS", io.plcLogic.LatchPosition.DOWN )
-    self._moveTypeTag        = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
-    self._stateTag           = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
+    self._actuatorPosition = io.plc.setupTag( "ACTUATOR_POS", io.plcLogic.LatchPosition.DOWN )
+    self._moveTypeTag      = io.plc.setupTag( "MOVE_TYPE", io.plcLogic.MoveTypes.RESET )
+    self._stateTag         = io.plc.setupTag( "STATE", io.plcLogic.States.READY )
+    self._errorCodeTag     = io.plc.setupTag( "ERROR_CODE", 0 )
     self._maxXY_VelocityTag     = io.plc.setupTag( "XY_SPEED", 0.0 )
     self._maxXY_AccelerationTag = io.plc.setupTag( "XY_ACCELERATION", 0.0 )
     self._maxXY_DecelerationTag = io.plc.setupTag( "XY_DECELERATION", 0.0 )

@@ -50,6 +50,37 @@ class PLC_Logic :
     DOWN       = 2
   # end class
 
+  # Lookup table of error code names.
+  ERROR_CODES = {
+    0: "None",
+
+    2001: "XY Jog, Z is extended",
+    2002: "Physical X or Y axis fault",
+
+    3001: "XY Seek, Z is extended",
+    3002: "Physical X or Y axis fault",
+    3003: "Motion complete, but position is incorrect",
+
+    4001: "Z Jog, Master Z Transfer Enable Not Ready",
+    4002: "Physical Z axis fault",
+    4003: "Latch not in position 2 when retrieving winder head",
+
+    5001: "Z Seek, Master Z Transfer Enable Not Ready",
+    5002: "Physical Z axis fault",
+    5003: "Motion complete, but position is incorrect",
+    5004: "Latch not in position 2 when retrieving winder head",
+
+    6000: "Latching State Successful",
+    6001: "Latching State, Z Stage not present OR Z Fixed not Present OR Z Not Extended",
+    6002: "Latching State, Latch did not move to next position",
+
+    7000: "Homing Latch State Successful",
+    7001: "Homing Latch State, Z Stage Not Present",
+    7002: "Homing Latch State, Latch did not move to home position",
+
+    8000: "Unlock Latch Motor Successful"
+  }
+
   #---------------------------------------------------------------------
   def isReady( self ) :
     """
@@ -319,43 +350,32 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.UNSERVO )
 
   #---------------------------------------------------------------------
-  # $$$FUTURE
-  def isInTransferArea( self ) :
-
-    # $$$DEBUG - Fix.
-    positions = self._xyAxis.getPosition()
-
-    result = ( 0 == positions[ 0 ] and 0 == positions[ 1 ] )
-
-    return result
-
-  #---------------------------------------------------------------------
-  # $$$FUTURE
-  def setCameraTrigger( self, deltaX, deltaY ) :
+  def getErrorCode( self ) :
     """
-    Setup the PLC for camera triggering.
-
-    Args:
-      deltaX - Change in X after which to trigger camera.  0 to disable.
-      deltaY - Change in Y after which to trigger camera.  0 to disable.
-    """
-    pass
-
-  #---------------------------------------------------------------------
-  # $$$FUTURE
-  def flushCameraFIFO( self ) :
-    pass
-
-  #---------------------------------------------------------------------
-  # $$$FUTURE
-  def getCameraFIFO( self ) :
-    """
-    Return any new elements in camera FIFO.
+    Get the error code reported by PLC.
+    (Use 'getErrorCodeString' to translate code into string.)
 
     Returns:
-      Array of new capture elements from camera.
+      Integer error code.
     """
-    pass
+    return self._errorCode.get()
+
+  #---------------------------------------------------------------------
+  def getErrorCodeString( self ) :
+    """
+    Get the error code reported by PLC as a string.
+
+    Returns:
+      String representation of error code.
+    """
+    errorCode = self._errorCode.get()
+
+    if errorCode in PLC_Logic.ERROR_CODES :
+      result = PLC_Logic.ERROR_CODES[ errorCode ]
+    else:
+      result = "Unknown " + str( errorCode )
+
+    return result
 
   #---------------------------------------------------------------------
   def __init__( self, plc, xyAxis, zAxis ) :
@@ -373,7 +393,8 @@ class PLC_Logic :
 
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
-    self._state           = PLC.Tag( plc, "STATE", attributes, tagType="DINT" )
+    self._state         = PLC.Tag( plc, "STATE", attributes, tagType="DINT" )
+    self._errorCode     = PLC.Tag( plc, "ERROR_CODE", attributes,tagType="DINT" )
 
     self._actuatorPosition   = PLC.Tag( plc, "ACTUATOR_POS",    tagType="DINT" )
     self._moveType           = PLC.Tag( plc, "MOVE_TYPE",       tagType="INT" )
@@ -383,7 +404,6 @@ class PLC_Logic :
     self._maxZ_Velocity      = PLC.Tag( plc, "Z_SPEED",         tagType="REAL" )
     self._maxZ_Acceleration  = PLC.Tag( plc, "Z_ACCELERATION",  tagType="REAL" )
     self._maxZ_Deceleration  = PLC.Tag( plc, "Z_DECELLERATION", tagType="REAL" )
-    self.errorCode           = PLC.Tag( plc, "ERROR_CODE",      tagType="DINT" )
 
     self._velocity = 0.0
     self._maxAcceleration = 0

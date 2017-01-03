@@ -2,6 +2,10 @@ function Camera( modules )
 {
   var self = this
 
+  // Constant jog speed for incremental moves.
+  // Something small but reasonable.
+  var JOG_SPEED = 50
+
   var page = modules.get( "Page" )
   var winder = modules.get( "Winder" )
 
@@ -109,16 +113,33 @@ function Camera( modules )
   winder.addPeriodicDisplay( "io.camera.cameraResultY.get()", "#cameraY" )
 
   var count = 0
+  var cameraURL
   var cameraUpdateFunction = function()
   {
-    var url = "ftp://admin@192.168.16.55/image.bmp?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
+    var url = cameraURL + "?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
     $( "#cameraImage" )
       .attr( "src", url )
+  }
 
-    count += 1
-    $( "#debugText" ).text( count )
+  // Function to load the URL of the camera's last captured image.
+  var loadCameraURL = function()
+  {
+    winder.remoteAction
+    (
+      "process.getCameraImageURL()",
+      function( url )
+      {
+        cameraURL = url
+        console.log( cameraURL )
+        if ( cameraTimer )
+        {
+          clearInterval( cameraTimer )
+          cameraTimer = null
+        }
 
-    cameraTimer = setTimeout( cameraUpdateFunction, 100 )
+        cameraTimer = setInterval( cameraUpdateFunction, 100 )
+      }
+    )
   }
 
   // Shutdown/restart function to stop/restart camera updates.
@@ -127,11 +148,31 @@ function Camera( modules )
     (
       function()
       {
-        clearTimeout( cameraTimer )
+        console.log( "Camera module shutting down..." )
+        clearInterval( cameraTimer )
+        cameraTimer = null
       }
     )
-    .registerRestoreCallback( cameraUpdateFunction )
+    .registerRestoreCallback( loadCameraURL )
 
+
+  // Incremental jog.
+  page.loadSubPage
+  (
+    "/Desktop/Modules/IncrementalJog",
+    "#smallMotionsDiv",
+    function()
+    {
+      var incrementalJog = modules.get( "IncrementalJog" )
+      incrementalJog.velocityCallback
+      (
+        function()
+        {
+          return JOG_SPEED
+        }
+      )
+    }
+  )
 
   // Filter table object with columns for the log file.
   var filteredTable =
@@ -187,25 +228,11 @@ function Camera( modules )
             .text( column )
         }
 
-        // $( "<td />" )
-        //   .appendTo( rowTag )
-        //   .text( "-" )
       }
 
       $( "#calibrationTable" ).replaceWith( table )
-
-
-      // var dataSet = []
-      // for ( var row of data )
-      // {
-      //
-      //   dataSet.push( rowData )
-      // }
-      //
-      // filteredTable.loadFromArray( dataSet )
-      // filteredTable.display( "#calibrationTable" )
     }
   )
 
-  cameraUpdateFunction()
+  loadCameraURL()
 }

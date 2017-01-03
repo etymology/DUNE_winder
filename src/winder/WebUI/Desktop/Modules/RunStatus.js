@@ -35,6 +35,36 @@ function RunStatus( modules )
     return inMotion
   }
 
+
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Show the PLC status details pop-up.
+  //-----------------------------------------------------------------------------
+  this.showDetails = function()
+  {
+    var page = modules.get( "Page" )
+    page.loadSubPage
+    (
+      "/Desktop/Modules/Overlay",
+      "#modalDiv",
+      function()
+      {
+        page.loadSubPage
+        (
+          "/Desktop/Modules/PLC_Status",
+          "#overlayBox",
+          function()
+          {
+            var overlay = modules.get( "Overlay" )
+            var plcStatus = modules.get( "PLC_Status" )
+            overlay.show()
+            plcStatus.update()
+          }
+        )
+      }
+    )
+  }
+
   //-----------------------------------------------------------------------------
   modules.load
   (
@@ -42,6 +72,13 @@ function RunStatus( modules )
     function()
     {
       var winder = modules.get( "Winder" )
+
+      winder.addPeriodicRead
+      (
+        "io.plcLogic.getErrorCodeString()",
+        self.states,
+        "plcError"
+      )
 
       // Update for primary state machine.
       winder.addPeriodicDisplay
@@ -101,4 +138,6 @@ function RunStatus( modules )
 
     }
   )
+
+  window[ "runStatus" ] = this
 }

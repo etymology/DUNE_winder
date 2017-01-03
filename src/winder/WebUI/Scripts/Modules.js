@@ -269,7 +269,8 @@ var Modules = function()
   //----------------------------------------------------------------------------
   this.shutdown = function()
   {
-    for ( var index in shutdownCallbacks )
+    // Shutdown modules in reverse order from how they were loaded...
+    for ( var index in shutdownCallbacks.reverse() )
     {
       var callback = shutdownCallbacks[ index ]
       callback( shutdownCallbackParameters[ callback ] )

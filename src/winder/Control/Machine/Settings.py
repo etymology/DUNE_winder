@@ -44,6 +44,9 @@ class Settings :
     """
     configuration.default( "plcAddress", "192.168.16.49" )
 
+    # Location of camera's last captured image.
+    configuration.default( "cameraURL", "ftp://admin@192.168.16.55/image.bmp" )
+
     # Default for GUI server.
     configuration.default( "serverAddress", "127.0.0.1" )
     configuration.default( "serverPort", Settings.SERVER_PORT )

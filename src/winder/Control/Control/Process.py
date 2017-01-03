@@ -72,6 +72,8 @@ class Process :
       float( configuration.get( "maxDeceleration" ) )
     )
 
+    self._cameraURL = configuration.get( "cameraURL" )
+
     # Setup extended/retracted positions for head.
     io.head.setExtendedAndRetracted( machineCalibration.zFront, machineCalibration.zBack )
 
@@ -991,6 +993,20 @@ class Process :
         )
 
     return error
+
+  #---------------------------------------------------------------------
+  def setCameraImageURL( self, url ) :
+    """
+    Set the URL for the camera image.  Override function for simulator.
+    """
+    self._cameraURL = url
+
+  #---------------------------------------------------------------------
+  def getCameraImageURL( self ) :
+    """
+    Get the URL for the camera image.
+    """
+    return self._cameraURL
 
   #---------------------------------------------------------------------
   def startCalibrationScanEdge( self, travel, velocity=None, acceleration=None, deceleration=None ) :

@@ -75,13 +75,7 @@ button.jog
   float: left;
 }
 
-#smallMotions button
-{
-  width: 60px;
-  margin: 2px;
-}
-
-#smallMotions
+#smallMotionsDiv
 {
   width: 300px;
 }

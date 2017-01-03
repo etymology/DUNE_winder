@@ -1,5 +1,6 @@
 function Jog( modules )
 {
+  var self = this
   var winder = modules.get( "Winder" )
   var page = modules.get( "Page" )
   var motorStatus
@@ -201,35 +202,6 @@ function Jog( modules )
 
   //-----------------------------------------------------------------------------
   // Uses:
-  //   Make an incremental move in X.
-  // Input:
-  //   offset - Value (+/-) to move.
-  //-----------------------------------------------------------------------------
-  this.moveX = function( offset )
-  {
-    var velocity = this.getVelocity()
-    var x = motorStatus.motor[ "xPosition" ] + offset
-    var y = "None"
-
-    winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Make an incremental move in Y.
-  // Input:
-  //   offset - Value (+/-) to move.
-  //-----------------------------------------------------------------------------
-  this.moveY = function( offset )
-  {
-    var velocity = this.getVelocity()
-    var x = "None"
-    var y = motorStatus.motor[ "yPosition" ] + offset
-    winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
   //   Callback to start Z axis jogging.
   // Input:
   //   direction - Direction (1,-1, 0) of jog.
@@ -360,18 +332,6 @@ function Jog( modules )
     )
   }
 
-  // // Callback function to initialize position graphic.
-  // // Called twice--once when the position graphic page is loaded, and again
-  // // when the motor status page is loaded.  Both must be loaded before
-  // // initialization can take place, and either could load first.
-  // var positionGraphicCount = 2
-  // positionGraphicInitialize = function()
-  // {
-  //   positionGraphicCount -= 1
-  //   if ( 0 == positionGraphicCount )
-  //     positionGraphic.initialize( 0.7, motorStatus )
-  // }
-
   page.loadSubPage
   (
     "/Desktop/Modules/PositionGraphic",
@@ -394,10 +354,20 @@ function Jog( modules )
       var x = new CopyField( "#xPosition", "#xPositionCell" )
       var y = new CopyField( "#yPosition", "#yPositionCell" )
       var z = new CopyField( "#zPosition", "#zPositionCell" )
-
-      //positionGraphicInitialize()
     }
 
+  )
+
+  // Incremental jog.
+  page.loadSubPage
+  (
+    "/Desktop/Modules/IncrementalJog",
+    "#smallMotionsDiv",
+    function()
+    {
+      var incrementalJog = modules.get( "IncrementalJog" )
+      incrementalJog.velocityCallback( self.getVelocity )
+    }
   )
 
   // Fetch fully extended position from machine calibration.
@@ -615,16 +585,3 @@ function Jog( modules )
 
   window[ "jog" ] = this
 }
-
-// //-----------------------------------------------------------------------------
-// // Uses:
-// //   Called when page loads.
-// //-----------------------------------------------------------------------------
-// $( document ).ready
-// (
-//   function()
-//   {
-//     jog = new Jog()
-//   }
-// )
-//

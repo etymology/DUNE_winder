@@ -236,6 +236,10 @@ try:
   # Primary control process.
   process = Process( io, log, configuration, systemTime, machineCalibration )
 
+  # For the simulator, use a local file for the capture image.
+  if isSimulated :
+    process.setCameraImageURL( "/capture.bmp" )
+
   #
   # Initialize threads.
   #
