@@ -78,9 +78,6 @@ class BaseIO:
     # NOTE: Most of these inputs do not exist on the test hardware fixture.
     #
 
-    # $$$DEBUG - Restore default to True
-    self.estop = PLC_Input( "estop", self.plc, "Point_IO:1:I", 0, False )
-
     # Z-Stage sensors.
     self.Latch_Homed         = PLC_Input( "Latch_Homed",        self.plc, "Machine_SW_Stat", 0 )  # LATCH_ACTUATOR_HOMED
     self.Z_Retracted_1A      = PLC_Input( "Z_Retracted_1A",     self.plc, "Machine_SW_Stat", 1 )  # Z_RETRACTED_1A
@@ -106,5 +103,6 @@ class BaseIO:
     self.endOfTravel_Xp      = PLC_Input( "endOfTravel_Xp",      self.plc, "Machine_SW_Stat", 20 ) # PLUS_X_EOT
     self.endOfTravel_Xm      = PLC_Input( "endOfTravel_Xm",      self.plc, "Machine_SW_Stat", 21 ) # MINUS_X_EOT
     self.Rotation_Lock_key   = PLC_Input( "Rotation_Lock_key",   self.plc, "Machine_SW_Stat", 22 ) # ROT_LOCK_KEY
+    self.estop               = PLC_Input( "estop",               self.plc, "Machine_SW_Stat", 23, True )
 
 # end class

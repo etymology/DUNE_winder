@@ -169,6 +169,7 @@ var Modules = function()
             {
               // Any exception means the module failed to load correctly.
               errorFunction()
+              console.log( "Failed to create instance of " + module )
             }
 
             // Module count is one closer to finished.
@@ -187,6 +188,8 @@ var Modules = function()
 
             // Module count is one closer to finished.
             modulesLoading -= 1
+
+            console.log( "Failed to load " + module )
 
             // Check to see if all modules have been loaded.
             checkCallbacks()

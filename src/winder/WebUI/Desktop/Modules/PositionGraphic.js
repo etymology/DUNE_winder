@@ -364,8 +364,8 @@ function PositionGraphic( modules )
 
         statusLight( xyStatusCanvas, 1225, 275, inputs[ "Rotation_Lock_key" ], true )
 
-        statusLight( xyStatusCanvas, 1225, 485, ! inputs[ "endOfTravel_Xp" ], true )
-        statusLight( xyStatusCanvas,  100, 485, ! inputs[ "endOfTravel_Xm" ], true )
+        statusLight( xyStatusCanvas, 1225, 485, inputs[ "endOfTravel_Xp" ], true )
+        statusLight( xyStatusCanvas,  100, 485, inputs[ "endOfTravel_Xm" ], true )
 
         statusLight( xyStatusCanvas,  120, 485, inputs[ "X_Park_OK" ] )
 
@@ -392,10 +392,10 @@ function PositionGraphic( modules )
         // NOTE: Constants come for positions on image.
         //
 
-        statusLight( zStatusCanvas, 485, 150, ! inputs[ "Z_End_of_Travel" ], true )
+        statusLight( zStatusCanvas, 485, 150, inputs[ "Z_End_of_Travel" ], true )
         statusLight( zStatusCanvas, 505, 150, inputs[ "Z_Retracted_1A" ] )
 
-        statusLight( zStatusCanvas, 545, 150, ! inputs[ "Z_End_of_Travel" ], true )
+        statusLight( zStatusCanvas, 545, 150, inputs[ "Z_End_of_Travel" ], true )
         statusLight( zStatusCanvas, 565, 150, inputs[ "Z_Extended" ] )
 
         statusLight( zStatusCanvas, 1200, 275, inputs[ "Z_Fixed_Latched" ] )

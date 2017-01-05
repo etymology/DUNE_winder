@@ -196,7 +196,7 @@ function Camera( modules )
         function()
         {
           return "None"
-        },
+        }
       )
     }
   )
