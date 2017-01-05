@@ -1,4 +1,4 @@
-    <section>
+    <section id="section1">
       <article id="cameraDiv">
         <img id="cameraImage" alt="Camera image" />
         <div id="cameraStats">
@@ -10,24 +10,86 @@
       </article>
       <div id="debugText"></div>
 
-      <article id="motorStatusDiv">Loading...</article>
-      <article id="smallMotionsDiv">Loading...</article>
-
       <article>
-        <button id="cameraTriggerButton">Trigger</button>
-        <button id="moveStart">Move to start</button>
-        <button id="moveEnd">Move to end</button>
-        <br />
-        <button id="reset">Reset scan</button>
-        <button id="startUp">Scan +Y</button>
-        <button id="startDown">Scan -Y</button>
+        <h2>Seek initial location</h2>
+        <article>
+          <h3>Nominal corners</h3>
+          <div class="buttonSet">
+            <button>TL</button>
+            <div></div>
+            <button>TR</button>
+
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <button>BL</button>
+            <div></div>
+            <button>BR</button>
+          </div>
+        </article>
+
+        <article>
+          <h3>Traverse</h3>
+          <div class="buttonSet">
+            <div></div>
+            <button>&uArr;</button>
+            <div></div>
+
+            <button>&lArr;</button>
+            <div></div>
+            <button>&rArr;</button>
+
+            <div></div>
+            <button>&dArr;</button>
+            <div></div>
+          </div>
+        </article>
 
       </article>
 
-
+      <article>
+        <h3>Nominal pin</h3>
+        <input id="nominalPin" />
+        <button id="nominalPinSeek">Seek</button>
+      </article>
 
       <article>
-         <p id="calibrationTable">Loading...</p>
+        <h2>Triggering</h2>
+        <div class="triggerButtons">
+          <button id="cameraTriggerButton">Trigger</button>
+          <button id="moveStart">Move to start</button>
+          <button id="moveEnd">Move to end</button>
+          <br />
+          <button id="reset">Reset scan</button>
+          <button id="startUp">Scan +Y</button>
+          <button id="startDown">Scan -Y</button>
+        </div>
+
+      </article>
+
+    </section>
+
+    <section id="section2">
+      <article id="motorStatusDiv">Loading...</article>
+      <article id="smallMotionsDiv">Loading...</article>
+      <article id="jogJoystickDiv">Loading...</article>
+
+      <article>
+        <h2>Seek pin</h2>
+        <input id="calibratedPin" />
+        <button id="calibratedPinSeek">Seek</button>
+      </article>
+
+    </section>
+
+    <section id="section3">
+      <article id="calibrationTableDiv">
+        <div id="table-wrapper">
+          <div id="table-scroll">
+            <p id="calibrationTable">Loading...</p>
+          </div>
+        </div>
       </article>
 
 

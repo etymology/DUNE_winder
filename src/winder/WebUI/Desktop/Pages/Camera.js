@@ -6,6 +6,9 @@ function Camera( modules )
   // Something small but reasonable.
   var JOG_SPEED = 50
 
+  // How often to update the image from the camera.
+  var CAMERA_UPDATE_RATE = 500
+
   var page = modules.get( "Page" )
   var winder = modules.get( "Winder" )
 
@@ -130,14 +133,13 @@ function Camera( modules )
       function( url )
       {
         cameraURL = url
-        console.log( cameraURL )
         if ( cameraTimer )
         {
           clearInterval( cameraTimer )
           cameraTimer = null
         }
 
-        cameraTimer = setInterval( cameraUpdateFunction, 100 )
+        cameraTimer = setInterval( cameraUpdateFunction, CAMERA_UPDATE_RATE )
       }
     )
   }
@@ -148,7 +150,6 @@ function Camera( modules )
     (
       function()
       {
-        console.log( "Camera module shutting down..." )
         clearInterval( cameraTimer )
         cameraTimer = null
       }
@@ -174,6 +175,32 @@ function Camera( modules )
     }
   )
 
+  // Incremental jog.
+  page.loadSubPage
+  (
+    "/Desktop/Modules/JogJoystick",
+    "#jogJoystickDiv",
+    function()
+    {
+      var jogJoystick = modules.get( "JogJoystick" )
+      jogJoystick.callbacks
+      (
+        function()
+        {
+          return JOG_SPEED
+        },
+        function()
+        {
+          return "None"
+        },
+        function()
+        {
+          return "None"
+        },
+      )
+    }
+  )
+
   // Filter table object with columns for the log file.
   var filteredTable =
       new FilteredTable
@@ -191,46 +218,96 @@ function Camera( modules )
   }
 
 
+  // $$$ var rand = function() { return Math.round( Math.random() * 10 ); }
+  // $$$ var tempData = []
+  // $$$ for ( var count = 0; count < 800; count += 1 )
+  // $$$   tempData.push
+  // $$$   (
+  // $$$     { MotorX: rand(), MotorY: rand(), Status: rand(), MatchLevel: rand(), CameraX: rand(), CameraY: rand() },
+  // $$$   )
+
+  var oldData = null
+
+  function isCaptureFIFO_Different( a, b )
+  {
+    var isDifferent = false
+
+    isDifferent |= ! ( a instanceof Array )
+    isDifferent |= ! ( b instanceof Array )
+
+    if ( ! isDifferent )
+      isDifferent |= ( a.length != b.length )
+
+    if ( ! isDifferent )
+    {
+      for ( var index = 0; index < a.length; index += 1 )
+      {
+        var rowA = a[ index ]
+        var rowB = b[ index ]
+
+        for ( var key in rowA )
+          isDifferent |= rowA[ key ] != rowB[ key ]
+      }
+    }
+
+    return isDifferent
+  }
+
+  var count = 0
   winder.addPeriodicCallback
   (
     "io.camera.captureFIFO",
     function( data )
     {
-      var table = $( "<table />" )
-        .attr( "id", "calibrationTable" )
+      // $$$ count += 1
+      // $$$ $( "#debugText" ).text( count )
+      // $$$
+      // $$$ data = tempData
 
-      var rowTag = $( "<tr />" ).appendTo( table )
-      var heading = [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ]
-      for ( var headingText of heading )
+      if ( isCaptureFIFO_Different( data, oldData ) )
+      {
+        oldData = data
+
+        var table =
+          $( "<table />" )
+            .attr( "id", "calibrationTable" )
+
+        var theadTag = $( "<thead />" ).appendTo( table )
+
+        var rowTag = $( "<tr />" ).appendTo( theadTag )
+        var heading = [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ]
+        for ( var headingText of heading )
           $( "<th />" )
             .text( headingText )
             .appendTo( rowTag )
 
+        var tbodyTag = $( "<tbody />" ).appendTo( table )
 
-      for ( var row of data )
-      {
-        var rowData =
-          [
-            round( row.MotorX, 2 ),
-            round( row.MotorY, 2 ),
-            row.Status,
-            row.MatchLevel,
-            round( row.CameraX, 2 ),
-            round( row.CameraY, 2 ),
-          ]
-
-        var rowTag = $( "<tr />" ).appendTo( table )
-        for ( var columnIndex in rowData )
+        for ( var row of data )
         {
-          var column = rowData[ columnIndex ]
-          $( "<td />" )
-            .appendTo( rowTag )
-            .text( column )
+          var rowData =
+            [
+              round( row.MotorX, 2 ),
+              round( row.MotorY, 2 ),
+              row.Status,
+              row.MatchLevel,
+              round( row.CameraX, 2 ),
+              round( row.CameraY, 2 ),
+            ]
+
+          var rowTag = $( "<tr />" ).appendTo( tbodyTag )
+          for ( var columnIndex in rowData )
+          {
+            var column = rowData[ columnIndex ]
+            $( "<td />" )
+              .appendTo( rowTag )
+              .text( column )
+          }
+
         }
 
+        $( "#calibrationTable" ).replaceWith( table )
       }
-
-      $( "#calibrationTable" ).replaceWith( table )
     }
   )
 

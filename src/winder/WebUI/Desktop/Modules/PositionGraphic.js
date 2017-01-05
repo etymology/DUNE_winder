@@ -131,6 +131,21 @@ function PositionGraphic( modules )
 
   //---------------------------------------------------------------------------
   // Uses:
+  //   Get a canvas context by name.
+  //---------------------------------------------------------------------------
+  function getCanvas( canvasName )
+  {
+    var canvas = document.getElementById( canvasName )
+    var context
+
+    if ( canvas )
+      context = canvas.getContext( "2d" )
+
+    return context
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
   //   Callback run after machine calibration has been acquired.  Sets up
   //   periodic function to update graphics.
   //---------------------------------------------------------------------------
@@ -253,7 +268,7 @@ function PositionGraphic( modules )
         //
         // Position head (Z image).
         //
-        var zStatusCanvas = document.getElementById( "zStatusCanvas" ).getContext( "2d" )
+        var zStatusCanvas = getCanvas( "zStatusCanvas" )
         zStatusCanvas.clearRect( 0, 0, Z_GRAPHIC_X, Z_GRAPHIC_Y )
 
         var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
@@ -341,7 +356,7 @@ function PositionGraphic( modules )
           $( "#zHeadImage" ).hide()
 
 
-        var xyStatusCanvas = document.getElementById( "xyStatusCanvas" ).getContext( "2d" )
+        var xyStatusCanvas = getCanvas( "xyStatusCanvas" )
         xyStatusCanvas.clearRect( 0, 0, baseGraphicWidth, sideGraphicHeight )
 
         statusLight( xyStatusCanvas,   30, 350, ! inputs[ "plcFunctional" ], true )
@@ -418,7 +433,7 @@ function PositionGraphic( modules )
           while ( lines.length > ( LINES + 1 ) )
             lines.shift()
 
-          var pathCanvas = document.getElementById( "pathCanvas" ).getContext( "2d" )
+          var pathCanvas = getCanvas( "pathCanvas" )
 
           // Clear canvas.
           pathCanvas.clearRect( 0, 0, baseGraphicWidth, baseGraphicHeight )
@@ -475,7 +490,7 @@ function PositionGraphic( modules )
           lastY = motorY
         }
 
-        var seekCanvas = document.getElementById( "seekCanvas" ).getContext( "2d" )
+        var seekCanvas = getCanvas( "seekCanvas" )
 
         // If there is a starting point and X/Y is in motion.
         if ( ( null !== startingX )

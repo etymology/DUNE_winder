@@ -27,22 +27,6 @@ main
   width: calc( 100% - 20px );
 }
 
-div.jog
-{
-  background: none;
-  width: 175px;
-  margin: auto;
-}
-
-button.jog
-{
-  height: 50px;
-  width:  50px;
-  font-size: 200%;
-  margin: 2px;
-  float: left;
-}
-
 #velocitySliderBox
 {
   margin-left: 10px;

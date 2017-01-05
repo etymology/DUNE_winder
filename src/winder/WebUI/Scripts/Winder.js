@@ -31,7 +31,7 @@ var Winder = function( modules )
   var isInError = false
 
   // Instance of timer for periodic updates.  Used to stop timer.
-  var periodicTimer
+  var periodicTimer = null
 
   // Instance of data loading in periodic updates.  Used to stop load during
   // shutdown.
@@ -291,11 +291,6 @@ var Winder = function( modules )
 
     }
 
-    // Setup to run this function again.  (i.e. make it periodic.)
-    // NOTE: This needs to happen even if the function was skipped due to
-    // the semaphore being in use.
-    if ( ! self.periodicShutdown )
-      periodicTimer = setTimeout( self.periodicUpdate, updateRate )
   }
 
   //---------------------------------------------------------------------------
@@ -1035,7 +1030,7 @@ var Winder = function( modules )
   {
     // Shutdown timer.
     if ( periodicTimer )
-      clearTimeout( periodicTimer )
+      clearInterval( periodicTimer )
 
     // Abort any running loads in progress.
     if ( periodicLoadInstance )
@@ -1055,8 +1050,8 @@ var Winder = function( modules )
     var wasShutdown = this.periodicShutdown
     self.periodicShutdown = false
 
-    if ( ! periodicTimer )
-      self.periodicUpdate()
+    if ( null == periodicTimer )
+      periodicTimer = setInterval( self.periodicUpdate, updateRate )
 
     if ( wasShutdown )
       // Run error-clear callbacks.

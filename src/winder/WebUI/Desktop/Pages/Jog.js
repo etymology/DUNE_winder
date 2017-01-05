@@ -70,67 +70,10 @@ function Jog( modules )
 
   //-----------------------------------------------------------------------------
   // Uses:
-  //   Callback to start X/Y axis jog.
-  // Input:
-  //   x - Direction (1,-1, 0) for x-axis.
-  //   y - Direction (1,-1, 0) for y-axis.
-  //-----------------------------------------------------------------------------
-  this.jogXY_Start = function( x, y )
-  {
-    // Convert direction to velocity.
-    var velocity = this.getVelocity()
-    x *= velocity
-    y *= velocity
-
-    // When both velocities are the same, calculate the maximum linear velocity
-    // and use that.
-    if ( ( 0 != x )
-      && ( 0 != y )
-      && ( Math.abs( x ) == Math.abs( y ) ) )
-    {
-      velocity = Math.sqrt( x * x / 2.0 )
-
-      if ( x < 0 )
-        x = -velocity
-      else
-        x = velocity
-
-      if ( y < 0 )
-        y = -velocity
-      else
-        y = velocity
-    }
-
-    var acceleration = this.getAcceleration()
-    var deceleration = this.getDeceleration()
-
-    winder.remoteAction
-    (
-      "process.jogXY(" + x + "," + y + "," + acceleration + "," + deceleration + ")"
-    )
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Callback to stop X/Y jogging.
-  //-----------------------------------------------------------------------------
-  this.jogXY_Stop = function()
-  {
-    winder.remoteAction( "process.jogXY( 0, 0 )" )
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
   //   Callback to start X/Y axis seek.
   //-----------------------------------------------------------------------------
   this.seekXY = function( x, y )
   {
-    if ( null == x )
-      x = $( "#seekX" ).val()
-
-    if ( null == y )
-      y = $( "#seekY" ).val()
-
     var velocity = this.getVelocity()
     var acceleration = this.getAcceleration()
     var deceleration = this.getDeceleration()
@@ -145,7 +88,12 @@ function Jog( modules )
     )
   }
 
-  // $$$DEBUG
+  //-----------------------------------------------------------------------------
+  // Uses:
+  //   Callback to seek from one of the seek sets.
+  // Input:
+
+  //-----------------------------------------------------------------------------
   this.seekXY_Set = function( setName )
   {
     var x = $( "#seekX_" + setName ).val()
@@ -367,6 +315,18 @@ function Jog( modules )
     {
       var incrementalJog = modules.get( "IncrementalJog" )
       incrementalJog.velocityCallback( self.getVelocity )
+    }
+  )
+
+  // Jog joystick.
+  page.loadSubPage
+  (
+    "/Desktop/Modules/JogJoystick",
+    "#jogJoystickDiv",
+    function()
+    {
+      var jogJoystick = modules.get( "JogJoystick" )
+      jogJoystick.callbacks( self.getVelocity, self.getAcceleration, self.getDeceleration )
     }
   )
 
