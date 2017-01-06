@@ -1,11 +1,16 @@
     <section id="section1">
-      <article id="cameraDiv">
-        <img id="cameraImage" alt="Camera image" />
-        <div id="cameraStats">
-          <p>Result: <span id="cameraResult">-</span></p>
-          <p>Score: <span id="cameraScore">-</span></p>
-          <p>X: <span id="cameraX">-</span></p>
-          <p>Y: <span id="cameraY">-</span></p>
+      <article>
+        <div id="cameraDiv">
+          <img id="cameraImage" alt="Camera image" />
+          <canvas id="cameraCanvas" width="640px" height="480px" />
+
+          <div id="cameraStats">
+            <p>Result: <span id="cameraResult">-</span></p>
+            <p>Score: <span id="cameraScore">-</span></p>
+            <p>X: <span id="cameraX">-</span></p>
+            <p>Y: <span id="cameraY">-</span></p>
+          </div>
+
         </div>
       </article>
       <div id="debugText"></div>
@@ -49,9 +54,41 @@
       </article>
 
       <article>
-        <h3>Nominal pin</h3>
-        <input id="nominalPin" />
-        <button id="nominalPinSeek">Seek</button>
+        <h2>Nominal pin</h2>
+        <div>
+          <input id="nominalPin" />
+          <button id="nominalPinSeek">Seek</button>
+        </div>
+      </article>
+
+      <article>
+        <h2>Manual Scan</h2>
+        <div>
+          <input id="startPin" />
+          <label for="startPin">Start pin</label>
+        </div>
+
+        <div>
+          <input id="endPin" />
+          <label for="endPin">End pin</label>
+        </div>
+
+        <div>
+          <input id="spacingX" />
+          <label for="spacingX">Pin spacing X</label>
+        </div>
+
+        <div>
+          <input id="spacingY" />
+          <label for="spacingY">Pin spacing Y</label>
+        </div>
+
+        <div>
+          <input id="velocity" />
+          <label for="velocity">Velocity</label>
+        </div>
+
+        <button id="scanButton">Scan</button>
       </article>
 
       <article>

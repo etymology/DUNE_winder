@@ -1009,6 +1009,43 @@ class Process :
     return self._cameraURL
 
   #---------------------------------------------------------------------
+  def startManualCalibrate( self, deltaX, deltaY, counts, velocity=None, acceleration=None, deceleration=None ) :
+    """
+    $$$DEBUG
+    """
+
+    if not self.controlStateMachine.isMovementReady() :
+      self._log.add(
+        self.__class__.__name__,
+        "CALIBRATION_ERROR",
+        "Manual calibration edge scan error--machine not idle.",
+        [ deltaX, deltaY, velocity, acceleration, deceleration ]
+      )
+    else :
+      xPosition = self._io.xAxis.getPosition() + deltaX * counts
+      yPosition = self._io.yAxis.getPosition() + deltaY * counts
+
+      self._io.camera.startScan( deltaX, deltaY )
+
+      self._log.add(
+        self.__class__.__name__,
+        "CALIBRATION",
+        "Manual scan.  X/Y to (" + str( xPosition )
+          + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
+          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
+        [ xPosition, yPosition, velocity, acceleration, deceleration ]
+      )
+
+      self.controlStateMachine.seekX = xPosition
+      self.controlStateMachine.seekY = yPosition
+      self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.seekAcceleration = acceleration
+      self.controlStateMachine.seekDeceleration = deceleration
+      self.controlStateMachine.calibrationRequest = True
+
+    return isError
+
+  #---------------------------------------------------------------------
   def startCalibrationScanEdge( self, travel, velocity=None, acceleration=None, deceleration=None ) :
     """
     To a calibration scan of a single edge on the current layer.

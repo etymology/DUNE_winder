@@ -21,11 +21,16 @@ section
 
 #cameraDiv
 {
+  width: 640px;
+  height: 480px;
   position: relative;
 }
 
-#cameraImage
+#cameraCanvas
 {
+  position: absolute;
+  top: 0px;
+  left: 0px;
   width: 640px;
   height: 480px;
 }
@@ -79,9 +84,6 @@ div.triggerButtons button
   text-align: center;
 }
 
-
-
-
 #table-wrapper
 {
   position: relative;
@@ -106,4 +108,11 @@ div.triggerButtons button
   z-index: 2;
   height: 20px;
   width: 100%;
+}
+
+input
+{
+  width: 50px;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }

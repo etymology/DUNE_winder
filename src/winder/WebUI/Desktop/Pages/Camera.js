@@ -9,10 +9,25 @@ function Camera( modules )
   // How often to update the image from the camera.
   var CAMERA_UPDATE_RATE = 500
 
+  var IMAGE_WIDTH  = 640
+  var IMAGE_HEIGHT = 480
+
   var page = modules.get( "Page" )
   var winder = modules.get( "Winder" )
 
   var cameraTimer
+
+  var lastCapture = {}
+
+  var motorStatus
+  modules.load
+  (
+    "/Desktop/Modules/MotorStatus",
+    function()
+    {
+      motorStatus = modules.get( "MotorStatus" )
+    }
+  )
 
   // Motor status.
   page.loadSubPage
@@ -37,7 +52,7 @@ function Camera( modules )
 
         winder.remoteAction
         (
-          "io.camera.cameraTrigger.set( 1 )",
+          "[ io.camera.cameraTriggerEnable.set( 1 ), io.camera.cameraTrigger.set( 1 ) ]",
           function()
           {
             //winder.remoteAction( "io.camera.cameraTrigger.set( 0 )" )
@@ -52,7 +67,8 @@ function Camera( modules )
     (
       function()
       {
-        winder.remoteAction( "process.manualSeekXY( 110., 300., 400., 200., 200. )" )
+        //winder.remoteAction( "process.manualSeekXY( 110., 300., 400., 200., 200. )" )
+        winder.remoteAction( "io.camera.cameraTrigger.set( 0 )" )
       }
     )
 
@@ -110,11 +126,72 @@ function Camera( modules )
       }
     )
 
-  winder.addPeriodicDisplay( "io.camera.cameraResultStatus.get()", "#cameraResult" )
-  winder.addPeriodicDisplay( "io.camera.cameraResultScore.get()", "#cameraScore" )
-  winder.addPeriodicDisplay( "io.camera.cameraResultX.get()", "#cameraX" )
-  winder.addPeriodicDisplay( "io.camera.cameraResultY.get()", "#cameraY" )
 
+  $( "#scanButton" )
+    .click
+    (
+      function()
+      {
+        var startPin = parseInt( $( "#startPin" ).val() )
+        var endPin   = parseInt( $( "#endPin"   ).val() )
+        var spacingX = parseFloat( $( "#spacingX" ).val() )
+        var spacingY = parseFloat( $( "#spacingY" ).val() )
+        var velocity = parseFloat( $( "#velocity" ).val() )
+
+        var pinDelta = endPin - startPin
+
+        var startX = motorStatus.motor[ "xPosition" ]
+        var startY = motorStatus.motor[ "yPosition" ]
+        var endX = startX + spacingX * pinDelta
+        var endY = startY + spacingY * pinDelta
+
+        var command = "process.startManualCalibrate( " + spacingX + ", " + spacingY + ", " + pinDelta + ", " + velocity + " )"
+
+        console.log( command )
+        winder.remoteAction( command )
+      }
+    )
+
+  winder.addPeriodicDisplay( "io.camera.cameraResultStatus.get()", "#cameraResult", lastCapture, "status" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultScore.get()", "#cameraScore", lastCapture, "score" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultX.get()", "#cameraX", lastCapture, "x" )
+  winder.addPeriodicDisplay( "io.camera.cameraResultY.get()", "#cameraY", lastCapture, "y" )
+
+  //---------------------------------------------------------------------------
+  // $$$DEBUG
+  //---------------------------------------------------------------------------
+  function line( canvas, x1, y1, x2, y2 )
+  {
+    canvas.beginPath()
+    canvas.moveTo( x1, y1 )
+    canvas.lineTo( x2, y2 )
+    canvas.stroke()
+  }
+
+  //---------------------------------------------------------------------------
+  // $$$DEBUG
+  //---------------------------------------------------------------------------
+  function crosshairs( canvas, x, y, length )
+  {
+    line( canvas, x - length, y, x + length, y )
+    line( canvas, x, y - length, x, y + length )
+  }
+
+  //---------------------------------------------------------------------------
+  // $$$DEBUG - Doesn't work.  Fix.
+  //---------------------------------------------------------------------------
+  function bigCrosshairs( canvas, x, y, length )
+  {
+    line( canvas, x - length, y - 1, x + length, y - 1 )
+    line( canvas, x - length, y + 1, x + length, y + 1 )
+
+    line( canvas, x - 1, y - length, x - 1, y + length )
+    line( canvas, x + 1, y - length, x + 1, y + length )
+  }
+
+  //---------------------------------------------------------------------------
+  // $$$DEBUG
+  //---------------------------------------------------------------------------
   var count = 0
   var cameraURL
   var cameraUpdateFunction = function()
@@ -122,6 +199,29 @@ function Camera( modules )
     var url = cameraURL + "?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
     $( "#cameraImage" )
       .attr( "src", url )
+      .bind
+      (
+        "load",
+        function()
+        {
+          var canvas = getCanvas( "cameraCanvas" )
+          canvas.clearRect( 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT )
+
+          //canvas.lineWidth = 3
+          //canvas.strokeStyle = "white"
+          //crosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
+
+          canvas.lineWidth = 1
+          canvas.strokeStyle = "black"
+          crosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
+          //bigCrosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
+
+          canvas.strokeStyle = "Magenta"
+          crosshairs( canvas, lastCapture[ "x" ], lastCapture[ "y" ], 10 )
+
+
+        }
+      )
   }
 
   // Function to load the URL of the camera's last captured image.
@@ -228,6 +328,25 @@ function Camera( modules )
 
   var oldData = null
 
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Get a canvas context by name.
+  //---------------------------------------------------------------------------
+  function getCanvas( canvasName )
+  {
+    var canvas = document.getElementById( canvasName )
+    var context
+
+    if ( canvas )
+      context = canvas.getContext( "2d" )
+
+    return context
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   $$$DEBUG
+  //---------------------------------------------------------------------------
   function isCaptureFIFO_Different( a, b )
   {
     var isDifferent = false
@@ -307,9 +426,25 @@ function Camera( modules )
         }
 
         $( "#calibrationTable" ).replaceWith( table )
+
       }
+
     }
   )
 
   loadCameraURL()
+
+  // Register shutdown function that will stop the camera updates.
+  modules.registerShutdownCallback
+  (
+    function()
+    {
+      if ( cameraTimer )
+      {
+        clearInterval( cameraTimer )
+        cameraTimer = null
+      }
+    }
+
+  )
 }
