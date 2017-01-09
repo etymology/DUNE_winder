@@ -43,7 +43,9 @@ class HardwareMode( StateMachineState ) :
       self.log.add(
         self.__class__.__name__,
         "HARD_ERROR",
-        "PLC error reported."
+        "PLC error reported: " + self.io.plcLogic.getErrorCodeString()
+          + " [" + str( self.io.plcLogic.getErrorCode() ) + "]",
+        [ str( self.io.plcLogic.getErrorCode() ) ]
       )
 
     return False
@@ -98,11 +100,12 @@ class HardwareMode( StateMachineState ) :
 
       if not self.isStateClear and isStateClear :
 
-        # $$$FUTURE : Log which PLC error.
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
-          "PLC error reported."
+          "PLC error reported: " + self.io.plcLogic.getErrorCodeString()
+            + " [" + str( self.io.plcLogic.getErrorCode() ) + "]",
+          [ str( self.io.plcLogic.getErrorCode() ) ]
         )
         self.isStateClear = False
 

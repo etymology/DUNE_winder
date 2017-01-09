@@ -45,7 +45,7 @@ function Camera( modules )
     }
   )
 
-  $( "#cameraTriggerButton" )
+  $( "#triggerStartButton" )
     .click
     (
       function()
@@ -63,7 +63,7 @@ function Camera( modules )
       }
     )
 
-  $( "#moveStart" )
+  $( "#triggerStopButton" )
     .click
     (
       function()
@@ -73,12 +73,26 @@ function Camera( modules )
       }
     )
 
-  $( "#moveEnd" )
+  $( "#centerButton" )
     .click
     (
       function()
       {
-        winder.remoteAction( "process.manualSeekXY( 110., 600., 400., 200., 200. )" )
+        var pixelsPer_mm = 17.7734782609
+        //parseFloat( $( "pixelsPer_mm" ).val() )
+
+        // (Yes, x and y are reversed)
+        var y = ( IMAGE_WIDTH  / 2 ) - parseFloat( lastCapture[ "x" ] )
+        var x = ( IMAGE_HEIGHT / 2 ) - parseFloat( lastCapture[ "y" ] )
+
+        x /= pixelsPer_mm
+        y /= pixelsPer_mm
+
+        x = parseFloat( motorStatus.motor[ "xPosition" ] ) + x
+        y = parseFloat( motorStatus.motor[ "yPosition" ] ) - y
+
+        winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + ", 50 )"  )
+        //alert( x + " " + y )
       }
     )
 
@@ -600,7 +614,6 @@ function Camera( modules )
         setState( 0 )
       }
     )
-
 
   // Register shutdown function that will stop the camera updates.
   modules.registerShutdownCallback
