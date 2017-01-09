@@ -265,10 +265,23 @@ class PLC_Simulator :
     self._zAxis.poll()
 
     # Local function to validate that motor positions are within limits.
-    def verifyPositionLimits( axis, axisIO, positionMin, positionMax ) :
+    def verifyPositionLimits( axis, axisIO, positionMin, positionMax, mEndOfTravel, pEndOfTravel ) :
+      position = axisIO.getPosition()
+      if ( None != mEndOfTravel ) :
+        if ( position < positionMin ) :
+          mEndOfTravel.set( False )
+        else:
+          mEndOfTravel.set( True )
+
+      if ( None != pEndOfTravel ) :
+        if ( position > positionMax ) :
+          pEndOfTravel.set( False )
+        else:
+          pEndOfTravel.set( True )
+
       if axis.isInMotion() :
-        position = axisIO.getPosition()
         velocity = axisIO.getVelocity()
+
         if   ( ( velocity + self.VELOCITY_ERROR ) < 0 and position < positionMin ) \
           or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
 
@@ -284,9 +297,9 @@ class PLC_Simulator :
           self._zAxis.hardStop()
 
     # Verify that all axis potions are within limits.
-    verifyPositionLimits( self._xAxis, self._io.xAxis, self._xMin, self._xMax )
-    verifyPositionLimits( self._yAxis, self._io.yAxis, self._yMin, self._yMax )
-    verifyPositionLimits( self._zAxis, self._io.zAxis, self._zMin, self._zMax )
+    verifyPositionLimits( self._xAxis, self._io.xAxis, self._xMin, self._xMax, self.endOfTravel_Xm, self.endOfTravel_Xp )
+    verifyPositionLimits( self._yAxis, self._io.yAxis, self._yMin, self._yMax, self.endOfTravel_Ym, self.endOfTravel_Yp )
+    verifyPositionLimits( self._zAxis, self._io.zAxis, self._zMin, self._zMax, None, None )
 
     #
     # Simulate inputs based on machine state.
@@ -301,9 +314,9 @@ class PLC_Simulator :
     # End-of-travels.
     if self._io.zAxis.getPosition() > self._zMax \
       or self._io.zAxis.getPosition() < self._zMin :
-      self.Z_End_of_Travel.set( True )
-    else :
       self.Z_End_of_Travel.set( False )
+    else :
+      self.Z_End_of_Travel.set( True )
 
     # Latch and present sensors.
     latchPosition = self._io.plc.getTag( self._actuatorPosition )
@@ -465,10 +478,10 @@ class PLC_Simulator :
     self.X_Transfer_OK       = self.SimulatedInput( io, "Machine_SW_Stat", 15, False )
     self.Y_Mount_Transfer_OK = self.SimulatedInput( io, "Machine_SW_Stat", 16, False )
     self.Y_Transfer_OK       = self.SimulatedInput( io, "Machine_SW_Stat", 17, False )
-    self.endOfTravel_Yp      = self.SimulatedInput( io, "Machine_SW_Stat", 18, False )
-    self.endOfTravel_Ym      = self.SimulatedInput( io, "Machine_SW_Stat", 19, False )
-    self.endOfTravel_Xp      = self.SimulatedInput( io, "Machine_SW_Stat", 20, False )
-    self.endOfTravel_Xm      = self.SimulatedInput( io, "Machine_SW_Stat", 21, False )
+    self.endOfTravel_Yp      = self.SimulatedInput( io, "Machine_SW_Stat", 18, True )
+    self.endOfTravel_Ym      = self.SimulatedInput( io, "Machine_SW_Stat", 19, True )
+    self.endOfTravel_Xp      = self.SimulatedInput( io, "Machine_SW_Stat", 20, True )
+    self.endOfTravel_Xm      = self.SimulatedInput( io, "Machine_SW_Stat", 21, True )
     self.Rotation_Lock_key   = self.SimulatedInput( io, "Machine_SW_Stat", 22, True  )
 
     # True to use real-time for simulations, False for using a time delta.

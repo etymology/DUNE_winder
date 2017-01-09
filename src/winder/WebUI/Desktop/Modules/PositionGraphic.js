@@ -381,8 +381,8 @@ function PositionGraphic( modules )
         statusLight( xyStatusCanvas, x, 440, inputs[ "Y_Mount_Transfer_OK" ] )
         statusLight( xyStatusCanvas, x,  40, inputs[ "Y_Transfer_OK" ] )
 
-        statusLight( xyStatusCanvas, x, 460, inputs[ "endOfTravel_Yp" ] )
-        statusLight( xyStatusCanvas, x,  20, inputs[ "endOfTravel_Ym" ] )
+        statusLight( xyStatusCanvas, x, 460, inputs[ "endOfTravel_Ym" ], true )
+        statusLight( xyStatusCanvas, x,  20, inputs[ "endOfTravel_Yp" ], true )
 
         // Y-motor status.
         statusLight( xyStatusCanvas, x + 20, 460, inputs[ "yFunctional" ] )

@@ -116,3 +116,12 @@ input
   margin-right: 5px;
   margin-bottom: 5px;
 }
+
+button.notSelected
+{
+  visibility: hidden;
+}
+
+button.selected
+{
+}

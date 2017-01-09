@@ -167,9 +167,10 @@ var Modules = function()
             }
             catch ( exception )
             {
+              console.log( "Failed to create instance of " + module )
+
               // Any exception means the module failed to load correctly.
               errorFunction()
-              console.log( "Failed to create instance of " + module )
             }
 
             // Module count is one closer to finished.

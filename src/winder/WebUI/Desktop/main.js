@@ -101,9 +101,10 @@ function setupMainScreen()
 var baseStylesheets = []
 function load( pageName )
 {
+  var page = window[ "page" ]
+
   if ( ! USE_FULL_PAGE_CACHE )
   {
-    var page = window[ "page" ]
     var modules = page.getModules()
     modules.shutdown()
 
@@ -142,11 +143,27 @@ function load( pageName )
     (
       pageName,
       "#main",
-      setupMainScreen
+      setupMainScreen,
+      null,
+      function( module )
+      {
+        alert( "Problems loading the module: " + module )
+      }
     )
   }
   else
-    page.load( page )
+    // Loading sub page and setup main screen after sub page finishes loading.
+    page.load
+    (
+      pageName,
+      "#main",
+      setupMainScreen,
+      null,
+      function( module )
+      {
+        alert( "Problems loading the module: " + module )
+      }
+    )
 }
 
 //-----------------------------------------------------------------------------

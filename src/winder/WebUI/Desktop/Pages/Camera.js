@@ -9,6 +9,7 @@ function Camera( modules )
   // How often to update the image from the camera.
   var CAMERA_UPDATE_RATE = 500
 
+  // Dimensions of image from camera.
   var IMAGE_WIDTH  = 640
   var IMAGE_HEIGHT = 480
 
@@ -310,13 +311,14 @@ function Camera( modules )
         []
       )
 
-
+  //---------------------------------------------------------------------------
+  // $$$DEBUG
+  //---------------------------------------------------------------------------
   function round( value, decimals )
   {
     var multiplier = Math.pow( 10, decimals )
     return Math.round( value * multiplier ) / multiplier
   }
-
 
   // $$$ var rand = function() { return Math.round( Math.random() * 10 ); }
   // $$$ var tempData = []
@@ -433,6 +435,172 @@ function Camera( modules )
   )
 
   loadCameraURL()
+
+  var ENABLE_STATES =
+  [
+    {
+      tl : true,
+      t  : false,
+      tr : true,
+      l  : false,
+      go : false,
+      r  : false,
+      bl : true,
+      b  : false,
+      br : true
+    },
+
+    {
+      tl : false,
+      t  : true,
+      tr : false,
+      l  : true,
+      go : false,
+      r  : true,
+      bl : false,
+      b  : true,
+      br : false
+    },
+
+    {
+      tl : false,
+      t  : false,
+      tr : false,
+      l  : false,
+      go : true,
+      r  : false,
+      bl : false,
+      b  : false,
+      br : false
+    }
+  ]
+
+  //---------------------------------------------------------------------------
+  // $$$DEBUG
+  //---------------------------------------------------------------------------
+  function setState( state )
+  {
+    for ( var tag in ENABLE_STATES[ state ] )
+      $( "#" + tag ).prop( "disabled", ! ENABLE_STATES[ state ][ tag ] )
+  }
+
+  //---------------------------------------------------------------------------
+  // $$$DEBUG
+  //---------------------------------------------------------------------------
+  var selectedCorner = null
+
+  var OUTER =
+  [
+    "#tl",
+    "#tr",
+    "#bl",
+    "#br",
+    "#t",
+    "#l",
+    "#r",
+    "#b"
+  ]
+
+  var CORNERS =
+  [
+    [ "#tl", "tl" ],
+    [ "#tr", "tr" ],
+    [ "#bl", "bl" ],
+    [ "#br", "br" ]
+  ]
+
+  for ( var index in CORNERS )
+  {
+    let corner = CORNERS[ index ]
+    $( corner[ 0 ] )
+      .click
+      (
+        function()
+        {
+          $( corner[ 0 ] ).attr( "class", "selected" )
+          selectedCorner = corner[ 1 ]
+          setState( 1 )
+        }
+      )
+  }
+
+  var EDGES =
+  [
+    [ "#t", "t" ],
+    [ "#l", "l" ],
+    [ "#r", "r" ],
+    [ "#b", "b" ]
+  ]
+
+  //
+
+  var scanDirection
+  for ( var index in EDGES )
+  {
+    let edge = EDGES[ index ]
+    $( edge[ 0 ] )
+      .click
+      (
+        function()
+        {
+          var selectedEdge = edge[ 1 ]
+          var otherSelection = selectedCorner.replace( selectedEdge, "" )
+
+          var DIRECTIONS =
+          {
+            l: "r",
+            r: "l",
+            t: "b",
+            b: "t"
+          }
+
+          var direction = DIRECTIONS[ otherSelection ]
+
+          scanDirection = otherSelection + direction
+
+          var ARROWS =
+          {
+            lr: "&#8594;",
+            rl: "&#8592;",
+            tb: "&#8595;",
+            bt: "&#8593;"
+          }
+
+          for ( var item in OUTER )
+            if ( ( OUTER[ item ] != ( "#" + selectedEdge ) )
+              && ( OUTER[ item ] != ( "#" + selectedCorner ) ) )
+            {
+                $( OUTER[ item ] ).attr( "class", "notSelected" )
+            }
+
+          $( edge[ 0 ] ).html( ARROWS[ scanDirection ] )
+
+          setState( 2 )
+        }
+      )
+  }
+
+  setState( 0 )
+
+  $( "#go" )
+    .click
+    (
+      function()
+      {
+        $( "#tl" ).attr( "class", "" )
+        $( "#tr" ).attr( "class", "" )
+        $( "#bl" ).attr( "class", "" )
+        $( "#br" ).attr( "class", "" )
+
+        $( "#t" ).html( "&#8660;" ).attr( "class", "" )
+        $( "#l" ).html( "&#8661;" ).attr( "class", "" )
+        $( "#r" ).html( "&#8661;" ).attr( "class", "" )
+        $( "#b" ).html( "&#8660;" ).attr( "class", "" )
+
+        setState( 0 )
+      }
+    )
+
 
   // Register shutdown function that will stop the camera updates.
   modules.registerShutdownCallback
