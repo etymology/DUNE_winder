@@ -154,8 +154,8 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
             if ( ( $.isNumeric( a[ sortColumn ] ) )
               && ( $.isNumeric( b[ sortColumn ] ) ) )
             {
-              a = parseFloat( a )
-              b = parseFloat( b )
+              a = parseFloat( a[ sortColumn ] )
+              b = parseFloat( b[ sortColumn ] )
               result = 0
               if ( a > b )
                 result = 1
