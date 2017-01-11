@@ -334,13 +334,20 @@ function Camera( modules )
     return Math.round( value * multiplier ) / multiplier
   }
 
-  // $$$ var rand = function() { return Math.round( Math.random() * 10 ); }
-  // $$$ var tempData = []
-  // $$$ for ( var count = 0; count < 800; count += 1 )
-  // $$$   tempData.push
-  // $$$   (
-  // $$$     { MotorX: rand(), MotorY: rand(), Status: rand(), MatchLevel: rand(), CameraX: rand(), CameraY: rand() },
-  // $$$   )
+  var rand = function() { return Math.round( Math.random() * 10 ); }
+  var tempData = []
+  for ( var count = 0; count < 800; count += 1 )
+    tempData.push
+    (
+      {
+        MotorX: Math.random(),
+        MotorY: Math.random(),
+        Status: rand(),
+        MatchLevel: Math.random() * 100,
+        CameraX: Math.random(),
+        CameraY: Math.random()
+      },
+    )
 
   var oldData = null
 
@@ -397,7 +404,9 @@ function Camera( modules )
       // $$$ count += 1
       // $$$ $( "#debugText" ).text( count )
       // $$$
-      // $$$ data = tempData
+
+      // $$$DEBUG - Remove.
+      data = tempData
 
       if ( isCaptureFIFO_Different( data, oldData ) )
       {
@@ -425,7 +434,7 @@ function Camera( modules )
               round( row.MotorX, 2 ),
               round( row.MotorY, 2 ),
               row.Status,
-              row.MatchLevel,
+              row.MatchLevel, //round( row.MatchLevel, 0 ),
               round( row.CameraX, 2 ),
               round( row.CameraY, 2 ),
             ]

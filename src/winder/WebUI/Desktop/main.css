@@ -121,43 +121,6 @@ h1, h2, h3, h4, h5, h6, p
   padding: 0;
 }
 
-/*
- * Drop-down boxes.
- */
-.dropDown
-{
-  position: relative;
-  display: inline-block;
-}
-
-.dropDown p
-{
-  display: block;
-  min-width: 100px;
-  text-align: center;
-  padding: 2px;
-  border-radius: 5% !important;
-}
-
-.dropDown div
-{
-  padding: 4px;
-  display: none;
-  position: absolute;
-  min-width: 160px;
-  background-color: rgb( 99, 99, 129 );
-}
-
-.dropDown button
-{
-  min-width: 150px;
-}
-
-.dropDown:hover div
-{
-  display: block;
-}
-
 input.changed
 {
   background-color: grey;
@@ -185,3 +148,74 @@ input.error
 {
   display: none;
 }
+
+
+/*
+ * Filter table
+ */
+div.filter-table
+{
+}
+
+div.filter-table table
+{
+  width: calc( 100% - 16px );
+  table-layout: fixed;
+}
+
+div.filter-table-outer
+{
+  position: relative;
+  height: 100%;
+}
+
+div.filter-table-inner
+{
+  overflow-y: scroll;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/*
+ * Drop-down boxes.
+ */
+.dropDown
+{
+  position: relative;
+  display: inline-block;
+}
+
+.dropDown p
+{
+  display: block;
+  min-width: 100px;
+  text-align: center;
+  padding: 2px;
+  border-radius: 5% !important;
+}
+
+.dropDown div
+{
+  z-index: 2;
+  padding: 4px;
+  display: none;
+  position: absolute;
+  min-width: 160px;
+  background-color: rgb( 99, 99, 129 );
+}
+
+.dropDown button
+{
+  min-width: 150px;
+}
+
+.dropDown:hover div
+{
+  display: block;
+}
+/*
+ * --------------------------
+ */

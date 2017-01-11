@@ -16,7 +16,7 @@ function Log( modules )
         (
           [ "Time", "Module", "Type", "Description" ],
           [ false, true, true, false ],
-          [ "200px", "25px", "25px" ]
+          [ "200px", "150px", "150px" ]
         )
 
     var query = "log.getAll( 50 )"

@@ -37,6 +37,10 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
   var displayCallback = null
 
+  // Lookup table between the raw array and the filtered.
+  // Used to translate the row index of 'data' to the row id in the HTML table.
+  var sortLookup = {}
+
   // If using a global filter enable, or no filters are enabled...
   if ( ( false === columnFilterEnables )
     || ( true === columnFilterEnables )
@@ -94,7 +98,8 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     // Loop through all the raw data looking for matches...
     for ( var rowIndex in data )
     {
-      var row = data[ rowIndex ]
+      var row = data[ rowIndex ].slice()
+      row.push( rowIndex )
 
       var addRow = true
       for ( var column in row )
@@ -186,25 +191,35 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     // Tag id without hash character.
     var idString = tableId.replace( "#", "" )
 
-    // Create a new table element to replace old.
-    var table = $( "<table />" ).attr( "id", idString )
-    $( tableId ).replaceWith( table )
+    var displayDiv =
+      $( "<div />" )
+        .attr( "class", "filter-table" )
+        .attr( "id", idString )
 
-    // If there are column widths to use...
-    if ( columnWidths )
+    // Create a new table element to replace old.
+    var table = $( "<table />" )
+      .appendTo( displayDiv )
+
+    function setupColumnWidths( table, columnWidths )
     {
-      // For each of the columns, set the width.
-      // NOTE: Additional styles can be applied from style sheet--this is only
-      // for widths.
-      var tableRow = $( "<colgroup />" ).appendTo( table )
-      for ( var index in columnWidths )
+      // If there are column widths to use...
+      if ( columnWidths )
       {
-        var width = columnWidths[ index ]
-        $( "<col/>" )
-          .appendTo( tableRow )
-          .width( width )
+        // For each of the columns, set the width.
+        // NOTE: Additional styles can be applied from style sheet--this is only
+        // for widths.
+        var tableRow = $( "<colgroup />" ).appendTo( table )
+        for ( var index in columnWidths )
+        {
+          var width = columnWidths[ index ]
+          $( "<col/>" )
+            .appendTo( tableRow )
+            .width( width )
+        }
       }
     }
+
+    setupColumnWidths( table, columnWidths )
 
     var newColumnFilters = []
     var tableHeader = $( "<thead />" ).appendTo( table )
@@ -411,27 +426,56 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
     // If there is as yet no filtered data, use the full data set.
     if ( ! filteredData )
-      filteredData = data
+      this.filter()
+
+    var outerDiv =
+      $( "<div />" )
+        .attr( "class", "filter-table-outer" )
+        .appendTo( displayDiv )
+
+    var innerDiv =
+      $( "<div />" )
+        .attr( "class", "filter-table-inner" )
+        .appendTo( outerDiv )
+
+    // Create a new table element to replace old.
+    var table = $( "<table />" )
+      .appendTo( innerDiv )
+
+    setupColumnWidths( table, columnWidths )
+
+    // Reset sort lookup table.  We'll rebuild it during this loop.
+    sortLookup = {}
 
     // Fill the body of the table with data.
     var tableBody = $( "<tbody />" ).appendTo( table )
     for ( var row in filteredData )
     {
       var rowData = filteredData[ row ]
-      var tableRow = $( "<tr />" ).appendTo( tableBody )
+
+      // Last column is the sort index.
+      var indexColumn = rowData.length - 1
+      sortLookup[ rowData[ indexColumn ] ] = row
+
+      var tableRow = $( "<tr />" )
+        .attr( "id", "row_" + this.id + "_" + row )
+        .appendTo( tableBody )
+
       for ( var index in rowData )
       {
         var item = rowData[ index ]
-        $( "<td/>" )
-          .appendTo( tableRow )
-          .attr( "id", "cell_" + this.id + "_" + row + "_" + index )
-          .text( item )
+        if ( index != indexColumn )
+          $( "<td/>" )
+            .appendTo( tableRow )
+            .attr( "id", "cell_" + this.id + "_" + row + "_" + index )
+            .text( item )
       }
     }
 
+    $( tableId ).replaceWith( displayDiv )
+
     if ( displayCallback )
       displayCallback()
-
   }
 
   //---------------------------------------------------------------------------
@@ -495,11 +539,19 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   //   row - Desired row.
   //   column - Desired column.
   // Output:
-  //   Tag id for desired cell.
+  //   Tag id for desired cell.  null if this row doesn't exist (i.e. has been
+  //   filtered out).
   //---------------------------------------------------------------------------
   this.getCellId = function( row, column )
   {
-    return "cell_" + this.id + "_" + row + "_" + column
+    var result = null
+    if ( row in sortLookup )
+    {
+      row = sortLookup[ row ]
+      result = "cell_" + this.id + "_" + row + "_" + column
+    }
+
+    return result
   }
 
   //---------------------------------------------------------------------------

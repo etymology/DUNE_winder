@@ -24,16 +24,27 @@ function IO( modules )
         filteredTable.loadFromArray( data )
         filteredTable.display( tag )
 
-        for ( var row in data )
+        for ( let row in data )
         {
           var ioPoint = data[ row ]
           var name = ioPoint[ 0 ]
 
           var query = itemQuery.replace( "$", '"' + name + '"' )
 
-          var id = filteredTable.getCellId( row, 1 )
+          // Update function.
+          winder.addPeriodicCallback
+          (
+            query,
+            function( data )
+            {
+              // Get the cell id this data is stored.
+              var id = filteredTable.getCellId( row, 1 )
 
-          winder.addPeriodicDisplay( query, "#" + id )
+              // If this cell exists...
+              if ( id )
+                $( "#" + id ).html( data )
+            }
+          )
         }
       }
     )

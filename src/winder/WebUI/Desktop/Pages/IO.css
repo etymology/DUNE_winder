@@ -14,3 +14,18 @@
 {
   width: 100%;
 }
+
+div.filter-table
+{
+  height: 850px;
+}
+
+div.filter-table-inner
+{
+  overflow-y: auto;
+}
+
+main article
+{
+  height: calc( 100% - 25px );
+}
