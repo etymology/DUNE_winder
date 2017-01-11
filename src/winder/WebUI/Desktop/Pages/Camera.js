@@ -106,41 +106,15 @@ function Camera( modules )
       }
     )
 
-  $( "#startUp" )
+  $( "#randomButton" )
     .click
     (
       function()
       {
-        // var command = "[" +
-        //   "io.camera.cameraDeltaEnable.set( 0 )," +
-        //   "io.camera.cameraTriggerEnable.set( 1 )," +
-        //   "io.camera.cameraX_Delta.set( 0 )," +
-        //   "io.camera.cameraY_Delta.set( 8 )," +
-        //   "io.camera.cameraDeltaEnable.set( 1 )," +
-        //   "process.manualSeekXY( 110., 600., 50., 200., 200. ) ]"
-        var command = 'process.startCalibrationScanEdge( "LT", 50 )'
-
+        var command = 'io.camera.fillFIFO_WithRandom()'
         winder.remoteAction( command )
       }
     )
-
-  $( "#startDown" )
-    .click
-    (
-      function()
-      {
-        var command = "[" +
-          "io.camera.cameraDeltaEnable.set( 0 )," +
-          "io.camera.cameraTriggerEnable.set( 1 )," +
-          "io.camera.cameraX_Delta.set( 0 )," +
-          "io.camera.cameraY_Delta.set( -8 )," +
-          "io.camera.cameraDeltaEnable.set( 1 )," +
-          "process.manualSeekXY( 110., 300., 50., 200., 200. ) ]"
-
-        winder.remoteAction( command )
-      }
-    )
-
 
   $( "#scanButton" )
     .click
@@ -160,9 +134,13 @@ function Camera( modules )
         var endX = startX + spacingX * pinDelta
         var endY = startY + spacingY * pinDelta
 
-        var command = "process.startManualCalibrate( " + spacingX + ", " + spacingY + ", " + pinDelta + ", " + velocity + " )"
+        var command =
+          "process.startManualCalibrate( "
+          + spacingX + ", "
+          + spacingY + ", "
+          + pinDelta + ", "
+          + velocity + " )"
 
-        console.log( command )
         winder.remoteAction( command )
       }
     )
@@ -334,21 +312,6 @@ function Camera( modules )
     return Math.round( value * multiplier ) / multiplier
   }
 
-  var rand = function() { return Math.round( Math.random() * 10 ); }
-  var tempData = []
-  for ( var count = 0; count < 800; count += 1 )
-    tempData.push
-    (
-      {
-        MotorX: Math.random(),
-        MotorY: Math.random(),
-        Status: rand(),
-        MatchLevel: Math.random() * 100,
-        CameraX: Math.random(),
-        CameraY: Math.random()
-      },
-    )
-
   var oldData = null
 
   //---------------------------------------------------------------------------
@@ -395,63 +358,54 @@ function Camera( modules )
     return isDifferent
   }
 
+  var columnNames = [ "Pin",  "Motor X", "Motor Y", "Status", "Match", "Camera X", "Camera Y" ]
+  var filters     = [ false,  false,     false,     true,     false,   false,      false      ]
+  var widths      = [ "10%",  "15%",     "15%",     "15%",    "15%",   "15%",      "15%"      ]
+  var filteredTable = new FilteredTable( columnNames, filters, widths )
+
+  // Callback when a row on the calibration table is clicked.
+  // The information from the row is put in the Select Pin table.
+  filteredTable.setRowCallback
+  (
+    function( row )
+    {
+      var rowData = oldData[ row ]
+      $( "#selectPin"  ).val( rowData[ "Pin" ] )
+      $( "#selectPinX" ).val( rowData[ "MotorX" ] )
+      $( "#selectPinY" ).val( rowData[ "MotorY" ] )
+    }
+  )
+
   var count = 0
   winder.addPeriodicCallback
   (
-    "io.camera.captureFIFO",
+    "process.getCalibrationData()",
     function( data )
     {
-      // $$$ count += 1
-      // $$$ $( "#debugText" ).text( count )
-      // $$$
-
-      // $$$DEBUG - Remove.
-      data = tempData
-
       if ( isCaptureFIFO_Different( data, oldData ) )
       {
         oldData = data
 
-        var table =
-          $( "<table />" )
-            .attr( "id", "calibrationTable" )
-
-        var theadTag = $( "<thead />" ).appendTo( table )
-
-        var rowTag = $( "<tr />" ).appendTo( theadTag )
-        var heading = [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ]
-        for ( var headingText of heading )
-          $( "<th />" )
-            .text( headingText )
-            .appendTo( rowTag )
-
-        var tbodyTag = $( "<tbody />" ).appendTo( table )
-
-        for ( var row of data )
+        var cleanData = []
+        for ( var rowIndex in data )
         {
-          var rowData =
+          var row = data[ rowIndex ]
+          cleanData.push
+          (
             [
+              row.Pin,
               round( row.MotorX, 2 ),
               round( row.MotorY, 2 ),
               row.Status,
-              row.MatchLevel, //round( row.MatchLevel, 0 ),
+              round( row.MatchLevel, 0 ),
               round( row.CameraX, 2 ),
               round( row.CameraY, 2 ),
             ]
-
-          var rowTag = $( "<tr />" ).appendTo( tbodyTag )
-          for ( var columnIndex in rowData )
-          {
-            var column = rowData[ columnIndex ]
-            $( "<td />" )
-              .appendTo( rowTag )
-              .text( column )
-          }
-
+          )
         }
 
-        $( "#calibrationTable" ).replaceWith( table )
-
+        filteredTable.loadFromArray( cleanData )
+        filteredTable.display( "#calibrationTable" )
       }
 
     }
@@ -621,6 +575,40 @@ function Camera( modules )
         $( "#b" ).html( "&#8660;" ).attr( "class", "" )
 
         setState( 0 )
+      }
+    )
+
+  $( "#selectPinSeek" )
+    .click
+    (
+      function()
+      {
+        var x = parseFloat( $( "#selectPinX" ).val() )
+        var y = parseFloat( $( "#selectPinY" ).val() )
+
+        winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + ", 150 )"  )
+      }
+    )
+
+  $( "#selectPinUseCurrent" )
+    .click
+    (
+      function()
+      {
+        $( "#selectPinX" ).val( parseFloat( motorStatus.motor[ "xPosition" ] ) )
+        $( "#selectPinY" ).val( parseFloat( motorStatus.motor[ "yPosition" ] ) )
+      }
+    )
+
+  $( "#selectPinSave" )
+    .click
+    (
+      function()
+      {
+        var pin = $( "#selectPin" ).val()
+        var x = $( "#selectPinX" ).val()
+        var y = $( "#selectPinY" ).val()
+        winder.remoteAction( "process.setCalibrationData( " + pin + ", " + x + ", " + y + " )"  )
       }
     )
 

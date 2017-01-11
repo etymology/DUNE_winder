@@ -24,22 +24,40 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 {
   var self = this
 
+  // A unique id for this object.
   this.id = Math.floor( Math.random() * 0xFFFFFFFF )
 
   // Table data.
   var data
 
+  // Used to filter data.  List where each entry contains an array with the
+  // column to be filtered, and a list of true/false values for each possible
+  // value of the cell.
+  // Example:
+  // [ # Column         Enable for all possible column values.
+  //   [ "firstName", { "Jane" : true, "Joe" : false, "John" : true } ],
+  //   [ "lastName",  { "Smith" : true, "Doe" : false } ],
+  // ]
+  // This would filter the data to include first names of Jane and John who also
+  // have the last name Smith.
   var columnFilters = null
 
+  // Used to sort columns.  Double list.  Each entry contains an array with the
+  // column to be sorted, and the direction (-1/1) of sort.
   var sortArray = []
 
+  // A filtered/sorted copy of 'data'.
   var filteredData
 
+  // Callback to run after display is complete.
   var displayCallback = null
 
   // Lookup table between the raw array and the filtered.
   // Used to translate the row index of 'data' to the row id in the HTML table.
   var sortLookup = {}
+
+  // Callback function when a row is clicked.
+  var rowCallback
 
   // If using a global filter enable, or no filters are enabled...
   if ( ( false === columnFilterEnables )
@@ -132,12 +150,28 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
         (
           function( a, b )
           {
-            // Get the objects in the selected column as strings.
-            a = a[ sortColumn ].toString()
-            b = b[ sortColumn ].toString()
+            var result
+            if ( ( $.isNumeric( a[ sortColumn ] ) )
+              && ( $.isNumeric( b[ sortColumn ] ) ) )
+            {
+              a = parseFloat( a )
+              b = parseFloat( b )
+              result = 0
+              if ( a > b )
+                result = 1
+              else
+                result = -1
+            }
+            else
+            {
+              // Get the objects in the selected column as strings.
+              a = a[ sortColumn ].toString()
+              b = b[ sortColumn ].toString()
 
-            // Compare strings.
-            var result = a.localeCompare( b )
+              // Compare strings.
+              result = a.localeCompare( b )
+
+            }
 
             // Account for sort direction.
             // (Remember: sort direction is either 1 or -1.)
@@ -186,6 +220,7 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   // Inputs:
   //   tableId - Id of the table tag to place data.  Tag will be overwritten.
   //---------------------------------------------------------------------------
+  var temp = 0
   this.display = function( tableId )
   {
     // Tag id without hash character.
@@ -449,17 +484,28 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
     // Fill the body of the table with data.
     var tableBody = $( "<tbody />" ).appendTo( table )
-    for ( var row in filteredData )
+    for ( let row in filteredData )
     {
       var rowData = filteredData[ row ]
 
       // Last column is the sort index.
       var indexColumn = rowData.length - 1
-      sortLookup[ rowData[ indexColumn ] ] = row
+      let lookupValue = rowData[ indexColumn ]
+      sortLookup[ lookupValue ] = row
 
       var tableRow = $( "<tr />" )
         .attr( "id", "row_" + this.id + "_" + row )
         .appendTo( tableBody )
+
+      // If there is a callback for rows, register it.
+      if ( rowCallback )
+        tableRow.click
+        (
+          function()
+          {
+            rowCallback( lookupValue )
+          }
+        )
 
       for ( var index in rowData )
       {
@@ -530,6 +576,8 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
 
       data.push( rowData )
     }
+
+    this.filter()
   }
 
   //---------------------------------------------------------------------------
@@ -563,6 +611,19 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   this.setDisplayCallback = function( callback )
   {
     displayCallback = callback
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Set a callback to when a row is clicked.
+  // Input:
+  //   callback - Callback function.
+  // Notes:
+  //   Doesn't take effect until 'display' is called.
+  //---------------------------------------------------------------------------
+  this.setRowCallback = function( callback )
+  {
+    rowCallback = callback
   }
 
 }

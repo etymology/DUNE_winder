@@ -82,6 +82,14 @@ class Process :
 
     self._machineCalibration = machineCalibration
 
+    # $$$DEBUG
+    self.calibrationStartPin = 100
+    self.calibrationPinDirection = 1
+    self.calibrationPinMax = 150
+    self.calibrationData = []
+
+
+
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
     """
@@ -1007,6 +1015,53 @@ class Process :
     Get the URL for the camera image.
     """
     return self._cameraURL
+
+  #
+  # $$$DEBUG - Move calibration functions to their own calibration unit.
+  #
+
+  #---------------------------------------------------------------------
+  def setupCalibration( self, startPin ) :
+    """
+    $$$DEBUG
+    """
+    self.calibrationStartPin = startPin
+
+  #---------------------------------------------------------------------
+  def getCalibrationData( self ) :
+    """
+    $$$DEBUG
+    """
+    self.calibrationData = []
+    if None != self.calibrationStartPin :
+      pin = self.calibrationStartPin
+      for entry in self._io.camera.captureFIFO :
+        fullEntry = entry
+        fullEntry[ "Pin" ] = pin  # $$$DEBUG - bad practice.
+        self.calibrationData.append( fullEntry )
+
+        pin += self.calibrationPinDirection
+        if pin > self.calibrationPinMax :
+          pin = 1
+
+    return self.calibrationData
+
+  #---------------------------------------------------------------------
+  def setCalibrationData( self, pin, x, y ) :
+    """
+    $$$DEBUG
+    """
+    items = self.calibrationData
+
+    # Find row for pin in capture FIFO.
+    row = ( item for item in items if item[ "Pin" ] == pin ).next()
+
+    # Update data.
+    row[ "Status" ] = 1
+    row[ "CameraX" ] = None
+    row[ "CameraY" ] = None
+    row[ "MotorX" ] = x
+    row[ "MotorY" ] = y
 
   #---------------------------------------------------------------------
   def startManualCalibrate( self, deltaX, deltaY, counts, velocity=None, acceleration=None, deceleration=None ) :

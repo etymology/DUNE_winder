@@ -163,6 +163,20 @@ div.filter-table table
   table-layout: fixed;
 }
 
+div.filter-table .filter-table-inner table
+{
+  width: calc( 100% );
+  table-layout: fixed;
+}
+
+div.filter-table td
+{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
 div.filter-table-outer
 {
   position: relative;
@@ -171,11 +185,9 @@ div.filter-table-outer
 
 div.filter-table-inner
 {
-  overflow-y: scroll;
+  overflow-y: auto;
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
   bottom: 0;
 }
 

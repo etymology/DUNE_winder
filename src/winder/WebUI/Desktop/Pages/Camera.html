@@ -32,31 +32,13 @@
             <button id="b" >&#8660;</button>
             <button id="br">BR</button>
           </div>
+
         </article>
 
-        <article>
-          <h3>Traverse</h3>
-          <div class="buttonSet">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-        </article>
-
-      </article>
-
-      <article>
-        <h2>Nominal pin</h2>
         <div>
-          <input id="nominalPin" />
-          <button id="nominalPinSeek">Seek</button>
+          <button id="commitButton">Commit scan</button>
         </div>
+
       </article>
 
       <article>
@@ -64,6 +46,7 @@
         <div>
           <input id="startPin" />
           <label for="startPin">Start pin</label>
+          <button id="nominalPinSeek">Seek</button>
         </div>
 
         <div>
@@ -82,11 +65,42 @@
         </div>
 
         <div>
-          <input id="velocity" />
+          <input id="velocity" value="25" />
           <label for="velocity">Velocity</label>
         </div>
 
         <button id="scanButton">Scan</button>
+      </article>
+
+      <article>
+        <h2>Selected Pin</h2>
+        <div class="float-left">
+          <input id="selectPin" />
+          <label for="selectPin">Selected pin</label>
+          <div>
+            <input id="selectPinX" />
+            <label for="selectPinX">x</label>
+          </div>
+
+          <div>
+            <input id="selectPinY" />
+            <label for="selectPinY">y</label>
+          </div>
+        </div>
+
+        <div class="float-right">
+          <div>
+            <button id="selectPinSeek">Seek</button>
+          </div>
+          <div>
+            <button id="selectPinUseCurrent">Use current</button>
+          </div>
+
+          <div>
+            <button id="selectPinSave">Save</button>
+          </div>
+        </div>
+
       </article>
 
       <article>
@@ -97,8 +111,8 @@
           <button id="centerButton">Center</button>
           <br />
           <button id="reset">Reset scan</button>
-          <button id="startUp">Scan +Y</button>
-          <button id="startDown">Scan -Y</button>
+          <button></button>
+          <button id="randomButton">Random</button>
         </div>
 
       </article>
@@ -125,11 +139,7 @@
 
     <section id="section3">
       <article id="calibrationTableDiv">
-        <div id="table-wrapper">
-          <div id="table-scroll">
-            <p id="calibrationTable">Loading...</p>
-          </div>
-        </div>
+        <div id="calibrationTable">Loading...</div>
       </article>
 
 

@@ -11,6 +11,7 @@
 # accumulates capture data.  These two systems must be implemented in the PLC
 # for maximum speed.
 ###############################################################################
+import random
 from IO.Devices.PLC import PLC
 
 class Camera:
@@ -168,4 +169,23 @@ class Camera:
 
     if self._callback :
       self._callback( False )
+
+  #---------------------------------------------------------------------
+  def fillFIFO_WithRandom( self, count = 100 ) :
+    """
+    Fill the camera FIFO with random data.  Debug function.
+    """
+    self.captureFIFO = []
+    for index in xrange( 0, count ) :
+      # Place all FIFO values in capture FIFO.
+      self.captureFIFO.append(
+        {
+          "MotorX"     : random.uniform( 0, 6000 ),
+          "MotorY"     : random.uniform( 0, 2700 ),
+          "Status"     : random.randint( 0, 1 ),
+          "MatchLevel" : random.uniform( 0, 100 ),
+          "CameraX"    : random.uniform( 0, 640 ),
+          "CameraY"    : random.uniform( 0, 480 )
+        }
+      )
 

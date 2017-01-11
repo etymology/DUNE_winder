@@ -342,7 +342,7 @@ function Configuration( modules )
       }
     )
 
-  // $$$DEBUG - TEMPORARY.
+  // $$$TEMPORARY.
   this.logout = function()
   {
     winder.login
@@ -353,6 +353,12 @@ function Configuration( modules )
         location.reload( true )
       }
     )
+  }
+
+  // $$$TEMPORARY.
+  this.stop = function()
+  {
+    winder.shutdown()
   }
 
   window[ "configuration" ] = this
