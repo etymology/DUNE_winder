@@ -2,9 +2,8 @@ function Camera( modules )
 {
   var self = this
 
-  // Constant jog speed for incremental moves.
-  // Something small but reasonable.
-  var JOG_SPEED = 50
+  // Default velocity is 10%.
+  var DEFAULT_VELOCITY = 10
 
   // How often to update the image from the camera.
   var CAMERA_UPDATE_RATE = 500
@@ -13,14 +12,14 @@ function Camera( modules )
   var IMAGE_WIDTH  = 640
   var IMAGE_HEIGHT = 480
 
-  var page = modules.get( "Page" )
-  var winder = modules.get( "Winder" )
-
   var cameraTimer
-
   var lastCapture = {}
 
+  var page = modules.get( "Page" )
+  var winder = modules.get( "Winder" )
   var motorStatus
+  var sliders
+
   modules.load
   (
     "/Desktop/Modules/MotorStatus",
@@ -29,6 +28,10 @@ function Camera( modules )
       motorStatus = modules.get( "MotorStatus" )
     }
   )
+
+  //---------------------------------------------
+  // Sub-pages.
+  //---------------------------------------------
 
   // Motor status.
   page.loadSubPage
@@ -45,21 +48,57 @@ function Camera( modules )
     }
   )
 
+
+  // Velocity sliders.
+  page.loadSubPage
+  (
+    "/Desktop/Modules/Sliders",
+    "#slidersDiv",
+    function()
+    {
+      sliders = modules.get( "Sliders" )
+      sliders.setVelocity( DEFAULT_VELOCITY )
+
+      // Incremental jog.
+      page.loadSubPage
+      (
+        "/Desktop/Modules/IncrementalJog",
+        "#smallMotionsDiv",
+        function()
+        {
+          var incrementalJog = modules.get( "IncrementalJog" )
+          incrementalJog.velocityCallback( sliders.getVelocity )
+        }
+      )
+
+      // Incremental jog.
+      page.loadSubPage
+      (
+        "/Desktop/Modules/JogJoystick",
+        "#jogJoystickDiv",
+        function()
+        {
+          var jogJoystick = modules.get( "JogJoystick" )
+          jogJoystick.callbacks
+          (
+            sliders.getVelocity,
+            sliders.getAcceleration,
+            sliders.getDeceleration
+          )
+        }
+      )
+    }
+  )
+  //---------------------------------------------
+  // Button callbacks.
+  //---------------------------------------------
+
   $( "#triggerStartButton" )
     .click
     (
       function()
       {
-
-        winder.remoteAction
-        (
-          "[ io.camera.cameraTriggerEnable.set( 1 ), io.camera.cameraTrigger.set( 1 ) ]",
-          function()
-          {
-            //winder.remoteAction( "io.camera.cameraTrigger.set( 0 )" )
-          }
-        )
-
+        winder.remoteAction( "io.camera.setManualTrigger( True )" )
       }
     )
 
@@ -68,51 +107,47 @@ function Camera( modules )
     (
       function()
       {
-        //winder.remoteAction( "process.manualSeekXY( 110., 300., 400., 200., 200. )" )
-        winder.remoteAction( "io.camera.cameraTrigger.set( 0 )" )
+        winder.remoteAction( "io.camera.setManualTrigger( False )" )
       }
     )
 
-  $( "#centerButton" )
+  $( "#pixelsPer_mm" )
+    .on
+    (
+      "input",
+      function()
+      {
+        $( "#pixelsPer_mm_Save" ).prop( "disabled", false )
+      }
+    )
+
+  $( "#pixelsPer_mm_Save" )
+    .prop( "disabled", true )
     .click
     (
       function()
       {
-        var pixelsPer_mm = 17.7734782609
-        //parseFloat( $( "pixelsPer_mm" ).val() )
-
-        // (Yes, x and y are reversed)
-        var y = ( IMAGE_WIDTH  / 2 ) - parseFloat( lastCapture[ "x" ] )
-        var x = ( IMAGE_HEIGHT / 2 ) - parseFloat( lastCapture[ "y" ] )
-
-        x /= pixelsPer_mm
-        y /= pixelsPer_mm
-
-        x = parseFloat( motorStatus.motor[ "xPosition" ] ) + x
-        y = parseFloat( motorStatus.motor[ "yPosition" ] ) - y
-
-        winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + ", 50 )"  )
-        //alert( x + " " + y )
+        var value = $( "#pixelsPer_mm" ).val()
+        winder.remoteAction( "process.cameraCalibration.pixelsPer_mm( " + value + ")" )
+        $( "#pixelsPer_mm_Save" ).prop( "disabled", true )
       }
     )
+
+  winder.remoteAction
+  (
+    "process.cameraCalibration.pixelsPer_mm()",
+    function( value )
+    {
+      $( "#pixelsPer_mm" ).val( value )
+    }
+  )
 
   $( "#reset" )
     .click
     (
       function()
       {
-        //winder.remoteAction( "io.camera.cameraDeltaEnable.set( False )" )
-        winder.remoteAction( "io.camera.reset()" )
-      }
-    )
-
-  $( "#randomButton" )
-    .click
-    (
-      function()
-      {
-        var command = 'io.camera.fillFIFO_WithRandom()'
-        winder.remoteAction( command )
+        winder.remoteAction( "process.cameraCalibration.reset()" )
       }
     )
 
@@ -126,6 +161,7 @@ function Camera( modules )
         var spacingX = parseFloat( $( "#spacingX" ).val() )
         var spacingY = parseFloat( $( "#spacingY" ).val() )
         var velocity = parseFloat( $( "#velocity" ).val() )
+        var pixelsPer_mm = parseFloat( $( "#pixelsPer_mm" ).val() )
 
         var pinDelta = endPin - startPin
 
@@ -135,15 +171,69 @@ function Camera( modules )
         var endY = startY + spacingY * pinDelta
 
         var command =
-          "process.startManualCalibrate( "
+          "process.startCalibrate( "
+          + startPin + ", "
+          + endPin + ", "
+          + "2400,"
           + spacingX + ", "
           + spacingY + ", "
-          + pinDelta + ", "
           + velocity + " )"
 
         winder.remoteAction( command )
       }
     )
+
+  $( "#selectPinSeek" )
+    .click
+    (
+      function()
+      {
+        var x = parseFloat( $( "#selectPinX" ).val() )
+        var y = parseFloat( $( "#selectPinY" ).val() )
+        var velocity = sliders.getVelocity()
+
+        winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + ", " + velocity + " )"  )
+      }
+    )
+
+  $( "#selectPinUseCurrent" )
+    .click
+    (
+      function()
+      {
+        $( "#selectPinX" ).val( parseFloat( motorStatus.motor[ "xPosition" ] ) )
+        $( "#selectPinY" ).val( parseFloat( motorStatus.motor[ "yPosition" ] ) )
+      }
+    )
+
+  $( "#selectPinSave" )
+    .click
+    (
+      function()
+      {
+        var pin = $( "#selectPin" ).val()
+        var x = $( "#selectPinX" ).val()
+        var y = $( "#selectPinY" ).val()
+        winder.remoteAction
+        (
+          "process.cameraCalibration.setCalibrationData( " + pin + ", " + x + ", " + y + " )"
+        )
+      }
+    )
+
+  $( "#commitButton" )
+    .click
+    (
+      function()
+      {
+        winder.remoteAction
+        (
+          "process.commitCalibration()"
+        )
+      }
+    )
+
+  //---------------------------------------------
 
   winder.addPeriodicDisplay( "io.camera.cameraResultStatus.get()", "#cameraResult", lastCapture, "status" )
   winder.addPeriodicDisplay( "io.camera.cameraResultScore.get()", "#cameraScore", lastCapture, "score" )
@@ -151,10 +241,29 @@ function Camera( modules )
   winder.addPeriodicDisplay( "io.camera.cameraResultY.get()", "#cameraY", lastCapture, "y" )
 
   //---------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Draw a line on the specified canvas.
+  // Input:
+  //   canvas - Canvas to place line.
+  //   x1 - X coordinate of starting location.
+  //   y1 - Y coordinate of starting location.
+  //   x2 - X coordinate of end location.
+  //   y2 - Y coordinate of end location.
   //---------------------------------------------------------------------------
   function line( canvas, x1, y1, x2, y2 )
   {
+    if ( ( x1 % 2 ) > 0 )
+      x1 += 0.5
+
+    if ( ( y1 % 2 ) > 0 )
+      y1 += 0.5
+
+    if ( ( x2 % 2 ) > 0 )
+      x2 += 0.5
+
+    if ( ( y2 % 2 ) > 0 )
+      y2 += 0.5
+
     canvas.beginPath()
     canvas.moveTo( x1, y1 )
     canvas.lineTo( x2, y2 )
@@ -162,32 +271,28 @@ function Camera( modules )
   }
 
   //---------------------------------------------------------------------------
-  // $$$DEBUG
+  // Uses:
+  //   Display crosshairs on camera image overlay at the given X/Y position.
+  // Input:
+  //   x - X location in pixels.
+  //   y - Y location in pixels.
+  //   length - Length of crosshairs.
   //---------------------------------------------------------------------------
   function crosshairs( canvas, x, y, length )
   {
+    x = Math.round( x )
+    y = Math.round( y )
+    length = Math.round( length )
     line( canvas, x - length, y, x + length, y )
     line( canvas, x, y - length, x, y + length )
   }
 
   //---------------------------------------------------------------------------
-  // $$$DEBUG - Doesn't work.  Fix.
+  // Uses:
+  //   Update function for image from camera.
   //---------------------------------------------------------------------------
-  function bigCrosshairs( canvas, x, y, length )
-  {
-    line( canvas, x - length, y - 1, x + length, y - 1 )
-    line( canvas, x - length, y + 1, x + length, y + 1 )
-
-    line( canvas, x - 1, y - length, x - 1, y + length )
-    line( canvas, x + 1, y - length, x + 1, y + length )
-  }
-
-  //---------------------------------------------------------------------------
-  // $$$DEBUG
-  //---------------------------------------------------------------------------
-  var count = 0
   var cameraURL
-  var cameraUpdateFunction = function()
+  function cameraUpdateFunction()
   {
     var url = cameraURL + "?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
     $( "#cameraImage" )
@@ -200,25 +305,37 @@ function Camera( modules )
           var canvas = getCanvas( "cameraCanvas" )
           canvas.clearRect( 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT )
 
-          //canvas.lineWidth = 3
-          //canvas.strokeStyle = "white"
-          //crosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
-
           canvas.lineWidth = 1
           canvas.strokeStyle = "black"
           crosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
-          //bigCrosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
 
           canvas.strokeStyle = "Magenta"
           crosshairs( canvas, lastCapture[ "x" ], lastCapture[ "y" ], 10 )
-
-
         }
       )
   }
 
-  // Function to load the URL of the camera's last captured image.
-  var loadCameraURL = function()
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Round to specified number of decimal places.
+  // Input:
+  //   value - Value to round.
+  //   decimals - Number of decimal places to round.
+  // Output:
+  //   Rounded value.
+  //---------------------------------------------------------------------------
+  function round( value, decimals )
+  {
+    var multiplier = Math.pow( 10, decimals )
+    return Math.round( value * multiplier ) / multiplier
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Function to load the URL of the camera's last captured image.
+  //   This URL is configured in the control software.
+  //---------------------------------------------------------------------------
+  function loadCameraURL()
   {
     winder.remoteAction
     (
@@ -237,83 +354,6 @@ function Camera( modules )
     )
   }
 
-  // Shutdown/restart function to stop/restart camera updates.
-  modules
-    .registerShutdownCallback
-    (
-      function()
-      {
-        clearInterval( cameraTimer )
-        cameraTimer = null
-      }
-    )
-    .registerRestoreCallback( loadCameraURL )
-
-
-  // Incremental jog.
-  page.loadSubPage
-  (
-    "/Desktop/Modules/IncrementalJog",
-    "#smallMotionsDiv",
-    function()
-    {
-      var incrementalJog = modules.get( "IncrementalJog" )
-      incrementalJog.velocityCallback
-      (
-        function()
-        {
-          return JOG_SPEED
-        }
-      )
-    }
-  )
-
-  // Incremental jog.
-  page.loadSubPage
-  (
-    "/Desktop/Modules/JogJoystick",
-    "#jogJoystickDiv",
-    function()
-    {
-      var jogJoystick = modules.get( "JogJoystick" )
-      jogJoystick.callbacks
-      (
-        function()
-        {
-          return JOG_SPEED
-        },
-        function()
-        {
-          return "None"
-        },
-        function()
-        {
-          return "None"
-        }
-      )
-    }
-  )
-
-  // Filter table object with columns for the log file.
-  var filteredTable =
-      new FilteredTable
-      (
-        [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ],
-        [ false, false, false, false, false, false ],
-        []
-      )
-
-  //---------------------------------------------------------------------------
-  // $$$DEBUG
-  //---------------------------------------------------------------------------
-  function round( value, decimals )
-  {
-    var multiplier = Math.pow( 10, decimals )
-    return Math.round( value * multiplier ) / multiplier
-  }
-
-  var oldData = null
-
   //---------------------------------------------------------------------------
   // Uses:
   //   Get a canvas context by name.
@@ -331,7 +371,12 @@ function Camera( modules )
 
   //---------------------------------------------------------------------------
   // Uses:
-  //   $$$DEBUG
+  //   Compare function used to see if two capture FIFOs differ.
+  // Input:
+  //   a - First FIFO to compare.
+  //   b - Second FIFO to compare.
+  // Returns:
+  //   True if the FIFOs differ, false if they are the same.
   //---------------------------------------------------------------------------
   function isCaptureFIFO_Different( a, b )
   {
@@ -358,9 +403,34 @@ function Camera( modules )
     return isDifferent
   }
 
-  var columnNames = [ "Pin",  "Motor X", "Motor Y", "Status", "Match", "Camera X", "Camera Y" ]
-  var filters     = [ false,  false,     false,     true,     false,   false,      false      ]
-  var widths      = [ "10%",  "15%",     "15%",     "15%",    "15%",   "15%",      "15%"      ]
+  // Shutdown/restart function to stop/restart camera updates.
+  modules
+    .registerShutdownCallback
+    (
+      function()
+      {
+        clearInterval( cameraTimer )
+        cameraTimer = null
+      }
+    )
+    .registerRestoreCallback( loadCameraURL )
+
+
+
+  // Filter table object with columns for the log file.
+  var filteredTable =
+      new FilteredTable
+      (
+        [ "Motor X", "Motor Y", "Status", "Match Level", "Camera X", "Camera Y" ],
+        [ false, false, false, false, false, false ],
+        []
+      )
+
+  var oldData = null
+
+  var columnNames = [ "Pin",  "Motor X", "Motor Y", "Status", "Match"   ]
+  var filters     = [ false,  false,     false,     true,     false     ]
+  var widths      = [ "20%",  "20%",     "20%",     "20%",    "20%"     ]
   var filteredTable = new FilteredTable( columnNames, filters, widths )
 
   // Callback when a row on the calibration table is clicked.
@@ -371,15 +441,14 @@ function Camera( modules )
     {
       var rowData = oldData[ row ]
       $( "#selectPin"  ).val( rowData[ "Pin" ] )
-      $( "#selectPinX" ).val( rowData[ "MotorX" ] )
-      $( "#selectPinY" ).val( rowData[ "MotorY" ] )
+      $( "#selectPinX" ).val( round( rowData[ "MotorX" ], 2 ) )
+      $( "#selectPinY" ).val( round( rowData[ "MotorY" ], 2 ) )
     }
   )
 
-  var count = 0
   winder.addPeriodicCallback
   (
-    "process.getCalibrationData()",
+    "process.cameraCalibration.getCalibrationData()",
     function( data )
     {
       if ( isCaptureFIFO_Different( data, oldData ) )
@@ -411,80 +480,87 @@ function Camera( modules )
     }
   )
 
-  loadCameraURL()
-
   var ENABLE_STATES =
   [
     {
-      tl : true,
-      t  : false,
-      tr : true,
-      l  : false,
-      go : false,
-      r  : false,
-      bl : true,
-      b  : false,
-      br : true
+      TL : true,
+      T  : false,
+      TR : true,
+      L  : false,
+      GO : false,
+      R  : false,
+      BL : true,
+      B  : false,
+      BR : true
     },
 
     {
-      tl : false,
-      t  : true,
-      tr : false,
-      l  : true,
-      go : false,
-      r  : true,
-      bl : false,
-      b  : true,
-      br : false
+      TL : false,
+      T  : true,
+      TR : false,
+      L  : true,
+      GO : false,
+      R  : true,
+      BL : false,
+      B  : true,
+      BR : false
     },
 
     {
-      tl : false,
-      t  : false,
-      tr : false,
-      l  : false,
-      go : true,
-      r  : false,
-      bl : false,
-      b  : false,
-      br : false
+      TL : false,
+      T  : false,
+      TR : false,
+      L  : false,
+      GO : true,
+      R  : false,
+      BL : false,
+      B  : false,
+      BR : false
     }
   ]
 
-  //---------------------------------------------------------------------------
-  // $$$DEBUG
-  //---------------------------------------------------------------------------
-  function setState( state )
-  {
-    for ( var tag in ENABLE_STATES[ state ] )
-      $( "#" + tag ).prop( "disabled", ! ENABLE_STATES[ state ][ tag ] )
-  }
-
-  //---------------------------------------------------------------------------
-  // $$$DEBUG
-  //---------------------------------------------------------------------------
-  var selectedCorner = null
-
   var OUTER =
   [
-    "#tl",
-    "#tr",
-    "#bl",
-    "#br",
-    "#t",
-    "#l",
-    "#r",
-    "#b"
+    "#TL",
+    "#TR",
+    "#BL",
+    "#BR",
+    "#T",
+    "#L",
+    "#R",
+    "#B"
   ]
 
   var CORNERS =
   [
-    [ "#tl", "tl" ],
-    [ "#tr", "tr" ],
-    [ "#bl", "bl" ],
-    [ "#br", "br" ]
+    [ "#TL", "TL" ],
+    [ "#TR", "TR" ],
+    [ "#BL", "BL" ],
+    [ "#BR", "BR" ]
   ]
+
+  var EDGES =
+  [
+    [ "#T", "T" ],
+    [ "#L", "L" ],
+    [ "#R", "R" ],
+    [ "#B", "B" ]
+  ]
+
+  // Starting corner.
+  var selectedCorner = null
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Enable/disable select state buttons based on state.
+  // Input:
+  //   state - That to place buttons (0-2).
+  //---------------------------------------------------------------------------
+  function setSelectState( state )
+  {
+    for ( var tag in ENABLE_STATES[ state ] )
+      $( "#" + tag ).prop( "disabled", ! ENABLE_STATES[ state ][ tag ] )
+  }
 
   for ( var index in CORNERS )
   {
@@ -496,22 +572,12 @@ function Camera( modules )
         {
           $( corner[ 0 ] ).attr( "class", "selected" )
           selectedCorner = corner[ 1 ]
-          setState( 1 )
+          setSelectState( 1 )
         }
       )
   }
 
-  var EDGES =
-  [
-    [ "#t", "t" ],
-    [ "#l", "l" ],
-    [ "#r", "r" ],
-    [ "#b", "b" ]
-  ]
-
-  //
-
-  var scanDirection
+  // Setup the edge button callbacks.
   for ( var index in EDGES )
   {
     let edge = EDGES[ index ]
@@ -525,104 +591,87 @@ function Camera( modules )
 
           var DIRECTIONS =
           {
-            l: "r",
-            r: "l",
-            t: "b",
-            b: "t"
+            L: "R",
+            R: "L",
+            T: "B",
+            B: "T"
           }
 
           var direction = DIRECTIONS[ otherSelection ]
 
-          scanDirection = otherSelection + direction
+          var scanDirection = otherSelection + direction
+
+          // Starting/ending corner of scan.
+          var startCorner = selectedEdge + otherSelection
+          var endCorner = selectedEdge + direction
+
+          // Fetch the layer geometry.
+          winder.remoteAction
+          (
+            "process.getLayerPinGeometry()",
+            function( data )
+            {
+              var front = data[ 0 ]
+
+              var startPin = front[ startCorner ][ 0 ]
+              var endPin   = front[ endCorner   ][ 0 ]
+              var deltaX   = front[ startCorner ][ 1 ]
+              var deltaY   = front[ startCorner ][ 2 ]
+
+              // Fill in the parameters for the scan with information from
+              // geometry.
+              $( "#startPin" ).val( startPin )
+              $( "#endPin"   ).val( endPin )
+              $( "#spacingX" ).val( deltaX )
+              $( "#spacingY" ).val( deltaY )
+            }
+          )
 
           var ARROWS =
           {
-            lr: "&#8594;",
-            rl: "&#8592;",
-            tb: "&#8595;",
-            bt: "&#8593;"
+            LR: "&#8594;",
+            RL: "&#8592;",
+            TB: "&#8595;",
+            BT: "&#8593;"
           }
 
           for ( var item in OUTER )
             if ( ( OUTER[ item ] != ( "#" + selectedEdge ) )
               && ( OUTER[ item ] != ( "#" + selectedCorner ) ) )
             {
-                $( OUTER[ item ] ).attr( "class", "notSelected" )
+              $( OUTER[ item ] ).attr( "class", "notSelected" )
             }
 
           $( edge[ 0 ] ).html( ARROWS[ scanDirection ] )
 
-          setState( 2 )
+          setSelectState( 2 )
         }
       )
   }
 
-  setState( 0 )
-
-  $( "#go" )
+  $( "#GO" )
     .click
     (
       function()
       {
-        $( "#tl" ).attr( "class", "" )
-        $( "#tr" ).attr( "class", "" )
-        $( "#bl" ).attr( "class", "" )
-        $( "#br" ).attr( "class", "" )
+        $( "#TL" ).attr( "class", "" )
+        $( "#TR" ).attr( "class", "" )
+        $( "#BL" ).attr( "class", "" )
+        $( "#BR" ).attr( "class", "" )
 
-        $( "#t" ).html( "&#8660;" ).attr( "class", "" )
-        $( "#l" ).html( "&#8661;" ).attr( "class", "" )
-        $( "#r" ).html( "&#8661;" ).attr( "class", "" )
-        $( "#b" ).html( "&#8660;" ).attr( "class", "" )
+        $( "#T" ).html( "&#8660;" ).attr( "class", "" )
+        $( "#L" ).html( "&#8661;" ).attr( "class", "" )
+        $( "#R" ).html( "&#8661;" ).attr( "class", "" )
+        $( "#B" ).html( "&#8660;" ).attr( "class", "" )
 
-        setState( 0 )
+        setSelectState( 0 )
       }
     )
 
-  $( "#selectPinSeek" )
-    .click
-    (
-      function()
-      {
-        var x = parseFloat( $( "#selectPinX" ).val() )
-        var y = parseFloat( $( "#selectPinY" ).val() )
+  //---------------------------------------------
+  // Construction
+  //---------------------------------------------
 
-        winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + ", 150 )"  )
-      }
-    )
-
-  $( "#selectPinUseCurrent" )
-    .click
-    (
-      function()
-      {
-        $( "#selectPinX" ).val( parseFloat( motorStatus.motor[ "xPosition" ] ) )
-        $( "#selectPinY" ).val( parseFloat( motorStatus.motor[ "yPosition" ] ) )
-      }
-    )
-
-  $( "#selectPinSave" )
-    .click
-    (
-      function()
-      {
-        var pin = $( "#selectPin" ).val()
-        var x = $( "#selectPinX" ).val()
-        var y = $( "#selectPinY" ).val()
-        winder.remoteAction( "process.setCalibrationData( " + pin + ", " + x + ", " + y + " )"  )
-      }
-    )
-
-  // Register shutdown function that will stop the camera updates.
-  modules.registerShutdownCallback
-  (
-    function()
-    {
-      if ( cameraTimer )
-      {
-        clearInterval( cameraTimer )
-        cameraTimer = null
-      }
-    }
-
-  )
+  setSelectState( 0 )
+  loadCameraURL()
 }

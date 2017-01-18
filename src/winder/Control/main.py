@@ -196,16 +196,25 @@ try:
   if version.update() :
     log.add( "Main", "VERSION_CHANGE", "Control software has changed." )
 
+  # Version information for user interface.
+  uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
+  if uiVersion.update() :
+    log.add( "Main", "VERSION_UI_CHANGE", "User interface has changed." )
+
   log.add(
     "Main",
     "VERSION",
-    "Control software version " + str( version.getVersion() ),
-    [ version.getVersion(), version.getHash(), version.getDate() ]
+    "Control software version " + str( version.getVersion() ) +
+    ", user interface version " + str( uiVersion.getVersion() ),
+    [
+      version.getVersion(),
+      version.getHash(),
+      version.getDate(),
+      uiVersion.getVersion(),
+      uiVersion.getHash(),
+      uiVersion.getDate()
+    ]
   )
-
-  # Version information for user interface.
-  uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
-  uiVersion.verify()
 
   # Create I/O map.
   if isSimulated :

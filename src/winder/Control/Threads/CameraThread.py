@@ -50,10 +50,13 @@ class CameraThread( PrimaryThread ) :
     """
     Body of camera thread.
     """
+    hasData = False
     while PrimaryThread.isRunning :
 
       # If not running, wait.
-      if not self._isRunning :
+      # NOTE: If we had data last time, keep running until we do not.  Makes
+      # sure FIFO is empty before pausing thread.
+      if not self._isRunning and not hasData :
         self._semaphore.acquire()
 
       # If not shutting down...

@@ -70,10 +70,25 @@ class CalibrationMode( StateMachineState ) :
     return isError
 
   #---------------------------------------------------------------------
+  def exit( self ) :
+    """
+    Function called when exiting this state.
+
+    Returns:
+      True if there was an error, false if not.
+    """
+
+    self._io.camera.endScan()
+
+    return False
+
+  #---------------------------------------------------------------------
   def update( self ):
     """
     Update function that is called periodically.
     """
+
+    self.stateMachine.cameraCalibration.poll()
 
     # If stop requested...
     if self.stateMachine.stopRequest :

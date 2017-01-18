@@ -16,10 +16,12 @@ from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
 from Control.G_CodeHandler import G_CodeHandler
 from Control.ControlStateMachine import ControlStateMachine
+from Control.CameraCalibration import CameraCalibration
 
 from Machine.Spool import Spool
 from Machine.HeadCompensation import HeadCompensation
 from Machine.GeometrySelection import GeometrySelection
+from Machine.LayerFunctions import LayerFunctions
 
 class Process :
 
@@ -82,13 +84,8 @@ class Process :
 
     self._machineCalibration = machineCalibration
 
-    # $$$DEBUG
-    self.calibrationStartPin = 100
-    self.calibrationPinDirection = 1
-    self.calibrationPinMax = 150
-    self.calibrationData = []
-
-
+    self.cameraCalibration = CameraCalibration( io )
+    self.controlStateMachine.cameraCalibration = self.cameraCalibration
 
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
@@ -1016,79 +1013,76 @@ class Process :
     """
     return self._cameraURL
 
-  #
-  # $$$DEBUG - Move calibration functions to their own calibration unit.
-  #
-
   #---------------------------------------------------------------------
-  def setupCalibration( self, startPin ) :
+  def startCalibrate(
+    self,
+    startPin,
+    endPin,
+    maxPins,
+    deltaX,
+    deltaY,
+    velocity=None,
+    acceleration=None,
+    deceleration=None
+  ) :
     """
-    $$$DEBUG
-    """
-    self.calibrationStartPin = startPin
+    Begin the calibration sequence.
 
-  #---------------------------------------------------------------------
-  def getCalibrationData( self ) :
-    """
-    $$$DEBUG
-    """
-    self.calibrationData = []
-    if None != self.calibrationStartPin :
-      pin = self.calibrationStartPin
-      for entry in self._io.camera.captureFIFO :
-        fullEntry = entry
-        fullEntry[ "Pin" ] = pin  # $$$DEBUG - bad practice.
-        self.calibrationData.append( fullEntry )
-
-        pin += self.calibrationPinDirection
-        if pin > self.calibrationPinMax :
-          pin = 1
-
-    return self.calibrationData
-
-  #---------------------------------------------------------------------
-  def setCalibrationData( self, pin, x, y ) :
-    """
-    $$$DEBUG
-    """
-    items = self.calibrationData
-
-    # Find row for pin in capture FIFO.
-    row = ( item for item in items if item[ "Pin" ] == pin ).next()
-
-    # Update data.
-    row[ "Status" ] = 1
-    row[ "CameraX" ] = None
-    row[ "CameraY" ] = None
-    row[ "MotorX" ] = x
-    row[ "MotorY" ] = y
-
-  #---------------------------------------------------------------------
-  def startManualCalibrate( self, deltaX, deltaY, counts, velocity=None, acceleration=None, deceleration=None ) :
-    """
-    $$$DEBUG
+    Args:
+      startPin: First pin in scan.
+      endPin: Last pin in scan.
+      maxPin: The number of pin before wrap occurs.
+      deltaX: Nominal change in X for next pin.  (Can be 0 for Y traverse.)
+      deltaY: Nominal change in Y for next pin.  (Can be 0 for X traverse.)
+      velocity: Maximum velocity.  None for last velocity used.
+      acceleration: Maximum positive acceleration.  None for default.
+      deceleration: Maximum negative acceleration.  None for default.
     """
 
     if not self.controlStateMachine.isMovementReady() :
       self._log.add(
         self.__class__.__name__,
         "CALIBRATION_ERROR",
-        "Manual calibration edge scan error--machine not idle.",
-        [ deltaX, deltaY, velocity, acceleration, deceleration ]
+        "Calibration scan error--machine not idle.",
+        [ startPin, endPin, deltaX, deltaY, velocity, acceleration, deceleration ]
       )
+      isError = True
     else :
-      xPosition = self._io.xAxis.getPosition() + deltaX * counts
-      yPosition = self._io.yAxis.getPosition() + deltaY * counts
+
+      #
+      # Determine direction of travel.
+      #
+
+      pinDelta = endPin - startPin
+      if pinDelta < 0 :
+        direction = -1
+      else :
+        direction = 1
+
+      pinCount = abs( pinDelta )
+
+      pinDelta = pinCount + startPin
+
+      # Does the pin count rollover?
+      if ( pinDelta > maxPins ) or ( pinDelta < 0 ) :
+        direction = -direction
+
+      self.cameraCalibration.setupCalibration( startPin, direction, maxPins )
 
       self._io.camera.startScan( deltaX, deltaY )
+
+      # Setup seek location.
+      xPosition = self._io.xAxis.getPosition() + deltaX * pinCount
+      yPosition = self._io.yAxis.getPosition() + deltaY * pinCount
 
       self._log.add(
         self.__class__.__name__,
         "CALIBRATION",
-        "Manual scan.  X/Y to (" + str( xPosition )
+        "Calibration scan from pin " + str( startPin ) + " to " + str( endPin )
+          + ".  X/Y to (" + str( xPosition )
           + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
           + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
-        [ xPosition, yPosition, velocity, acceleration, deceleration ]
+        [ startPin, endPin, xPosition, yPosition, velocity, acceleration, deceleration ]
       )
 
       self.controlStateMachine.seekX = xPosition
@@ -1097,108 +1091,83 @@ class Process :
       self.controlStateMachine.seekAcceleration = acceleration
       self.controlStateMachine.seekDeceleration = deceleration
       self.controlStateMachine.calibrationRequest = True
+      isError = False
 
     return isError
 
   #---------------------------------------------------------------------
-  def startCalibrationScanEdge( self, travel, velocity=None, acceleration=None, deceleration=None ) :
+  def getLayerPinGeometry( self ) :
     """
-    To a calibration scan of a single edge on the current layer.
+    Get the pin geometry for current layer.
 
-    Args:
-      travel: Edge and direction to scan. (T/B/L/R)
-      velocity: Maximum velocity.  None for last velocity used.
-      acceleration: Maximum positive acceleration.  None for default.
-      deceleration: Maximum negative acceleration.  None for default.
     Returns:
-      True if there was an error, False if not.
-    Notes:
-      Edge and direction two characters from the set (T/B/L/R) that specify
-      the edge, and direction of travel.
-      Example:
-        TR - Top edge, moving from left to right.
-        LB - Left edge, moving from top to bottom.
-        LR - Invalid.  Left edge moving to the right is an incorrect combination.
+      A array of two sides.  Each side is a dictionary of of what pin number is
+      on each edge corner.  There are eight edge corners (4 edges, 2 sides to
+      each edge).  Returns None if no APA is loaded.
     """
+    result = None
+    if None != self.apa :
+      layer = self.apa.getLayer()
+      geometry = GeometrySelection( layer )
 
-    # Deconstruct travel into edge and direction of travel.
-    travel = travel.upper()
-    edge = travel[ 0 ]
-    direction = travel[ 1 ]
+      pinFront = geometry.startPinFront
+      pinBack  = geometry.startPinBack
 
-    # Make sure the combination of edge and travel are valid.
-    isError = (
-      ( ( "T" == edge or "B" == edge ) and ( "T" == direction or "B" == direction ) )
-      or
-      ( ( "L" == edge or "R" == edge ) and ( "L" == direction or "R" == direction ) )
-    )
+      # Edges starting on bottom right and moving counter-clockwise.
+      edges = [ "RB", "RT", "TR", "TL", "LT", "LB", "BL", "BR" ]
 
-    if isError :
-      error = "invalid travel"
-    # If there is no APA loaded...
-    elif None == self.apa :
-      isError = True
-      error = "no APA loaded"
-    # If machine isn't ready to move...
-    elif not self.controlStateMachine.isMovementReady() :
-      isError = True
-      error = "machine not idle"
+      front = {}
+      back  = {}
+      for edgeIndex in xrange( 0, 4 ) :
 
-    if isError :
-      self._log.add(
-        self.__class__.__name__,
-        "CALIBRATION_ERROR",
-        "Calibration edge scan error--" + error + ".",
-        [ travel, velocity, acceleration, deceleration ]
-      )
-    else :
-      # Get the geometry for current layer.
-      geometry = GeometrySelection( self.apa.getLayer() )
+        frontCount  = geometry.gridFront[ edgeIndex ][ 0 ]
+        frontDeltaX = geometry.gridFront[ edgeIndex ][ 1 ]
+        frontDeltaY = geometry.gridFront[ edgeIndex ][ 2 ]
+        backCount   = geometry.gridBack[ edgeIndex ][ 0 ]
+        backDeltaX  = geometry.gridBack[ edgeIndex ][ 1 ]
+        backDeltaY  = geometry.gridBack[ edgeIndex ][ 2 ]
 
-      # Get the layout of the selected edge.
-      index = geometry.edgeToGridIndex[ edge ]
-      edgeGrid = geometry.gridFront[ index ] # $$$DEBUG - Always front?
+        # Forward.
+        edge = edges[ edgeIndex * 2 + 0 ]
+        front[ edge ] = [ pinFront, frontDeltaX, frontDeltaY ]
+        back[ edge ]  = [ pinBack, backDeltaX, backDeltaY ]
 
-      # Number of pins on this edge.
-      pins = edgeGrid[ 0 ]
+        frontCount -= 1
+        frontCount *= geometry.directionFront
+        backCount -= 1
+        backCount *= geometry.directionBack
 
-      xPosition = None
-      yPosition = None
-      deltaX = 0
-      deltaY = 0
-      if "T" == edge or "B" == edge :
-        if "L" == direction :
-          deltaX = geometry.deltaX
-        else :
-          deltaX = -geometry.deltaX
+        pinFront = LayerFunctions.offsetPin( geometry, pinFront, frontCount )
+        pinBack  = LayerFunctions.offsetPin( geometry, pinBack,  backCount )
 
-        xPosition = deltaX * pins
-      else :
-        if "T" == direction :
-          deltaY = geometry.deltaY
-        else :
-          deltaY = -geometry.deltaY
+        # Reverse.
+        edge = edges[ edgeIndex * 2 + 1 ]
+        front[ edge ] = [ pinFront, -frontDeltaX, -frontDeltaY ]
+        back[ edge ]  = [ pinBack, -backDeltaX, -backDeltaY ]
 
-        yPosition = deltaY * pins
+        pinFront = LayerFunctions.offsetPin( geometry, pinFront, geometry.directionFront )
+        pinBack  = LayerFunctions.offsetPin( geometry, pinBack,  geometry.directionBack )
 
-      # $$$DEBUG - Put back self._io.camera.startScan( deltaX, deltaY )
-      self._io.camera.startScan( 0, 8 )
+        result = [ front, back ]
 
-      self._log.add(
-        self.__class__.__name__,
-        "CALIBRATION",
-        "Scan " + str( travel ) + ". X/Y to (" + str( xPosition )
-          + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
-          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
-        [ edge, xPosition, yPosition, velocity, acceleration, deceleration ]
-      )
+    return result
 
-      self.controlStateMachine.seekX = xPosition
-      self.controlStateMachine.seekY = yPosition
-      self.controlStateMachine.seekVelocity = velocity
-      self.controlStateMachine.seekAcceleration = acceleration
-      self.controlStateMachine.seekDeceleration = deceleration
-      self.controlStateMachine.calibrationRequest = True
+  #---------------------------------------------------------------------
+  def commitCalibration( self ) :
+    """
+    Commit the scan data to the calibration file.
+    """
+    isError = True
+    if None != self.apa :
+      isError = False
+      layer = self.apa.getLayer()
+      geometry = GeometrySelection( layer )
+      calibration = self.gCodeHandler.getLayerCalibration()
+
+      # $$$DEBUG - Figure out if we are scanning front or back.
+
+      self.cameraCalibration.saveCalibration( calibration, geometry, True )
+      calibration.save()
 
     return isError
 

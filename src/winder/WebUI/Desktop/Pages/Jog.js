@@ -12,16 +12,7 @@ function Jog( modules )
       motorStatus = modules.get( "MotorStatus" )
     }
   )
-
-  var MIN_VELOCITY = 1.0
-  var maxVelocity
-
-  var MIN_ACCELERATION = 1.0
-  var maxAcceleration = 200
-  var maxDeceleration = 50
-
-  var lastAcceleration
-  var lastDeceleration
+  var sliders
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -39,33 +30,6 @@ function Jog( modules )
   this.servoDisable = function()
   {
     winder.remoteAction( 'process.servoDisable()' )
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Get the desired velocity.
-  //-----------------------------------------------------------------------------
-  this.getVelocity = function()
-  {
-    return document.getElementById( "velocitySlider" ).scaledValue()
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Get the desired positive acceleration.
-  //-----------------------------------------------------------------------------
-  this.getAcceleration = function()
-  {
-    return document.getElementById( "accelerationSlider" ).scaledValue()
-  }
-
-  //-----------------------------------------------------------------------------
-  // Uses:
-  //   Get the desired negative acceleration.
-  //-----------------------------------------------------------------------------
-  this.getDeceleration = function()
-  {
-    return document.getElementById( "decelerationSlider" ).scaledValue()
   }
 
   //-----------------------------------------------------------------------------
@@ -306,27 +270,43 @@ function Jog( modules )
 
   )
 
-  // Incremental jog.
+  // Velocity sliders.
   page.loadSubPage
   (
-    "/Desktop/Modules/IncrementalJog",
-    "#smallMotionsDiv",
+    "/Desktop/Modules/Sliders",
+    "#slidersDiv",
     function()
     {
-      var incrementalJog = modules.get( "IncrementalJog" )
-      incrementalJog.velocityCallback( self.getVelocity )
-    }
-  )
+      sliders = modules.get( "Sliders" )
 
-  // Jog joystick.
-  page.loadSubPage
-  (
-    "/Desktop/Modules/JogJoystick",
-    "#jogJoystickDiv",
-    function()
-    {
-      var jogJoystick = modules.get( "JogJoystick" )
-      jogJoystick.callbacks( self.getVelocity, self.getAcceleration, self.getDeceleration )
+      // Incremental jog.
+      page.loadSubPage
+      (
+        "/Desktop/Modules/IncrementalJog",
+        "#smallMotionsDiv",
+        function()
+        {
+          var incrementalJog = modules.get( "IncrementalJog" )
+          incrementalJog.velocityCallback( sliders.getVelocity )
+        }
+      )
+
+      // Jog joystick.
+      page.loadSubPage
+      (
+        "/Desktop/Modules/JogJoystick",
+        "#jogJoystickDiv",
+        function()
+        {
+          var jogJoystick = modules.get( "JogJoystick" )
+          jogJoystick.callbacks
+          (
+            sliders.getVelocity,
+            sliders.getAcceleration,
+            sliders.getDeceleration
+          )
+        }
+      )
     }
   )
 
@@ -339,209 +319,6 @@ function Jog( modules )
       $( "#extendedPosition" ).val( data )
     }
   )
-
-  var sliderValues =
-  {
-   "velocitySlider"     : 100,
-   "accelerationSlider" : 100,
-   "decelerationSlider" : 100
-  }
-
-  var createSlider = function( query, sliderTag, valueTag, valueUnits, minimum )
-  {
-    // Maximum velocity.
-    winder.remoteAction
-    (
-      query,
-      function( data )
-      {
-        var maximum = parseFloat( data )
-
-        // Callback when slider is changed.
-        sliderFunction =
-          function( event, ui )
-          {
-            sliderValues[ sliderTag ] = ui.value
-            var value = ui.value / 100.0 * ( maximum - minimum ) + minimum
-            value = Math.round( value * 10.0 ) / 10.0
-            $( "#" + valueTag ).html( value + " " + valueUnits )
-          }
-
-        ui = new function() { this.value = sliderValues[ sliderTag ] }
-        sliderFunction( null, ui )
-
-        // Function to get the scaled value of slider.
-        document.getElementById( sliderTag ).scaledValue =
-            function()
-            {
-              // Start with the level of the velocity slider.
-              var value = parseFloat( $( this ).slider( "value" )  )
-
-              // Correctly scale the velocity.
-              value /= 100.0
-              value *= ( maximum - minimum )
-              value += minimum
-
-              return value
-            }
-
-        $( "#" + sliderTag )
-          .slider
-          (
-            {
-              min: 0,
-              max: 100,
-              value: sliderValues[ sliderTag ],
-              change: sliderFunction,
-              slide: sliderFunction
-            }
-          )
-
-      }
-    )
-
-  }
-
-  var createSliders = function()
-  {
-    createSlider
-    (
-      'process.maxVelocity()',
-      "velocitySlider",
-      "velocityValue",
-      "mm/s",
-      MIN_VELOCITY
-    )
-
-    createSlider
-    (
-      'io.plcLogic.maxAcceleration()',
-      "accelerationSlider",
-      "accelerationValue",
-      "mm/s<sup>2</sup>",
-      MIN_ACCELERATION
-    )
-
-    createSlider
-    (
-      'io.plcLogic.maxDeceleration()',
-      "decelerationSlider",
-      "decelerationValue",
-      "mm/s<sup>2</sup>",
-      MIN_ACCELERATION
-    )
-  }
-
-  createSliders()
-  winder.addErrorClearCallback( createSliders )
-
-
-  // // Maximum velocity.
-  // winder.remoteAction
-  // (
-  //   'configuration.get( "maxAcceleration" )',
-  //   function( data )
-  //   {
-  //     maxAcceleration = parseFloat( data )
-  //
-  //     // Callback when slider is changed.
-  //     sliderFunction =
-  //       function( event, ui )
-  //       {
-  //         var velocity = ui.value / 100.0 * ( maxAcceleration - MIN_ACCELERATION ) + MIN_ACCELERATION
-  //         var value = Math.round( velocity * 10.0 ) / 10.0
-  //         $( "#accelerationValue" ).html( value + " mm/s<sup>2</sup>" )
-  //       }
-  //
-  //     ui = new function() { this.value = 100 }
-  //     sliderFunction( null, ui )
-  //
-  //     // Setup slider.
-  //     $( "#accelerationSlider" )
-  //       .slider
-  //       (
-  //         {
-  //           min: 0,
-  //           max: 100,
-  //           value: 100,
-  //           change: sliderFunction,
-  //           slide: sliderFunction
-  //         }
-  //       )
-  //
-  //   }
-  // )
-  //
-  // // Maximum velocity.
-  // winder.remoteAction
-  // (
-  //   'configuration.get( "maxDeceleration" )',
-  //   function( data )
-  //   {
-  //     maxDeceleration = parseFloat( data )
-  //
-  //     // Callback when slider is changed.
-  //     sliderFunction =
-  //       function( event, ui )
-  //       {
-  //         var velocity = ui.value / 100.0 * ( maxDeceleration - MIN_ACCELERATION ) + MIN_ACCELERATION
-  //         var value = Math.round( velocity * 10.0 ) / 10.0
-  //         $( "#decelerationValue" ).html( value + " mm/s<sup>2</sup>" )
-  //       }
-  //
-  //     ui = new function() { this.value = 100 }
-  //     sliderFunction( null, ui )
-  //
-  //     // Setup slider.
-  //     $( "#decelerationSlider" )
-  //       .slider
-  //       (
-  //         {
-  //           min: 0,
-  //           max: 100,
-  //           value: 100,
-  //           change: sliderFunction,
-  //           slide: sliderFunction
-  //         }
-  //       )
-  //
-  //   }
-  // )
-  //
-  // // Maximum velocity.
-  // winder.remoteAction
-  // (
-  //   'process.maxVelocity()',
-  //   function( data )
-  //   {
-  //     maxVelocity = parseFloat( data )
-  //
-  //     // Callback when slider is changed.
-  //     sliderFunction =
-  //       function( event, ui )
-  //       {
-  //         var velocity = ui.value / 100.0 * ( maxVelocity - MIN_VELOCITY ) + MIN_VELOCITY
-  //         var value = Math.round( velocity * 10.0 ) / 10.0
-  //         $( "#velocityValue" ).html( value + " mm/s" )
-  //       }
-  //
-  //     ui = new function() { this.value = 100 }
-  //     sliderFunction( null, ui )
-  //
-  //     // Setup slider.
-  //     $( "#velocitySlider" )
-  //       .slider
-  //       (
-  //         {
-  //           min: 0,
-  //           max: 100,
-  //           value: 100,
-  //           change: sliderFunction,
-  //           slide: sliderFunction
-  //         }
-  //       )
-  //   }
-  // )
 
   window[ "jog" ] = this
 }

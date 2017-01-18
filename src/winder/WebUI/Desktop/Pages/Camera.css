@@ -129,3 +129,8 @@ div.float-right
   float: right;
   text-align: right;
 }
+
+#slidersDiv
+{
+  width: 525px;
+}

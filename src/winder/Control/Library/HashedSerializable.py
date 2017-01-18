@@ -47,6 +47,9 @@ class HashedSerializable( Serializable ) :
     """
     Serializable.__init__( self, includeOnly, exclude, ignoreMissing )
 
+    self._filePath = None
+    self._fileName = None
+
     # Hash of XML data used for modification detection.
     self.hashValue = ""
 
@@ -98,6 +101,9 @@ class HashedSerializable( Serializable ) :
       exceptionForMismatch is True).
     """
 
+    self._filePath = filePath
+    self._fileName = fileName
+
     # Load the serialized XML data as usual.
     Serializable.load( self, filePath, fileName, nameOverride )
 
@@ -121,15 +127,20 @@ class HashedSerializable( Serializable ) :
     return isError
 
   #-------------------------------------------------------------------
-  def save( self, filePath, fileName, nameOverride=None ) :
+  def save( self, filePath=None, fileName=None, nameOverride=None ) :
     """
     Write XML data to disk.
 
     Args:
-      filePath: Directory of file.
-      fileName: File name to save in.
+      filePath: Directory of file.  Omit to use the path specified loading.
+      fileName: File name to save in.  Omit to use the name specified loading.
       nameOverride: Top-level XML name.
     """
+
+    # File name/path omitted?
+    if None == filePath and None == fileName :
+      filePath = self._filePath
+      fileName = self._fileName
 
     # Start with the XML.
     outputText = self.toXML_String( nameOverride )

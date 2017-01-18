@@ -423,8 +423,7 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
             )
         }
 
-        if ( null == columnFilters )
-          columnFilters = newColumnFilters
+        columnFilters = newColumnFilters
       }
 
       cell.append( subCell )

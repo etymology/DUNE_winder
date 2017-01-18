@@ -100,7 +100,6 @@ class ControlStateMachine( LoggedStateMachine ) :
     self._io = io
 
     self.systemTime = systemTime
-    self.gCodeHandler = None
 
     self.windTime = 0
 
@@ -110,19 +109,25 @@ class ControlStateMachine( LoggedStateMachine ) :
     self.stopNextRequest = False # True to stop after completing the current G-Code line.
     self.loopMode        = False # True to continuously loop the G-Code.
     self.positionLogging = False # True to log resulting position after each move.
+    self.gCodeHandler    = None
+
+    # Manual mode options.
+    self.manualRequest = False
+    self.isJogging = False
+    self.idleServos = False
+    self.executeGCode = False
+    self.setHeadPosition = None
+
+    # Calibration mode options.
+    self.calibrationRequest = False
+    self.cameraCalibration  = None
 
     # Manual/calibration mode options.
-    self.manualRequest = False
-    self.calibrationRequest = False
-    self.idleServos = False
-    self.isJogging = False
-    self.executeGCode = False
     self.seekX = None
     self.seekY = None
     self.seekZ = None
     self.seekVelocity = None
     self.seekAcceleration = None
     self.seekDeceleration = None
-    self.setHeadPosition = None
 
 # end class

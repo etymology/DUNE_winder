@@ -27,17 +27,13 @@ main
   width: calc( 100% - 20px );
 }
 
-#velocitySliderBox
+#slidersDiv
 {
   margin-left: 10px;
   margin-bottom: 10px;
   width: 1025px;
 }
 
-#velocitySlider, #accelerationSlider, #decelerationSlider
-{
-  width: 97%;
-}
 
 #seekX_1, #seekY_1,
 #seekX_2, #seekY_2,

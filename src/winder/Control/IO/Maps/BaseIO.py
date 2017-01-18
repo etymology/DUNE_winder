@@ -104,5 +104,6 @@ class BaseIO:
     self.endOfTravel_Xm      = PLC_Input( "endOfTravel_Xm",      self.plc, "Machine_SW_Stat", 21 ) # MINUS_X_EOT
     self.Rotation_Lock_key   = PLC_Input( "Rotation_Lock_key",   self.plc, "Machine_SW_Stat", 22 ) # ROT_LOCK_KEY
     self.estop               = PLC_Input( "estop",               self.plc, "Machine_SW_Stat", 23, True )
+    self.park                = PLC_Input( "park",                self.plc, "Machine_SW_Stat", 24, False )
 
 # end class

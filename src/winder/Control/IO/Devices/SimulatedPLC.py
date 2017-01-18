@@ -14,6 +14,8 @@ from PLC import PLC
 class SimulatedPLC( PLC ) :
 
   tags = {}
+  writeCallbacks = {}
+  readCallbacks = {}
 
   #---------------------------------------------------------------------
   def initialize( self ) :
@@ -36,6 +38,27 @@ class SimulatedPLC( PLC ) :
     return False
 
   #---------------------------------------------------------------------
+  def _fetch( self, tag ) :
+    """
+    Fetch data from tag.
+    Only for individual tags as opposed to lists.
+
+    Args:
+      tag: A single PLC tag.
+
+    Returns:
+      Result of the data read, or None if there was a problem.
+    """
+    result = None
+    if tag in SimulatedPLC.tags.keys() :
+      result = SimulatedPLC.tags[ tag ]
+
+      if tag in SimulatedPLC.readCallbacks :
+        result = SimulatedPLC.readCallbacks[ tag ]( tag, result )
+
+    return result
+
+  #---------------------------------------------------------------------
   def read( self, tag ) :
     """
     Read a tag(s) from the PLC.
@@ -46,17 +69,16 @@ class SimulatedPLC( PLC ) :
     Returns:
       Result of the data read, or None if there was a problem.
     """
-    result = None
+    result = []
 
     if not isinstance( tag, list ) :
-      tags = [ tag ]
+      value = self._fetch( tag )
+      result.append( value )
     else:
       tags = tag
-
-    result = []
-    for tag in tags :
-      if tag in SimulatedPLC.tags.keys() :
-        result.append( [ tag, SimulatedPLC.tags[ tag ], "" ] )
+      for tag in tags :
+        value = self._fetch( tag )
+        result.append( [ tag, value, "" ] )
 
     return result
 
@@ -74,6 +96,9 @@ class SimulatedPLC( PLC ) :
         None is returned in case of error otherwise the tag list is returned.
     """
     if tag in SimulatedPLC.tags.keys() :
+      if tag in SimulatedPLC.writeCallbacks :
+        data = SimulatedPLC.writeCallbacks[ tag ]( tag, data )
+
       SimulatedPLC.tags[ tag ] = data
 
     return []
@@ -91,12 +116,12 @@ class SimulatedPLC( PLC ) :
     """
     result = self.read( tag )
     if result :
-      result = result[ 0 ][ 1 ]
+      result = result[ 0 ]
 
     return result
 
   #---------------------------------------------------------------------
-  def setupTag( self, tag, data=None ) :
+  def setupTag( self, tag, data=None, writeCallback=None, readCallback=None ) :
     """
     Setup a tag.
 
@@ -105,6 +130,12 @@ class SimulatedPLC( PLC ) :
       data: Initial data in tag.
     """
     SimulatedPLC.tags[ tag ] = data
+
+    if writeCallback :
+      SimulatedPLC.writeCallbacks[ tag ] = writeCallback
+
+    if readCallback :
+      SimulatedPLC.readCallbacks[ tag ] = readCallback
 
     return tag
 

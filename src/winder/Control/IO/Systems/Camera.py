@@ -16,6 +16,10 @@ from IO.Devices.PLC import PLC
 
 class Camera:
 
+  # The dimensions of a captured frame from the camera.
+  FRAME_WIDTH  = 640
+  FRAME_HEIGHT = 480
+
   #---------------------------------------------------------------------
   def __init__( self, plc ) :
     """
@@ -25,8 +29,13 @@ class Camera:
       plcLogic: Instance of PLC_Logic.
     """
 
+    # PLC tags for pin capture.
     self.cameraTrigger        = PLC.Tag( plc, "Cam_F_Trigger", tagType="BOOL" )
     self.cameraTriggerEnable  = PLC.Tag( plc, "Cam_F_En", tagType="BOOL" )
+
+    self.cameraDeltaEnable     = PLC.Tag( plc, "EN_POS_TRIGGERS", tagType="BOOL" )
+    self.cameraX_Delta         = PLC.Tag( plc, "X_DELTA", tagType="REAL" )
+    self.cameraY_Delta         = PLC.Tag( plc, "Y_DELTA", tagType="REAL" )
 
     self.cameraFIFO_MotorX     = PLC.Tag( plc, "FIFO_Data[0]", tagType="REAL" )
     self.cameraFIFO_MotorY     = PLC.Tag( plc, "FIFO_Data[1]", tagType="REAL" )
@@ -34,14 +43,10 @@ class Camera:
     self.cameraFIFO_MatchLevel = PLC.Tag( plc, "FIFO_Data[3]", tagType="REAL" )
     self.cameraFIFO_CameraX    = PLC.Tag( plc, "FIFO_Data[4]", tagType="REAL" )
     self.cameraFIFO_CameraY    = PLC.Tag( plc, "FIFO_Data[5]", tagType="REAL" )
-
     self.cameraFIFO_Clock      = PLC.Tag( plc, "READ_FIFOS", tagType="BOOL" )
 
-    self.cameraDeltaEnable     = PLC.Tag( plc, "EN_POS_TRIGGERS", tagType="BOOL" )
-    self.cameraX_Delta         = PLC.Tag( plc, "X_DELTA", tagType="REAL" )
-    self.cameraY_Delta         = PLC.Tag( plc, "Y_DELTA", tagType="REAL" )
 
-    # $$$DEBUG - Old.  Probably not needed.
+    # Direct to camera tags.
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     self.cameraResultStatus = PLC.Tag( plc, "Cam_F:I.InspectionResults[0]", attributes, tagType="REAL" )
@@ -49,8 +54,13 @@ class Camera:
     self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
     self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
 
+    # Data from camera FIFO.
     self.captureFIFO = []
+
+    # Callback to run during enable/disabling of triggering.
     self._callback = None
+
+    self._startingFlush = True
 
   #---------------------------------------------------------------------
   def setCallback( self, callback ) :
@@ -81,14 +91,16 @@ class Camera:
     self.cameraFIFO_Clock.set( 1 )
 
     # Any data in FIFO?
-    isData = self.cameraFIFO_MotorX.poll()
+    self.cameraFIFO_Status.poll()
 
-    if self.cameraFIFO_MotorX.get() > 0 :
+    isData = False
+    if self.cameraFIFO_Status.get() > 0 :
+      isData = True
 
       # Update remaining FIFO values.
       # $$$FUTURE - Do a block read.
+      self.cameraFIFO_MotorX.poll()
       self.cameraFIFO_MotorY.poll()
-      self.cameraFIFO_Status.poll()
       self.cameraFIFO_MatchLevel.poll()
       self.cameraFIFO_CameraX.poll()
       self.cameraFIFO_CameraY.poll()
@@ -109,10 +121,27 @@ class Camera:
 
   #---------------------------------------------------------------------
   def reset( self ) :
-    """$$$DEBUG"""
+    """
+    Reset all scan results.
+    """
     self.captureFIFO = []
     self.cameraDeltaEnable.set( 0 )
     self.cameraTriggerEnable.set( 0 )
+
+  #---------------------------------------------------------------------
+  def setManualTrigger( self, isEnabled ) :
+    """
+    Start/stop manual triggering.
+
+    Args:
+      isEnabled: True to enable manual triggering, False to stop.
+
+    Notes:
+      The PLC logic will continuously trigger the camera at regular periods
+      when enabled.
+    """
+    io.camera.cameraTriggerEnable.set( 1 )
+    io.camera.cameraTrigger.set( isEnabled )
 
   #---------------------------------------------------------------------
   def startScan( self, deltaX, deltaY ) :
@@ -132,11 +161,12 @@ class Camera:
     # Flush capture FIFO.
     self.captureFIFO = []
 
-    #self.cameraDeltaEnable.set( 0 )
     self.cameraTriggerEnable.set( 1 )
     self.cameraX_Delta.set( deltaX )
     self.cameraY_Delta.set( deltaY )
     self.cameraDeltaEnable.set( 1 )
+
+    self._startingFlush = True
 
     if self._callback :
       self._callback( True )
@@ -150,42 +180,5 @@ class Camera:
     self.cameraDeltaEnable.set( 0 )
     self.cameraTriggerEnable.set( 0 )
 
-    # $$$DEBUG - Temporary.
-    with open( "cameraDump.txt", 'a' ) as outputFile :
-
-      # Write header.
-      if len( self.captureFIFO ) > 0 :
-        for key in self.captureFIFO[ 0 ] :
-          outputFile.write( str( key ) + "," )
-
-      # Write data.
-      for row in self.captureFIFO :
-        for key in row :
-          outputFile.write( str( row[ key ] ) + "," )
-
-        outputFile.write( "\n" )
-
-      outputFile.write( "\n\n" )
-
     if self._callback :
       self._callback( False )
-
-  #---------------------------------------------------------------------
-  def fillFIFO_WithRandom( self, count = 100 ) :
-    """
-    Fill the camera FIFO with random data.  Debug function.
-    """
-    self.captureFIFO = []
-    for index in xrange( 0, count ) :
-      # Place all FIFO values in capture FIFO.
-      self.captureFIFO.append(
-        {
-          "MotorX"     : random.uniform( 0, 6000 ),
-          "MotorY"     : random.uniform( 0, 2700 ),
-          "Status"     : random.randint( 0, 1 ),
-          "MatchLevel" : random.uniform( 0, 100 ),
-          "CameraX"    : random.uniform( 0, 640 ),
-          "CameraY"    : random.uniform( 0, 480 )
-        }
-      )
-
