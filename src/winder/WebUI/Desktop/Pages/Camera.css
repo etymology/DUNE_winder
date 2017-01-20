@@ -1,23 +1,35 @@
 section
 {
-  height: 100%;
   float: left;
 }
 
-#section1
+#imageSection, #motorPositionSection
 {
-  width: 36%;
+  height: 600px;
 }
 
-#section2
+#imageSection
 {
-  width: 30%;
+  width: 35%;
 }
 
-#section3
+#motorPositionSection
 {
-  width: 34%;
+  width: 35%;
 }
+
+#editSection
+{
+  width: 70%;
+}
+
+#resultsSection
+{
+  width: calc( 30% - 0px );
+  height: calc( 100% - 0px );
+  float: right;
+}
+
 
 #cameraDiv
 {
@@ -41,6 +53,8 @@ section
   bottom: 10px;
   left: 10px;
 }
+
+
 
 #smallMotionsDiv
 {
@@ -75,7 +89,7 @@ div.triggerButtons button
 #calibrationTableDiv
 {
   width: 95%;
-  height: 95%;
+  height: calc( 100% - 30px );
 }
 
 #calibrationTableDiv table
@@ -101,7 +115,7 @@ button.selected
 
 div.filter-table
 {
-  height: 850px;
+  height: calc( 100% - 30px );
 }
 
 div.filter-table thead tr
@@ -132,5 +146,6 @@ div.float-right
 
 #slidersDiv
 {
-  width: 525px;
+  /*width: 525px;*/
+  width: calc( 100% - 30px );
 }

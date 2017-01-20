@@ -5,6 +5,9 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+import os.path
+import shutil
+
 from Library.HashedSerializable import HashedSerializable
 from Library.SerializableLocation import SerializableLocation
 
@@ -18,9 +21,13 @@ class LayerCalibration( HashedSerializable ) :
   """
 
   #-------------------------------------------------------------------
-  def __init__( self, layer=None ) :
+  def __init__( self, layer=None, filePath=None, fileName=None, archivePath=None ) :
     """
     Constructor.
+
+    Args:
+      layer: Name of layer.  (Optional)
+      archivePath: Location to archive this data when changed.  (Optional)
     """
 
     # Include only is just for the automatic serialized objects.
@@ -33,7 +40,7 @@ class LayerCalibration( HashedSerializable ) :
     self._layer = layer
 
     # Offset of 0,0 on the APA to machine offset.
-    self.offset = None
+    self.offset = SerializableLocation()
 
     # Z-positions to level with front/back of pins.
     self.zFront = None
@@ -41,6 +48,10 @@ class LayerCalibration( HashedSerializable ) :
 
     # Look-up table that correlates pin names to their locations.
     self._locations = {}
+
+    self._filePath = filePath
+    self._fileName = fileName
+    self._archivePath = archivePath
 
   #-------------------------------------------------------------------
   def copy( self ) :
@@ -115,6 +126,77 @@ class LayerCalibration( HashedSerializable ) :
       Name of layer (X/V/U/G).
     """
     return self._layer
+
+  #-------------------------------------------------------------------
+  def archive( self ) :
+    """
+    Archive this calibration data if archive does not already exist.
+    """
+
+    if self._archivePath :
+      # Create directory if it doesn't exist.
+      if not os.path.exists( self._archivePath ) :
+        os.makedirs( self._archivePath )
+
+      # If this file does not exist in the archive, copy it there.
+      archiveFile = self._archivePath + "/" + self.hashValue
+      fileName = self.getFullFileName()
+      if not os.path.isfile( archiveFile ) :
+        # Make an archive copy of the file.
+        shutil.copy2( fileName, archiveFile )
+
+  #-------------------------------------------------------------------
+  def _fileNameSetup( self, filePath, fileName ) :
+    """
+    Setup path and file name if override is given.
+
+    Args:
+      filePath: Override file path.
+      fileName: Override file name.
+    """
+    if None == filePath and None == fileName :
+      filePath = self._filePath
+      fileName = self._fileName
+
+    self._filePath = filePath
+    self._fileName = fileName
+
+  #-------------------------------------------------------------------
+  def load( self, filePath=None, fileName=None, nameOverride=None, exceptionForMismatch=True ) :
+    """
+    Load an XML file and return instance.
+
+    Args:
+      filePath: Directory of file.
+      fileName: File name to load.
+      nameOverride: Top-level XML name.
+      exceptionForMismatch: True to raise an exception if the hash does not
+        match.  Default is True.
+
+    Returns:
+      True if there was an error, False if not.
+
+    Throws:
+      HashedSerializable.Error if hashes do not match (only when
+      exceptionForMismatch is True).
+    """
+    self._fileNameSetup( filePath, fileName )
+    HashedSerializable.load( self, filePath, fileName, nameOverride, exceptionForMismatch )
+    self.archive()
+
+  #-------------------------------------------------------------------
+  def save( self, filePath=None, fileName=None, nameOverride=None ) :
+    """
+    Save data to disk.
+
+    Args:
+      filePath: Directory of file.  Omit to use the path specified loading.
+      fileName: File name to save in.  Omit to use the name specified loading.
+      nameOverride: Top-level XML name.
+    """
+    self._fileNameSetup( filePath, fileName )
+    HashedSerializable.save( self, filePath, fileName, nameOverride )
+    self.archive()
 
   #---------------------------------------------------------------------
   def serialize( self, xmlDocument, nameOverride=None ) :

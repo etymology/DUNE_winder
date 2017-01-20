@@ -28,9 +28,6 @@ class APA_Geometry( MachineGeometry ) :
     self.apaWindLength = 6393.884256
 
     # Offset from machine 0,0
-    # $$$DEBUG - Figure this out. self.toAPA_OffsetX = 150
-    # $$$DEBUG - Figure this out. self.toAPA_OffsetX = 605.914 - 25.4/2
-    # $$$DEBUG - Figure this out. self.toAPA_OffsetY = 339.778 - ( 191.107 - 38.1 / 2 )
     self.toAPA_OffsetX = 180 + 403.165  # Arbitrary.
     self.toAPA_OffsetY = 167.721
     self.toAPA_OffsetZ = 0

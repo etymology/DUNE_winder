@@ -14,7 +14,7 @@ class SimulatedMotor :
 
   # Standard deviation for position jitter.  Emulates servo error.
   # (Currently 0 because machine limits in rest of simulator don't like it).
-  JITTER = 0.025
+  JITTER = 0.015
 
   #---------------------------------------------------------------------
   def positionDelta( self ) :

@@ -9,9 +9,6 @@
 import xml.dom.minidom
 import os.path
 
-# $$$TEMPORARY - Temporary.
-from Machine.DefaultCalibration import DefaultLayerCalibration
-
 from Library.Serializable import Serializable
 from Library.Recipe import Recipe
 
@@ -89,18 +86,21 @@ class AnodePlaneArray( APA_Base ) :
     return self.getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
 
   #---------------------------------------------------------------------
-  def useDefaultCalibration( self ) :
+  def closeLoadedRecipe( self ) :
     """
-    Generate and use default calibration file for layer.
-    $$$TEMPORARY
+    Close the open recipe and reset internals to blank APA.
     """
+    if self._calibrationFile :
+      self._calibrationFile = None
+      self._calibration = None
+      self._gCodeHandler.useLayerCalibration( None )
 
-    # $$$TEMPORARY - Temporary.  Load the actual calibration file instead.
-    self._calibrationFile = self._layer + "_Calibration.xml"
-    self._calibration = \
-      DefaultLayerCalibration( self.getPath(), self._calibrationFile, self._layer )
+    if self._recipeFile :
+      self._recipeFile = None
+      self._gCodeHandler.closeG_Code()
 
-    self._gCodeHandler.useLayerCalibration( self._calibration )
+    self._layer = None
+    self._lineNumber = None
 
   #---------------------------------------------------------------------
   def loadRecipe( self, layer=None, recipeFile=None, startingLine=None ) :
@@ -120,34 +120,16 @@ class AnodePlaneArray( APA_Base ) :
     if None != layer :
       self._layer = layer
 
-    # $$$TEMPORARY
-    if not self._calibrationFile :
-      self.useDefaultCalibration()
-
     # If there is a calibration file, load it.
     if self._calibrationFile :
-      self._calibration = LayerCalibration()
+      archivePath = self.getPath() + "/Calibration"
+      self._calibration = LayerCalibration( archivePath=archivePath )
 
       try :
-        # $$$TEMPORARY - Put back first line.
-        #self._calibration.load( self.getPath(), self._calibrationFile )
-        self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
-
-        self._log.add(
-          self.__class__.__name__,
-          "LOAD",
-          "Loaded calibration file " + self._calibrationFile + ".",
-          [ self._calibrationFile, self._calibration.hashValue ]
-        )
-
-        # Make use of calibration.
-        self._gCodeHandler.useLayerCalibration( self._calibration )
+        self._calibration.load( self.getPath(), self._calibrationFile )
       except LayerCalibration.Error as exception :
-        error = "Invalid calibration file."
-        isError = True
-        self._gCodeHandler.useLayerCalibration( None )
 
-        errorString = "Unable to load calibration for " \
+        errorString = "Invalid calibration hash for " \
           + self._calibrationFile                       \
           + " because "                                 \
           + str( exception ) + "."
@@ -157,10 +139,36 @@ class AnodePlaneArray( APA_Base ) :
         self._log.add(
           self.__class__.__name__,
           "LOAD",
-          errorString,
+          errorString + "  Rehashing.",
           errorData
         )
 
+        try :
+          self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
+          self._calibration.save()
+        except LayerCalibration.Error as exception :
+          error = "Invalid calibration file."
+          isError = True
+
+          self._gCodeHandler.useLayerCalibration( None )
+
+          self._log.add(
+            self.__class__.__name__,
+            "LOAD",
+            errorString  + "  Aborting.",
+            errorData
+          )
+
+
+      self._log.add(
+        self.__class__.__name__,
+        "LOAD",
+        "Loaded calibration file " + self._calibrationFile + ".",
+        [ self._calibrationFile, self._calibration.hashValue ]
+      )
+
+      # Make use of calibration.
+      self._gCodeHandler.useLayerCalibration( self._calibration )
 
     else :
       # If there is no calibration, use none.
@@ -250,21 +258,15 @@ class AnodePlaneArray( APA_Base ) :
     return self._calibrationFile
 
   #---------------------------------------------------------------------
-  def setCalibrationFile( self, calibrationFile ) :
+  def setupBlankCalibration( self, layer, geometry ) :
     """
-    Set a calibration file to use for layer.
-
-    Args:
-      calibrationFile: Calibration file to be used.
+    Setup a blank calibration file for layer.
     """
-    self._calibrationFile = calibrationFile
     self._calibration = LayerCalibration()
-
-    # $$$DEBUG - Temporary.  Put back.
-    #self._calibration.load( self.getPath(), self._calibrationFile )
-    self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
-
-    self._gCodeHandler.useLayerCalibration( self._calibration )
+    self._calibration.zFront = geometry.mostlyRetract
+    self._calibration.zBack  = geometry.mostlyExtend
+    self._calibrationFile = layer + "_Calibration.xml"
+    self._calibration.save( self.getPath(), self._calibrationFile )
 
   #---------------------------------------------------------------------
   def setStage( self, stage, message="<unspecified>" ) :

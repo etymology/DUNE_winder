@@ -6,7 +6,10 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+import xml.dom.minidom
+
 from Library.Geometry.Location import Location
+from Library.ArrayToCSV import ArrayToCSV
 
 from Machine.LayerFunctions import LayerFunctions
 
@@ -17,10 +20,10 @@ class CameraCalibration :
     """
     Constructor.
     """
-
     self._io = io
     self._pixelsPer_mm = 18
     self._calibrationData = []
+    self._side      = None
     self._startPin  = None
     self._direction = None
     self._pinMax    = None
@@ -51,13 +54,13 @@ class CameraCalibration :
 
     calibrationData = []
     if None != self._startPin :
+
       pin = self._startPin
       for entry in self._io.camera.captureFIFO :
 
-        fullEntry = {}
-        fullEntry[ "Pin"    ]      = pin
-        fullEntry[ "Status" ]      = entry[ "Status" ]
-        fullEntry[ "MatchLevel"  ] = entry[ "MatchLevel"  ]
+        fullEntry = entry.copy()
+        fullEntry[ "Side" ] = self._side
+        fullEntry[ "Pin" ] = pin
 
         # Get offset from camera center of pin location.
         # (Yes, x and y are reversed)
@@ -69,8 +72,8 @@ class CameraCalibration :
         y /= self._pixelsPer_mm
 
         # Save corrected position.
-        fullEntry[ "MotorX" ] = entry[ "MotorX" ] + x
-        fullEntry[ "MotorY" ] = entry[ "MotorY" ] - y
+        fullEntry[ "MotorX_Corrected" ] = entry[ "MotorX" ] + x
+        fullEntry[ "MotorY_Corrected" ] = entry[ "MotorY" ] - y
 
         calibrationData.append( fullEntry )
 
@@ -84,7 +87,7 @@ class CameraCalibration :
     self._calibrationData = calibrationData
 
   #---------------------------------------------------------------------
-  def saveCalibration( self, layerCalibration, geometry, isFront ) :
+  def commitCalibration( self, layerCalibration, geometry, isFront ) :
     """
     Update the layer with the acquired calibration data.
 
@@ -114,11 +117,11 @@ class CameraCalibration :
         pin = LayerFunctions.translateFrontBack( geometry, pin )
         pinName = sideB + str( pin )
         location = Location( entry[ "MotorX" ], entry[ "MotorY" ], geometry.mostlyRetract )
-        # $$$DEBUG - Offset opposite side.
+        # $$$FUTURE - Offset opposite side.
         layerCalibration.setPinLocation( pinName, location )
 
   #---------------------------------------------------------------------
-  def setupCalibration( self, startPin, direction, pinMax ) :
+  def setupCalibration( self, side, startPin, direction, pinMax ) :
     """
     Setup parameters for a calibration scan.
     Call before starting polling.
@@ -129,6 +132,7 @@ class CameraCalibration :
       pinMax: Maximum number of pins before rolling over.
     """
 
+    self._side      = side
     self._startPin  = startPin
     self._direction = direction
     self._pinMax    = pinMax
@@ -171,3 +175,10 @@ class CameraCalibration :
     """
     self._io.camera.reset()
     self._calibrationData = []
+
+  #---------------------------------------------------------------------
+  def save( self, filePath, fileName ) :
+    """
+    Write calibration data to CSV file.
+    """
+    return ArrayToCSV.saveDictionarySet( self._calibrationData, filePath, fileName, isHashed=True )

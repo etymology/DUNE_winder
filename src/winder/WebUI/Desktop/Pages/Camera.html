@@ -1,5 +1,6 @@
-    <section id="section1">
+    <section id="imageSection">
       <article>
+        <h2>Camera</h2>
         <div id="cameraDiv">
           <img id="cameraImage" alt="Camera image" />
           <canvas id="cameraCanvas" width="640px" height="480px" />
@@ -12,20 +13,49 @@
           </div>
 
         </div>
+
+        <article>
+          <h3>Triggering</h3>
+          <button id="triggerStartButton">Trigger Start</button>
+          <button id="triggerStopButton">Trigger stop</button>
+        </article>
+
+        <article>
+          <h3>Pixels/mm</h3>
+          <input id="pixelsPer_mm" />
+          <label for="pixelsPer_mm">Pixels/mm</label>
+          <button id="pixelsPer_mm_Save">Save</button>
+        </article>
+
       </article>
       <div id="debugText"></div>
+    </section>
 
-      <article>
-        <h2>Seek initial location</h2>
+    <section id="resultsSection">
+      <article id="calibrationTableDiv">
+        <div id="calibrationTable">Loading...</div>
+      </article>
+    </section>
+
+    <section id="motorPositionSection">
+      <article id="motorStatusDiv">Loading...</article>
+      <article id="smallMotionsDiv">Loading...</article>
+      <article id="jogJoystickDiv">Loading...</article>
+      <article id="slidersDiv">Loading...</article>
+    </section>
+
+    <section id="editSection">
+      <article id="scanSetup">
+        <h2>Scan setup</h2>
         <article>
-          <h3>Nominal corners</h3>
+          <h3>Edge selection</h3>
           <div class="buttonSet">
             <button id="TL">TL</button>
             <button id="T" >&#8660;</button>
             <button id="TR">TR</button>
 
             <button id="L" >&#8661;</button>
-            <button id="GO">Go</button>
+            <button id="GO">&check;</button>
             <button id="R" >&#8661;</button>
 
             <button id="BL">BL</button>
@@ -35,42 +65,44 @@
 
         </article>
 
-        <div>
-          <button id="commitButton">Commit scan</button>
-        </div>
+        <article>
+          <h3>Scan Parameters</h3>
+          <div>
+            <input id="startPin" />
+            <label for="startPin">Start pin</label>
+            <button id="nominalPinSeek">Seek</button>
+          </div>
+
+          <div>
+            <input id="endPin" />
+            <label for="endPin">End pin</label>
+          </div>
+
+          <div>
+            <input id="totalPins" />
+            <label for="totalPins">Total pins</label>
+          </div>
+
+          <div>
+            <input id="spacingX" />
+            <label for="spacingX">Pin spacing X</label>
+          </div>
+
+          <div>
+            <input id="spacingY" />
+            <label for="spacingY">Pin spacing Y</label>
+          </div>
+
+          <div>
+            <input id="velocity" value="25" />
+            <label for="velocity">Velocity</label>
+          </div>
+
+          <button id="scanButton">Scan</button>
+        </article>
 
       </article>
 
-      <article>
-        <h2>Manual Scan</h2>
-        <div>
-          <input id="startPin" />
-          <label for="startPin">Start pin</label>
-          <button id="nominalPinSeek">Seek</button>
-        </div>
-
-        <div>
-          <input id="endPin" />
-          <label for="endPin">End pin</label>
-        </div>
-
-        <div>
-          <input id="spacingX" />
-          <label for="spacingX">Pin spacing X</label>
-        </div>
-
-        <div>
-          <input id="spacingY" />
-          <label for="spacingY">Pin spacing Y</label>
-        </div>
-
-        <div>
-          <input id="velocity" value="25" />
-          <label for="velocity">Velocity</label>
-        </div>
-
-        <button id="scanButton">Scan</button>
-      </article>
 
       <article>
         <h2>Selected Pin</h2>
@@ -86,6 +118,11 @@
             <input id="selectPinY" />
             <label for="selectPinY">y</label>
           </div>
+
+          <p>Camera X: <span id="selectCameraX"></span></p>
+          <p>Camera Y: <span id="selectCameraY"></span></p>
+          <p>Motor X: <span id="selectMotorX"></span></p>
+          <p>Motor Y: <span id="selectMotorY"></span></p>
         </div>
 
         <div class="float-right">
@@ -101,39 +138,12 @@
           </div>
         </div>
 
-      </article>
-
-      <article>
-        <h2>Pixels/mm</h2>
-          <div>
-            <input id="pixelsPer_mm" />
-            <label for="pixelsPer_mm">Pixels/mm</label>
-            <button id="pixelsPer_mm_Save">Save</button>
-          </div>
-      </article>
-
-      <article>
-        <h2>Triggering</h2>
-        <div class="triggerButtons">
-          <button id="triggerStartButton">Trigger Start</button>
-          <button id="triggerStopButton">Trigger stop</button>
+        <div>
+          <button id="commitButton">Commit scan</button>
           <button id="reset">Reset scan</button>
         </div>
-
       </article>
 
-    </section>
-
-    <section id="section2">
-      <article id="motorStatusDiv">Loading...</article>
-      <article id="smallMotionsDiv">Loading...</article>
-      <article id="jogJoystickDiv">Loading...</article>
-      <article id="slidersDiv">Loading...</article>
 
     </section>
 
-    <section id="section3">
-      <article id="calibrationTableDiv">
-        <div id="calibrationTable">Loading...</div>
-      </article>
-    </section>

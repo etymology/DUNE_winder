@@ -10,6 +10,11 @@ from Library.StateMachineState import StateMachineState
 
 class CalibrationMode( StateMachineState ) :
 
+  # After reaching the finial location, there is a pause to allow the camera
+  # FIFO to be emptied.  This is the number of counts of that pause.
+  # (At 100 ms/update, this is 500 ms.)
+  SHUTDOWN_COUNT = 5
+
   #---------------------------------------------------------------------
   def __init__( self, stateMachine, state, io, log ) :
     """
@@ -26,6 +31,7 @@ class CalibrationMode( StateMachineState ) :
     self._io   = io
     self._log  = log
     self._noteSeekStop = False
+    self._shutdownCount = None
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -40,6 +46,7 @@ class CalibrationMode( StateMachineState ) :
     isError = True
 
     self._noteSeekStop = False
+    self._shutdownCount = None
 
     # X/Y axis move?
     if None != self.stateMachine.seekX or None != self.stateMachine.seekY :
@@ -102,8 +109,16 @@ class CalibrationMode( StateMachineState ) :
       self._noteSeekStop = True
       self.stateMachine.stopRequest = False
 
+    if self._shutdownCount > 0 :
+      self._shutdownCount -= 1
+
+    isMotionCompleat = self._io.plcLogic.isReady()
+
+    if isMotionCompleat and None == self._shutdownCount :
+      self._shutdownCount = CalibrationMode.SHUTDOWN_COUNT
+
     # Is movement done?
-    if self._io.plcLogic.isReady() :
+    if isMotionCompleat and 0 == self._shutdownCount :
 
       # If we were seeking and stopped pre-maturely, note where.
       if self._noteSeekStop :
@@ -119,6 +134,5 @@ class CalibrationMode( StateMachineState ) :
 
       self._io.camera.endScan()
       self.changeState( self.stateMachine.States.STOP )
-
 
 #end class

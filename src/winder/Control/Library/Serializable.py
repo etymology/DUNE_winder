@@ -84,7 +84,7 @@ class Serializable :
     if isinstance( value, ( list, dict ) ) :
       # Create child node for the list/dictionary.
       node = xmlDocument.createElement( value.__class__.__name__ )
-      node.setAttribute( "name", variable )
+      node.setAttribute( "name", str( variable ) )
 
       if isinstance( value, list ) :
         # Turn list into dictionary.

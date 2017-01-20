@@ -394,6 +394,17 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
+  def closeG_Code( self ) :
+    """
+    Close the loaded G-Code file.
+    """
+    self._gCode = None
+    self._currentLine = -1
+    self._nextLine = -1
+    self._firstMove = True
+    self.useLayerCalibration( None )
+
+  #---------------------------------------------------------------------
   def loadG_Code( self, lines, calibration ) :
     """
     Load G-Code file.
@@ -412,8 +423,6 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     # Use current X/Y/Z position as starting points.
     # (These will be moved to self.lastN when the next line is executed.)
-    # $$$DEBUG - Decide if this stays.  Initial position should be set by
-    # APA loading.
     self._x = self._io.xAxis.getPosition()
     self._y = self._io.yAxis.getPosition()
     self._z = self._io.zAxis.getPosition()

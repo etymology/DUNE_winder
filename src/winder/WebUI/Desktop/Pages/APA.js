@@ -298,7 +298,7 @@ function APA( modules )
     var reasonForChange = $( "#apaStageReason" ).val()
     winder.remoteAction
     (
-      'process.apa.setStage( ' + newStage + ', "' + reasonForChange + '" )',
+      'process.setStage( ' + newStage + ', "' + reasonForChange + '" )',
       function()
       {
         $( "#apaStageReason" ).val( "" )
@@ -318,7 +318,6 @@ function APA( modules )
       'process.stopNextLine()',
       function()
       {
-        // $$$ $( "#stopButton" ).prop( "disabled", true )
         isStopping = true
       }
     )

@@ -37,8 +37,6 @@ class G_LayerGeometry( GX_LayerGeometry ) :
     # Locations of the two columns of pins.
     self.leftEdge  = -self.boardThickness
     self.rightEdge = self.layerLength / self.scale + self.boardSpacing + self.boardThickness
-    # $$$ self.leftEdge  = -self.boardWidth
-    # $$$ self.rightEdge = 6410.37 / self.scale + self.boardWidth
 
     # Offset from APA's (0,0,0) position.
     self.apaOffsetX = -13.23 + self.boardThickness

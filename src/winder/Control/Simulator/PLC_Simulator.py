@@ -126,7 +126,7 @@ class PLC_Simulator :
     isEnabled = self._io.plc.getTag( self._cameraDeltaEnable )
 
     # Camera enabled?
-    if isEnabled :
+    if isEnabled or self._cameraEnabled :
 
       # Get the current position and trigger deltas.
       x = self._io.xAxis.getPosition()
@@ -136,32 +136,17 @@ class PLC_Simulator :
 
       # Just enabled?
       if not self._cameraEnabled :
-        self._cameraStartX = x
-        self._cameraStartY = y
-        self._cameraLastX = x
-        self._cameraLastY = y
+        self._nextPinX = x
+        self._nextPinY = y
 
-      # Compute distance traveled since last update.
-      self._cameraDeltaX += x - self._cameraLastX
-      self._cameraDeltaY += y - self._cameraLastY
-
-      startX = self._cameraLastX
-      startY = self._cameraLastY
-
-      def triggerUpdate( delta, cameraDelta, start, cameraStart, x, y, index ) :
-        # Simulate triggers in X.
-        while ( ( delta > 0 and cameraDelta > delta ) \
-             or ( delta < 0 and cameraDelta < delta ) ) :
-
-          # Calculate where the next pin occurred.
-          pinLocation = start - cameraStart
-          pinLocation = int( pinLocation / delta )
-          pinLocation *= delta
-          pinLocation += cameraStart
+      def triggerUpdate( delta, nextPin, limit, x, y, index ) :
+        count = 0
+        while ( ( delta > 0 and nextPin < limit ) \
+             or ( delta < 0 and nextPin > limit ) ) :
 
           # Make up some jitter in the pin's location.
-          xError = random.uniform( -PLC_Simulator.CAMERA_JITTER, PLC_Simulator.CAMERA_JITTER )
-          yError = random.uniform( -PLC_Simulator.CAMERA_JITTER, PLC_Simulator.CAMERA_JITTER )
+          xError = 0 #random.uniform( -PLC_Simulator.CAMERA_JITTER, PLC_Simulator.CAMERA_JITTER )
+          yError = 0 #random.uniform( -PLC_Simulator.CAMERA_JITTER, PLC_Simulator.CAMERA_JITTER )
 
           # Make up a matching value.
           matchLevel = random.triangular( 50, 100, 85 )
@@ -170,21 +155,21 @@ class PLC_Simulator :
           entry = [ x, y, 1, matchLevel, 320 + xError, 240 + yError ]
 
           # Set either X/Y to the pin location.
-          entry[ index ] = pinLocation
+          entry[ index ] = nextPin
 
           # Add information to FIFO.
           self._cameraFIFO.put( entry )
 
-          start += delta
-          cameraDelta -= delta
+          nextPin += delta
+          count += 1
 
-        return start
+        return count
 
-      startX = triggerUpdate( deltaX, self._cameraDeltaX, startX, self._cameraStartX, x, y, 0 )
-      startY = triggerUpdate( deltaY, self._cameraDeltaY, startY, self._cameraStartY, x, y, 1 )
+      countX = triggerUpdate( deltaX, self._nextPinX, x, x, y, 0 )
+      countY = triggerUpdate( deltaY, self._nextPinY, y, x, y, 1 )
 
-      self._cameraLastX = startX
-      self._cameraLastY = startY
+      self._nextPinX += countX * deltaX
+      self._nextPinY += countY * deltaY
 
     self._cameraEnabled = isEnabled
 
@@ -415,7 +400,6 @@ class PLC_Simulator :
     def transferCheck( axis, target ) :
 
       halfWindor = self._machineGeometry.zWindow / 2
-      # $$$DEBUG print target - halfWindor, axis.getPosition(), target + halfWindor
 
       result = False
       if target - halfWindor < axis.getPosition() < target + halfWindor :
@@ -497,7 +481,6 @@ class PLC_Simulator :
 
     self._cameraFIFO_Clock = io.plc.setupTag( "READ_FIFOS", False, self.cameraFIFO_ClockCallback )
 
-
     # Initial states of PLC state machine.
     self._lastState = io.plcLogic.States.READY
     self._lastMoveType = io.plcLogic.MoveTypes.RESET
@@ -507,12 +490,10 @@ class PLC_Simulator :
     self._lastZ_Speed = None
 
     self._cameraEnabled = False
-    self._cameraStartX = None
-    self._cameraStartY = None
     self._cameraDeltaX = 0.0
     self._cameraDeltaY = 0.0
-    self._cameraLastX = None
-    self._cameraLastY = None
+    self._nextPinX = None
+    self._nextPinY = None
     self._cameraFIFO = Queue.Queue()
 
     self._latchDelay = Delay( self._simulationTime )

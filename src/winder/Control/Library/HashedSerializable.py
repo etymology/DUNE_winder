@@ -127,6 +127,42 @@ class HashedSerializable( Serializable ) :
     return isError
 
   #-------------------------------------------------------------------
+  def getFullFileName( self ) :
+    """
+    Get the full path to file.
+    File must have been saved/loaded prior to calling.
+
+    Returns:
+      Full path to file.
+    """
+
+    return self._filePath + "/" + self._fileName
+
+  #-------------------------------------------------------------------
+  def getFileName( self ) :
+    """
+    Get the file name.
+    File must have been saved/loaded prior to calling.
+
+    Returns:
+      File name.
+    """
+
+    return self._fileName
+
+  #-------------------------------------------------------------------
+  def getFilePath( self ) :
+    """
+    Get the file path.
+    File must have been saved/loaded prior to calling.
+
+    Returns:
+      File path.
+    """
+
+    return self._filePath
+
+  #-------------------------------------------------------------------
   def save( self, filePath=None, fileName=None, nameOverride=None ) :
     """
     Write XML data to disk.
@@ -142,17 +178,20 @@ class HashedSerializable( Serializable ) :
       filePath = self._filePath
       fileName = self._fileName
 
+    self._filePath = filePath
+    self._fileName = fileName
+
     # Start with the XML.
     outputText = self.toXML_String( nameOverride )
 
     # Calculate hash of XML.
-    bodyHash = self._calculateStringHash( outputText )
+    self.hashValue = self._calculateStringHash( outputText )
 
     # Replace hash value with updated value.
     outputText = \
       re.sub(
         '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>',
-        '<str name="hashValue">' + bodyHash + '</str>' ,
+        '<str name="hashValue">' + self.hashValue + '</str>' ,
         outputText
       )
 

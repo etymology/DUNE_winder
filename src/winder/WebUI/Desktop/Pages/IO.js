@@ -24,12 +24,14 @@ function IO( modules )
         filteredTable.loadFromArray( data )
         filteredTable.display( tag )
 
-        for ( let row in data )
+        for ( var row in data )
         {
           var ioPoint = data[ row ]
           var name = ioPoint[ 0 ]
 
           var query = itemQuery.replace( "$", '"' + name + '"' )
+
+          let localRow = row
 
           // Update function.
           winder.addPeriodicCallback
@@ -38,7 +40,7 @@ function IO( modules )
             function( data )
             {
               // Get the cell id this data is stored.
-              var id = filteredTable.getCellId( row, 1 )
+              let id = filteredTable.getCellId( localRow, 1 )
 
               // If this cell exists...
               if ( id )

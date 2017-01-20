@@ -22,8 +22,23 @@ from Machine.Spool import Spool
 from Machine.HeadCompensation import HeadCompensation
 from Machine.GeometrySelection import GeometrySelection
 from Machine.LayerFunctions import LayerFunctions
+from Machine.DefaultCalibration import DefaultLayerCalibration
 
 class Process :
+
+  STAGE_TABLE = {
+    0  : None,                                         # Uninitialized.
+    1  : { "layer" : "X", "recipe" : "X-Layer_1.gc" }, # X-first.
+    2  : { "layer" : "X", "recipe" : "X-Layer_2.gc" }, # X-second.
+    3  : { "layer" : "V", "recipe" : "V-Layer_1.gc" }, # V-first.
+    4  : { "layer" : "V", "recipe" : "V-Layer_2.gc" }, # V-second.
+    5  : { "layer" : "U", "recipe" : "U-Layer_1.gc" }, # U-first.
+    6  : { "layer" : "U", "recipe" : "U-Layer_2.gc" }, # U-second.
+    7  : { "layer" : "G", "recipe" : "G-Layer_1.gc" }, # G-first.
+    8  : { "layer" : "G", "recipe" : "G-Layer_2.gc" }, # G-second.
+    9  : None,                                         # Sign-off.
+    10 : None                                          # Complete.
+  }
 
   #---------------------------------------------------------------------
   def __init__( self, io, log, configuration, systemTime, machineCalibration ) :
@@ -233,6 +248,49 @@ class Process :
         )
 
     return isError
+
+  #---------------------------------------------------------------------
+  def setStage( self, stage, message="<unspecified>" ) :
+    """
+    Set the APA progress stage.
+
+    Args:
+      stage: Integer number (table in APA_Base.Stages) of APA progress.
+      message: Message/reason for changing to new stage.
+    """
+    isError = False
+
+    if not self.apa :
+      isError = True
+      self._log.add(
+        self.__class__.__name__,
+        "STATE_SET",
+        "Unable to set state--no APA loaded.",
+        [ stage, message ]
+      )
+
+    if not isError :
+      if stage in Process.STAGE_TABLE :
+        settings = Process.STAGE_TABLE[ stage ]
+        self.apa.closeLoadedRecipe()
+        if settings :
+          layer = settings[ "layer" ]
+          recipe = settings[ "recipe" ]
+          geometry = GeometrySelection( layer )
+
+          self.apa.setupBlankCalibration( layer, geometry )
+          self.apa.setStage( stage, message )
+          self.apa.loadRecipe( layer, recipe )
+
+      else :
+        isError = True
+
+        self._log.add(
+          self.__class__.__name__,
+          "STATE_SET",
+          "Unable to set state--unknown state " + str( stage ),
+          [ stage, message ]
+        )
 
   #---------------------------------------------------------------------
   def getG_CodeList( self, center, delta ) :
@@ -888,6 +946,60 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
+  def seekPinNominal( self, pin, velocity ) :
+    """
+    Seek out the nominal pin location.
+    Useful for calibration scan setup.
+
+    Args:
+      pin - Name of pin to seek.
+      velocity: Speed of z axis in m/s.
+
+    Returns:
+      True if there was an error, False if not.
+    """
+    isError = True
+    if self.apa :
+      # Get the name of this layer.
+      layer = self.apa.getLayer()
+
+      # Get the default calibration for this layer.
+      calibration = DefaultLayerCalibration( None, None, layer )
+
+      # Does request pin exist?
+      if calibration.getPinExists( pin ) :
+        self._log.add(
+          self.__class__.__name__,
+          "SEEK_PIN_NOMINAL",
+          "Nominal pin seek " + pin + " at " + str( velocity ) +".",
+          [ pin, velocity ]
+        )
+
+        # Get the center of the pins.
+        position = calibration.getPinLocation( pin )
+        position = position.add( calibration.offset )
+
+        # Run a manual seek to pin position.
+        self.manualSeekXY( position.x, position.y, velocity )
+        isError = False
+      else:
+        self._log.add(
+          self.__class__.__name__,
+          "SEEK_PIN_NOMINAL",
+          "Nominal pin seek request ignored--pin(s) does not exist.",
+          [ pin, velocity ]
+        )
+    else:
+      self._log.add(
+        self.__class__.__name__,
+        "SEEK_PIN_NOMINAL",
+        "Nominal pin seek request ignored--no APA loaded.",
+        [ pin, velocity ]
+      )
+
+    return isError
+
+  #---------------------------------------------------------------------
   def setAnchorPoint( self, pinA, pinB = None ) :
     """
     Specify the anchor point--location where the wire is assume to be fixed.
@@ -944,7 +1056,7 @@ class Process :
       y = self._io.yAxis.getPosition()
       z = self._io.zAxis.getPosition()
 
-      # $$$DEBUG - This doesn't work.  Not too important.  Fix it one day.
+      # $$$FUTURE - This doesn't work.  Not too important.  Fix it one day.
       # if self._io.head.BACK == self._io.head.getSide() :
       #   print "Back"
       #   z = self._io.head.getTargetAxisPosition()
@@ -1016,6 +1128,7 @@ class Process :
   #---------------------------------------------------------------------
   def startCalibrate(
     self,
+    side,
     startPin,
     endPin,
     maxPins,
@@ -1029,6 +1142,7 @@ class Process :
     Begin the calibration sequence.
 
     Args:
+      side: Front/back (F/B).
       startPin: First pin in scan.
       endPin: Last pin in scan.
       maxPin: The number of pin before wrap occurs.
@@ -1049,31 +1163,31 @@ class Process :
       isError = True
     else :
 
-      #
       # Determine direction of travel.
-      #
-
       pinDelta = endPin - startPin
       if pinDelta < 0 :
         direction = -1
       else :
         direction = 1
 
-      pinCount = abs( pinDelta )
-
-      pinDelta = pinCount + startPin
-
-      # Does the pin count rollover?
-      if ( pinDelta > maxPins ) or ( pinDelta < 0 ) :
-        direction = -direction
-
-      self.cameraCalibration.setupCalibration( startPin, direction, maxPins )
-
+      # Get the scan parameters setup.
+      self.cameraCalibration.setupCalibration( side, startPin, direction, maxPins )
       self._io.camera.startScan( deltaX, deltaY )
 
       # Setup seek location.
-      xPosition = self._io.xAxis.getPosition() + deltaX * pinCount
-      yPosition = self._io.yAxis.getPosition() + deltaY * pinCount
+      # The seek distance is the distance for the number of pins expected, plus
+      # 1/2 to be sure the last pin is found.
+      pinCount = abs( pinDelta )
+      xPosition = self._io.xAxis.getPosition() + deltaX * ( pinCount + 0.5 )
+      yPosition = self._io.yAxis.getPosition() + deltaY * ( pinCount + 0.5 )
+
+      # Begin the seek by switching into calibration mode.
+      self.controlStateMachine.seekX = xPosition
+      self.controlStateMachine.seekY = yPosition
+      self.controlStateMachine.seekVelocity = velocity
+      self.controlStateMachine.seekAcceleration = acceleration
+      self.controlStateMachine.seekDeceleration = deceleration
+      self.controlStateMachine.calibrationRequest = True
 
       self._log.add(
         self.__class__.__name__,
@@ -1085,12 +1199,6 @@ class Process :
         [ startPin, endPin, xPosition, yPosition, velocity, acceleration, deceleration ]
       )
 
-      self.controlStateMachine.seekX = xPosition
-      self.controlStateMachine.seekY = yPosition
-      self.controlStateMachine.seekVelocity = velocity
-      self.controlStateMachine.seekAcceleration = acceleration
-      self.controlStateMachine.seekDeceleration = deceleration
-      self.controlStateMachine.calibrationRequest = True
       isError = False
 
     return isError
@@ -1148,7 +1256,7 @@ class Process :
         pinFront = LayerFunctions.offsetPin( geometry, pinFront, geometry.directionFront )
         pinBack  = LayerFunctions.offsetPin( geometry, pinBack,  geometry.directionBack )
 
-        result = [ front, back ]
+      result = [ front, back, geometry.pins ]
 
     return result
 
@@ -1163,11 +1271,30 @@ class Process :
       layer = self.apa.getLayer()
       geometry = GeometrySelection( layer )
       calibration = self.gCodeHandler.getLayerCalibration()
+      calibrationFileName = calibration.getFileName()
+      cameraDataPath = self.apa.getPath() + "Scans"
 
-      # $$$DEBUG - Figure out if we are scanning front or back.
+      # Create directory if it doesn't exist.
+      if not os.path.exists( cameraDataPath ) :
+        os.makedirs( cameraDataPath )
 
-      self.cameraCalibration.saveCalibration( calibration, geometry, True )
+      cameraDataFile = str( self._systemTime.get() )
+      cameraDataFile = cameraDataFile.replace( " ", "_" ).replace( ":", "_" ).replace( ".", "_" )
+      cameraDataFile += ".csv"
+
+      # $$$FUTURE - Figure out if we are scanning front or back.
+
+      self.cameraCalibration.commitCalibration( calibration, geometry, True )
+      cameraDataHash = self.cameraCalibration.save( cameraDataPath, cameraDataFile )
       calibration.save()
+
+      self._log.add(
+        self.__class__.__name__,
+        "CALIBRATION_SAVED",
+        "Updated calibration information from scan for layer " + layer + " to " \
+          + calibrationFileName + ".",
+        [ layer, calibrationFileName, calibration.hashValue, cameraDataFile, cameraDataHash ]
+      )
 
     return isError
 

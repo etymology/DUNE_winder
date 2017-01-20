@@ -48,7 +48,6 @@ function Camera( modules )
     }
   )
 
-
   // Velocity sliders.
   page.loadSubPage
   (
@@ -156,11 +155,12 @@ function Camera( modules )
     (
       function()
       {
-        var startPin = parseInt( $( "#startPin" ).val() )
-        var endPin   = parseInt( $( "#endPin"   ).val() )
-        var spacingX = parseFloat( $( "#spacingX" ).val() )
-        var spacingY = parseFloat( $( "#spacingY" ).val() )
-        var velocity = parseFloat( $( "#velocity" ).val() )
+        var startPin  = parseInt( $( "#startPin" ).val() )
+        var endPin    = parseInt( $( "#endPin"   ).val() )
+        var spacingX  = parseFloat( $( "#spacingX" ).val() )
+        var spacingY  = parseFloat( $( "#spacingY" ).val() )
+        var totalPins = parseFloat( $( "#totalPins" ).val() )
+        var velocity  = parseFloat( $( "#velocity" ).val() )
         var pixelsPer_mm = parseFloat( $( "#pixelsPer_mm" ).val() )
 
         var pinDelta = endPin - startPin
@@ -172,9 +172,10 @@ function Camera( modules )
 
         var command =
           "process.startCalibrate( "
+          + '"F",' +
           + startPin + ", "
           + endPin + ", "
-          + "2400,"
+          + totalPins + ","
           + spacingX + ", "
           + spacingY + ", "
           + velocity + " )"
@@ -230,6 +231,19 @@ function Camera( modules )
         (
           "process.commitCalibration()"
         )
+      }
+    )
+
+  $( "#nominalPinSeek" )
+    .click
+    (
+      function()
+      {
+        var pin = $( "#startPin" ).val()
+        var velocity = sliders.getVelocity()
+
+        // $$$FUTURE - Front side only.  Fix.
+        winder.remoteAction( 'process.seekPinNominal( "F' + pin + '", ' + velocity + ' )' )
       }
     )
 
@@ -428,9 +442,9 @@ function Camera( modules )
 
   var oldData = null
 
-  var columnNames = [ "Pin",  "Motor X", "Motor Y", "Status", "Match"   ]
-  var filters     = [ false,  false,     false,     true,     false     ]
-  var widths      = [ "20%",  "20%",     "20%",     "20%",    "20%"     ]
+  var columnNames = [ "Side", "Pin",  "Motor X", "Motor Y", "Ok?", "Match"   ]
+  var filters     = [ false,   false, false,     false,     true,     false     ]
+  var widths      = [ "15%",  "15%",  "20%",     "20%",     "15%",    "15%"     ]
   var filteredTable = new FilteredTable( columnNames, filters, widths )
 
   // Callback when a row on the calibration table is clicked.
@@ -441,8 +455,12 @@ function Camera( modules )
     {
       var rowData = oldData[ row ]
       $( "#selectPin"  ).val( rowData[ "Pin" ] )
-      $( "#selectPinX" ).val( round( rowData[ "MotorX" ], 2 ) )
-      $( "#selectPinY" ).val( round( rowData[ "MotorY" ], 2 ) )
+      $( "#selectPinX" ).val( round( rowData[ "MotorX_Corrected" ], 2 ) )
+      $( "#selectPinY" ).val( round( rowData[ "MotorY_Corrected" ], 2 ) )
+      $( "#selectMotorX"  ).text( round( rowData[ "MotorX" ], 2 ) )
+      $( "#selectMotorY"  ).text( round( rowData[ "MotorY" ], 2 ) )
+      $( "#selectCameraX" ).text( round( rowData[ "CameraX" ], 2 ) )
+      $( "#selectCameraY" ).text( round( rowData[ "CameraY" ], 2 ) )
     }
   )
 
@@ -462,9 +480,10 @@ function Camera( modules )
           cleanData.push
           (
             [
+              row.Side,
               row.Pin,
-              round( row.MotorX, 2 ),
-              round( row.MotorY, 2 ),
+              round( row.MotorX_Corrected, 2 ),
+              round( row.MotorY_Corrected, 2 ),
               row.Status,
               round( row.MatchLevel, 0 ),
               round( row.CameraX, 2 ),
@@ -613,17 +632,19 @@ function Camera( modules )
             {
               var front = data[ 0 ]
 
-              var startPin = front[ startCorner ][ 0 ]
-              var endPin   = front[ endCorner   ][ 0 ]
-              var deltaX   = front[ startCorner ][ 1 ]
-              var deltaY   = front[ startCorner ][ 2 ]
+              var startPin  = front[ startCorner ][ 0 ]
+              var endPin    = front[ endCorner   ][ 0 ]
+              var deltaX    = front[ startCorner ][ 1 ]
+              var deltaY    = front[ startCorner ][ 2 ]
+              var totalPins = data[ 2 ]
 
               // Fill in the parameters for the scan with information from
               // geometry.
-              $( "#startPin" ).val( startPin )
-              $( "#endPin"   ).val( endPin )
-              $( "#spacingX" ).val( deltaX )
-              $( "#spacingY" ).val( deltaY )
+              $( "#startPin"  ).val( startPin )
+              $( "#endPin"    ).val( endPin )
+              $( "#totalPins" ).val( totalPins )
+              $( "#spacingX"  ).val( deltaX )
+              $( "#spacingY"  ).val( deltaY )
             }
           )
 
