@@ -272,6 +272,7 @@ class Process :
     if not isError :
       if stage in Process.STAGE_TABLE :
         settings = Process.STAGE_TABLE[ stage ]
+        self.apa.setStage( stage, message )
         self.apa.closeLoadedRecipe()
         if settings :
           layer = settings[ "layer" ]
@@ -279,9 +280,7 @@ class Process :
           geometry = GeometrySelection( layer )
 
           self.apa.setupBlankCalibration( layer, geometry )
-          self.apa.setStage( stage, message )
           self.apa.loadRecipe( layer, recipe )
-
       else :
         isError = True
 
@@ -608,10 +607,10 @@ class Process :
     Return the current layer of the APA.
 
     Returns:
-      String name of the current layer of the APA.  Empty string if no recipe
+      String name of the current layer of the APA.  None if no recipe
       loaded.
     """
-    result = ""
+    result = None
     if self.apa :
       result = self.apa.getLayer()
 
@@ -1204,6 +1203,23 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
+  def getAPA_Side( self ) :
+    """
+    Get the front-facing side of the APA.
+
+    Returns:
+      0 for front side of APA facing front side of machine.
+      1 for back side of APA facing front side of machine.
+      None for either no loaded APA, or APA in an invalid state for such a query.
+    """
+    result = None
+    if None != self.apa :
+      stage = self.apa.getStage()
+      result = self.apa.STAGE_SIDE[ stage ]
+
+    return result
+
+  #---------------------------------------------------------------------
   def getLayerPinGeometry( self ) :
     """
     Get the pin geometry for current layer.
@@ -1215,6 +1231,8 @@ class Process :
     """
     result = None
     if None != self.apa :
+      stage = self.apa.getStage()
+      side = self.apa.STAGE_SIDE[ stage ]
       layer = self.apa.getLayer()
       geometry = GeometrySelection( layer )
 
@@ -1226,6 +1244,10 @@ class Process :
 
       front = {}
       back  = {}
+      frontSumX = 0
+      frontSumY = 0
+      backSumX = 0
+      backSumY = 0
       for edgeIndex in xrange( 0, 4 ) :
 
         frontCount  = geometry.gridFront[ edgeIndex ][ 0 ]
@@ -1235,10 +1257,20 @@ class Process :
         backDeltaX  = geometry.gridBack[ edgeIndex ][ 1 ]
         backDeltaY  = geometry.gridBack[ edgeIndex ][ 2 ]
 
+        frontSumX += geometry.gridFront[ edgeIndex ][ 3 ]
+        frontSumY += geometry.gridFront[ edgeIndex ][ 4 ]
+        backSumX += geometry.gridBack[ edgeIndex ][ 3 ]
+        backSumY += geometry.gridBack[ edgeIndex ][ 4 ]
+
+        # Offset between front/back side pins.
+        # This is either an offset in X or Y, and really just for the U-layer.
+        offsetX = backSumX - frontSumX
+        offsetY = backSumY - frontSumY
+
         # Forward.
         edge = edges[ edgeIndex * 2 + 0 ]
-        front[ edge ] = [ pinFront, frontDeltaX, frontDeltaY ]
-        back[ edge ]  = [ pinBack, backDeltaX, backDeltaY ]
+        front[ edge ] = [ pinFront, frontDeltaX, frontDeltaY, offsetX, offsetY ]
+        back[ edge ]  = [ pinBack, backDeltaX, backDeltaY, -offsetX, -offsetY ]
 
         frontCount -= 1
         frontCount *= geometry.directionFront
@@ -1250,8 +1282,8 @@ class Process :
 
         # Reverse.
         edge = edges[ edgeIndex * 2 + 1 ]
-        front[ edge ] = [ pinFront, -frontDeltaX, -frontDeltaY ]
-        back[ edge ]  = [ pinBack, -backDeltaX, -backDeltaY ]
+        front[ edge ] = [ pinFront, -frontDeltaX, -frontDeltaY, offsetX, offsetY ]
+        back[ edge ]  = [ pinBack, -backDeltaX, -backDeltaY, -offsetX, -offsetY ]
 
         pinFront = LayerFunctions.offsetPin( geometry, pinFront, geometry.directionFront )
         pinBack  = LayerFunctions.offsetPin( geometry, pinBack,  geometry.directionBack )
@@ -1261,9 +1293,14 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
-  def commitCalibration( self ) :
+  def commitCalibration( self, side, offsetX, offsetY ) :
     """
     Commit the scan data to the calibration file.
+
+    Args:
+      side: Front facing side of APA (0=front, 1=back).
+      offsetX: Offset in X from current side to other side.
+      offsetY: Offset in Y from current side to other side.
     """
     isError = True
     if None != self.apa :
@@ -1282,9 +1319,19 @@ class Process :
       cameraDataFile = cameraDataFile.replace( " ", "_" ).replace( ":", "_" ).replace( ".", "_" )
       cameraDataFile += ".csv"
 
-      # $$$FUTURE - Figure out if we are scanning front or back.
+      if self.apa.Side.FRONT == side :
+        isFrontSide = True
+      else :
+        isFrontSide = False
 
-      self.cameraCalibration.commitCalibration( calibration, geometry, True )
+      self.cameraCalibration.commitCalibration(
+        calibration,
+        geometry,
+        isFrontSide,
+        offsetX,
+        offsetY
+      )
+
       cameraDataHash = self.cameraCalibration.save( cameraDataPath, cameraDataFile )
       calibration.save()
 

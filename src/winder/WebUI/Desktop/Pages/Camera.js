@@ -19,6 +19,7 @@ function Camera( modules )
   var winder = modules.get( "Winder" )
   var motorStatus
   var sliders
+  var side
 
   modules.load
   (
@@ -170,9 +171,13 @@ function Camera( modules )
         var endX = startX + spacingX * pinDelta
         var endY = startY + spacingY * pinDelta
 
+        var selectedSide = "F"
+        if ( 1 == side )
+          selectedSide = "B"
+
         var command =
           "process.startCalibrate( "
-          + '"F",' +
+          + '"' + selectedSide + '",' +
           + startPin + ", "
           + endPin + ", "
           + totalPins + ","
@@ -227,9 +232,12 @@ function Camera( modules )
     (
       function()
       {
+        var offsetX = $( "#offsetX" ).val()
+        var offsetY = $( "#offsetY" ).val()
+
         winder.remoteAction
         (
-          "process.commitCalibration()"
+          'process.commitCalibration( ' + side + ', ' + offsetX + ',' + offsetY + ' )'
         )
       }
     )
@@ -241,9 +249,11 @@ function Camera( modules )
       {
         var pin = $( "#startPin" ).val()
         var velocity = sliders.getVelocity()
+        var sideText = "F"
+        if ( 1 == side )
+          sideText = "B"
 
-        // $$$FUTURE - Front side only.  Fix.
-        winder.remoteAction( 'process.seekPinNominal( "F' + pin + '", ' + velocity + ' )' )
+        winder.remoteAction( 'process.seekPinNominal( "' + sideText + pin + '", ' + velocity + ' )' )
       }
     )
 
@@ -370,6 +380,53 @@ function Camera( modules )
 
   //---------------------------------------------------------------------------
   // Uses:
+  //   Get the APA side facing the front of the machine.
+  //---------------------------------------------------------------------------
+  function loadSide()
+  {
+    winder.remoteAction
+    (
+      "process.getAPA_Side()",
+      function( data )
+      {
+        side = data
+        var sideText = "N/A"
+        if ( -1 == side )
+          disableSelectState()
+        else
+        {
+          setSelectState( 0 )
+          sideText = "Front"
+          if ( 1 == side )
+            sideText = "Back"
+
+        }
+        $( "#apaSide" ).text( sideText )
+      }
+    )
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Get the APA side facing the front of the machine.
+  //---------------------------------------------------------------------------
+  function loadLayer()
+  {
+    winder.remoteAction
+    (
+      "process.getRecipeLayer()",
+      function( layer )
+      {
+        if ( null == layer )
+          layer = "N/A"
+
+        $( "#apaLayer" ).text( layer )
+      }
+    )
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
   //   Get a canvas context by name.
   //---------------------------------------------------------------------------
   function getCanvas( canvasName )
@@ -423,13 +480,20 @@ function Camera( modules )
     (
       function()
       {
+        disableSelectState()
         clearInterval( cameraTimer )
         cameraTimer = null
       }
     )
-    .registerRestoreCallback( loadCameraURL )
-
-
+    .registerRestoreCallback
+    (
+      function()
+      {
+        loadCameraURL()
+        loadSide()
+        loadLayer()
+      }
+    )
 
   // Filter table object with columns for the log file.
   var filteredTable =
@@ -575,10 +639,25 @@ function Camera( modules )
   // Input:
   //   state - That to place buttons (0-2).
   //---------------------------------------------------------------------------
+  var currentState
   function setSelectState( state )
   {
+    currentState = state
     for ( var tag in ENABLE_STATES[ state ] )
-      $( "#" + tag ).prop( "disabled", ! ENABLE_STATES[ state ][ tag ] )
+    {
+      var enable = ENABLE_STATES[ state ][ tag ]
+      $( "#" + tag ).prop( "disabled", ! enable )
+    }
+  }
+
+  //---------------------------------------------------------------------------
+  // Uses:
+  //   Disable all state select buttons.
+  //---------------------------------------------------------------------------
+  function disableSelectState()
+  {
+    for ( var tag in ENABLE_STATES[ 0 ] )
+      $( "#" + tag ).prop( "disabled", true )
   }
 
   for ( var index in CORNERS )
@@ -630,13 +709,18 @@ function Camera( modules )
             "process.getLayerPinGeometry()",
             function( data )
             {
-              var front = data[ 0 ]
-
-              var startPin  = front[ startCorner ][ 0 ]
-              var endPin    = front[ endCorner   ][ 0 ]
-              var deltaX    = front[ startCorner ][ 1 ]
-              var deltaY    = front[ startCorner ][ 2 ]
+              var front     = data[ 0 ]
+              var back      = data[ 1 ]
               var totalPins = data[ 2 ]
+
+              var startPin         = front[ startCorner ][ 0 ]
+              var endPin           = front[ endCorner   ][ 0 ]
+              var deltaX           = front[ startCorner ][ 1 ]
+              var deltaY           = front[ startCorner ][ 2 ]
+              var offsetX          = round( front[ startCorner ][ 3 ], 13 )
+              var offsetY          = round( front[ startCorner ][ 4 ], 13 )
+              var oppositeStartPin = back[ startCorner ][ 0 ]
+              var oppositeEndPin   = back[ endCorner   ][ 0 ]
 
               // Fill in the parameters for the scan with information from
               // geometry.
@@ -645,6 +729,10 @@ function Camera( modules )
               $( "#totalPins" ).val( totalPins )
               $( "#spacingX"  ).val( deltaX )
               $( "#spacingY"  ).val( deltaY )
+              $( "#offsetX"   ).val( offsetX )
+              $( "#offsetY"   ).val( offsetY )
+              $( "#oppositeStartPin" ).val( oppositeStartPin )
+              $( "#oppositeEndPin"   ).val( oppositeEndPin )
             }
           )
 
@@ -695,4 +783,6 @@ function Camera( modules )
 
   setSelectState( 0 )
   loadCameraURL()
+  loadSide()
+  loadLayer()
 }

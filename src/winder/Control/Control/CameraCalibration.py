@@ -87,7 +87,7 @@ class CameraCalibration :
     self._calibrationData = calibrationData
 
   #---------------------------------------------------------------------
-  def commitCalibration( self, layerCalibration, geometry, isFront ) :
+  def commitCalibration( self, layerCalibration, geometry, isFront, offsetX, offsetY ) :
     """
     Update the layer with the acquired calibration data.
 
@@ -95,6 +95,8 @@ class CameraCalibration :
       layerCalibration: Calibration for current layer.
       geometry: Layer geometry.
       isFront: True is camera data is from front side of APA.
+      offsetX: Offset in X from current side to other side.
+      offsetY: Offset in Y from current side to other side.
 
     Returns:
       layerCalibration is modified.
@@ -116,8 +118,9 @@ class CameraCalibration :
 
         pin = LayerFunctions.translateFrontBack( geometry, pin )
         pinName = sideB + str( pin )
-        location = Location( entry[ "MotorX" ], entry[ "MotorY" ], geometry.mostlyRetract )
-        # $$$FUTURE - Offset opposite side.
+        x = entry[ "MotorX" ] + offsetX
+        y = entry[ "MotorY" ] + offsetY
+        location = Location( x, y, geometry.mostlyRetract )
         layerCalibration.setPinLocation( pinName, location )
 
   #---------------------------------------------------------------------

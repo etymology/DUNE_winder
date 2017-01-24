@@ -204,12 +204,19 @@ try:
   log.add(
     "Main",
     "VERSION",
-    "Control software version " + str( version.getVersion() ) +
-    ", user interface version " + str( uiVersion.getVersion() ),
+    "Control software version " + str( version.getVersion() ),
     [
       version.getVersion(),
       version.getHash(),
-      version.getDate(),
+      version.getDate()
+    ]
+  )
+
+  log.add(
+    "Main",
+    "VERSION_UI",
+    "User interface version " + str( uiVersion.getVersion() ),
+    [
       uiVersion.getVersion(),
       uiVersion.getHash(),
       uiVersion.getDate()

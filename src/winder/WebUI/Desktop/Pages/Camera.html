@@ -45,64 +45,89 @@
     </section>
 
     <section id="editSection">
-      <article id="scanSetup">
-        <h2>Scan setup</h2>
-        <article>
-          <h3>Edge selection</h3>
-          <div class="buttonSet">
-            <button id="TL">TL</button>
-            <button id="T" >&#8660;</button>
-            <button id="TR">TR</button>
+      <article>
+        <h2>Edge selection</h2>
+        <div class="buttonSet">
+          <button id="TL">TL</button>
+          <button id="T" >&#8660;</button>
+          <button id="TR">TR</button>
 
-            <button id="L" >&#8661;</button>
-            <button id="GO">&check;</button>
-            <button id="R" >&#8661;</button>
+          <button id="L" >&#8661;</button>
+          <button id="GO">&check;</button>
+          <button id="R" >&#8661;</button>
 
-            <button id="BL">BL</button>
-            <button id="B" >&#8660;</button>
-            <button id="BR">BR</button>
-          </div>
-
-        </article>
-
-        <article>
-          <h3>Scan Parameters</h3>
-          <div>
-            <input id="startPin" />
-            <label for="startPin">Start pin</label>
-            <button id="nominalPinSeek">Seek</button>
-          </div>
-
-          <div>
-            <input id="endPin" />
-            <label for="endPin">End pin</label>
-          </div>
-
-          <div>
-            <input id="totalPins" />
-            <label for="totalPins">Total pins</label>
-          </div>
-
-          <div>
-            <input id="spacingX" />
-            <label for="spacingX">Pin spacing X</label>
-          </div>
-
-          <div>
-            <input id="spacingY" />
-            <label for="spacingY">Pin spacing Y</label>
-          </div>
-
-          <div>
-            <input id="velocity" value="25" />
-            <label for="velocity">Velocity</label>
-          </div>
-
-          <button id="scanButton">Scan</button>
-        </article>
-
+          <button id="BL">BL</button>
+          <button id="B" >&#8660;</button>
+          <button id="BR">BR</button>
+        </div>
+        <p>APA layer: <span id="apaLayer">--</span></p>
+        <p>APA facing side: <span id="apaSide">--</span></p>
       </article>
 
+      <article>
+        <h2>Scan Parameters</h2>
+        <div>
+          <div class="float-left">
+            <div>
+              <input id="startPin" />
+              <label for="startPin">Start pin</label>
+              <button id="nominalPinSeek">Seek</button>
+            </div>
+
+            <div>
+              <input id="endPin" />
+              <label for="endPin">End pin</label>
+            </div>
+
+            <div>
+              <input id="totalPins" />
+              <label for="totalPins">Total pins</label>
+            </div>
+
+            <div>
+              <input id="spacingX" />
+              <label for="spacingX">Pin spacing X</label>
+            </div>
+
+            <div>
+              <input id="spacingY" />
+              <label for="spacingY">Pin spacing Y</label>
+            </div>
+
+            <div>
+              <input id="velocity" value="25" />
+              <label for="velocity">Velocity</label>
+            </div>
+          </div>
+
+          <div class="float-left pad-left">
+            <div>
+              <input id="oppositeStartPin" />
+              <label for="oppositeStartPin">Opposite start</label>
+            </div>
+
+            <div>
+              <input id="oppositeEndPin" />
+              <label for="oppositeEndPin">Opposite end</label>
+            </div>
+
+            <div>
+              <input id="offsetX" />
+              <label for="offsetX">Offset X</label>
+            </div>
+
+            <div>
+              <input id="offsetY" />
+              <label for="offsetY">Offset Y</label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="clear center">
+          <button id="scanButton">Scan</button>
+        </div>
+      </article>
 
       <article>
         <h2>Selected Pin</h2>

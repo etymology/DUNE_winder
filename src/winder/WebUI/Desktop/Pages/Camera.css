@@ -144,6 +144,21 @@ div.float-right
   text-align: right;
 }
 
+.pad-left
+{
+  margin-left: 20px;
+}
+
+div.center
+{
+  text-align: center;
+}
+
+div.clear
+{
+  clear: both;
+}
+
 #slidersDiv
 {
   /*width: 525px;*/

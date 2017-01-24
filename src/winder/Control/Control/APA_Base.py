@@ -40,9 +40,29 @@ class APA_Base( Serializable ) :
     COMPLETE = 10
   # end class
 
+  class Side :
+    NONE  = -1
+    FRONT = 0
+    BACK  = 1
+  # end class
+
+  # Look-up table for what APA side faces the machine front.
+  STAGE_SIDE = [
+    Side.NONE,  # UNINITIALIZED
+    Side.FRONT, # LAYER_X_FIRST
+    Side.BACK,  # LAYER_X_SECOND
+    Side.FRONT, # LAYER_V_FIRST
+    Side.BACK,  # LAYER_V_SECOND
+    Side.FRONT, # LAYER_U_FIRST
+    Side.BACK,  # LAYER_U_SECOND
+    Side.FRONT, # LAYER_G_FIRST
+    Side.BACK,  # LAYER_G_SECOND
+    Side.NONE,  # SIGN_OFF
+    Side.NONE,  # COMPLETE
+  ]
+
   # Items saved to disk.
-  SERIALIZED_VARIABLES = \
-  [
+  SERIALIZED_VARIABLES = [
     '_name',
     "_calibrationFile",
     "_recipeFile",

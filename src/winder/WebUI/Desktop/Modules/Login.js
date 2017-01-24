@@ -45,7 +45,7 @@ $( document ).ready
     var clickCount = 0
     var timer
 
-    // $$$DEBUG - Backdoor function.
+    // $$$TEMPORARY - Backdoor function.  Remove when login is functional.
     $( "#loginHeader" )
       .click
       (
