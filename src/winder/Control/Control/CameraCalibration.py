@@ -46,6 +46,33 @@ class CameraCalibration :
     return self._pixelsPer_mm
 
   #---------------------------------------------------------------------
+  def _correct( self, motorX, motorY, cameraX, cameraY ) :
+    """
+    Run correction on a motor and camera position.
+
+    Args:
+      motorX: X-axis motor position.
+      motorY: Y-axis motor position.
+      cameraX: X-axis pin location from camera (pixels).
+      cameraY: Y-axis pin location from camera (pixels).
+    """
+    # Get offset from camera center of pin location.
+    # (Yes, x and y are reversed)
+    y = ( self._io.camera.FRAME_WIDTH  / 2 ) - cameraX
+    x = ( self._io.camera.FRAME_HEIGHT / 2 ) - cameraY
+
+    # Convert pixels to millimeters.
+    x /= self._pixelsPer_mm
+    y /= self._pixelsPer_mm
+
+    # Save corrected position.
+    x = motorX + x
+    y = motorY - y
+
+    return [ x, y ]
+
+
+  #---------------------------------------------------------------------
   def poll( self ) :
     """
     Periodic update function to call while calibration is taking place.
@@ -62,18 +89,18 @@ class CameraCalibration :
         fullEntry[ "Side" ] = self._side
         fullEntry[ "Pin" ] = pin
 
-        # Get offset from camera center of pin location.
-        # (Yes, x and y are reversed)
-        y = ( self._io.camera.FRAME_WIDTH  / 2 ) - entry[ "CameraX" ]
-        x = ( self._io.camera.FRAME_HEIGHT / 2 ) - entry[ "CameraY" ]
-
         # Convert pixels to millimeters.
-        x /= self._pixelsPer_mm
-        y /= self._pixelsPer_mm
+        [ x, y ] = \
+          self._correct(
+            entry[ "MotorX" ],
+            entry[ "MotorY" ],
+            entry[ "CameraX" ],
+            entry[ "CameraY" ]
+          )
 
         # Save corrected position.
-        fullEntry[ "MotorX_Corrected" ] = entry[ "MotorX" ] + x
-        fullEntry[ "MotorY_Corrected" ] = entry[ "MotorY" ] - y
+        fullEntry[ "MotorX_Corrected" ] = x
+        fullEntry[ "MotorY_Corrected" ] = y
 
         calibrationData.append( fullEntry )
 
@@ -85,6 +112,30 @@ class CameraCalibration :
 
     # Switch to new data.
     self._calibrationData = calibrationData
+
+  #---------------------------------------------------------------------
+  def centerCurrentLocation( self ) :
+    """
+    Compute pin center based on current image and motor position.
+    Use for manual triggering and incremental motion (do not use while moving).
+
+    Returns:
+      Array with X/Y motor position of pin location.  Array with None for
+      invalid capture data.
+    """
+    x = None
+    y = None
+    status = self._io.camera.cameraResultStatus
+
+    if 1 == status :
+      cameraX = self._io.camera.cameraResultX
+      cameraY = self._io.camera.cameraResultY
+      motorX = self._io.xAxis.getPosition()
+      motorY = self._io.yAxis.getPosition()
+
+      [ x , y ] = self._correct( motorX, motorY, cameraX, cameraY )
+
+    return [ x, y ]
 
   #---------------------------------------------------------------------
   def commitCalibration( self, layerCalibration, geometry, isFront, offsetX, offsetY ) :

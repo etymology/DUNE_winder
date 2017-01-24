@@ -99,11 +99,13 @@ def commandHandler( _, command ) :
     )
 
   # Try and make JSON object of result.
+  # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
+  # raise an exception.)
   try:
-    result = json.dumps( result )
+    result = json.dumps( result, encoding="unicode_escape" )
   except TypeError :
     # If it cannot be made JSON, just make it a string.
-    result = json.dumps( str( result ) )
+    result = json.dumps( str( result ), encoding="unicode_escape" )
 
   return result
 

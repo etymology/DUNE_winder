@@ -257,6 +257,16 @@ function Camera( modules )
       }
     )
 
+  $( "#centerButton" )
+    .click
+    (
+      function()
+      {
+        var velocity = sliders.getVelocity()
+        winder.remoteAction( 'process.cameraSeekCenter( ' + velocity + ' )' )
+      }
+    )
+
   //---------------------------------------------
 
   winder.addPeriodicDisplay( "io.camera.cameraResultStatus.get()", "#cameraResult", lastCapture, "status" )

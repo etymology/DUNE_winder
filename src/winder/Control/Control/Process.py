@@ -100,6 +100,8 @@ class Process :
     self._machineCalibration = machineCalibration
 
     self.cameraCalibration = CameraCalibration( io )
+    self.cameraCalibration.pixelsPer_mm( configuration.get( "pixelsPer_mm" ) )
+
     self.controlStateMachine.cameraCalibration = self.cameraCalibration
 
   #---------------------------------------------------------------------
@@ -1301,6 +1303,9 @@ class Process :
       side: Front facing side of APA (0=front, 1=back).
       offsetX: Offset in X from current side to other side.
       offsetY: Offset in Y from current side to other side.
+
+    Returns:
+      True if there was an error, False if not.
     """
     isError = True
     if None != self.apa :
@@ -1341,6 +1346,40 @@ class Process :
         "Updated calibration information from scan for layer " + layer + " to " \
           + calibrationFileName + ".",
         [ layer, calibrationFileName, calibration.hashValue, cameraDataFile, cameraDataHash ]
+      )
+
+    return isError
+
+  #---------------------------------------------------------------------
+  def cameraSeekCenter( self, velocity=None ) :
+    """
+    Seek to the center of the pin currently in view.
+    Only useful if camera has a pin location to work with.
+
+    Args:
+      velocity: Seek velocity.
+
+    Returns:
+      True if there was an error, False if not.
+    """
+    isError = False
+    [ x, y ] = self.cameraCalibration.centerCurrentLocation()
+    if None != x and None != y :
+
+      self.manualSeekXY( x, y, velocity )
+
+      self._log.add(
+        self.__class__.__name__,
+        "PIN_CENTER",
+        "Seeking pin center: " + str( x ) + " " + str( y ) + ".",
+        [ x, y ]
+      )
+    else :
+      isError = True
+      self._log.add(
+        self.__class__.__name__,
+        "PIN_CENTER",
+        "Failed to find a pin center to seek."
       )
 
     return isError

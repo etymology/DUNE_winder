@@ -46,6 +46,7 @@ class Settings :
 
     # Location of camera's last captured image.
     configuration.default( "cameraURL", "ftp://admin@192.168.16.55/image.bmp" )
+    configuration.default( "pixelsPer_mm", 18 )
 
     # Default for GUI server.
     configuration.default( "serverAddress", "127.0.0.1" )
