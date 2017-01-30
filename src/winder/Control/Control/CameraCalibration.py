@@ -41,7 +41,7 @@ class CameraCalibration :
     """
 
     if None != pixelsPer_mm :
-      self._pixelsPer_mm = pixelsPer_mm
+      self._pixelsPer_mm = float( pixelsPer_mm )
 
     return self._pixelsPer_mm
 
