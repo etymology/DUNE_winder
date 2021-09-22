@@ -106,4 +106,6 @@ class BaseIO:
     self.estop               = PLC_Input( "estop",               self.plc, "Machine_SW_Stat", 23, True )
     self.park                = PLC_Input( "park",                self.plc, "Machine_SW_Stat", 24, False )
 
+    self.Light_Curtain       = PLC_Input("Light_Curtain",        self.plc, "Machine_SW_Stat", 25 ) # LIGHT_CURTAIN
+
 # end class

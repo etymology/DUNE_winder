@@ -11,6 +11,12 @@ function PLC_Status( modules )
   {
     winder.remoteAction( 'process.acknowledgeError()' )
   }
+  
+  // new function for PLC_Init - PWH - September 2021
+  this.PLC_init = function ()
+  {
+    winder.remoteAction( 'process.acknowledgePLC_Init()' )
+  }
 
   //-----------------------------------------------------------------------------
   // Uses:

@@ -42,6 +42,7 @@ class PLC_Logic :
     HOME_LATCH = 6
     LATCH_UNLOCK = 7
     UNSERVO    = 8
+    PLC_INIT   = 9
   # end class
 
   class LatchPosition :
@@ -247,6 +248,19 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.RESET )
 
   #---------------------------------------------------------------------
+  # New function for PLC_Init - PWH - September 2021
+  def PLC_init( self ) :
+
+    """ 
+    Initilize PLC logic. 
+    """
+
+    self._moveType.set( self.MoveTypes.PLC_INIT ) 
+
+  
+
+  #--------------------------------------------------------------------- 
+  
   def latchHome( self ) :
     """
     Start a latch homing operation.

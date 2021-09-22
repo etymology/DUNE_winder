@@ -140,8 +140,8 @@ class Camera:
       The PLC logic will continuously trigger the camera at regular periods
       when enabled.
     """
-    io.camera.cameraTriggerEnable.set( 1 )
-    io.camera.cameraTrigger.set( isEnabled )
+    self.cameraTriggerEnable.set( 1 )
+    self.cameraTrigger.set( isEnabled )
 
   #---------------------------------------------------------------------
   def startScan( self, deltaX, deltaY ) :

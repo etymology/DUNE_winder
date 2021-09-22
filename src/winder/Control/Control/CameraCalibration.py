@@ -125,11 +125,11 @@ class CameraCalibration :
     """
     x = None
     y = None
-    status = self._io.camera.cameraResultStatus
+    status = self._io.camera.cameraResultStatus.get()
 
     if 1 == status :
-      cameraX = self._io.camera.cameraResultX
-      cameraY = self._io.camera.cameraResultY
+      cameraX = self._io.camera.cameraResultX.get()
+      cameraY = self._io.camera.cameraResultY.get()
       motorX = self._io.xAxis.getPosition()
       motorY = self._io.yAxis.getPosition()
 
