@@ -359,8 +359,9 @@ function PositionGraphic( modules )
         var xyStatusCanvas = getCanvas( "xyStatusCanvas" )
         xyStatusCanvas.clearRect( 0, 0, baseGraphicWidth, sideGraphicHeight )
 
-        statusLight( xyStatusCanvas, 1255, 465, inputs[ "Light_Curtain" ], true )
+        statusLight( xyStatusCanvas, 1250, 440, inputs[ "Light_Curtain" ] )
 
+        statusLight( xyStatusCanvas,   30, 400, inputs[ "Gate_Key" ] )
         statusLight( xyStatusCanvas,   30, 350, ! inputs[ "plcFunctional" ], true )
         statusLight( xyStatusCanvas,   30, 375, ! inputs[ "estop" ], true )
 
