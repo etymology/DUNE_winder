@@ -129,6 +129,56 @@ function PositionGraphic( modules )
     statusCanvas.stroke()
   }
 
+//---------------------------------------------------------------------------
+  // Uses:
+  //   EXPERIMENTAL
+	//Set the state of a status BAR light on the image.
+  // Input:
+  //   x - Location in x.
+  //   y - Location in y.
+  //   status - State of light.
+  //   offIsError - False if being off (false) is ok, or true if this is an error.
+  //---------------------------------------------------------------------------
+  var statusLightBar = function( statusCanvas, x, y, status, offIsError )
+  {
+    // Scale locations.
+    x *= scale
+    y *= scale
+
+    // Select the color of the light indicator.
+    if ( status )
+    {
+      statusCanvas.fillStyle = "lime"
+      statusCanvas.strokeStyle = "green"
+    }
+    else
+    if ( ! offIsError )
+    {
+      statusCanvas.fillStyle = "blue"
+      statusCanvas.strokeStyle = "darkBlue"
+    }
+    else
+    {
+      statusCanvas.fillStyle = "red"
+      statusCanvas.strokeStyle = "red"
+    }
+
+    // Draw a BAR at the specified location.
+    statusCanvas.beginPath()
+	statusCanvas.moveTo(x, y)
+	statusCanvas.lineTo(x + 50 , y )
+
+    // Draw fill (do before border).
+    statusCanvas.fill()
+
+    // Draw border.
+    statusCanvas.lineWidth = 10 * scale
+    statusCanvas.stroke()
+  }
+
+
+
+
   //---------------------------------------------------------------------------
   // Uses:
   //   Get a canvas context by name.
@@ -358,6 +408,17 @@ function PositionGraphic( modules )
 
         var xyStatusCanvas = getCanvas( "xyStatusCanvas" )
         xyStatusCanvas.clearRect( 0, 0, baseGraphicWidth, sideGraphicHeight )
+
+		// Head Locking Pins
+		statusLightBar( xyStatusCanvas, 250, 100, inputs[ "X_Transfer_OK" ], true )
+		statusLightBar( xyStatusCanvas, 250, 250, inputs[ "X_Transfer_OK" ], true )
+		statusLightBar( xyStatusCanvas, 250, 400, inputs[ "X_Transfer_OK" ], true )		
+		
+		// Foot Locking Pins
+		statusLightBar( xyStatusCanvas, 1150, 100, inputs[ "X_Transfer_OK" ], true )
+		statusLightBar( xyStatusCanvas, 1150, 250, inputs[ "X_Transfer_OK" ], true )
+		statusLightBar( xyStatusCanvas, 1150, 400, inputs[ "X_Transfer_OK" ], true )
+
 
         statusLight( xyStatusCanvas, 1250, 440, inputs[ "Light_Curtain" ] )
 
