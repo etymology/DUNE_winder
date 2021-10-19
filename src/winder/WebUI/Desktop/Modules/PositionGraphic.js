@@ -410,14 +410,14 @@ function PositionGraphic( modules )
         xyStatusCanvas.clearRect( 0, 0, baseGraphicWidth, sideGraphicHeight )
 
 		// Head Locking Pins
-		statusLightBar( xyStatusCanvas, 250, 100, inputs[ "X_Transfer_OK" ], true )
-		statusLightBar( xyStatusCanvas, 250, 250, inputs[ "X_Transfer_OK" ], true )
-		statusLightBar( xyStatusCanvas, 250, 400, inputs[ "X_Transfer_OK" ], true )		
+		statusLightBar( xyStatusCanvas, 250, 100, ! inputs[ "FrameLockHeadTop" ], true )
+		statusLightBar( xyStatusCanvas, 250, 250, ! inputs[ "FrameLockHeadMid" ], true )
+		statusLightBar( xyStatusCanvas, 250, 400, ! inputs[ "FrameLockHeadBtm" ], true )		
 		
 		// Foot Locking Pins
-		statusLightBar( xyStatusCanvas, 1150, 100, inputs[ "X_Transfer_OK" ], true )
-		statusLightBar( xyStatusCanvas, 1150, 250, inputs[ "X_Transfer_OK" ], true )
-		statusLightBar( xyStatusCanvas, 1150, 400, inputs[ "X_Transfer_OK" ], true )
+		statusLightBar( xyStatusCanvas, 1150, 100, ! inputs[ "FrameLockFootTop" ], true )
+		statusLightBar( xyStatusCanvas, 1150, 250, ! inputs[ "FrameLockFootMid" ], true )
+		statusLightBar( xyStatusCanvas, 1150, 400, ! inputs[ "FrameLockFootBtm" ], true )
 
 
         statusLight( xyStatusCanvas, 1250, 440, inputs[ "Light_Curtain" ] )
