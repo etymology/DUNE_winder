@@ -8,6 +8,7 @@
 
 import os
 import re
+import math
 
 from Library.Geometry.Location import Location
 from Library.G_Code import G_Code
@@ -81,6 +82,7 @@ class Process :
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     self._maxVelocity = float( configuration.get( "maxVelocity" ) )
+    self._maxSlowVelocity = float( configuration.get( "maxSlowVelocity" ) )
 
     # Setup initial limits on velocity and acceleration.
     io.plcLogic.setupLimits(
@@ -97,12 +99,20 @@ class Process :
     # By default, the G-Code handler will use maximum velocity.
     self.gCodeHandler.setLimitVelocity( self._maxVelocity )
 
+    # Set the limits to prevent manually inputting wrong coordinate values
     self._machineCalibration = machineCalibration
+    self._transferLeft = float( self._machineCalibration.get( "transferLeft" ) )
+    self._transferRight = float( self._machineCalibration.get( "transferRight" ) )
+    self._limitLeft = float( self._machineCalibration.get( "limitLeft" ) )
+    self._limitRight = float( self._machineCalibration.get( "limitRight" ) )
+    self._limitTop = float( self._machineCalibration.get( "limitTop" ) )
+    self._limitBottom = float( self._machineCalibration.get( "limitBottom" ) )
 
     self.cameraCalibration = CameraCalibration( io )
     self.cameraCalibration.pixelsPer_mm( configuration.get( "pixelsPer_mm" ) )
 
     self.controlStateMachine.cameraCalibration = self.cameraCalibration
+    self.controlStateMachine.machineCalibration= self._machineCalibration
 
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
@@ -708,12 +718,24 @@ class Process :
       yVelocity: Speed of y axis in m/s.  Allows negative for reverse, 0 to stop.
       acceleration: Maximum positive acceleration.  None for default.
       deceleration: Maximum negative acceleration.  None for default.
+      Safe Zone: If JogXY is working outside the _transferRight and _transferLeft regions
+                 then the velocity of the Jog will be reduced to maxSlowVelocity in X and Y.
     Returns:
       True if there was an error, False if not.
     """
 
     isError = False
     if ( 0 != xVelocity or 0 != yVelocity ) and self.controlStateMachine.isMovementReady() :
+      #Current coordinates to find out if we are in Safety Zone
+      x = self._io.xAxis.getPosition()
+      y = self._io.yAxis.getPosition()
+      z = self._io.zAxis.getPosition()
+      if x < self._transferLeft  or x > self._transferRight : # reduce the Job velocity to maxSlowVelocity
+        if ( xVelocity != 0 ) :
+          xVelocity = math.copysign(self._maxSlowVelocity,xVelocity)
+        if ( yVelocity != 0 ) :
+          yVelocity = math.copysign(self._maxSlowVelocity,yVelocity)
+
       self._log.add(
         self.__class__.__name__,
         "JOG",
@@ -721,6 +743,7 @@ class Process :
           + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
         [ xVelocity, yVelocity, acceleration, deceleration ]
       )
+
       self.controlStateMachine.manualRequest = True
       self.controlStateMachine.isJogging = True
       self._io.plcLogic.jogXY( xVelocity, yVelocity, acceleration, deceleration )
@@ -1103,26 +1126,47 @@ class Process :
         [ line ]
       )
     else :
-      errorData = self.gCodeHandler.executeG_CodeLine( line )
+      #Check that X and Y input coordinate are within limits
+      codeLineSplit = line.split()
+      for cmd in codeLineSplit :
+        if "X" in cmd :
+          x = cmd.split("X")
+          if float(x[1]) < self._limitLeft or float(x[1]) > self._limitRight :
+            error = "Invalid X-axis Coordinates, exceeding limit" + str(x[1])
+        if "Y" in cmd :
+          y = cmd.split("Y")
+          if float(y[1]) < self._limitBottom or float(y[1]) > self._limitTop :
+            error = "Invalid Y-axis Coordinates, exceeding limit" + str(y[1])
 
-      if errorData :
-        error = errorData[ "message" ]
+      if error != None :
         self._log.add(
           self.__class__.__name__,
           "MANUAL_GCODE",
-          "Failed to execute manual G-Code line.",
-          [ line, error ]
-        )
-      else:
-        self.controlStateMachine.manualRequest = True
-        self.controlStateMachine.executeGCode = True
-
-        self._log.add(
-          self.__class__.__name__,
-          "MANUAL_GCODE",
-          "Execute manual G-Code line.",
+          "Failed to execute manual G-Code line. Coordinates exceeding limit.",
           [ line ]
         )
+      else :
+        #Excute G_CodeLine
+        errorData = self.gCodeHandler.executeG_CodeLine( line )
+
+        if errorData :
+          error = errorData[ "message" ]
+          self._log.add(
+            self.__class__.__name__,
+            "MANUAL_GCODE",
+            "Failed to execute manual G-Code line.",
+            [ line, error ]
+          )
+        else:
+          self.controlStateMachine.manualRequest = True
+          self.controlStateMachine.executeGCode = True
+
+          self._log.add(
+            self.__class__.__name__,
+            "MANUAL_GCODE",
+            "Execute manual G-Code line.",
+            [ line ]
+          )
 
     return error
 
