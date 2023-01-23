@@ -1125,18 +1125,38 @@ class Process :
         "Failed to execute manual G-Code line as machine was not ready.",
         [ line ]
       )
+      
     else :
+      #Check the format of the string matches a VALID PATTERN
+      xy = '(\ *[X]\d{1,4}\ *[Y]\d{1,4}\ *$)'   # 'X1234 Y1234','X0 Y1234'
+      gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
+      xyf = '(\ *[X]\d{1,4}\ *[Y]\d{1,4}\ *[F]\d{1,2}\ *$)'    # 'X1234 Y1234 F12' 
+      gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}\ *[F]\d{1,2}\ *$)'   # 'G105 PX123 F12','G105 PY123 F12'
+
+      if not re.match(xy+'|'+gxy+'|'+xyf+"|"+gxyf, line) :
+        error = "Invalid G-code format or coordinates exceeding digits XY[0,9999] "+line
+
       #Check that X and Y input coordinate are within limits
+      #Get the current positions 
+      xPosition = self._io.xAxis.getPosition()
+      yPosition  = self._io.yAxis.getPosition()
+      zPosition = self._io.zAxis.getPosition()
       codeLineSplit = line.split()
       for cmd in codeLineSplit :
         if "X" in cmd :
-          x = cmd.split("X")
-          if float(x[1]) < self._limitLeft or float(x[1]) > self._limitRight :
-            error = "Invalid X-axis Coordinates, exceeding limit" + str(x[1])
+          xCmd = cmd.split("X")
+          x = float(xCmd[1])
+          if re.match( gxy+'|'+gxyf, line):   # if G105 is used then add relative coordinate
+            x = x + xPosition 
+          if x < self._limitLeft or x > self._limitRight :
+            error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
         if "Y" in cmd :
-          y = cmd.split("Y")
-          if float(y[1]) < self._limitBottom or float(y[1]) > self._limitTop :
-            error = "Invalid Y-axis Coordinates, exceeding limit" + str(y[1])
+          yCmd = cmd.split("Y")
+          y = float(yCmd[1])
+          if re.match( gxy+'|'+gxyf, line):
+            y = y + yPosition
+          if y < self._limitBottom or y > self._limitTop :
+            error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
 
       if error != None :
         self._log.add(
