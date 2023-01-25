@@ -1130,9 +1130,10 @@ class Process :
       #Check the format of the string matches a VALID PATTERN
       xy = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'   # 'X1234 Y1234','X0 Y1234'
       gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
-      xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F12' 
-      gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F12'
-
+      gx_y = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *$)' # 'G105  PX123 PY123'
+      xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F123' 
+      gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F123'
+      gx_yf = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)' # 'G105  PX123 PY123 F123'
       if not re.match(xy+'|'+gxy+'|'+xyf+"|"+gxyf, line) :
         error = "Invalid G-code format or coordinates exceeding digits XY[0,9999] "+line
 
@@ -1146,14 +1147,14 @@ class Process :
         if "X" in cmd :
           xCmd = cmd.split("X")
           x = float(xCmd[1])
-          if re.match( gxy+'|'+gxyf, line):   # if G105 is used then add relative coordinate
+          if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):   # if G105 is used then add relative coordinate
             x = x + xPosition 
           if x < self._limitLeft or x > self._limitRight :
             error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
         if "Y" in cmd :
           yCmd = cmd.split("Y")
           y = float(yCmd[1])
-          if re.match( gxy+'|'+gxyf, line):
+          if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):
             y = y + yPosition
           if y < self._limitBottom or y > self._limitTop :
             error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
