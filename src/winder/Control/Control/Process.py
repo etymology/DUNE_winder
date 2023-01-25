@@ -1128,10 +1128,10 @@ class Process :
       
     else :
       #Check the format of the string matches a VALID PATTERN
-      xy = '(\ *[X]\d{1,4}\ *[Y]\d{1,4}\ *$)'   # 'X1234 Y1234','X0 Y1234'
-      gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
-      xyf = '(\ *[X]\d{1,4}\ *[Y]\d{1,4}\ *[F]\d{1,2}\ *$)'    # 'X1234 Y1234 F12' 
-      gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}\ *[F]\d{1,2}\ *$)'   # 'G105 PX123 F12','G105 PY123 F12'
+      xy = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'   # 'X1234 Y1234','X0 Y1234'
+      gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
+      xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F12' 
+      gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F12'
 
       if not re.match(xy+'|'+gxy+'|'+xyf+"|"+gxyf, line) :
         error = "Invalid G-code format or coordinates exceeding digits XY[0,9999] "+line
