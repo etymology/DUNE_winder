@@ -1134,7 +1134,7 @@ class Process :
       xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F123' 
       gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F123'
       gx_yf = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)' # 'G105  PX123 PY123 F123'
-      if not re.match(xy+'|'+gxy+'|'+xyf+"|"+gxyf, line) :
+      if not re.match(xy+'|'+gxy+'|'+xyf+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
         error = "Invalid G-code format or coordinates exceeding digits XY[0,9999] "+line
 
       #Check that X and Y input coordinate are within limits
