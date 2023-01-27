@@ -1137,8 +1137,8 @@ class Process :
       fxy = '(\ *[F]\d{1,3}\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'    # 'X1234 Y1234 F123' 
       gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F123'
       gx_yf = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)' # 'G105  PX123 PY123 F123'
-      gp = '(\ *[G]106\ *P[0123]\ *$)'
-      z = '(\ *[Z]-?\d{1,3}\ *$)'
+      gp = '(\ *[G]106\ *P[0123]\ *$)' # 'G106 P0', ..., 'G106 P4'
+      z = '(\ *[Z]-?\d{1,3}\ *$)'  # 'Z123' , 'Z-123'
       if not re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf+'|'+gp+'|'+z, line) :
         error = "Invalid G-code format or coordinates exceeding the maximun digits allowed [X1234] : "+line
 
@@ -1166,8 +1166,9 @@ class Process :
         if "Z" in cmd and re.match(z, line) :
           zCmd = cmd.split("Z")
           z = float(zCmd[1])
-          if z < self._zlimitFront or z > self._zlimitRear :
-            error = "Invalid Z-axis Coordinates, exceeding limit ["+str(self._zlimitFront)+" , "+str(self._zlimitRear)+"]"            
+          #if z < self._zlimitFront or z > self._zlimitRear :
+          if z > self._zlimitRear :  
+            error = "Invalid Z-axis Coordinates, exceeding limit ["+str(z)+" > "+str(self._zlimitRear)+"]"            
 
       if error != None :
         self._log.add(
