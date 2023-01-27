@@ -107,6 +107,8 @@ class Process :
     self._limitRight = float( self._machineCalibration.get( "limitRight" ) )
     self._limitTop = float( self._machineCalibration.get( "limitTop" ) )
     self._limitBottom = float( self._machineCalibration.get( "limitBottom" ) )
+    self._zlimitFront = float( self._machineCalibration.get( "zLimitFront" ) )
+    self._zlimitRear = float( self._machineCalibration.get( "zLimitRear" ) )
 
     self.cameraCalibration = CameraCalibration( io )
     self.cameraCalibration.pixelsPer_mm( configuration.get( "pixelsPer_mm" ) )
@@ -1131,10 +1133,13 @@ class Process :
       xy = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'   # 'X1234 Y1234','X0 Y1234'
       gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
       gx_y = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *$)' # 'G105  PX123 PY123'
-      xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F123' 
+      xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F123'
+      fxy = '(\ *[F]\d{1,3}\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'    # 'X1234 Y1234 F123' 
       gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F123'
       gx_yf = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)' # 'G105  PX123 PY123 F123'
-      if not re.match(xy+'|'+gxy+'|'+xyf+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
+      gp = '(\ *[G]106\ *P[0123]\ *$)'
+      z = '(\ *[Z]-?\d{1,3}\ *$)'
+      if not re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf+'|'+gp+'|'+z, line) :
         error = "Invalid G-code format or coordinates exceeding the maximun digits allowed [X1234] : "+line
 
       #Check that X and Y input coordinate are within limits
@@ -1144,20 +1149,25 @@ class Process :
       zPosition = self._io.zAxis.getPosition()
       codeLineSplit = line.split()
       for cmd in codeLineSplit :
-        if "X" in cmd :
+        if "X" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
           xCmd = cmd.split("X")
           x = float(xCmd[1])
           if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):   # if G105 is used then add relative coordinate
             x = x + xPosition 
           if x < self._limitLeft or x > self._limitRight :
             error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
-        if "Y" in cmd :
+        if "Y" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
           yCmd = cmd.split("Y")
           y = float(yCmd[1])
           if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):
             y = y + yPosition
           if y < self._limitBottom or y > self._limitTop :
             error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
+        if "Z" in cmd and re.match(z, line) :
+          zCmd = cmd.split("Z")
+          z = float(zCmd[1])
+          if z < self._zlimitFront or z > self._zlimitRear :
+            error = "Invalid Z-axis Coordinates, exceeding limit ["+str(self._zlimitFront)+" , "+str(self._zlimitRear)+"]"            
 
       if error != None :
         self._log.add(
