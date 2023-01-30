@@ -1159,7 +1159,7 @@ class Process :
           if x < self._limitLeft or x > self._limitRight :
             error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
           if x < self._transferLeft -10 and y > 1000 :
-            error = "Invalid XY-axis Coordinates, forbiden area [<"+str(self._transferLeft - 10)+" , >"+str(1000)+"]"
+            error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [x < "+str(self._transferLeft - 10)+" , y > "+str(1000)+"]"
         if "Y" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
           yCmd = cmd.split("Y")
           y = float(yCmd[1])
@@ -1168,7 +1168,7 @@ class Process :
           if y < self._limitBottom or y > self._limitTop :
             error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
           if x < self._transferLeft -10 and y > 1000 :
-            error = "Invalid XY-axis Coordinates, forbiden area [<"+str(self._transferLeft - 10)+" , >"+str(1000)+"]"
+            error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [x < "+str(self._transferLeft - 10)+" , y > "+str(1000)+"]"
           
         if "Z" in cmd and re.match(z, line) :
           zCmd = cmd.split("Z")
