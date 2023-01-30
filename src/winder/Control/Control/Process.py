@@ -1148,6 +1148,8 @@ class Process :
       yPosition  = self._io.yAxis.getPosition()
       zPosition = self._io.zAxis.getPosition()
       codeLineSplit = line.split()
+      x = float(0)
+      y = float(0)
       for cmd in codeLineSplit :
         if "X" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
           xCmd = cmd.split("X")
@@ -1156,6 +1158,8 @@ class Process :
             x = x + xPosition 
           if x < self._limitLeft or x > self._limitRight :
             error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
+          if x < self._transferLeft -10 and y > 1000 :
+            error = "Invalid XY-axis Coordinates, forbiden area [<"+str(self._transferLeft - 10)+" , >"+str(1000)+"]"
         if "Y" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
           yCmd = cmd.split("Y")
           y = float(yCmd[1])
@@ -1163,6 +1167,9 @@ class Process :
             y = y + yPosition
           if y < self._limitBottom or y > self._limitTop :
             error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
+          if x < self._transferLeft -10 and y > 1000 :
+            error = "Invalid XY-axis Coordinates, forbiden area [<"+str(self._transferLeft - 10)+" , >"+str(1000)+"]"
+          
         if "Z" in cmd and re.match(z, line) :
           zCmd = cmd.split("Z")
           z = float(zCmd[1])
