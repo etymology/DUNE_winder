@@ -1155,20 +1155,23 @@ class Process :
           xCmd = cmd.split("X")
           x = float(xCmd[1])
           if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):   # if G105 is used then add relative coordinate
-            x = x + xPosition 
-          if x < self._limitLeft or x > self._limitRight :
+            x = x + xPosition
+            if x < self._transferLeft -10 and yPosition > 1000 :
+              error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(x)+" < "+str(self._transferLeft - 10)+" , Y="+str(yPosition)+" > "+str(1000)+"]"
+          if x < self._limitLeft or x > self._limitRight :     # if X is exeeding safety limit 
             error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
-          if x < self._transferLeft -10 and y > 1000 :
-            error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [x < "+str(self._transferLeft - 10)+" , y > "+str(1000)+"]"
         if "Y" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
           yCmd = cmd.split("Y")
           y = float(yCmd[1])
           if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):
             y = y + yPosition
+            if xPosition < self._transferLeft -10 and y > 1000 :
+              error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(xPosition)+" < "+str(self._transferLeft - 10)+" , Y="+str(y)+" > "+str(1000)+"]"
           if y < self._limitBottom or y > self._limitTop :
             error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
-          if x < self._transferLeft -10 and y > 1000 :
-            error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [x < "+str(self._transferLeft - 10)+" , y > "+str(1000)+"]"
+
+        if x < self._transferLeft -10 and y > 1000 and re.match(xy+'|'+xyf+'|'+fxy, line) :
+          error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(x)+" < "+str(self._transferLeft - 10)+" , Y="+str(y)+" > "+str(1000)+"]"
           
         if "Z" in cmd and re.match(z, line) :
           zCmd = cmd.split("Z")
