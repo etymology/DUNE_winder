@@ -24,6 +24,8 @@ class SimulatedMotor :
     Returns:
       Amount of distance that needs to be traversed for motion.
     """
+    if self._plc.getTag( self._desiredPositionTag ) == None :
+      return -self._position
     return self._plc.getTag( self._desiredPositionTag ) - self._position
 
   #---------------------------------------------------------------------

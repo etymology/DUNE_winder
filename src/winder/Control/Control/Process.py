@@ -8,6 +8,7 @@
 
 import os
 import re
+import math
 
 from Library.Geometry.Location import Location
 from Library.G_Code import G_Code
@@ -81,6 +82,7 @@ class Process :
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
 
     self._maxVelocity = float( configuration.get( "maxVelocity" ) )
+    self._maxSlowVelocity = float( configuration.get( "maxSlowVelocity" ) )
 
     # Setup initial limits on velocity and acceleration.
     io.plcLogic.setupLimits(
@@ -97,12 +99,22 @@ class Process :
     # By default, the G-Code handler will use maximum velocity.
     self.gCodeHandler.setLimitVelocity( self._maxVelocity )
 
+    # Set the limits to prevent manually inputting wrong coordinate values
     self._machineCalibration = machineCalibration
+    self._transferLeft = float( self._machineCalibration.get( "transferLeft" ) )
+    self._transferRight = float( self._machineCalibration.get( "transferRight" ) )
+    self._limitLeft = float( self._machineCalibration.get( "limitLeft" ) )
+    self._limitRight = float( self._machineCalibration.get( "limitRight" ) )
+    self._limitTop = float( self._machineCalibration.get( "limitTop" ) )
+    self._limitBottom = float( self._machineCalibration.get( "limitBottom" ) )
+    self._zlimitFront = float( self._machineCalibration.get( "zLimitFront" ) )
+    self._zlimitRear = float( self._machineCalibration.get( "zLimitRear" ) )
 
     self.cameraCalibration = CameraCalibration( io )
     self.cameraCalibration.pixelsPer_mm( configuration.get( "pixelsPer_mm" ) )
 
     self.controlStateMachine.cameraCalibration = self.cameraCalibration
+    self.controlStateMachine.machineCalibration= self._machineCalibration
 
   #---------------------------------------------------------------------
   def setWireLength( self, length ) :
@@ -708,12 +720,24 @@ class Process :
       yVelocity: Speed of y axis in m/s.  Allows negative for reverse, 0 to stop.
       acceleration: Maximum positive acceleration.  None for default.
       deceleration: Maximum negative acceleration.  None for default.
+      Safe Zone: If JogXY is working outside the _transferRight and _transferLeft regions
+                 then the velocity of the Jog will be reduced to maxSlowVelocity in X and Y.
     Returns:
       True if there was an error, False if not.
     """
 
     isError = False
     if ( 0 != xVelocity or 0 != yVelocity ) and self.controlStateMachine.isMovementReady() :
+      #Current coordinates to find out if we are in Safety Zone
+      x = self._io.xAxis.getPosition()
+      y = self._io.yAxis.getPosition()
+      z = self._io.zAxis.getPosition()
+      if x < self._transferLeft  or x > self._transferRight : # reduce the Job velocity to maxSlowVelocity
+        if ( xVelocity != 0 ) :
+          xVelocity = math.copysign(self._maxSlowVelocity,xVelocity)
+        if ( yVelocity != 0 ) :
+          yVelocity = math.copysign(self._maxSlowVelocity,yVelocity)
+
       self._log.add(
         self.__class__.__name__,
         "JOG",
@@ -721,6 +745,7 @@ class Process :
           + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
         [ xVelocity, yVelocity, acceleration, deceleration ]
       )
+
       self.controlStateMachine.manualRequest = True
       self.controlStateMachine.isJogging = True
       self._io.plcLogic.jogXY( xVelocity, yVelocity, acceleration, deceleration )
@@ -1102,27 +1127,87 @@ class Process :
         "Failed to execute manual G-Code line as machine was not ready.",
         [ line ]
       )
+      
     else :
-      errorData = self.gCodeHandler.executeG_CodeLine( line )
+      #Check the format of the string matches a VALID PATTERN
+      xy = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'   # 'X1234 Y1234','X0 Y1234'
+      gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
+      gx_y = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *$)' # 'G105  PX123 PY123'
+      xyf = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'    # 'X1234 Y1234 F123'
+      fxy = '(\ *[F]\d{1,3}\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'    # 'X1234 Y1234 F123' 
+      gxyf = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)'   # 'G105 PX123 F12','G105 PY123 F123'
+      gx_yf = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)' # 'G105  PX123 PY123 F123'
+      gp = '(\ *[G]106\ *P[0123]\ *$)' # 'G106 P0', ..., 'G106 P4'
+      z = '(\ *[Z]\d{1,3}(\.\d{1,2})?\ *$)'  # 'Z123' , 'Z-123' , 'Z123.45' 
+      if not re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf+'|'+gp+'|'+z, line) :
+        error = "Invalid G-code format or coordinates exceeding the maximun digits allowed [X1234] : "+line
 
-      if errorData :
-        error = errorData[ "message" ]
+      #Check that X and Y input coordinate are within limits
+      #Get the current positions 
+      xPosition = self._io.xAxis.getPosition()
+      yPosition  = self._io.yAxis.getPosition()
+      zPosition = self._io.zAxis.getPosition()
+      codeLineSplit = line.split()
+      x = float(0)
+      y = float(0)
+      for cmd in codeLineSplit :
+        if "X" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
+          xCmd = cmd.split("X")
+          x = float(xCmd[1])
+          if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):   # if G105 is used then add relative coordinate
+            x = x + xPosition
+            if x < self._transferLeft -10 and yPosition > 1000 :
+              error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(x)+" < "+str(self._transferLeft - 10)+" , Y="+str(yPosition)+" > "+str(1000)+"]"
+          if x < self._limitLeft or x > self._limitRight :     # if X is exeeding safety limit 
+            error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
+        if "Y" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
+          yCmd = cmd.split("Y")
+          y = float(yCmd[1])
+          if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):
+            y = y + yPosition
+            if xPosition < self._transferLeft -10 and y > 1000 :
+              error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(xPosition)+" < "+str(self._transferLeft - 10)+" , Y="+str(y)+" > "+str(1000)+"]"
+          if y < self._limitBottom or y > self._limitTop :
+            error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
+
+        if x < self._transferLeft -10 and y > 1000 and re.match(xy+'|'+xyf+'|'+fxy, line) :
+          error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(x)+" < "+str(self._transferLeft - 10)+" , Y="+str(y)+" > "+str(1000)+"]"
+          
+        if "Z" in cmd and re.match(z, line) :
+          zCmd = cmd.split("Z")
+          z = float(zCmd[1])
+          if z < self._zlimitFront or z > self._zlimitRear :
+            error = "Invalid Z-axis Coordinates, exceeding limit ["+str(z)+" > "+str(self._zlimitRear)+"]"            
+
+      if error != None :
         self._log.add(
           self.__class__.__name__,
           "MANUAL_GCODE",
-          "Failed to execute manual G-Code line.",
-          [ line, error ]
-        )
-      else:
-        self.controlStateMachine.manualRequest = True
-        self.controlStateMachine.executeGCode = True
-
-        self._log.add(
-          self.__class__.__name__,
-          "MANUAL_GCODE",
-          "Execute manual G-Code line.",
+          "Failed to execute manual G-Code line. Coordinates exceeding limit.",
           [ line ]
         )
+      else :
+        #Excute G_CodeLine
+        errorData = self.gCodeHandler.executeG_CodeLine( line )
+
+        if errorData :
+          error = errorData[ "message" ]
+          self._log.add(
+            self.__class__.__name__,
+            "MANUAL_GCODE",
+            "Failed to execute manual G-Code line.",
+            [ line, error ]
+          )
+        else:
+          self.controlStateMachine.manualRequest = True
+          self.controlStateMachine.executeGCode = True
+
+          self._log.add(
+            self.__class__.__name__,
+            "MANUAL_GCODE",
+            "Execute manual G-Code line.",
+            [ line ]
+          )
 
     return error
 

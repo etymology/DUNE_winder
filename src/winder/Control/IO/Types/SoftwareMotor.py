@@ -33,8 +33,8 @@ class SoftwareMotor( Motor ) :
     self._acceleration    = 0
     self._position        = 0
     self._jerk            = 200
-    self._maxAcceleration = 200
-    self._maxVelocity     = 400
+    self._maxAcceleration = 100
+    self._maxVelocity     = 200
     self._startTime       = simulationTime.get()
     self._motion          = Motion()
 

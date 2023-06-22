@@ -26,6 +26,7 @@ class WindMode( StateMachineState ) :
     self._io = io
     self._log = log
     self._startTime = None
+    self._currentLine = 0 
 
   #---------------------------------------------------------------------
   def enter( self ) :
@@ -106,7 +107,8 @@ class WindMode( StateMachineState ) :
     """
     Update function that is called periodically.
     """
-
+    #Want to print G-Code line
+    
     # If stop requested...
     if self.stateMachine.stopRequest :
       # We didn't finish this line.  Run it again.
@@ -130,6 +132,19 @@ class WindMode( StateMachineState ) :
         self.stateMachine.gCodeHandler.clearCodeError()
 
         isDone = True
+
+      # Is G-Code execution complete?
+      if not isDone :
+        if self.stateMachine.gCodeHandler.isG_CodeLoaded() :
+          line = self.stateMachine.gCodeHandler.getLine()
+          if self._currentLine != line :
+            # Log message that wind is complete.
+            self._log.add(
+              self.__class__.__name__,
+              "LINE",
+              "G-Code executing line N"+str(line), [self._currentLine, line]
+             )
+          self._currentLine = line
 
 
       # Is G-Code execution complete?

@@ -68,7 +68,11 @@ class Head :
 
       # Start seek to the finial position.
       self._desiredPosition = self._lastSeek
-      self._plcLogic.setZ_Position( self._lastSeek, self._velocity )
+      # Hack to speed up arm retraction at G106 P3 movement
+      if  self.EXTENDED == self._position : # Leave head latched, then retract arm with : 10 * velocity
+        self._plcLogic.setZ_Position( self._lastSeek, self._velocity * 10 )
+      else :  # run at normal velocity
+        self._plcLogic.setZ_Position( self._lastSeek, self._velocity )
 
       # Always idle after this motion.
       self._nextState = self.States.IDLE
