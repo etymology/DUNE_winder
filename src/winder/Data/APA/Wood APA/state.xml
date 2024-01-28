@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<SerializableData>
+	<AnodePlaneArray>
+		<str name="_name">Wood APA</str>
+		<str name="_calibrationFile">X_Calibration.xml</str>
+		<str name="_recipeFile">LayerX_gCode.gc</str>
+		<int name="_lineNumber">2640</int>
+		<str name="_layer">X</str>
+		<int name="_stage">1</int>
+		<str name="_creationDate">2016-12-19 19:24:20.486000</str>
+		<str name="_lastModifyDate">2024-01-08 21:46:01.520000</str>
+		<float name="_loadedTime">701541.828</float>
+		<float name="_windTime">4647.003</float>
+		<float name="_x">440.0</float>
+		<float name="_y">0.0</float>
+		<int name="_headLocation">0</int>
+	</AnodePlaneArray>
+</SerializableData>
