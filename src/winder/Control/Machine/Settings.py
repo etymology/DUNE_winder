@@ -42,10 +42,10 @@ class Settings :
     """
     Setup default values for configuration.
     """
-    configuration.default( "plcAddress", "192.168.16.49" )
+    configuration.default( "plcAddress", "192.168.140.13" )
 
     # Location of camera's last captured image.
-    configuration.default( "cameraURL", "ftp://admin@192.168.16.55/image.bmp" )
+    configuration.default( "cameraURL", "ftp://admin@192.168.140.19/image.bmp" )
     configuration.default( "pixelsPer_mm", 18 )
 
     # Default for GUI server.

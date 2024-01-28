@@ -231,6 +231,8 @@ function Jog( modules )
     $( "#gExecutionCodeStatus" ).html( "Request G-Code execution..." )
 
     var gCode = $( "#manualGCode" ).val()
+    //UPDATED TO CHANGE MANUAL GCODE TO UPPERCASE - deactivated as update was made to Jog.html
+    //gCode = gCode.toUpperCase()
     winder.remoteAction
     (
       'process.executeG_CodeLine( "' + gCode + '" )',

@@ -17,7 +17,7 @@
         <article id="manualG_CodeDiv">
           <button onclick="gCodePage.executeGCode()">Run</button>
           <h2>Manual G-Code</h2>
-          <input id="manualGCode" />
+          <input id="manualGCode"  oninput="this.value = this.value.toUpperCase()"/>
         </article>
 
         <article id="gCodeAdvanceDiv">

@@ -22,7 +22,7 @@ from .G_Codes import G_Codes
 
 class G_CodeHandlerBase :
 
-  DEBUG_UNIT = False
+  DEBUG_UNIT = True
 
   #---------------------------------------------------------------------
   def _setX( self, x ) :
@@ -35,8 +35,10 @@ class G_CodeHandlerBase :
     Returns:
       None.
     """
+   
     self._xyChange = True
     self._x = x
+    print "$$$$$ setX %f" %self._x
 
   #---------------------------------------------------------------------
   def _setY( self, y ) :
@@ -49,8 +51,10 @@ class G_CodeHandlerBase :
     Returns:
       None.
     """
+    
     self._xyChange = True
     self._y = y
+    print "$$$$$ setY %f" %self._y
 
 
   #---------------------------------------------------------------------
@@ -229,11 +233,14 @@ class G_CodeHandlerBase :
       print "  SEEK_TRANSFER starting at", endLocation,
 
     # Starting location based on anchor point.  Actual location has compensation
-    # for pin diameter.
+    # for pin diameter
+    print "$$$$$ seekT:endloc", endLocation
     startLocation = self._headCompensation.pinCompensation( endLocation )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print "Pin correction", startLocation,
+
+    print "$$$$$ seekT:startloc", startLocation
 
     if None == startLocation :
       data = [
@@ -254,10 +261,13 @@ class G_CodeHandlerBase :
         self._machineCalibration.transferRight,
         self._machineCalibration.transferBottom
       )
+    print "$$$$$ seekT:edges", edges
 
     location = edges.intersectSegment( segment )
+    print "$$$$$ seekT:loc", location
+
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "Finial location", location
+      print "Final location", location
 
     if None == location :
       data = [
@@ -266,7 +276,6 @@ class G_CodeHandlerBase :
       ]
 
       raise G_CodeException( "G-Code seek transfer could not establish a finial location.", data )
-
     self._x = location.x
     self._y = location.y
     self._xyChange = True
@@ -276,11 +285,11 @@ class G_CodeHandlerBase :
     """
     Seek between pins.
     """
-
+    print "$$$$$ G_CodeHandlerBase._pinCenter"
     pinNumberA = self._parameterExtract( function, 1, None, str, "pin center" )
     pinNumberB = self._parameterExtract( function, 2, None, str, "pin center" )
     axies = self._parameterExtract( function, 3, None, str, "pin center" )
-
+    print "$$$$$$  PIN_CENTER", pinNumberA, pinNumberB
     if G_CodeHandlerBase.DEBUG_UNIT :
       print "  PIN_CENTER", pinNumberA, pinNumberB,
 
@@ -302,6 +311,7 @@ class G_CodeHandlerBase :
       self._y = center.y
       self._xyChange = True
 
+    print "$$$$$_pinCenter: x = %f, y = %f" %(self._x, self._y)
     # Save the Z center location (but don't act on it).
     self._z = center.z
 
@@ -389,7 +399,7 @@ class G_CodeHandlerBase :
 
     self._headCompensation.anchorPoint( pin )
     self._headCompensation.orientation( orientation )
-
+    print "$$$$$  G_CodeHandlerBase._anchorPoint: ANCHOR_POINT", pinNumber, pin, orientation
     if G_CodeHandlerBase.DEBUG_UNIT :
       print "  ANCHOR_POINT", pinNumber, pin, orientation
 
@@ -401,12 +411,18 @@ class G_CodeHandlerBase :
 
     z = self._getHeadPosition( self._headPosition )
 
+
     currentLocation = Location( self._x, self._y, z )
+    print "$$$$$  ARM_CORRECT", currentLocation
+
     if G_CodeHandlerBase.DEBUG_UNIT :
       print "  ARM_CORRECT", currentLocation,
+    print "$$$$$ Y IS CLOSE: ", MathExtra.isclose( self._y, self._machineCalibration.transferTop ) or MathExtra.isclose( self._y, self._machineCalibration.transferBottom )
 
     if   MathExtra.isclose( self._y, self._machineCalibration.transferTop ) \
-      or MathExtra.isclose( self._y, self._machineCalibration.transferBottom ) :
+      or MathExtra.isclose( self._y, self._machineCalibration.transferBottom, abs_tol = 0.001 ) :
+        
+        print "$$$$$ self._y is close to transferTop or transferBotton: Y: %f, X: %f" %(self._y, self._x)
         self._x = self._headCompensation.correctX( currentLocation )
         if G_CodeHandlerBase.DEBUG_UNIT :
           print "new X", self._x,
@@ -435,14 +451,18 @@ class G_CodeHandlerBase :
           self._x = location.x
           if G_CodeHandlerBase.DEBUG_UNIT :
             print "Edge", self._x, self._y,
+        print "$$$$$ edge: ", edge
+
     else :
+      print "$$$$$ Precorrected Y: %f" %self._y
       self._y = self._headCompensation.correctY( currentLocation )
       if G_CodeHandlerBase.DEBUG_UNIT :
         print "new Y", self._y,
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print
-
+    print "$$$$$  ARM_CORRECTED x: %f y: %f" %(self._x, self._y)
+    
     self._xyChange = True
 
   #---------------------------------------------------------------------

@@ -90,6 +90,7 @@ class HeadCompensation :
     if self._orientation :
       pinRadius = self._machineCalibration.pinDiameter / 2
       circle = Circle( self._anchorPoint, pinRadius )
+      print "$$$$$", self._orientation
       result = circle.tangentPoint( self._orientation, endPoint )
       self._anchorOffset = result.sub( self._anchorPoint )
     else :
@@ -234,7 +235,7 @@ class HeadCompensation :
 
     # Correct the Y position with two offsets.
     correctedY = machineLocation.y + headCorrection + rollerCorrection
-
+    print "$$$$$ correctY: %f" %correctedY
     return correctedY
 
   #---------------------------------------------------------------------
@@ -271,7 +272,7 @@ class HeadCompensation :
     rollerX *= deltaX / abs( deltaY )
 
     x += rollerX
-
+    print "$$$$$ correctX: %f" %x
     return x
 
   #---------------------------------------------------------------------
@@ -304,11 +305,15 @@ class HeadCompensation :
 
     deltaX = machineLocation.x - anchorPoint.x
     deltaY = machineLocation.y - anchorPoint.y
+    print "$$$$$ deltaY: ", deltaY, machineLocation.y
     deltaZ = machineLocation.z - anchorPoint.z
+    print "$$$$$ deltaZ: ", deltaZ, machineLocation.z
 
     travelZ = abs( zDesired - anchorPoint.z )
+    print "$$$$$ travelZ: ", travelZ, zDesired, anchorPoint.z
     lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
     lengthYZ = math.sqrt( deltaY**2 + deltaZ**2 )
+    print "$$$$$ lengthYZ: ", lengthYZ
 
     x = anchorPoint.x
     y = anchorPoint.y
@@ -320,6 +325,7 @@ class HeadCompensation :
     if 0 != lengthYZ :
       yCorrection = travelZ * deltaY / lengthYZ
       y += yCorrection
+      print "$$$$$ yCorrection: ", yCorrection, anchorPoint.y
 
     return [ x, y ]
 

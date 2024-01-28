@@ -329,6 +329,7 @@ function Camera( modules )
   function cameraUpdateFunction()
   {
     var url = cameraURL + "?random=" + Math.floor( Math.random() * 0xFFFFFFFF )
+
     $( "#cameraImage" )
       .attr( "src", url )
       .bind
@@ -339,6 +340,8 @@ function Camera( modules )
           var canvas = getCanvas( "cameraCanvas" )
           canvas.clearRect( 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT )
 
+          canvas.drawImage(this, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+
           canvas.lineWidth = 1
           canvas.strokeStyle = "black"
           crosshairs( canvas, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 10 )
@@ -348,6 +351,7 @@ function Camera( modules )
         }
       )
   }
+
 
   //---------------------------------------------------------------------------
   // Uses:

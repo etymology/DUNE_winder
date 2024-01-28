@@ -24,4 +24,5 @@ class SeekTransferG_Code( G_CodeFunction ) :
     Args:
       seekLocation: One (or more) of the seek seek locations.
     """
+    print("$$$$$ SeekTransferG_Code.py")
     G_CodeFunction.__init__( self, G_Codes.SEEK_TRANSFER, [] )
