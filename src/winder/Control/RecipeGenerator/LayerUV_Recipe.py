@@ -47,7 +47,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     self.anchorOrientations = {}
 
   #-------------------------------------------------------------------
-  def _createNode( self, grid, orientation, side, depth, startPin, direction ) :
+  def _createNode( self, grid, orientation, side, depth, startPin, direction ):
     """
     Create nodes.
     This is a list of pins starting with the bottom left corner moving in
@@ -77,7 +77,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
     # This is a lookup table to translate wire orientation to an angle.
     angle180 = math.radians( 180 )
     orientationAngles = \
-    {
+      {
       "TR" : -self.geometry.angle,
       "RT" : -self.geometry.angle,
       "TL" :  self.geometry.angle,
@@ -90,17 +90,11 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     # Lookup table for what pin to center the wire.  Centering is always the
     # target pin, and the pin to the left or right.
-    if orientation :
-                  # Left  Top   Right  Bottom
-      centering = [ +1,   -1,   +1,    -1     ]
-    else :
-      centering = [ -1,   +1,   -1,    +1     ]
-
+    centering = [+1, -1, +1, -1] if orientation else [-1, +1, -1, +1]
     x = 0
     y = 0
-    setIndex = 0
     pinNumber = startPin
-    for parameter in grid :
+    for setIndex, parameter in enumerate(grid):
       count = parameter[ 0 ]
       xInc  = parameter[ 1 ]
       yInc  = parameter[ 2 ]
@@ -108,7 +102,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       y += parameter[ 4 ]
       anchorOrientation = parameter[ 5 ]
 
-      for _ in range( 0, count ) :
+      for _ in range(count):
         location = Location( round( x, 5 ) + 0, round( y, 5 ) + 0, depth )
         pin = side + str( pinNumber )
         self.nodes[ pin ] = location
@@ -118,7 +112,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
         pinNumber += direction
 
-        if 0 == pinNumber :
+        if pinNumber == 0:
           pinNumber = self.geometry.pins
         elif pinNumber > self.geometry.pins :
           pinNumber = 1
@@ -129,7 +123,6 @@ class LayerUV_Recipe( RecipeGenerator ) :
       # Backup for last position.
       x -= xInc
       y -= yInc
-      setIndex += 1
 
   #-------------------------------------------------------------------
   def _createNet( self, windSteps, direction=1 ) :
@@ -277,7 +270,7 @@ class LayerUV_Recipe( RecipeGenerator ) :
       self.gCodePath.push()
 
   #---------------------------------------------------------------------
-  def _wind( self, start1, start2, direction, windsOverride=None ) :
+  def _wind( self, start1, start2, direction, windsOverride=None ):
     """
     Wind the layer using the class parameters.
 
@@ -322,13 +315,13 @@ class LayerUV_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for index in range( 1, totalCount + 1 ) :
+    for index in range( 1, totalCount + 1 ):
       self._wrapCenter()
       self._wrapEdge( direction )
       self._wrapCenter()
       self._wrapEdge( -direction )
 
-      self.gCodePath.pushComment( "Loop " + str( index ) + " of " + str( totalCount ) )
+      self.gCodePath.pushComment(f"Loop {str(index)} of {str(totalCount)}")
       self.gCodePath.push()
 
       if halfCount == index :

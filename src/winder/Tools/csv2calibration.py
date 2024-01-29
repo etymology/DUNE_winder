@@ -31,16 +31,16 @@ for line in lines:
     cols = line.split( "\t" )
     points.append( cols )
 
-if "X" == layer :
-  geometry = X_LayerGeometry()
-elif "V" == layer :
-  geometry = V_LayerGeometry()
-elif "U" == layer :
-  geometry = U_LayerGeometry()
-elif "G" == layer :
+if layer == "G":
   geometry = G_LayerGeometry()
-else :
-  raise "Unknown layer: " + str( layer )
+elif layer == "U":
+  geometry = U_LayerGeometry()
+elif layer == "V":
+  geometry = V_LayerGeometry()
+elif layer == "X":
+  geometry = X_LayerGeometry()
+else:
+  raise f"Unknown layer: {str(layer)}"
 
 layerCalibration = LayerCalibration( layer )
 
@@ -52,7 +52,7 @@ layerCalibration.zFront = geometry.mostlyExtend
 layerCalibration.zBack  = geometry.mostlyRetract
 
 # For each point...
-for point in points :
+for point in points:
   pinFront = int( point[ 0 ] )
   pinBack  = ( 399 - pinFront ) % 2399 + 1
   x = point[ 1 ]
@@ -61,7 +61,7 @@ for point in points :
   locationFront = SerializableLocation( x, y, layerCalibration.zFront )
   locationBack  = SerializableLocation( x, y, layerCalibration.zBack  )
 
-  layerCalibration.setPinLocation( "F" + str( pinFront ), locationFront )
-  layerCalibration.setPinLocation( "B" + str( pinBack  ), locationBack  )
+  layerCalibration.setPinLocation(f"F{pinFront}", locationFront)
+  layerCalibration.setPinLocation(f"B{str(pinBack)}", locationBack)
 
 layerCalibration.save( ".", outputFileName )

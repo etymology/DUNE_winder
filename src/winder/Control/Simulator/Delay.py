@@ -14,7 +14,7 @@ import datetime
 class Delay :
 
   #---------------------------------------------------------------------
-  def __init__( self, systemTime, delay=None ) :
+  def __init__( self, systemTime, delay=None ):
     """
     Constructor.
 
@@ -26,7 +26,7 @@ class Delay :
     self._systemTime = systemTime
     self._endTime = None
 
-    if None != delay :
+    if delay != None:
       self.set( delay )
 
 
@@ -42,16 +42,12 @@ class Delay :
     self._endTime = self._systemTime.get() + delta
 
   #---------------------------------------------------------------------
-  def hasExpired( self ) :
+  def hasExpired( self ):
     """
     Check to see if the delay time has elapsed.
 
     Returns:
       True if delay has elapsed, False if not.
     """
-    result = True
-
-    if None != self._endTime :
-      result = self._systemTime.get() >= self._endTime
-
-    return result
+    return (self._systemTime.get() >= self._endTime
+            if self._endTime != None else True)

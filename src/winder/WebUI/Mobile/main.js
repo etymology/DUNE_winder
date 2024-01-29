@@ -13,21 +13,22 @@ var USE_FULL_PAGE_CACHE = false
 //-----------------------------------------------------------------------------
 function getParameterByName( name, url )
 {
-  if ( ! url )
+  if (! url) {
     url = window.location.href
+  }
 
   name = name.replace( /[\[\]]/g, "\\$&" )
   var regex = new RegExp( "[?&]" + name + "(=([^&#]*)|&|#|$)" )
   var results = regex.exec( url )
 
   var returnResult
-  if ( ! results )
+  if (! results) {
     returnResult = null
-  else
-  if ( ! results[ 2 ] )
-    returnResult = ''
-  else
-    returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) )
+  } else if (! results[ 2 ]) {
+           returnResult = ''
+         } else {
+           returnResult = decodeURIComponent( results[ 2 ].replace( /\+/g, " " ) )
+         }
 
   return returnResult
 }
@@ -62,10 +63,11 @@ function setupMainScreen()
         (
           function()
           {
-            if ( $( this ).val() )
+            if ($( this ).val()) {
               $( this ).attr( "class", "toggleDown" )
-            else
+            } else {
               $( this ).attr( "class", "toggle" )
+            }
 
             //if ( ! $( this ).click() )
             {
@@ -78,8 +80,9 @@ function setupMainScreen()
                     $( this ).toggleClass( "toggleDown" )
 
                     var value = 0
-                    if ( $( this ).attr( 'class' ) == "toggleDown" )
+                    if ($( this ).attr( 'class' ) == "toggleDown") {
                       value = 1
+                    }
 
                     $( this ).val( value )
                   }
@@ -101,15 +104,14 @@ function setupMainScreen()
 var baseStylesheets = []
 function load( pageName )
 {
-  if ( ! USE_FULL_PAGE_CACHE )
-  {
+  if (! USE_FULL_PAGE_CACHE) {
     var page = window[ "page" ]
     var modules = page.getModules()
     var winder = modules.get( "Winder" )
     winder.shutdown()
-
+  
     $( '#main' ).html( "Loading..." )
-
+  
     // Remove all styles sheets that are not base styles.
     $( 'head' )
       .find( 'link' )
@@ -119,25 +121,25 @@ function load( pageName )
         {
           // Where did this style sheet come from?
           var url = $( this ).attr( 'href' )
-
+  
           // Is it a base style sheet?
-          if ( -1 == baseStylesheets.indexOf( url ) )
-            // Remove it.
+          if (-1 == baseStylesheets.indexOf( url )) {
             $( this ).remove()
+          }
         }
       )
-
+  
     var page = new Page()
     window[ "page" ] = page
-
+  
     // Winder module is used on every page.
     page.addCommonModule( "/Scripts/Winder" )
-
+  
     // page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
     // page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
     // page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
     // page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
-
+  
     // Loading sub page and setup main screen after sub page finishes loading.
     page.load
     (
@@ -145,9 +147,9 @@ function load( pageName )
       "#main",
       setupMainScreen
     )
-  }
-  else
+  } else {
     page.load( page )
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -162,8 +164,9 @@ $( document ).ready
     var pageName = getParameterByName( "page" )
 
     // If there is no page, use default.
-    if ( ! pageName )
+    if (! pageName) {
       pageName = "Menu"
+    }
 
     // Save all the loaded style sheet URLs.  These need to stay regardless
     // of what page is loaded.

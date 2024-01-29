@@ -73,7 +73,7 @@ class Segment :
     return math.sqrt( deltaX**2 + deltaY**2 + deltaZ**2 )
 
   #---------------------------------------------------------------------
-  def slope( self ) :
+  def slope( self ):
     """
     Slope of X/Y.
 
@@ -84,11 +84,7 @@ class Segment :
     deltaX = self.deltaX()
     deltaY = self.deltaY()
 
-    slope = float( "inf" )
-    if 0 != deltaX :
-      slope = deltaY / deltaX
-
-    return slope
+    return deltaY / deltaX if deltaX != 0 else float( "inf" )
 
   #---------------------------------------------------------------------
   def intercept( self ) :
@@ -112,7 +108,7 @@ class Segment :
     return ( self.start.x == self.finish.x ) and ( self.start.y == self.finish.y )
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Get a string representation of object.
 
@@ -120,5 +116,5 @@ class Segment :
       String representation of object in form (x1, y1, z1)-(x2, y2, z2) where
       xn/yn/zn are numbers and n is 1 for starting location, 2 for finishing.
     """
-    return str( self.start ) + "-" + str( self.finish )
+    return f"{str(self.start)}-{str(self.finish)}"
 

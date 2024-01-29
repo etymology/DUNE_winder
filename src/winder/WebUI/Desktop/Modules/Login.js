@@ -14,20 +14,17 @@ function login()
     function( loginResult )
     {
       // Did the login work?
-      if ( loginResult )
-      {
-        // Reload.
+      if (loginResult) {
         $( "#loginResult" )
           .html( "Reloading..." )
           .removeClass( "inError" )
-
+      
         location.reload( true )
-      }
-      else
-        // Signify there was a problem.
+      } else {
         $( "#loginResult" )
           .html( "Login incorrect." )
           .addClass( "inError" )
+      }
     }
   )
 
@@ -53,10 +50,11 @@ $( document ).ready
         {
           clickCount += 1
 
-          if ( clickCount >= 3 )
-             $( "#loginPassword" ).val( "PSL#Winder" )
+          if (clickCount >= 3) {
+            $( "#loginPassword" ).val( "PSL#Winder" )
+          }
 
-          if ( null == timer )
+          if (null == timer) {
             timer = setTimeout
             (
               function()
@@ -66,6 +64,7 @@ $( document ).ready
               },
               500
             )
+          }
         }
       )
   }

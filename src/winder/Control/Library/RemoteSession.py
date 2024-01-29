@@ -106,7 +106,7 @@ class RemoteSession :
     return result
 
   #----------------------------------------------------------------------------
-  def _update( self ) :
+  def _update( self ):
     """
     Update session.  Called when session has been used to keep session alive.
     Internal function.
@@ -116,17 +116,17 @@ class RemoteSession :
 
     self._updateCount += 1
 
-    self._lastUpdate = datetime.datetime.utcnow()
+    self._lastUpdate = datetime.datetime.now(datetime.timezone.utc)
 
   #----------------------------------------------------------------------------
-  def _isExpired( self ) :
+  def _isExpired( self ):
     """
     Check to see if session is expired.  Internal function.
 
     Returns:
       True if session is expired.
     """
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     then = self._lastUpdate
     delta = now - then
 
@@ -184,7 +184,7 @@ class RemoteSession :
     self._salt = str( binascii.hexlify( os.urandom( self.SALT_SIZE ) ) ) + self._id
 
   #----------------------------------------------------------------------------
-  def checkPassword( self, passwordHash, password=None ) :
+  def checkPassword( self, passwordHash, password=None ):
     """
     Verify a password hash.
 
@@ -192,7 +192,7 @@ class RemoteSession :
       passwordHash: Incoming hash of password.
       password: Actual password to check against.
     """
-    if None == password :
+    if password is None:
       password = RemoteSession.PASSWORD
 
     hasedData = self._salt + password

@@ -17,7 +17,7 @@ class DigitalInput( DigitalIO ) :
   map = {}
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Convert state to string.
 
@@ -25,14 +25,10 @@ class DigitalInput( DigitalIO ) :
       "1" for on, "0" for off.
     """
 
-    result = "0"
-    if self.get() :
-      result = "1"
-
-    return result
+    return "1" if self.get() else "0"
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -42,7 +38,7 @@ class DigitalInput( DigitalIO ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in DigitalInput.list )
+    assert name not in DigitalInput.list
 
     DigitalIO.__init__( self, name )
     DigitalInput.list.append( self )

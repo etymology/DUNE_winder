@@ -68,8 +68,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     var defaultSetting = false
 
     // If all columns are to allow filtering...
-    if ( columnFilterEnables )
+    if (columnFilterEnables) {
       defaultSetting = true
+    }
 
     // Build filter enables with default value.
     columnFilterEnables = []
@@ -91,8 +92,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     {
       var row = data[ rowIndex ]
       var item = row[ column ]
-      if ( results.indexOf( item ) == -1 )
+      if (results.indexOf( item ) == -1) {
         results.push( item )
+      }
     }
 
     return results
@@ -128,8 +130,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
           addRow &= columnFilters[ column ][ row[ column ] ]
         }
 
-      if ( addRow )
+      if (addRow) {
         filteredData.push( row )
+      }
     }
 
     for ( var forwardIndex in sortArray )
@@ -157,10 +160,11 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
               a = parseFloat( a[ sortColumn ] )
               b = parseFloat( b[ sortColumn ] )
               result = 0
-              if ( a > b )
+              if (a > b) {
                 result = 1
-              else
+              } else {
                 result = -1
+              }
             }
             else
             {
@@ -195,16 +199,18 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
   //---------------------------------------------------------------------------
   this.setSort = function( column, direction )
   {
-    if ( direction )
+    if (direction) {
       direction = 1
-    else
+    } else {
       direction = -1
+    }
 
     // If this sort is already being applied, remove it.
     for ( index in sortArray )
     {
-      if ( column == sortArray[ index ][ 0 ]  )
+      if (column == sortArray[ index ][ 0 ]) {
         sortArray.splice( index, 1 )
+      }
     }
 
     // Push new sort ordering to the front of the array.
@@ -279,13 +285,12 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
             var message = $( "<p />" ).attr( "id", idString ).text( "Sorting..." )
             $( tableId ).replaceWith( message )
 
-            if ( ( ! sortArray[ 0 ] )
-              || ( localColumn != sortArray[ 0 ][ 0 ] ) )
-            {
+            if (( ! sortArray[ 0 ] )
+                          || ( localColumn != sortArray[ 0 ][ 0 ] )) {
               self.setSort( localColumn, 1 )
-            }
-            else
+            } else {
               sortArray[ 0 ][ 1 ] *= -1
+            }
 
             self.filter()
             self.display( tableId )
@@ -396,8 +401,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
           if ( null != columnFilters )
           {
             buttonValue = columnFilters[ columnIndex ][ item ]
-            if ( ! buttonValue )
+            if (! buttonValue) {
               buttonClass = "toggle"
+            }
           }
 
           $( "<button />" )
@@ -413,8 +419,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
                 $( this ).toggleClass( "toggleDown" )
 
                 var value = false
-                if ( $( this ).attr( 'class' ) == "toggleDown" )
+                if ($( this ).attr( 'class' ) == "toggleDown") {
                   value = true
+                }
 
                 columnFilters[ localColumn ][ item ] = value
 
@@ -433,8 +440,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
         && ( columnIndex == sortArray[ 0 ][ 0 ] ) )
       {
         var arrow = "&#8593;"
-        if ( -1 == sortArray[ 0 ][ 1 ] )
+        if (-1 == sortArray[ 0 ][ 1 ]) {
           arrow = "&#8595;"
+        }
 
         // Create a <div> tag to hold sorting arrow.
         var labelId = "columnSort_" + this.id + "_" + columnIndex
@@ -459,8 +467,9 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
     }
 
     // If there is as yet no filtered data, use the full data set.
-    if ( ! filteredData )
+    if (! filteredData) {
       this.filter()
+    }
 
     var outerDiv =
       $( "<div />" )
@@ -497,7 +506,7 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
         .appendTo( tableBody )
 
       // If there is a callback for rows, register it.
-      if ( rowCallback )
+      if (rowCallback) {
         tableRow.click
         (
           function()
@@ -505,22 +514,25 @@ function FilteredTable( columnNames, columnFilterEnables, columnWidths )
             rowCallback( lookupValue )
           }
         )
+      }
 
       for ( var index in rowData )
       {
         var item = rowData[ index ]
-        if ( index != indexColumn )
+        if (index != indexColumn) {
           $( "<td/>" )
             .appendTo( tableRow )
             .attr( "id", "cell_" + this.id + "_" + row + "_" + index )
             .text( item )
+        }
       }
     }
 
     $( tableId ).replaceWith( displayDiv )
 
-    if ( displayCallback )
+    if (displayCallback) {
       displayCallback()
+    }
   }
 
   //---------------------------------------------------------------------------

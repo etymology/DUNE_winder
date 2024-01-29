@@ -20,7 +20,7 @@ class DigitalOutput( six.with_metaclass(ABCMeta, DigitalIO) ) :
   _state = False
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Convert state to string.
 
@@ -28,14 +28,10 @@ class DigitalOutput( six.with_metaclass(ABCMeta, DigitalIO) ) :
       "1" for on, "0" for off.
     """
 
-    result = "0"
-    if self.get() :
-      result = "1"
-
-    return result
+    return "1" if self.get() else "0"
 
   #---------------------------------------------------------------------
-  def __init__( self, name, initialState = 0 ) :
+  def __init__( self, name, initialState = 0 ):
     """
     Constructor.
 
@@ -46,7 +42,7 @@ class DigitalOutput( six.with_metaclass(ABCMeta, DigitalIO) ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in DigitalOutput.list )
+    assert name not in DigitalOutput.list
 
     DigitalIO.__init__( self, name )
     DigitalOutput.list.append( self )

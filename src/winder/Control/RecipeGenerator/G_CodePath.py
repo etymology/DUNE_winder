@@ -87,7 +87,7 @@ class G_CodePath( Path3d ) :
       self._seekForceZ.append( index )
 
   #---------------------------------------------------------------------
-  def toG_Code( self, output, name, isCommentOut=False ) :
+  def toG_Code( self, output, name, isCommentOut=False ):
     """
     Turn path into G-Code text.
 
@@ -99,18 +99,18 @@ class G_CodePath( Path3d ) :
     if isCommentOut :
       output.write( "# " )
 
-    output.write( "( " + name + " )\n" )
+    output.write(f"( {name}" + " )\n")
     lineNumber = 1
 
     lastX = 0
     lastY = 0
     lastZ = 0
 
-    for index, point in enumerate( self.path ) :
+    for index, point in enumerate( self.path ):
       if isCommentOut :
         output.write( "# " )
 
-      output.write( "N" + str( lineNumber ) )
+      output.write(f"N{str(lineNumber)}")
 
       if index in self._seekForceX :
         lastX = None
@@ -121,30 +121,30 @@ class G_CodePath( Path3d ) :
       if index in self._seekForceZ :
         lastZ = None
 
-      if lastX != point.x :
-        output.write( " X" + str( point.x ) )
+      if lastX != point.x:
+        output.write(f" X{str(point.x)}")
         lastX = point.x
 
-      if lastY != point.y :
-        output.write( " Y" + str( point.y ) )
+      if lastY != point.y:
+        output.write(f" Y{str(point.y)}")
         lastY = point.y
 
-      if lastZ != point.z :
-        output.write( " Z" + str( point.z ) )
+      if lastZ != point.z:
+        output.write(f" Z{str(point.z)}")
         lastZ = point.z
 
-      if index in self._gCode :
-        for gCode in self._gCode[ index ] :
-          output.write( " " + gCode.toG_Code() )
+      if index in self._gCode:
+        for gCode in self._gCode[ index ]:
+          output.write(f" {gCode.toG_Code()}")
 
-      if index in self._comment :
-        output.write( " ( " + self._comment[ index ] + " )" )
+      if index in self._comment:
+        output.write(f" ( {self._comment[index]} )")
 
       output.write( "\n" )
       lineNumber += 1
 
   #---------------------------------------------------------------------
-  def _pointLabel( self, output, location, text, layer=None ) :
+  def _pointLabel( self, output, location, text, layer=None ):
     """
     Make a SketchUp label at specified location.
 
@@ -153,29 +153,26 @@ class G_CodePath( Path3d ) :
       location: The location to label.
       text: The text to place on this label.
     """
-    x = location.x / 25.4
     y = location.y / 25.4
     z = location.z / 25.4
 
-    output.write(
-      'point = Geom::Point3d.new [ '
-        + str( x ) + ','
-        + str( z ) + ','
-        + str( y ) + ' ]'
-        + "\n" )
+    x = location.x / 25.4
+    output.write(f'point = Geom::Point3d.new [ {str(x)},{str(z)},{str(y)} ]' +
+                 "\n")
 
     x = random.uniform( -3, 3 )
     y = random.uniform( -3, 3 )
 
-    output.write( 'vector = Geom::Vector3d.new ' + str( x ) + ',0,' + str( y ) + "\n" )
-    output.write( 'label = Sketchup.active_model.entities.add_text "'
-      + text + '", point, vector' + "\n" )
+    output.write(f'vector = Geom::Vector3d.new {x},0,{y}' + "\n")
+    output.write(
+        f'label = Sketchup.active_model.entities.add_text "{text}", point, vector'
+        + "\n")
 
-    if layer :
-      output.write( 'label.layer = ' + layer + "\n" )
+    if layer:
+      output.write(f'label.layer = {layer}' + "\n")
 
   #---------------------------------------------------------------------
-  def toSketchUpRuby( self, output, layer, half="", enableLables=True ) :
+  def toSketchUpRuby( self, output, layer, half="", enableLables=True ):
     """
     Turn path into Ruby code for use in SketchUp.  Labels G-Code functions.
     Useful for visualizing paths.
@@ -185,30 +182,35 @@ class G_CodePath( Path3d ) :
       half: Layer label for which half.
       enables: True to enable labels G-Code labels.
     """
-    Path3d.toSketchUpRuby( self, output, "G-Code path " + layer + "-" + half )
+    Path3d.toSketchUpRuby(self, output, f"G-Code path {layer}-{half}")
 
-    if enableLables :
+    if enableLables:
       output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\n" )
-      for index, gCodeList in six.iteritems(self._gCode) :
+      for index, gCodeList in six.iteritems(self._gCode):
 
         location = self.path[ index ]
 
-        for gCode in gCodeList :
+        for gCode in gCodeList:
 
           function = int( gCode.getFunction() )
 
-          if G_Codes.LATCH == function :
+          if G_Codes.LATCH == function:
             side = "front"
             if HeadLocationG_Code.BACK == int( gCode.getParameter( 0 ) ) :
               side = "back"
 
-            self._pointLabel( output, location, "Z-latch " + side, "layer" )
+            self._pointLabel(output, location, f"Z-latch {side}", "layer")
 
           if G_Codes.SEEK_TRANSFER == function :
             self._pointLabel( output, location, "Seek transfer", "layer" )
 
-          if G_Codes.PIN_CENTER == function :
-            self._pointLabel( output, location, "Center " + gCode.getParameter( 0 ) + "-" + gCode.getParameter( 1 ), "layer" )
+          if G_Codes.PIN_CENTER == function:
+            self._pointLabel(
+                output,
+                location,
+                f"Center {gCode.getParameter(0)}-{gCode.getParameter(1)}",
+                "layer",
+            )
 
           if G_Codes.OFFSET == function :
             self._pointLabel( output, location, "Offset", "layer" )

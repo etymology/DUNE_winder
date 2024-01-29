@@ -32,7 +32,7 @@ class WindMode( StateMachineState ) :
     self._currentLine = 0 
 
   #---------------------------------------------------------------------
-  def enter( self ) :
+  def enter( self ):
     """
     Function called when entering this state.
 
@@ -41,8 +41,8 @@ class WindMode( StateMachineState ) :
     """
     isError = False
 
-    if None == self.stateMachine.gCodeHandler \
-     or not self.stateMachine.gCodeHandler.isG_CodeLoaded() :
+    if (self.stateMachine.gCodeHandler is None
+        or not self.stateMachine.gCodeHandler.isG_CodeLoaded()):
       isError = True
       self._log.add(
         self.__class__.__name__,
@@ -66,22 +66,21 @@ class WindMode( StateMachineState ) :
         "Wind cannot start because G-Code is finished."
       )
 
-    if not isError :
+    if not isError:
       self._startTime = self.stateMachine.systemTime.get()
-      self.stateMachine.windTime = 0
       self.stateMachine.stopRequest = False
+      self.stateMachine.windTime = 0
       self._log.add(
-        self.__class__.__name__,
-        "WIND",
-        "G-Code execution begins at line "
-          + str( self.stateMachine.gCodeHandler.getLine() ),
-        [ self.stateMachine.gCodeHandler.getLine() ]
+          self.__class__.__name__,
+          "WIND",
+          f"G-Code execution begins at line {str(self.stateMachine.gCodeHandler.getLine())}",
+          [self.stateMachine.gCodeHandler.getLine()],
       )
 
     return isError
 
   #---------------------------------------------------------------------
-  def exit( self ) :
+  def exit( self ):
     """
     Function called when exiting this state.
 
@@ -90,16 +89,16 @@ class WindMode( StateMachineState ) :
     """
 
     self.stateMachine.windTime += \
-      self.stateMachine.systemTime.getDelta( self._startTime )
+        self.stateMachine.systemTime.getDelta( self._startTime )
 
     deltaString = self.stateMachine.systemTime.getElapsedString( self.stateMachine.windTime )
 
     # Log message that wind is complete.
     self._log.add(
-      self.__class__.__name__,
-      "WIND_TIME",
-      "Wind ran for " + deltaString + ".",
-      [ self.stateMachine.windTime ]
+        self.__class__.__name__,
+        "WIND_TIME",
+        f"Wind ran for {deltaString}.",
+        [self.stateMachine.windTime],
     )
 
     self.stateMachine.gCodeHandler.stop()
@@ -111,9 +110,9 @@ class WindMode( StateMachineState ) :
     Update function that is called periodically.
     """
     #Want to print G-Code line
-    
+
     # If stop requested...
-    if self.stateMachine.stopRequest :
+    if self.stateMachine.stopRequest:
       # We didn't finish this line.  Run it again.
       self._io.plcLogic.stopSeek()
       self.changeState( self.stateMachine.States.STOP )
@@ -123,13 +122,13 @@ class WindMode( StateMachineState ) :
       # Update G-Code handler.
       isDone = self.stateMachine.gCodeHandler.poll()
 
-      if self.stateMachine.gCodeHandler.isG_CodeError() :
+      if self.stateMachine.gCodeHandler.isG_CodeError():
         # Log message that wind is complete.
         self._log.add(
-          self.__class__.__name__,
-          "WIND_ERROR",
-          "G-Code error.  " + self.stateMachine.gCodeHandler.getG_CodeErrorMessage(),
-          self.stateMachine.gCodeHandler.getG_CodeErrorData()
+            self.__class__.__name__,
+            "WIND_ERROR",
+            f"G-Code error.  {self.stateMachine.gCodeHandler.getG_CodeErrorMessage()}",
+            self.stateMachine.gCodeHandler.getG_CodeErrorData(),
         )
 
         self.stateMachine.gCodeHandler.clearCodeError()
@@ -137,16 +136,16 @@ class WindMode( StateMachineState ) :
         isDone = True
 
       # Is G-Code execution complete?
-      if not isDone :
-        if self.stateMachine.gCodeHandler.isG_CodeLoaded() :
+      if not isDone and self.stateMachine.gCodeHandler.isG_CodeLoaded():
           line = self.stateMachine.gCodeHandler.getLine()
-          if self._currentLine != line :
+          if self._currentLine != line:
             # Log message that wind is complete.
             self._log.add(
-              self.__class__.__name__,
-              "LINE",
-              "G-Code executing line N"+str(line), [self._currentLine, line]
-             )
+                self.__class__.__name__,
+                "LINE",
+                f"G-Code executing line N{str(line)}",
+                [self._currentLine, line],
+            )
           self._currentLine = line
 
 

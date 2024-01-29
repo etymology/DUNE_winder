@@ -447,10 +447,11 @@ var DateFormat = {};
         tense = diff < 0 ? 'from now' : 'ago';
   
         if(abs_diff < 60) {
-          if(diff >= 0)
+          if (diff >= 0) {
             return 'just now';
-          else
+          } else {
             return 'in a moment';
+          }
         } else if(abs_diff < 120) {
           return '1 minute ' + tense;
         } else if(abs_diff < 3600) {
@@ -460,10 +461,11 @@ var DateFormat = {};
         } else if(abs_diff < 86400) {
           return Math.floor(abs_diff / 3600) + ' hours ' + tense;
         } else if(abs_day_diff === 1) {
-          if(diff >= 0)
+          if (diff >= 0) {
             return 'Yesterday';
-          else
+          } else {
             return 'Tomorrow';
+          }
         } else if(abs_day_diff < 7) {
           return abs_day_diff + ' days ' + tense;
         } else if(abs_day_diff === 7) {

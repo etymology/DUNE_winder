@@ -84,7 +84,7 @@ class PLC_Logic :
   }
 
   #---------------------------------------------------------------------
-  def isReady( self ) :
+  def isReady( self ):
     """
     Check to see if the PLC is in a ready state.  This can be used to determine
     if all motion has completed, including all motor motion and latching
@@ -95,12 +95,7 @@ class PLC_Logic :
     """
     state = self._state.get()
 
-    if self.States.READY == state :
-      result = True
-    else :
-      result = False
-
-    return result
+    return self.States.READY == state
 
   #---------------------------------------------------------------------
   def isError( self ) :
@@ -123,7 +118,7 @@ class PLC_Logic :
     self._maxZ_Velocity.set( 0 )
 
   #---------------------------------------------------------------------
-  def setXY_Position( self, x, y, velocity=None, acceleration=None, deceleration=None ) :
+  def setXY_Position( self, x, y, velocity=None, acceleration=None, deceleration=None ):
     """
     Make a coordinated move of the X/Y axis.
 
@@ -133,13 +128,13 @@ class PLC_Logic :
       velocity: Maximum velocity at which to make move.  None to use last
         velocity.
     """
-    if None != velocity :
+    if velocity != None:
       self._velocity = velocity
 
-    if None != acceleration :
+    if acceleration != None:
       self._maxXY_Acceleration.set( float( acceleration ) )
 
-    if None != deceleration :
+    if deceleration != None:
       self._maxXY_Deceleration.set( float( deceleration ) )
 
     self._maxXY_Velocity.set( self._velocity )
@@ -147,7 +142,7 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.SEEK_XY )
 
   #---------------------------------------------------------------------
-  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ) :
+  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ):
     """
     Jog the X/Y axis at a given velocity.
 
@@ -158,17 +153,17 @@ class PLC_Logic :
         for seeking in reverse direction.
     """
 
-    if None != acceleration :
+    if acceleration != None:
       self._maxXY_Acceleration.set( float( acceleration ) )
 
-    if None != deceleration :
+    if deceleration != None:
       self._maxXY_Deceleration.set( float( deceleration ) )
 
     self._xyAxis.setVelocity( [ xVelocity, yVelocity ] )
     self._moveType.set( self.MoveTypes.JOG_XY )
 
   #---------------------------------------------------------------------
-  def setZ_Position( self, position, velocity=None ) :
+  def setZ_Position( self, position, velocity=None ):
     """
     Move Z-axis to a position.
 
@@ -177,7 +172,7 @@ class PLC_Logic :
       velocity: Maximum velocity at which to make move.  None to use last
         velocity.
     """
-    if None != velocity :
+    if velocity != None:
       self._velocity = velocity
 
     self._zAxis.setVelocity( self._velocity )
@@ -277,7 +272,7 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.LATCH_UNLOCK )
 
   #---------------------------------------------------------------------
-  def maxVelocity( self, maxVelocity=None ) :
+  def maxVelocity( self, maxVelocity=None ):
     """
     Set/get the maximum velocity.
 
@@ -287,7 +282,7 @@ class PLC_Logic :
     Returns:
       Maximum velocity.
     """
-    if None != maxVelocity :
+    if maxVelocity != None:
       self._velocity = maxVelocity
 
     self._maxXY_Velocity.set( self._velocity )
@@ -295,7 +290,7 @@ class PLC_Logic :
     return self._velocity
 
   #---------------------------------------------------------------------
-  def maxAcceleration( self, maxAcceleration=None ) :
+  def maxAcceleration( self, maxAcceleration=None ):
     """
     Set/get the maximum positive acceleration.
 
@@ -305,7 +300,7 @@ class PLC_Logic :
     Returns:
       Maximum positive acceleration.
     """
-    if None != maxAcceleration :
+    if maxAcceleration != None:
       self._maxAcceleration = maxAcceleration
 
     self._maxXY_Acceleration.set( self._maxAcceleration )
@@ -314,7 +309,7 @@ class PLC_Logic :
     return self._maxAcceleration
 
   #---------------------------------------------------------------------
-  def maxDeceleration( self, maxDeceleration=None ) :
+  def maxDeceleration( self, maxDeceleration=None ):
     """
     Set/get the maximum negative acceleration.
 
@@ -324,7 +319,7 @@ class PLC_Logic :
     Returns:
       Maximum positive acceleration.
     """
-    if None != maxDeceleration :
+    if maxDeceleration != None:
       self._maxDeceleration = maxDeceleration
 
     self._maxXY_Deceleration.set( self._maxDeceleration )
@@ -333,7 +328,7 @@ class PLC_Logic :
     return self._maxDeceleration
 
   #---------------------------------------------------------------------
-  def setupLimits( self, maxVelocity=None, maxAcceleration=None, maxDeceleration=None ) :
+  def setupLimits( self, maxVelocity=None, maxAcceleration=None, maxDeceleration=None ):
     """
     Setup the velocity and acceleration limits.
 
@@ -342,13 +337,13 @@ class PLC_Logic :
       maxAcceleration: Maximum positive acceleration.
       maxDeceleration: Maximum negative acceleration.
     """
-    if None != maxVelocity :
+    if maxVelocity != None:
       self._velocity = maxVelocity
 
-    if None != maxAcceleration :
+    if maxAcceleration != None:
       self._maxAcceleration = maxAcceleration
 
-    if None != maxDeceleration :
+    if maxDeceleration != None:
       self._maxDeceleration = maxDeceleration
 
     self._maxXY_Velocity.set( self._velocity )
@@ -376,7 +371,7 @@ class PLC_Logic :
     return self._errorCode.get()
 
   #---------------------------------------------------------------------
-  def getErrorCodeString( self ) :
+  def getErrorCodeString( self ):
     """
     Get the error code reported by PLC as a string.
 
@@ -385,12 +380,8 @@ class PLC_Logic :
     """
     errorCode = self._errorCode.get()
 
-    if errorCode in PLC_Logic.ERROR_CODES :
-      result = PLC_Logic.ERROR_CODES[ errorCode ]
-    else:
-      result = "Unknown " + str( errorCode )
-
-    return result
+    return (PLC_Logic.ERROR_CODES[errorCode] if errorCode
+            in PLC_Logic.ERROR_CODES else f"Unknown {str(errorCode)}")
 
   #---------------------------------------------------------------------
   def __init__( self, plc, xyAxis, zAxis ) :

@@ -86,19 +86,19 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       return self._tagName
 
     #---------------------------------------------------------------------
-    def poll( self ) :
+    def poll( self ):
       """
       Update the input by reading the value form PLC.  Call periodically.
       """
       value = self._plc.read( self._tagName )
-      if not value == None and not self._plc.isNotFunctional() :
+      if value is not None and not self._plc.isNotFunctional():
         self.updateFromReadTag( value[ 0 ] )
-      else :
+      else:
         self._value = self._attributes.defaultValue
 
     #---------------------------------------------------------------------
     @staticmethod
-    def pollAll( plc ) :
+    def pollAll( plc ):
       """
       Update all tags.
 
@@ -108,53 +108,50 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       """
 
       tagList = []
-      for tag in PLC.Tag.list :
+      for tag in PLC.Tag.list:
         # If this tag is polled...
-        if tag._attributes.isPolled :
+        if tag._attributes.isPolled:
           tagName = tag.getReadTag()
 
           # If this tag is not already in the list...
-          if not tagName in tagList :
+          if tagName not in tagList:
             tagList.append( tagName )
 
       # Break list into sub-sets of no more than 'maxTagsAtOnce' tags.
       tagSubset = \
-        [
+            [
           tagList[ tag : tag + PLC.MAX_TAG_READS ]
             for tag in range( 0, len( tagList ), PLC.MAX_TAG_READS )
         ]
 
       # For each tag subset...
-      for tagList in tagSubset :
+      for tagList in tagSubset:
         # Read all the tags in this subset.
         results = plc.read( tagList )
 
-        if None != results :
+        if results is None:
+          for tagName in tagList :
+            for tag in PLC.Tag.map[ tagName ] :
+              tag._value = tag._attributes.defaultValue
+
+        else:
           # Distribute the results to the tag objects.
           for result in results :
             # For each object that uses this tag name...
             for tag in PLC.Tag.map[ result[ 0 ] ] :
               # Send it the result.
               tag.updateFromReadTag( result[ 1 ] )
-        else:
-          for tagName in tagList :
-            for tag in PLC.Tag.map[ tagName ] :
-              tag._value = tag._attributes.defaultValue
 
 
     #---------------------------------------------------------------------
-    def getReadTag( self ) :
+    def getReadTag( self ):
       """
       Get read tag.  Used when reading multiple tags at once.
 
       Returns:
         Name of tag for reading.  None if this is a write-only tag.
       """
-      result = None
-      if self._attributes.canRead :
-        result = self._tagName
-
-      return result
+      return self._tagName if self._attributes.canRead else None
 
     #---------------------------------------------------------------------
     def updateFromReadTag( self, value ) :
@@ -181,7 +178,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       return self._value
 
     #---------------------------------------------------------------------
-    def set( self, value ) :
+    def set( self, value ):
       """
       Set the value.
 
@@ -194,9 +191,9 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       isError = False
 
       result = self._plc.write( self._tagName, value, self._type )
-      if None == result :
+      if result is None:
         isError = True
-      else :
+      else:
         self._value = value
 
       return isError

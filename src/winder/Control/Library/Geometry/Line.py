@@ -41,7 +41,7 @@ class Line :
 
   #---------------------------------------------------------------------
   @staticmethod
-  def fromSegment( segment ) :
+  def fromSegment( segment ):
     """
     Create a line from a line segment.  Useful for extending line segments.
 
@@ -52,11 +52,7 @@ class Line :
       Instance of Line.
     """
     slope = segment.slope()
-    if slope != float( "inf" ) :
-      intercept = segment.intercept()
-    else:
-      intercept = segment.start.x
-
+    intercept = segment.intercept() if slope != float( "inf" ) else segment.start.x
     return Line( slope, intercept )
 
   #---------------------------------------------------------------------
@@ -107,7 +103,7 @@ class Line :
     self.intercept = intercept
 
   #---------------------------------------------------------------------
-  def intersection( self, line ) :
+  def intersection( self, line ):
     """
     Return the point at which this line and an other intersect one an other.
 
@@ -126,21 +122,21 @@ class Line :
     y = float( "inf" )
 
     # Vertical lines?
-    if float( "inf" ) == line.slope or float( "inf" ) == self.slope :
+    if float( "inf" ) == line.slope:
       # If both lines are not vertical...
-      if line.slope != self.slope :
-        # Calculate positions from the non-vertical line.
-        if float( "inf" ) == line.slope :
-          x = line.intercept
-          y = self.getY( x )
-        else :
-          x = self.intercept
-          y = line.getY( x )
-    else :
+      if line.slope != self.slope:
+        x = line.intercept
+        y = self.getY( x )
+    elif float( "inf" ) == self.slope:
+      # If both lines are not vertical...
+      if line.slope != self.slope:
+        x = self.intercept
+        y = line.getY( x )
+    else:
       slopeDelta = line.slope - self.slope
 
       # If we have a slope and it is a number.
-      if 0 != slopeDelta and slopeDelta == slopeDelta :
+      if slopeDelta != 0 and slopeDelta == slopeDelta:
         x = interceptDelta / slopeDelta
 
       y = self.getY( x )
@@ -186,7 +182,7 @@ class Line :
     return ( y - self.intercept ) / self.slope
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Get a string representation of object.
 
@@ -194,8 +190,8 @@ class Line :
       String representation of object in form y = m x + b where m is the
       slope, and b is the intercept.
     """
-    xTerm = str( self.slope ) + "x + "
+    xTerm = f"{str(self.slope)}x + "
     if float( "inf" ) == self.slope :
       xTerm = ""
 
-    return "y = " + xTerm + str( self.intercept )
+    return f"y = {xTerm}{str(self.intercept)}"

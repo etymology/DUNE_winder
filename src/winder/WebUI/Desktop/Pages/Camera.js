@@ -172,8 +172,9 @@ function Camera( modules )
         var endY = startY + spacingY * pinDelta
 
         var selectedSide = "F"
-        if ( 1 == side )
+        if (side == 1) {
           selectedSide = "B"
+        }
 
         var command =
           "process.startCalibrate( "
@@ -250,8 +251,9 @@ function Camera( modules )
         var pin = $( "#startPin" ).val()
         var velocity = sliders.getVelocity()
         var sideText = "F"
-        if ( 1 == side )
+        if (side == 1) {
           sideText = "B"
+        }
 
         winder.remoteAction( 'process.seekPinNominal( "' + sideText + pin + '", ' + velocity + ' )' )
       }
@@ -286,17 +288,21 @@ function Camera( modules )
   //---------------------------------------------------------------------------
   function line( canvas, x1, y1, x2, y2 )
   {
-    if ( ( x1 % 2 ) > 0 )
+    if (( x1 % 2 ) > 0) {
       x1 += 0.5
+    }
 
-    if ( ( y1 % 2 ) > 0 )
+    if (( y1 % 2 ) > 0) {
       y1 += 0.5
+    }
 
-    if ( ( x2 % 2 ) > 0 )
+    if (( x2 % 2 ) > 0) {
       x2 += 0.5
+    }
 
-    if ( ( y2 % 2 ) > 0 )
+    if (( y2 % 2 ) > 0) {
       y2 += 0.5
+    }
 
     canvas.beginPath()
     canvas.moveTo( x1, y1 )
@@ -405,16 +411,16 @@ function Camera( modules )
       {
         side = data
         var sideText = "N/A"
-        if ( -1 == side )
+        if (-1 == side) {
           disableSelectState()
-        else
-        {
-          setSelectState( 0 )
-          sideText = "Front"
-          if ( 1 == side )
-            sideText = "Back"
-
-        }
+        } else {
+                  setSelectState( 0 )
+                  sideText = "Front"
+                  if (side == 1) {
+                    sideText = "Back"
+                  }
+        
+                }
         $( "#apaSide" ).text( sideText )
       }
     )
@@ -431,8 +437,9 @@ function Camera( modules )
       "process.getRecipeLayer()",
       function( layer )
       {
-        if ( null == layer )
+        if (null == layer) {
           layer = "N/A"
+        }
 
         $( "#apaLayer" ).text( layer )
       }
@@ -448,8 +455,9 @@ function Camera( modules )
     var canvas = document.getElementById( canvasName )
     var context
 
-    if ( canvas )
+    if (canvas) {
       context = canvas.getContext( "2d" )
+    }
 
     return context
   }
@@ -470,8 +478,9 @@ function Camera( modules )
     isDifferent |= ! ( a instanceof Array )
     isDifferent |= ! ( b instanceof Array )
 
-    if ( ! isDifferent )
+    if (! isDifferent) {
       isDifferent |= ( a.length != b.length )
+    }
 
     if ( ! isDifferent )
     {

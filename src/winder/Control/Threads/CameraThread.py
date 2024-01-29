@@ -54,17 +54,17 @@ class CameraThread( PrimaryThread ) :
       self._shutdownCount = CameraThread.SHUTDOWN_COUNT
 
   #---------------------------------------------------------------------
-  def body( self ) :
+  def body( self ):
     """
     Body of camera thread.
     """
     hasData = False
-    while PrimaryThread.isRunning :
+    while PrimaryThread.isRunning:
 
       # If not running, wait.
       # NOTE: If we had data last time, keep running until we do not.  Makes
       # sure FIFO is empty before pausing thread.
-      if not self._isRunning and not hasData and 0 == self._shutdownCount :
+      if not self._isRunning and not hasData and self._shutdownCount == 0:
         self._semaphore.acquire()
 
       # If not shutting down...

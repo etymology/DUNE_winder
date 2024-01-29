@@ -17,7 +17,7 @@ class PLC_Input( DigitalInput ) :
   list = []
 
   #---------------------------------------------------------------------
-  def __init__( self, name, plc, tagName=None, bit=0, defaultState=False, tagType="DINT" ) :
+  def __init__( self, name, plc, tagName=None, bit=0, defaultState=False, tagType="DINT" ):
     """
     Constructor.
 
@@ -34,7 +34,7 @@ class PLC_Input( DigitalInput ) :
     PLC_Input.list.append( self )
 
     # Just use the name for the tag?
-    if None == tagName :
+    if tagName is None:
       tagName = name
 
     self._plc = plc
@@ -49,7 +49,7 @@ class PLC_Input( DigitalInput ) :
     self._state = defaultState
 
   #---------------------------------------------------------------------
-  def _doGet( self ) :
+  def _doGet( self ):
     """
     Fetch state of input.
 
@@ -61,14 +61,14 @@ class PLC_Input( DigitalInput ) :
       functional, this value returns a default value.
     """
     value = self._tag.get()
-    if None != value :
+    if value is None:
+      value = self._defaultState
+
+    else:
       value = int( value )
       value >>= self._bit
       value &= 0x01
-      value = bool( value == 1 )
-    else :
-      value = self._defaultState
-
+      value = value == 1
     return value
 
 # end class

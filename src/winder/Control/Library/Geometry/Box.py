@@ -48,7 +48,7 @@ class Box :
     return start
 
   #-------------------------------------------------------------------
-  def intersectSegment( self, segment ) :
+  def intersectSegment( self, segment ):
     """
     Figure out where a segment will intersect the box.  The segment is extended
     until the end point makes an intersection.
@@ -62,19 +62,19 @@ class Box :
     """
 
     destination = None
-    if not segment.isPoint() :
+    if not segment.isPoint():
 
       # Create a line form the segment.
       line = Line.fromSegment( segment )
 
       # Python has no ability to pass integers by reference, so we use a
       # dictionary.
-      limits = {}
-      limits[ "minX" ] = float( "-inf" )
-      limits[ "minY" ] = float( "-inf" )
-      limits[ "maxX" ] = float( "inf" )
-      limits[ "maxY" ] = float( "inf" )
-
+      limits = {
+          "minX": float("-inf"),
+          "minY": float("-inf"),
+          "maxX": float("inf"),
+          "maxY": float("inf"),
+      }
       # Initial destination.
       destination = Location()
 
@@ -111,7 +111,7 @@ class Box :
     self._bottom = bottom
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Get a string representation of object.
 
@@ -119,7 +119,4 @@ class Box :
       String with the four corners of the box starting on the bottom left
       and moving clockwise.
     """
-    return "[ " + str( self._left )      \
-      + ", " + str( self._top )          \
-      + ", " + str( self._right )        \
-      + ", " + str( self._bottom ) + "]"
+    return f"[ {str(self._left)}, {str(self._top)}, {str(self._right)}, {str(self._bottom)}]"

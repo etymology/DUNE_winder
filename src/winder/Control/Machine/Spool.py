@@ -22,25 +22,25 @@ class Spool :
     self._low = lowWireQuantity
 
   #---------------------------------------------------------------------
-  def subtract( self, length ) :
+  def subtract( self, length ):
     """
     Subtract off a length of wire from spool.
 
     Args:
       length: Amount to subtract (in meters).
     """
-    if -1 != self._wire :
+    if self._wire != -1:
       self._wire -= length
 
   #---------------------------------------------------------------------
-  def isLow( self ) :
+  def isLow( self ):
     """
     Check to see if spool is low.
 
     Returns:
       True if low on wire, False if not.
     """
-    return ( self._wire < self._low ) and not ( -1 == self._wire )
+    return self._wire < self._low and self._wire != -1
 
   #---------------------------------------------------------------------
   def getWire( self ) :

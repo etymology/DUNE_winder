@@ -56,7 +56,7 @@ class LayerCorrection :
     pass
 
   #-------------------------------------------------------------------
-  def getRotation( self ) :
+  def getRotation( self ):
     """
     Compute the angle of rotation of the APA.
 
@@ -85,7 +85,7 @@ class LayerCorrection :
     # Number of rows/columns to average (skip
     averageCount = 0
 
-    for row in geometry.gridFront :
+    for row in geometry.gridFront:
       # Number of pins in this row/column.
       count = row[ 0 ]
 
@@ -110,15 +110,15 @@ class LayerCorrection :
       sumXY = 0
 
       # For all pins in this row/column...
-      for _ in range( 0, count ) :
+      for _ in range(count):
 
         # Get the pin location.
-        pinName = "F" + str( pinNumber )
+        pinName = f"F{str(pinNumber)}"
         layerPinLocation = self.layerCalibration.getPinLocation( pinName )
 
         # X and Y data depend on if this is a row or column, which is determined
         # by the sign.  Columns use slope of X/Y, rows use slope of Y/X.
-        if 1 == sign :
+        if sign == 1:
           x = layerPinLocation.y
           y = layerPinLocation.x
         else:
@@ -136,7 +136,7 @@ class LayerCorrection :
         pinNumber += geometry.directionFront
 
         # Roll-over.
-        if 0 == pinNumber :
+        if pinNumber == 0:
           pinNumber = geometry.pins
         elif pinNumber > geometry.pins :
           pinNumber = 1
@@ -205,7 +205,7 @@ if __name__ == "__main__" :
   # Check perfect (i.e. no noise) rotational error.
   for layer in [ 'X', 'V', 'U', 'G' ] :
     layerDefault = DefaultLayerCalibration( None, None, layer )
-    for _ in range( 0, 10 ) :
+    for _ in range(10) :
       layer = layerDefault.copy()
 
       rotation = random.uniform( -90, 90 )

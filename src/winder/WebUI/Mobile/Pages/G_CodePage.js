@@ -59,10 +59,11 @@ function G_CodePage( modules )
       'process.executeG_CodeLine( "' + gCode + '" )',
       function( data )
       {
-        if ( ! data )
+        if (! data) {
           $( "#gExecutionCodeStatus" ).html( "Executed with no errors." )
-        else
+        } else {
           $( "#gExecutionCodeStatus" ).html( "Error interpreting line: " + data )
+        }
       }
     )
   }
@@ -78,8 +79,9 @@ function G_CodePage( modules )
       // Next line is the current line because the current line has been incremented
       // by 1.
       var nextLine = gCodeLine[ "currentLine" ]
-      if ( nextLine < ( gCodeLine[ "totalLines" ] - 1 ) )
+      if (nextLine < ( gCodeLine[ "totalLines" ] - 1 )) {
         winder.remoteAction( 'process.setG_CodeLine( ' + nextLine + ' )' )
+      }
     }
   }
 
@@ -92,8 +94,9 @@ function G_CodePage( modules )
     if ( null != gCodeLine[ "currentLine" ] )
     {
       var nextLine = gCodeLine[ "currentLine" ] - 2
-      if ( nextLine >= -1 )
+      if (nextLine >= -1) {
         winder.remoteAction( 'process.setG_CodeLine( ' + nextLine + ' )' )
+      }
     }
   }
 
@@ -122,7 +125,7 @@ function G_CodePage( modules )
     {
       if ( null !== data )
       {
-        data = data + 1
+        data += 1
         gCodeLine[ "currentLine" ] = data
       }
       else

@@ -92,7 +92,7 @@ class Location :
     return [ self.x, self.y, self.z ]
 
   #---------------------------------------------------------------------
-  def copy( self, x=None, y=None, z=None ) :
+  def copy( self, x=None, y=None, z=None ):
     """
     Return a copy of this location.
 
@@ -105,19 +105,19 @@ class Location :
       New instance at the same location.
     """
 
-    if None == x :
+    if x is None:
       x = self.x
 
-    if None == y :
+    if y is None:
       y = self.y
 
-    if None == z :
+    if z is None:
       z = self.z
 
     return Location( x, y, z )
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Get a string representation of object.
 
@@ -126,10 +126,10 @@ class Location :
       numbers.
     """
 
-    return "(" + str( self.x ) + ", " + str( self.y ) + ", " + str( self.z ) + ")"
+    return f"({str(self.x)}, {str(self.y)}, {str(self.z)})"
 
   #---------------------------------------------------------------------
-  def __eq__( self, other ) :
+  def __eq__( self, other ):
     """
     Check to see if this location is equal to an other.
 
@@ -140,16 +140,12 @@ class Location :
       True if equal, False if not.
     """
 
-    result = False
-    if isinstance( other, Location ) :
-      result = MathExtra.isclose( self.x, other.x ) \
-           and MathExtra.isclose( self.y, other.y ) \
-           and MathExtra.isclose( self.z, other.z )
-
-    return result
+    return (MathExtra.isclose(self.x, other.x) and MathExtra.isclose(
+        self.y, other.y) and MathExtra.isclose(self.z, other.z) if isinstance(
+            other, Location) else False)
 
   #---------------------------------------------------------------------
-  def __ne__( self, other ) :
+  def __ne__( self, other ):
     """
     Check to see if this location are not equal to an other.
 
@@ -160,10 +156,7 @@ class Location :
       False if equal, True if not.
     """
 
-    result = True
-    if isinstance( object, Location ) :
-      result = not MathExtra.isclose( self.x, other.x ) \
-            or not MathExtra.isclose( self.y, other.y ) \
-            or not MathExtra.isclose( self.z, other.z )
-
-    return result
+    return (not MathExtra.isclose(self.x, other.x)
+            or not MathExtra.isclose(self.y, other.y)
+            or not MathExtra.isclose(self.z, other.z) if isinstance(
+                object, Location) else True)

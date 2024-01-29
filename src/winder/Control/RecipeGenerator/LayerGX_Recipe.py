@@ -82,7 +82,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
     directionBB = +1
 
     y = self.geometry.pinSpacing * firstPinScale
-    for pinOffset in range( 0, self.geometry.pins / 2 ) :
+    for pinOffset in range(self.geometry.pins / 2) :
 
       # Side A, column A.
       pinNameAA = self._pinName( "F", startAA, directionAA * pinOffset )

@@ -44,7 +44,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     pass
 
   #---------------------------------------------------------------------
-  def _send( self, tag, data ) :
+  def _send( self, tag, data ):
     """
     Send an XML field back to client.  Private.
 
@@ -53,7 +53,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       data: Data associated with tag.
     """
     data = xml.sax.saxutils.escape( str( data ) )
-    data = "<" + tag + ">" + str( data ) + "</" + tag + ">"
+    data = f"<{tag}>{str(data)}</{tag}>"
     self.wfile.write( data )
 
   #---------------------------------------------------------------------
@@ -69,13 +69,11 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     self._send( tag, data )
 
   #---------------------------------------------------------------------
-  def do_POST( self ) :
+  def do_POST( self ):
     """
     Callback for an HTTP POST request.
     This will process all requests for data.
     """
-
-    result = None
 
     # Get post data length.
     length = int( self.headers.getheader( 'content-length' ) )
@@ -103,7 +101,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     # it by default is authenticated.
     clientAddress = self.client_address[ 0 ]
     if re.search( "127\.[0-9]+\.[0-9]+\.[0-9]+", clientAddress ) \
-      or WebServerInterface.BYPASS_AUTHENTICATION :
+        or WebServerInterface.BYPASS_AUTHENTICATION :
       session.setAuthenticated( True )
 
     # Check to see if session is authenticated.
@@ -113,10 +111,10 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     self.send_response( 200 )
 
     # Construct cookie data to send back.
-    for cookieName in cookies :
+    for cookieName in cookies:
       cookieValue = str( cookies[ cookieName ] )
 
-      cookieData = cookieName + "=" + cookieValue
+      cookieData = f"{cookieName}={cookieValue}"
       self.send_header( 'Set-Cookie', cookieData )
 
     self.send_header( 'Content-type', 'text/xml' )
@@ -134,7 +132,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       self._JSON_send( "salt", session.getSalt() )
 
     # Does request have parameters?
-    if length > 0 :
+    if length > 0:
       # Get post data.
       postData = self.rfile.read( length )
 
@@ -142,7 +140,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       commands = postData.split( "&" )
 
       # For each command...
-      for command in commands :
+      for command in commands:
 
         # Break up the command.
         id, query = command.split( "=" )
@@ -153,7 +151,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
         # See if this is a basic query (i.e. changes nothing).
         isBasicQuery = re.search( WebServerInterface.BASIC_QUERIES, query )
 
-        if "passwordHash" == id :
+        if id == "passwordHash":
           passwordResult = session.checkPassword( query )
           self._JSON_send( "loginResult", passwordResult )
         elif isAuthenticated or isBasicQuery :
@@ -163,7 +161,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     # Close XML.
     self.wfile.write( '</ResultData>' )
 
-    return result
+    return None
 
 # end class
 

@@ -21,14 +21,13 @@ function G_Code( modules )
     {
       var newRow = $( "<tr/>" ).appendTo( gGodeBody )
 
-      if ( G_CODE_ROWS == rowIndex )
+      if (G_CODE_ROWS == rowIndex) {
         newRow.attr( "class", "gCodeCurrentLine" )
-      else
-      if ( G_CODE_ROWS - 1 == rowIndex )
-        newRow.attr( "id", "gCodeReverseRow" )
-      else
-      if ( G_CODE_ROWS + 1 == rowIndex )
-        newRow.attr( "id", "gCodeForwardRow" )
+      } else if (G_CODE_ROWS - 1 == rowIndex) {
+               newRow.attr( "id", "gCodeReverseRow" )
+             } else if (G_CODE_ROWS + 1 == rowIndex) {
+                      newRow.attr( "id", "gCodeForwardRow" )
+                    }
 
       var newCell = $( "<td/>" ).appendTo( newRow ).html( "&nbsp;" )
     }
@@ -68,8 +67,9 @@ function G_Code( modules )
 
                 // If there isn't any text, put in a non-breaking space to
                 // preserve the cell.
-                if ( ! text )
+                if (! text) {
                   text = "&nbsp;"
+                }
 
                 $( this ).html( text )
                 index += 1

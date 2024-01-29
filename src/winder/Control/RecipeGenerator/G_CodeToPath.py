@@ -61,7 +61,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self.useLayerCalibration( calibration )
 
   #---------------------------------------------------------------------
-  def toPath( self ) :
+  def toPath( self ):
     """
     Convert the G-Code into a 3d path.
 
@@ -84,7 +84,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
     self._headZ = self._geometry.retracted
     latchSide = FRONT
-    for line in range( 0, totalLines ) :
+    for line in range(totalLines):
 
       # Reset all values so we know what has changed.
       self._lastX = self._x
@@ -92,13 +92,13 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       self._lastZ = self._z
       self._functions = []
 
-      try :
+      try:
         self._gCode.executeNextLine( line )
       except Exception as exception:
         print("Unable to execute line", line)
-        print("  " + self._gCode.lines[ line ])
-        print("  " + str( exception ))
-        raise Exception( "Problems executing G-Code: " + str( exception ) )
+        print(f"  {self._gCode.lines[line]}")
+        print(f"  {str(exception)}")
+        raise Exception(f"Problems executing G-Code: {str(exception)}") from exception
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
@@ -117,7 +117,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     return path
 
   #---------------------------------------------------------------------
-  def _pointLabel( self, output, location, text, layer=None, offsetX=None, offsetY=None ) :
+  def _pointLabel( self, output, location, text, layer=None, offsetX=None, offsetY=None ):
     """
     Make a SketchUp label at specified location.
 
@@ -129,29 +129,27 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       offsetX: X-offset to label.
       offsetY: Y-offset to label.
     """
-    x = location.x / 25.4
     y = location.y / 25.4
     z = location.z / 25.4
 
-    output.write(
-      'point = Geom::Point3d.new [ '
-        + str( x ) + ','
-        + str( z ) + ','
-        + str( y ) + ' ]'
-        + "\n" )
+    x = location.x / 25.4
+    output.write(f'point = Geom::Point3d.new [ {str(x)},{str(z)},{str(y)} ]' +
+                 "\n")
 
-    if None == offsetX :
+    if offsetX is None:
       offsetX = random.uniform( -3, 3 )
 
-    if None == offsetY :
+    if offsetY is None:
       offsetY = random.uniform( -3, 3 )
 
-    output.write( 'vector = Geom::Vector3d.new ' + str( offsetX ) + ',0,' + str( offsetY ) + "\n" )
-    output.write( 'label = Sketchup.active_model.entities.add_text "'
-      + text + '", point, vector' + "\n" )
+    output.write(f'vector = Geom::Vector3d.new {str(offsetX)},0,{str(offsetY)}' +
+                 "\n")
+    output.write(
+        f'label = Sketchup.active_model.entities.add_text "{text}", point, vector'
+        + "\n")
 
-    if layer :
-      output.write( 'label.layer = ' + layer + "\n" )
+    if layer:
+      output.write(f'label.layer = {layer}' + "\n")
 
   #---------------------------------------------------------------------
   def writeRubyCode(
@@ -162,7 +160,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     enablePathLabels=False,
     enablePinLabels=False,
     isAppend=False
-  ) :
+  ):
     """
     Export node paths to Ruby code for import into SketchUp for visual
     verification.
@@ -175,19 +173,17 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       isAppend: True to append, False to overwrite output file.
     """
 
-    attributes = "w"
-    if isAppend :
-      attributes = "a"
-
-    with open( outputFileName, attributes ) as rubyFile :
+    attributes = "a" if isAppend else "w"
+    with open( outputFileName, attributes ) as rubyFile:
 
       gCodePath = self.toPath()
 
-      if enablePinLabels :
+      if enablePinLabels:
         rubyFile.write(
-          'layer = Sketchup.active_model.layers.add "Pin labels ' + layerName + '"' + "\n" )
+            f'layer = Sketchup.active_model.layers.add "Pin labels {layerName}"'
+            + "\n")
 
-        for pinName in self._calibration.getPinNames() :
+        for pinName in self._calibration.getPinNames():
           location = self._calibration.getPinLocation( pinName )
           location = location.add( self._calibration.offset )
 
@@ -196,7 +192,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
           y = 0.1
           x = 0.1
-          if "B" == pinName[ 0 ] :
+          if pinName[0] == "B":
             y = -y
             x = -x
 

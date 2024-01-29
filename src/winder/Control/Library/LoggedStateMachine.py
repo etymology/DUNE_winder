@@ -25,7 +25,7 @@ class LoggedStateMachine( StateMachine ) :
     self.log = log
 
   #---------------------------------------------------------------------
-  def changeState( self, newState ) :
+  def changeState( self, newState ):
     """
     Transition to a new state.
 
@@ -37,21 +37,14 @@ class LoggedStateMachine( StateMachine ) :
     """
 
 
-    oldModeName = "<None>"
-    if self.state :
-      oldModeName = self.state.__class__.__name__
-
+    oldModeName = self.state.__class__.__name__ if self.state else "<None>"
     isError = StateMachine.changeState( self, newState )
 
     newModeName = "<None>"
-    newState = self.states[ newState ]
-    if newState :
+    if newState := self.states[newState]:
       newModeName = newState.__class__.__name__
 
-    message = "Mode changed from "
-    if isError :
-      message = "Failed to change mode from "
-
+    message = "Failed to change mode from " if isError else "Mode changed from "
     # Log mode change.
     self.log.add(
       self.__class__.__name__,

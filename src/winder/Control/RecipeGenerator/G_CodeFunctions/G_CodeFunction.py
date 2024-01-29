@@ -14,7 +14,7 @@ class G_CodeFunction :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, gCode, parameters = [] ) :
+  def __init__(self, gCode, parameters=None):
     """
     Constructor.
 
@@ -22,6 +22,8 @@ class G_CodeFunction :
       gCode: The G-Code function number (integer).
       parameters: A list of parameters for the function.
     """
+    if parameters is None:
+      parameters = []
     self._gCode = int( gCode )
     self._parameters = parameters
 
@@ -49,16 +51,16 @@ class G_CodeFunction :
     return self._gCode
 
   #---------------------------------------------------------------------
-  def toG_Code( self ) :
+  def toG_Code( self ):
     """
     Translate object into G-Code text.
 
     Returns:
       String of G-Code text.
     """
-    result = "G" + str( self._gCode )
+    result = f"G{str(self._gCode)}"
 
-    for parameter in self._parameters :
-      result += " P" + str( parameter )
+    for parameter in self._parameters:
+      result += f" P{str(parameter)}"
 
     return result

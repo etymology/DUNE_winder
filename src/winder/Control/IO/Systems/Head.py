@@ -128,7 +128,7 @@ class Head :
     self._retracted = retracted
 
   #---------------------------------------------------------------------
-  def setPosition( self, position, velocity ) :
+  def setPosition( self, position, velocity ):
     """
     Set the head position.
 
@@ -139,14 +139,14 @@ class Head :
     isError = True
 
     # If the head is idle and the position is actually different...
-    if self.States.IDLE == self._state and position != self._position :
+    if self.States.IDLE == self._state and position != self._position:
 
       # Note from where we started.
       self._lastPosition = self._position
 
       self._velocity = velocity
 
-      if self.RETRACTED == position :
+      if self.RETRACTED == position:
         self._desiredPosition = self._retracted
       elif self.FRONT == position :
         self._desiredPosition = self._front
@@ -155,30 +155,25 @@ class Head :
       elif self.EXTENDED == position :
         self._desiredPosition = self._extended
       else:
-        raise "Unknown head position request" + str( position )
+        raise f"Unknown head position request{str(position)}"
 
       # No desired position likely means the locations have not been setup.
-      if None != self._desiredPosition :
+      if self._desiredPosition != None:
 
         # Do we have to go get/leave the head?
-        if self.EXTENDED == self._position or self.EXTENDED == position :
+        if self.EXTENDED in [self._position, position]:
 
           # The last seek is the set to the desired position.  If the back is
           # the desired position, then the last seek will be to the front, leaving
           # the head on the back.
-          if self.EXTENDED == position :
-            self._lastSeek = self._retracted
-          else :
-            self._lastSeek = self._desiredPosition
-
+          self._lastSeek = (self._retracted if self.EXTENDED == position else
+                            self._desiredPosition)
           # First seek is all the way to the back.
           self._desiredPosition = self._extended
 
           # After the seek is complete, begin a latch operation.
-          if self.EXTENDED == position :
-            self._nextState = self.States.START_DOUBLE_LATCH
-          else :
-            self._nextState = self.States.START_LATCH
+          self._nextState = (self.States.START_DOUBLE_LATCH if self.EXTENDED
+                             == position else self.States.START_LATCH)
         else:
           # If no latching operations are required, the seek finishes the operation.
           self._nextState = self.States.IDLE

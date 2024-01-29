@@ -147,7 +147,7 @@ class Log:
     #return '\n'.join(all_read_text.splitlines()[-total_lines_wanted:])
 
   #---------------------------------------------------------------------
-  def getAll( self, numberOfLines=-1 ) :
+  def getAll( self, numberOfLines=-1 ):
     """
     Get the entire log file.
 
@@ -157,7 +157,7 @@ class Log:
 
     fileName = list(self._outputFileList.keys())[ 0 ]
 
-    if -1 == numberOfLines :
+    if numberOfLines == -1:
       with open( fileName ) as inputFile :
         # Red and ignore header.
         inputFile.readline()
@@ -175,7 +175,7 @@ class Log:
     return lines
 
   #---------------------------------------------------------------------
-  def add( self, module, typeName, message, parameters = None ) :
+  def add( self, module, typeName, message, parameters = None ):
     """
     Add a message to log file.
 
@@ -188,15 +188,15 @@ class Log:
 
     currentTime = self._getTimestamp()
     line =                   \
-      str( currentTime )     \
-      + "\t"                 \
-      + str( module )        \
-      + "\t"                 \
-      + str( typeName )      \
-      + "\t"                 \
-      + message
+        str( currentTime )     \
+        + "\t"                 \
+        + str( module )        \
+        + "\t"                 \
+        + str( typeName )      \
+        + "\t"                 \
+        + message
 
-    if None == parameters :
+    if parameters is None:
       parameters = []
 
     for parameter in parameters:
@@ -211,8 +211,8 @@ class Log:
     self._lock.release()
 
     # Local echo if requested.
-    if self._localEcho :
-      line = str( currentTime ) + " " + message
+    if self._localEcho:
+      line = f"{str(currentTime)} {message}"
       isFirst = True
       parameterLine = ""
       for parameter in parameters:
@@ -221,8 +221,8 @@ class Log:
         isFirst = False
         parameterLine += str( parameter )
 
-      if "" != parameterLine :
-        parameterLine = " [" + parameterLine + "]"
+      if parameterLine != "":
+        parameterLine = f" [{parameterLine}]"
 
       line += parameterLine
 

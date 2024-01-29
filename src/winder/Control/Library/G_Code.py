@@ -19,7 +19,9 @@ from six.moves import map
 #=============================================================================
 class G_CodeException( Exception ) :
   #---------------------------------------------------------------------
-  def __init__( self, message, data=[] ) :
+  def __init__(self, message, data=None):
+    if data is None:
+      data = []
     Exception.__init__( self, message )
     self.data = data
 
@@ -65,17 +67,17 @@ class G_CodeClass :
     self.callback = callback
 
   #---------------------------------------------------------------------
-  def execute( self ) :
+  def execute( self ):
     """
     Execute this command. Runs command callback with code parameters.
 
     """
 
-    if None != self.callback :
+    if self.callback != None:
       self.callback( self.get() )
 
   #---------------------------------------------------------------------
-  def get( self ) :
+  def get( self ):
     """
     Get the parameter(s) for this code.
 
@@ -84,12 +86,12 @@ class G_CodeClass :
     """
 
     result = self.parameters
-    if 1 == len( self.parameters ) :
+    if len(self.parameters) == 1:
       result = self.parameters[ 0 ]
     return result
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Get a string representation of code.
 
@@ -97,7 +99,7 @@ class G_CodeClass :
       String representation of code.
     """
 
-    return self.__class__.__name__ + ": " + str( self.get() )
+    return f"{self.__class__.__name__}: {str(self.get())}"
 
 #=============================================================================
 # Implementations of the various G-Codes.
@@ -228,7 +230,7 @@ class G_CodeLine :
   }
 
   #---------------------------------------------------------------------
-  def __init__( self, callbacks, line ) :
+  def __init__( self, callbacks, line ):
     """
     Constructor.
 
@@ -256,80 +258,80 @@ class G_CodeLine :
     lastClass = None
 
     # For each command on the line...
-    for command in commands :
+    for command in commands:
       # Get the code (first character) and parameter (everything after the code).
       code = command[ :1 ]
       parameter = command[ 1: ]
 
       # If this is a parameter, pass it to the last class.
-      if 'P' == code :
-        if None != lastClass :
-
-          try :
-            lastClass.addParameter( parameter )
-          except ValueError as exception :
-            data = [
-              command,
-              code,
-              parameter
-            ]
-            raise G_CodeException( 'Invalid parameter data ' + parameter, data )
-
-        else:
+      if code == 'P':
+        if lastClass is None:
           data = [
             command,
             code,
             parameter
           ]
 
-          raise G_CodeException( 'Unassigned parameter ' + parameter, data )
+          raise G_CodeException(f'Unassigned parameter {parameter}', data)
 
-      # Ignore blank lines.
-      elif '' != code :
+        else:
 
-        if code in G_CodeLine.FUNCTION_TABLE :
-
-          # Create an object to hold this command.
-          lastClass = G_CodeLine.FUNCTION_TABLE[ code ]( self )
-
-          try :
-            # Add first parameter (everything after the code).
+          try:
             lastClass.addParameter( parameter )
-          except ValueError as exception :
+          except ValueError as exception:
             data = [
               command,
               code,
               parameter
             ]
-            raise G_CodeException( 'Invalid parameter data ' + parameter, data )
+            raise G_CodeException(f'Invalid parameter data {parameter}',
+                                  data) from exception
+
+      elif code != '':
+
+        if code in G_CodeLine.FUNCTION_TABLE:
+
+          # Create an object to hold this command.
+          lastClass = G_CodeLine.FUNCTION_TABLE[ code ]( self )
+
+          try:
+            # Add first parameter (everything after the code).
+            lastClass.addParameter( parameter )
+          except ValueError as exception:
+            data = [
+              command,
+              code,
+              parameter
+            ]
+            raise G_CodeException(f'Invalid parameter data {parameter}', data)
 
           # Assign the callback function.
           lastClass.setCallback( callbacks.getCallback( code ) )
 
           # Add this command to list.
           self.commands.append( lastClass )
-        else :
+        else:
           data = [
             command,
             code
           ]
-          raise G_CodeException( 'Unknown parameter ' + code, data )
+          raise G_CodeException(f'Unknown parameter {code}', data)
 
 
   #---------------------------------------------------------------------
-  def execute( self ) :
+  def execute( self ):
     """
     Run callbacks for G-code line.
 
     """
 
-    for command in self.commands :
-      if None != command.callback :
+    for command in self.commands:
+      if command.callback != None:
         command.execute()
 
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Turn decoded line back into G-code.
 
@@ -337,11 +339,7 @@ class G_CodeLine :
       G-code for this line.
     """
 
-    result = ""
-    for command in self.commands :
-      result += str( command ) + "\n"
-
-    return result
+    return "".join(str( command ) + "\n" for command in self.commands)
 
 #=============================================================================
 # Interpreter for a G-code file.

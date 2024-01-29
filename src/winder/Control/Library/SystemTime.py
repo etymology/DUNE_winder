@@ -25,7 +25,7 @@ class SystemTime( TimeSource ) :
     time.sleep( sleepTime )
 
   #-------------------------------------------------------------------
-  def get( self ) :
+  def get( self ):
     """
     Return the current time.
 
@@ -33,10 +33,10 @@ class SystemTime( TimeSource ) :
       Returns current time.
     """
 
-    return datetime.datetime.utcnow()
+    return datetime.datetime.now(datetime.timezone.utc)
 
   #-------------------------------------------------------------------
-  def getDelta( self, then, now=None ) :
+  def getDelta( self, then, now=None ):
     """
     Return the amount of time between two time stamps.
 
@@ -48,7 +48,7 @@ class SystemTime( TimeSource ) :
       Time between to time stamps.
     """
 
-    if None == now :
+    if now is None:
       now = self.get()
 
     delta = now - then

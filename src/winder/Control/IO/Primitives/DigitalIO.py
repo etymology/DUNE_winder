@@ -22,7 +22,7 @@ class DigitalIO( six.with_metaclass(ABCMeta, IO_Point) ) :
   _forcedState = False
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -32,7 +32,7 @@ class DigitalIO( six.with_metaclass(ABCMeta, IO_Point) ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in DigitalIO.list )
+    assert name not in DigitalIO.list
 
     IO_Point.__init__( self, name )
 

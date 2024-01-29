@@ -40,8 +40,9 @@ function CopyField( dataTag, parentTag )
         }
       )
 
-    if ( isEnabled )
+    if (isEnabled) {
       $( parentTag ).addClass( "copySelect" )
+    }
 
     // Loop through all input fields...
     $( "input" )
@@ -81,8 +82,9 @@ function CopyField( dataTag, parentTag )
       )
   }
 
-  if ( null == parentTag )
+  if (null == parentTag) {
     parentTag = dataTag
+  }
 
   // Setup copy field on requested dataTag.
   $( parentTag )

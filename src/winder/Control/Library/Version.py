@@ -98,7 +98,7 @@ class Version :
     node.appendChild( valueNode )
 
   #---------------------------------------------------------------------
-  def update( self ) :
+  def update( self ):
     """
     Update the version information.  Computes the hash and increments version
     number if has does not match.
@@ -107,11 +107,11 @@ class Version :
       True if the version has changed, False if not.
     """
     hasChanged = not self.verify()
-    if hasChanged :
+    if hasChanged:
       versionString = self._get( "string" )
       major, minor, build = versionString.split( "." )
       build = int( build ) + 1
-      versionString = str( major ) + "." + str( minor ) + "." + str( build )
+      versionString = f"{str(major)}.{str(minor)}.{str(build)}"
       self._set( "string", versionString )
       self._set( "hash", self._computedHash )
       self._set( "date", str( datetime.datetime.now() ) )

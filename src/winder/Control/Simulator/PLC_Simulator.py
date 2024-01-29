@@ -58,7 +58,7 @@ class PLC_Simulator :
       self.set( default )
 
     #-------------------------------------------------------------------
-    def get( self ) :
+    def get( self ):
       """
       Return the value of the input.
 
@@ -67,9 +67,7 @@ class PLC_Simulator :
       """
       value = self._io.plc.getTag( self._tagName )
       value = value >> self._bit
-      value = value & 0x01
-
-      return value
+      return value & 0x01
 
     #-------------------------------------------------------------------
     def set( self, state ) :
@@ -177,24 +175,18 @@ class PLC_Simulator :
     self._cameraEnabled = isEnabled
 
   #---------------------------------------------------------------------
-  def poll( self ) :
+  def poll( self ):
     """
     Update simulator.  Call periodically.
     """
 
-    def speedCheck( axis, last ) :
+    def speedCheck( axis, last ):
 
       speed = axis.getSpeedTag()
 
       # Speed change?
-      if last != speed :
-        # Speed of 0 means stop request.
-        if 0 == speed :
+      if last != speed and 0 == speed:
           axis.stop()
-        else:
-          # $$$FUTURE - Modify speed
-          pass
-
       return speed
 
     # Look for speed changes on both X and Y, and propagate these to the
@@ -338,7 +330,7 @@ class PLC_Simulator :
         velocity = axisIO.getVelocity()
 
         if   ( ( velocity + self.VELOCITY_ERROR ) < 0 and position < positionMin ) \
-          or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
+            or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
 
           #print axisIO.getName(), "out of range", positionMin, "<=", position, "<=", positionMax
           self._io.plc.write( self._errorCodeTag, 2002 )
@@ -368,7 +360,7 @@ class PLC_Simulator :
 
     # End-of-travels.
     if self._io.zAxis.getPosition() > self._zMax \
-      or self._io.zAxis.getPosition() < self._zMin :
+        or self._io.zAxis.getPosition() < self._zMin :
       self.Z_End_of_Travel.set( False )
     else :
       self.Z_End_of_Travel.set( True )
@@ -421,11 +413,11 @@ class PLC_Simulator :
 
     # All motions and delays finished?
     if not self._xAxis.isInMotion() \
-      and not self._yAxis.isInMotion() \
-      and not self._zAxis.isInMotion() \
-      and self._latchDelay.hasExpired() \
-      and self._io.plcLogic.States.LATCH_RELEASE != state \
-      and self._io.plcLogic.States.ERROR != state :
+        and not self._yAxis.isInMotion() \
+        and not self._zAxis.isInMotion() \
+        and self._latchDelay.hasExpired() \
+        and self._io.plcLogic.States.LATCH_RELEASE != state \
+        and self._io.plcLogic.States.ERROR != state :
 
       self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.RESET )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )

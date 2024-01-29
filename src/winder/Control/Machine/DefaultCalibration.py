@@ -29,7 +29,7 @@ from RecipeGenerator.LayerG_Recipe import LayerG_Recipe
 class DefaultMachineCalibration( MachineCalibration ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, outputFilePath=None, outputFileName=None ) :
+  def __init__( self, outputFilePath=None, outputFileName=None ):
     """
     Constructor.
 
@@ -68,18 +68,18 @@ class DefaultMachineCalibration( MachineCalibration ) :
     self.headRollerGap    = geometry.headRollerGap
     self.pinDiameter      = geometry.pinDiameter
 
-    if outputFilePath and outputFileName :
+    if outputFilePath and outputFileName:
       # If there isn't a calibration file, create it.  Otherwise, load what
       # has already been saved.
-      if not os.path.isfile( outputFilePath + "/" + outputFileName ) :
+      if not os.path.isfile(f"{outputFilePath}/{outputFileName}"):
         self.save()
-      else :
+      else:
         self.load()
 
 class DefaultLayerCalibration( LayerCalibration ) :
 
   #---------------------------------------------------------------------
-  def __init__( self, outputFilePath, outputFileName, layerName ) :
+  def __init__( self, outputFilePath, outputFileName, layerName ):
     """
     Export node list to calibration file.  Debug function.
 
@@ -88,20 +88,20 @@ class DefaultLayerCalibration( LayerCalibration ) :
       layerName: Name of recipe.
     """
 
-    if "X" == layerName :
+    if layerName == "X":
       geometry = X_LayerGeometry()
       recipe = LayerX_Recipe( geometry )
-    elif "V" == layerName :
+    elif layerName == "V":
       geometry = V_LayerGeometry()
       recipe = LayerV_Recipe( geometry )
-    elif "U" == layerName :
+    elif layerName == "U":
       geometry = U_LayerGeometry()
       recipe = LayerU_Recipe( geometry )
-    elif "G" == layerName :
+    elif layerName == "G":
       geometry = G_LayerGeometry()
       recipe = LayerG_Recipe( geometry )
-    else :
-      raise "Unknown layer: " + str( layerName )
+    else:
+      raise f"Unknown layer: {str(layerName)}"
 
     LayerCalibration.__init__( self, layerName )
     self.offset = geometry.apaLocation.add( geometry.apaOffset )

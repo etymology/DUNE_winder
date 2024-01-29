@@ -60,7 +60,7 @@ class TimeSource(six.with_metaclass(ABCMeta)) :
     pass
 
   #-------------------------------------------------------------------
-  def getElapsedString( self, seconds ) :
+  def getElapsedString( self, seconds ):
     """
     Return a string representing elapsed time.
 
@@ -85,14 +85,14 @@ class TimeSource(six.with_metaclass(ABCMeta)) :
     minutes = int( seconds / ( 60 ) )
     seconds -= minutes * ( 60 )
 
-    if days > 0 :
-      deltaString += str( days ) + "d "
+    if days > 0:
+      deltaString += f"{days}d "
 
-    if hours > 0 :
-      deltaString += str( hours ) + "h "
+    if hours > 0:
+      deltaString += f"{hours}h "
 
-    if minutes > 0 :
-      deltaString += str( minutes ) + "m "
+    if minutes > 0:
+      deltaString += f"{minutes}m "
 
     deltaString += "{:2.3f}s".format( seconds )
 

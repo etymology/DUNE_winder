@@ -19,7 +19,7 @@ class Camera( six.with_metaclass(ABCMeta, IO_Point) ) :
   map = {}
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -28,7 +28,7 @@ class Camera( six.with_metaclass(ABCMeta, IO_Point) ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in Camera.list )
+    assert name not in Camera.list
 
     IO_Point.__init__( self, name )
 

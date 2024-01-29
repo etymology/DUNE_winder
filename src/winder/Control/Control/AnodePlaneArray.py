@@ -79,14 +79,14 @@ class AnodePlaneArray( APA_Base ) :
       self.load()
 
   #---------------------------------------------------------------------
-  def _getG_CodeLogName( self, layer ) :
+  def _getG_CodeLogName( self, layer ):
     """
     Get the name of the G-Code log for this layer.
 
     Args:
       layer: Name of the layer.
     """
-    return self.getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
+    return f"{self.getPath()}/Layer{layer}{Settings.G_CODE_LOG_FILE}"
 
   #---------------------------------------------------------------------
   def closeLoadedRecipe( self ) :
@@ -106,7 +106,7 @@ class AnodePlaneArray( APA_Base ) :
     self._lineNumber = None
 
   #---------------------------------------------------------------------
-  def loadRecipe( self, layer=None, recipeFile=None, startingLine=None ) :
+  def loadRecipe( self, layer=None, recipeFile=None, startingLine=None ):
     """
     Load a recipe file into G_CodeHandler.
 
@@ -118,74 +118,72 @@ class AnodePlaneArray( APA_Base ) :
     Returns:
       True if there was an error, False if not.
     """
-    isError = False
-
-    if None != layer :
+    if layer != None:
       self._layer = layer
 
+    isError = False
     # If there is a calibration file, load it.
-    if self._calibrationFile :
-      archivePath = self.getPath() + "/Calibration"
+    if self._calibrationFile:
+      archivePath = f"{self.getPath()}/Calibration"
       self._calibration = LayerCalibration( archivePath=archivePath )
 
-      try :
+      try:
         self._calibration.load( self.getPath(), self._calibrationFile )
-      except LayerCalibration.Error as exception :
+      except LayerCalibration.Error as exception:
 
-        errorString = "Invalid calibration hash for " \
-          + self._calibrationFile                       \
-          + " because "                                 \
-          + str( exception ) + "."
+        errorString = f"Invalid calibration hash for {self._calibrationFile} because {str(exception)}."
 
         errorData = [ self._calibrationFile ] + exception.data
 
         self._log.add(
-          self.__class__.__name__,
-          "LOAD",
-          errorString + "  Rehashing.",
-          errorData
+            self.__class__.__name__,
+            "LOAD",
+            f"{errorString}  Rehashing.",
+            errorData,
         )
 
-        try :
+        try:
           self._calibration.load( self.getPath(), self._calibrationFile, exceptionForMismatch=False )
           self._calibration.save()
-        except LayerCalibration.Error as exception :
+        except LayerCalibration.Error as exception:
           error = "Invalid calibration file."
           isError = True
 
           self._gCodeHandler.useLayerCalibration( None )
 
           self._log.add(
-            self.__class__.__name__,
-            "LOAD",
-            errorString  + "  Aborting.",
-            errorData
+              self.__class__.__name__,
+              "LOAD",
+              f"{errorString}  Aborting.",
+              errorData,
           )
 
 
       self._log.add(
-        self.__class__.__name__,
-        "LOAD",
-        "Loaded calibration file " + self._calibrationFile + ".",
-        [ self._calibrationFile, self._calibration.hashValue ]
+          self.__class__.__name__,
+          "LOAD",
+          f"Loaded calibration file {self._calibrationFile}.",
+          [self._calibrationFile, self._calibration.hashValue],
       )
 
       # Make use of calibration.
       self._gCodeHandler.useLayerCalibration( self._calibration )
 
-    else :
+    else:
       # If there is no calibration, use none.
       self._gCodeHandler.useLayerCalibration( None )
 
-    if None != recipeFile :
+    if recipeFile != None:
       self._recipeFile = recipeFile
 
-    if None != startingLine :
+    if startingLine != None:
       self._lineNumber = startingLine
 
-    if not isError :
-      self._recipe = \
-        Recipe( self._recipeDirectory + "/" + self._recipeFile, self._recipeArchiveDirectory )
+    if not isError:
+      self._recipe = Recipe(
+          f"{self._recipeDirectory}/{self._recipeFile}",
+          self._recipeArchiveDirectory,
+      )
       self._gCodeHandler.loadG_Code( self._recipe.getLines(), self._calibration )
 
       # Assign a G-Code log.
@@ -197,37 +195,31 @@ class AnodePlaneArray( APA_Base ) :
       if isError :
         error = "Invalid line number."
 
-    if not isError :
+    if not isError:
       self._log.add(
-        self.__class__.__name__,
-        "GCODE",
-        "Loaded G-Code file " + self._recipeFile
-          + ", active layer " + self._layer
-          + ", starting at line " + str( self._lineNumber ),
-        [
-          self._recipeFile,
-          self._layer,
-          self._lineNumber,
-          self._recipe.getDescription(),
-          self._recipe.getID()
-        ]
+          self.__class__.__name__,
+          "GCODE",
+          f"Loaded G-Code file {self._recipeFile}, active layer {self._layer}, starting at line {str(self._lineNumber)}",
+          [
+              self._recipeFile,
+              self._layer,
+              self._lineNumber,
+              self._recipe.getDescription(),
+              self._recipe.getID(),
+          ],
       )
     else:
       self._log.add(
-        self.__class__.__name__,
-        "GCODE",
-        "Failed to loaded G-Code file " + self._recipeFile + ", starting at line " + str( self._lineNumber ),
-        [
-          error,
-          self._recipeFile,
-          self._lineNumber
-        ]
+          self.__class__.__name__,
+          "GCODE",
+          f"Failed to loaded G-Code file {self._recipeFile}, starting at line {str(self._lineNumber)}",
+          [error, self._recipeFile, self._lineNumber],
       )
 
     return isError
 
   #---------------------------------------------------------------------
-  def load( self ) :
+  def load( self ):
     """
     Load
 
@@ -237,10 +229,10 @@ class AnodePlaneArray( APA_Base ) :
 
     # Log message about AHA change.
     self._log.add(
-      self.__class__.__name__,
-      "LOAD",
-      "Loaded APA called " + self._name,
-      [ self._name ]
+        self.__class__.__name__,
+        "LOAD",
+        f"Loaded APA called {self._name}",
+        [self._name],
     )
 
     APA_Base.load( self )
@@ -261,18 +253,18 @@ class AnodePlaneArray( APA_Base ) :
     return self._calibrationFile
 
   #---------------------------------------------------------------------
-  def setupBlankCalibration( self, layer, geometry ) :
+  def setupBlankCalibration( self, layer, geometry ):
     """
     Setup a blank calibration file for layer.
     """
     self._calibration = LayerCalibration()
     self._calibration.zFront = geometry.mostlyRetract
     self._calibration.zBack  = geometry.mostlyExtend
-    self._calibrationFile = layer + "_Calibration.xml"
+    self._calibrationFile = f"{layer}_Calibration.xml"
     self._calibration.save( self.getPath(), self._calibrationFile )
 
   #---------------------------------------------------------------------
-  def setStage( self, stage, message="<unspecified>" ) :
+  def setStage( self, stage, message="<unspecified>" ):
     """
     Set the APA progress stage.
 
@@ -283,10 +275,10 @@ class AnodePlaneArray( APA_Base ) :
 
     # Note in the log the stage change.
     self._log.add(
-      self.__class__.__name__,
-      "STAGE",
-      "APA stage change from " + str( self._stage ) + " to " + str( stage ) + ".  Reason: " + message,
-      [ self._stage, stage, message ]
+        self.__class__.__name__,
+        "STAGE",
+        f"APA stage change from {str(self._stage)} to {str(stage)}.  Reason: {message}",
+        [self._stage, stage, message],
     )
     self._stage = stage
 
@@ -299,7 +291,7 @@ class AnodePlaneArray( APA_Base ) :
     APA_Base.save( self )
 
   #---------------------------------------------------------------------
-  def close( self ) :
+  def close( self ):
     """
     Close an APA.  Call during shutdown sequence.  Called internally when new
     APA is loaded.
@@ -318,17 +310,10 @@ class AnodePlaneArray( APA_Base ) :
     deltaString = self._systemTime.getElapsedString( elapsedTime )
 
     self._log.add(
-      self.__class__.__name__,
-      "CLOSE",
-      "Closing APA " + self._name + ", "
-        + str( self._recipeFile ) + ":" + str( self._lineNumber )
-        + " after " + deltaString,
-      [
-        self._name,
-        self._recipeFile,
-        self._lineNumber,
-        elapsedTime
-      ]
+        self.__class__.__name__,
+        "CLOSE",
+        f"Closing APA {self._name}, {str(self._recipeFile)}:{str(self._lineNumber)} after {deltaString}",
+        [self._name, self._recipeFile, self._lineNumber, elapsedTime],
     )
     self._log.detach( self.getPath() + AnodePlaneArray.LOG_FILE )
     AnodePlaneArray.activeAPA = None

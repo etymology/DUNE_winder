@@ -54,10 +54,11 @@ function Version( modules )
       "version.isValid()",
       function( data )
       {
-        if ( data )
+        if (data) {
           $( "#controlVersion" ).attr( 'class', "" )
-        else
+        } else {
           $( "#controlVersion" ).attr( 'class', "badVersion"  )
+        }
       }
     )
 
@@ -74,10 +75,11 @@ function Version( modules )
       "uiVersion.isValid()",
       function( data )
       {
-        if ( data )
+        if (data) {
           $( "#uiVersion" ).attr( 'class', "" )
-        else
+        } else {
           $( "#uiVersion" ).attr( 'class', "badVersion" )
+        }
       }
     )
   }

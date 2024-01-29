@@ -769,34 +769,29 @@ function Sizzle( selector, context, results, seed ) {
 				if ( (m = match[1]) ) {
 
 					// Document context
-					if ( nodeType === 9 ) {
-						if ( (elem = context.getElementById( m )) ) {
-
-							// Support: IE, Opera, Webkit
-							// TODO: identify versions
-							// getElementById can match elements by name instead of ID
-							if ( elem.id === m ) {
-								results.push( elem );
-								return results;
-							}
-						} else {
-							return results;
-						}
-
-					// Element context
-					} else {
-
-						// Support: IE, Opera, Webkit
-						// TODO: identify versions
-						// getElementById can match elements by name instead of ID
-						if ( newContext && (elem = newContext.getElementById( m )) &&
-							contains( context, elem ) &&
-							elem.id === m ) {
-
-							results.push( elem );
-							return results;
-						}
-					}
+					if (nodeType === 9) {
+     						if ( (elem = context.getElementById( m )) ) {
+     
+     							// Support: IE, Opera, Webkit
+     							// TODO: identify versions
+     							// getElementById can match elements by name instead of ID
+     							if ( elem.id === m ) {
+     								results.push( elem );
+     								return results;
+     							}
+     						} else {
+     							return results;
+     						}
+     
+     					// Element context
+     					}
+     else if (newContext && (elem = newContext.getElementById( m )) &&
+     							contains( context, elem ) &&
+     							elem.id === m) {
+     
+     							results.push( elem );
+     							return results;
+     						}
 
 				// Type selector
 				} else if ( match[2] ) {
@@ -1480,7 +1475,7 @@ Sizzle.uniqueSort = function( results ) {
 
 	// Unless we *know* we can detect duplicates, assume their presence
 	hasDuplicate = !support.detectDuplicates;
-	sortInput = !support.sortStable && results.slice( 0 );
+	sortInput = !support.sortStable && results.slice();
 	results.sort( sortOrder );
 
 	if ( hasDuplicate ) {
@@ -2066,7 +2061,7 @@ tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
 		cached = tokenCache[ selector + " " ];
 
 	if ( cached ) {
-		return parseOnly ? 0 : cached.slice( 0 );
+		return parseOnly ? 0 : cached.slice();
 	}
 
 	soFar = selector;
@@ -2124,7 +2119,7 @@ tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
 		soFar ?
 			Sizzle.error( selector ) :
 			// Cache the tokens
-			tokenCache( selector, groups ).slice( 0 );
+			tokenCache( selector, groups ).slice();
 };
 
 function toSelector( tokens ) {
@@ -2160,11 +2155,9 @@ function addCombinator( matcher, combinator, base ) {
 			// We can't set arbitrary data on XML nodes, so they don't benefit from combinator caching
 			if ( xml ) {
 				while ( (elem = elem[ dir ]) ) {
-					if ( elem.nodeType === 1 || checkNonElements ) {
-						if ( matcher( elem, context, xml ) ) {
-							return true;
-						}
-					}
+					if ((elem.nodeType === 1 || checkNonElements) && matcher( elem, context, xml )) {
+           return true;
+     }
 				}
 			} else {
 				while ( (elem = elem[ dir ]) ) {
@@ -2226,14 +2219,12 @@ function condense( unmatched, map, filter, context, xml ) {
 		mapped = map != null;
 
 	for ( ; i < len; i++ ) {
-		if ( (elem = unmatched[i]) ) {
-			if ( !filter || filter( elem, context, xml ) ) {
-				newUnmatched.push( elem );
-				if ( mapped ) {
-					map.push( i );
-				}
-			}
-		}
+		if (elem = unmatched[i] && (!filter || filter( elem, context, xml ))) {
+        newUnmatched.push( elem );
+  				if ( mapped ) {
+  					map.push( i );
+  				}
+  }
 	}
 
 	return newUnmatched;
@@ -2552,7 +2543,7 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 	if ( match.length === 1 ) {
 
 		// Reduce context if the leading compound selector is an ID
-		tokens = match[0] = match[0].slice( 0 );
+		tokens = match[0] = match[0].slice();
 		if ( tokens.length > 2 && (token = tokens[0]).type === "ID" &&
 				support.getById && context.nodeType === 9 && documentIsHTML &&
 				Expr.relative[ tokens[1].type ] ) {
@@ -2578,24 +2569,19 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 			if ( Expr.relative[ (type = token.type) ] ) {
 				break;
 			}
-			if ( (find = Expr.find[ type ]) ) {
-				// Search, expanding context for leading sibling combinators
-				if ( (seed = find(
-					token.matches[0].replace( runescape, funescape ),
-					rsibling.test( tokens[0].type ) && testContext( context.parentNode ) || context
-				)) ) {
-
-					// If seed is empty or no tokens remain, we can return early
-					tokens.splice( i, 1 );
-					selector = seed.length && toSelector( tokens );
-					if ( !selector ) {
-						push.apply( results, seed );
-						return results;
-					}
-
-					break;
-				}
-			}
+			if (find = Expr.find[ type ] && seed = find(
+   					token.matches[0].replace( runescape, funescape ),
+   					rsibling.test( tokens[0].type ) && testContext( context.parentNode ) || context
+   				)) {
+         tokens.splice( i, 1 );
+   					selector = seed.length && toSelector( tokens );
+   					if ( !selector ) {
+   						push.apply( results, seed );
+   						return results;
+   					}
+   
+   					break;
+   }
 		}
 	}
 
@@ -4216,7 +4202,7 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 			scale = scale || ".5";
 
 			// Adjust and apply
-			initialInUnit = initialInUnit / scale;
+			initialInUnit /= scale;
 			jQuery.style( elem, prop, initialInUnit + unit );
 
 		// Update scale, tolerating zero or NaN from tween.cur()
@@ -4590,13 +4576,10 @@ jQuery.event = {
 				handlers.delegateCount = 0;
 
 				// Only use addEventListener if the special events handler returns false
-				if ( !special.setup ||
-					special.setup.call( elem, data, namespaces, eventHandle ) === false ) {
-
-					if ( elem.addEventListener ) {
-						elem.addEventListener( type, eventHandle );
-					}
-				}
+				if ((!special.setup ||
+    					special.setup.call( elem, data, namespaces, eventHandle ) === false) && elem.addEventListener) {
+          elem.addEventListener( type, eventHandle );
+    }
 			}
 
 			if ( special.add ) {
@@ -4736,12 +4719,10 @@ jQuery.event = {
 					ret = ( ( jQuery.event.special[ handleObj.origType ] || {} ).handle ||
 						handleObj.handler ).apply( matched.elem, args );
 
-					if ( ret !== undefined ) {
-						if ( ( event.result = ret ) === false ) {
-							event.preventDefault();
-							event.stopPropagation();
-						}
-					}
+					if (ret !== undefined && ( event.result = ret ) === false) {
+           event.preventDefault();
+     							event.stopPropagation();
+     }
 				}
 			}
 		}
@@ -5807,30 +5788,20 @@ function curCSS( elem, name, computed ) {
 
 	// Support: IE9
 	// getPropertyValue is only needed for .css('filter') (#12537)
-	if ( computed ) {
-
-		// A tribute to the "awesome hack by Dean Edwards"
-		// Android Browser returns percentage for some values,
-		// but width seems to be reliably pixels.
-		// This is against the CSSOM draft spec:
-		// http://dev.w3.org/csswg/cssom/#resolved-values
-		if ( !support.pixelMarginRight() && rnumnonpx.test( ret ) && rmargin.test( name ) ) {
-
-			// Remember the original values
-			width = style.width;
-			minWidth = style.minWidth;
-			maxWidth = style.maxWidth;
-
-			// Put in the new values to get a computed value out
-			style.minWidth = style.maxWidth = style.width = ret;
-			ret = computed.width;
-
-			// Revert the changed values
-			style.width = width;
-			style.minWidth = minWidth;
-			style.maxWidth = maxWidth;
-		}
-	}
+	if (computed && (!support.pixelMarginRight() && rnumnonpx.test( ret ) && rmargin.test( name ))) {
+       width = style.width;
+ 			minWidth = style.minWidth;
+ 			maxWidth = style.maxWidth;
+ 
+ 			// Put in the new values to get a computed value out
+ 			style.minWidth = style.maxWidth = style.width = ret;
+ 			ret = computed.width;
+ 
+ 			// Revert the changed values
+ 			style.width = width;
+ 			style.minWidth = minWidth;
+ 			style.maxWidth = maxWidth;
+ }
 
 	return ret !== undefined ?
 
@@ -5964,15 +5935,9 @@ function getWidthOrHeight( elem, name, extra ) {
 	// Support: IE11 only
 	// In IE 11 fullscreen elements inside of an iframe have
 	// 100x too small dimensions (gh-1764).
-	if ( document.msFullscreenElement && window.top !== window ) {
-
-		// Support: IE11 only
-		// Running getBoundingClientRect on a disconnected node
-		// in IE throws an error.
-		if ( elem.getClientRects().length ) {
-			val = Math.round( elem.getBoundingClientRect()[ name ] * 100 );
-		}
-	}
+	if (document.msFullscreenElement && window.top !== window && elem.getClientRects().length) {
+       val = Math.round( elem.getBoundingClientRect()[ name ] * 100 );
+ }
 
 	// Some non-html elements return undefined for offsetWidth, so check for null/undefined
 	// svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
@@ -7831,34 +7796,24 @@ jQuery.extend( jQuery.event, {
 		event.type = type;
 
 		// If nobody prevented the default action, do it now
-		if ( !onlyHandlers && !event.isDefaultPrevented() ) {
-
-			if ( ( !special._default ||
-				special._default.apply( eventPath.pop(), data ) === false ) &&
-				acceptData( elem ) ) {
-
-				// Call a native DOM method on the target with the same name name as the event.
-				// Don't do default actions on window, that's where global variables be (#6170)
-				if ( ontype && jQuery.isFunction( elem[ type ] ) && !jQuery.isWindow( elem ) ) {
-
-					// Don't re-trigger an onFOO event when we call its FOO() method
-					tmp = elem[ ontype ];
-
-					if ( tmp ) {
-						elem[ ontype ] = null;
-					}
-
-					// Prevent re-triggering of the same event, since we already bubbled it above
-					jQuery.event.triggered = type;
-					elem[ type ]();
-					jQuery.event.triggered = undefined;
-
-					if ( tmp ) {
-						elem[ ontype ] = tmp;
-					}
-				}
-			}
-		}
+		if (!onlyHandlers && !event.isDefaultPrevented() && (( !special._default ||
+    				special._default.apply( eventPath.pop(), data ) === false ) &&
+    				acceptData( elem )) && (ontype && jQuery.isFunction( elem[ type ] ) && !jQuery.isWindow( elem ))) {
+        tmp = elem[ ontype ];
+    
+    					if ( tmp ) {
+    						elem[ ontype ] = null;
+    					}
+    
+    					// Prevent re-triggering of the same event, since we already bubbled it above
+    					jQuery.event.triggered = type;
+    					elem[ type ]();
+    					jQuery.event.triggered = undefined;
+    
+    					if ( tmp ) {
+    						elem[ ontype ] = tmp;
+    					}
+  }
 
 		return event.result;
 	},
@@ -8542,7 +8497,7 @@ jQuery.extend( {
 
 				// Support: IE8-11+
 				// Anchor's host property isn't correctly set when s.url is relative
-				urlAnchor.href = urlAnchor.href;
+				;
 				s.crossDomain = originAnchor.protocol + "//" + originAnchor.host !==
 					urlAnchor.protocol + "//" + urlAnchor.host;
 			} catch ( e ) {
@@ -8770,9 +8725,7 @@ jQuery.extend( {
 				error = statusText;
 				if ( status || !statusText ) {
 					statusText = "error";
-					if ( status < 0 ) {
-						status = 0;
-					}
+					status = Math.max(status, 0)
 				}
 			}
 
@@ -9681,7 +9634,7 @@ jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( 
 
 			if ( win ) {
 				win.scrollTo(
-					!top ? val : win.pageXOffset,
+					top ? win.pageXOffset : val,
 					top ? val : win.pageYOffset
 				);
 

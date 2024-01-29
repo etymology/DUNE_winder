@@ -52,11 +52,13 @@ function APA( modules )
     $( "#loading" ).html( "&nbsp;" )
     this.populateLists()
 
-    if ( this.loopButtonUpdate )
+    if (this.loopButtonUpdate) {
       this.loopButtonUpdate()
+    }
 
-    if ( this.reverseButtonUpdate )
+    if (this.reverseButtonUpdate) {
       this.reverseButtonUpdate()
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -83,10 +85,11 @@ function APA( modules )
   //-----------------------------------------------------------------------------
   this.setRunningState = function( isRunning )
   {
-    if ( isRunning )
+    if (isRunning) {
       winder.remoteAction( 'process.start()' )
-    else
+    } else {
       winder.remoteAction( 'process.stop()' )
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -219,8 +222,9 @@ function APA( modules )
       // Next line is the current line because the current line has been incremented
       // by 1.
       var nextLine = gCodeLine[ "currentLine" ]
-      if ( nextLine < ( gCodeLine[ "totalLines" ] - 1 ) )
+      if (nextLine < ( gCodeLine[ "totalLines" ] - 1 )) {
         winder.remoteAction( 'process.setG_CodeLine( ' + nextLine + ' )' )
+      }
     }
   }
 
@@ -233,8 +237,9 @@ function APA( modules )
     if ( null != gCodeLine[ "currentLine" ] )
     {
       var nextLine = gCodeLine[ "currentLine" ] - 2
-      if ( nextLine >= -1 )
+      if (nextLine >= -1) {
         winder.remoteAction( 'process.setG_CodeLine( ' + nextLine + ' )' )
+      }
     }
   }
 
@@ -247,10 +252,11 @@ function APA( modules )
     var line = $( "#apaLine" ).val() - 1
     var isForward = $( "#reverseButton" ).val()
 
-    if ( "1" == isForward )
+    if ("1" == isForward) {
       line -= 1
-    else
+    } else {
       line += 1
+    }
 
     winder.remoteAction( 'process.setG_CodeLine( ' + line + ' )' )
   }
@@ -339,7 +345,7 @@ function APA( modules )
     {
       if ( null !== data )
       {
-        data = data + 1
+        data += 1
         gCodeLine[ "currentLine" ] = data
       }
       else
@@ -365,13 +371,12 @@ function APA( modules )
     'process.spool.getWire()',
     function( data )
     {
-      if ( data )
-      {
+      if (data) {
         data /= 1000
         data = data.toLocaleString() + " meters"
-      }
-      else
+      } else {
         data = "-"
+      }
 
       $( "#spoolAmount" ).text( data )
     }
@@ -401,14 +406,12 @@ function APA( modules )
       // If there is no APA loaded, the value will be an empty string and
       // the options to change the stage need to be disabled.
       var isDisabled = false
-      if ( "" === value )
-      {
+      if ("" === value) {
         stage = "(no APA loaded)"
         isDisabled = true
-      }
-      else
-        // Translate the stage name.
+      } else {
         stage = STAGES[ value ]
+      }
 
       // Enable/disable APA stage control interface.
       $( "#apaStageSelect" ).prop( "disabled", isDisabled )

@@ -51,16 +51,16 @@ class WebServerThread( PrimaryThread ):
       httpd.handle_request()
 
   #---------------------------------------------------------------------
-  def stop( self ) :
+  def stop( self ):
     """
     Send a dummy request to server to cause connection to close.
     """
 
-    try :
+    try:
       # HEAD request just so thread unblocks.  This will throw an exception.
       connection = six.moves.http_client.HTTPConnection( "127.0.0.1" )
       connection.request( "HEAD","/" )
-    except :
+    except Exception:
       pass
 
 # end class

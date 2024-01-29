@@ -16,7 +16,7 @@ from Library.Geometry.Location import Location
 class Circle :
 
   #-------------------------------------------------------------------
-  def tangentPoint( self, orientationString, target ) :
+  def tangentPoint( self, orientationString, target ):
     """
     Return the location where intermediate line runs tangent to the target location.
 
@@ -56,7 +56,7 @@ class Circle :
     orientation = ORIENTATION_TABLE[ orientationString ]
     print("$$$$$  %s %s x=%f y=%f target x= %f target y = %f" %(orientationString, repr(orientation), self._center.x, self._center.y, target.x, target.y))
     if    orientation[ 0 ] == -sign( deltaX ) \
-      and orientation[ 1 ] == -sign( deltaY ) :
+        and orientation[ 1 ] == -sign( deltaY ) :
 
         intermediate  = deltaY * math.sqrt( deltaX**2 + deltaY**2 - self._radius**2 )
         intermediate *= orientation[ 2 ]
@@ -68,7 +68,7 @@ class Circle :
         print("$$$$$ circle.py ln 64 x: %f y: %f center: %s" % (x, y, repr(self._center)))
         result = Location( x, y, self._center.z )
 
-    print("$$$$$ %s" % repr(result))
+    print(f"$$$$$ {repr(result)}")
     return result
 
   #-------------------------------------------------------------------
@@ -89,14 +89,14 @@ class Circle :
     self._radius = radius
 
   #---------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Get intermediate string representation of object.
 
     Returns:
       String with the center and radius of circle.
     """
-    return "[ " + str( self._center ) + "-" + str( self._radius ) + "]"
+    return f"[ {str(self._center)}-{str(self._radius)}]"
 
 if __name__ == "__main__":
 

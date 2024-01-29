@@ -71,21 +71,22 @@ function MotorStatus( modules )
         var acceleration = self.motor[ axis + "Acceleration" ]
         var topAcceleration = self.motor[ "maxAcceleration" ]
         var direction = ( acceleration < 0 ) ^ ( rawVelocity < 0 )
-        if ( direction )
+        if (direction) {
           topAcceleration = self.motor[ "maxDeceleration" ]
+        }
 
         topAcceleration *= Math.sign( acceleration )
 
-        if ( ! isFunctional )
+        if (! isFunctional) {
           $( "#" + axis + "Label" ).addClass( "inError" )
-        else
-        {
-          $( "#" + axis + "Label" ).removeClass( "inError" )
-          if ( isMoving )
-            $( "#" + axis + "Label" ).addClass( "inMotion" )
-          else
-            $( "#" + axis + "Label" ).removeClass( "inMotion" )
-        }
+        } else {
+                  $( "#" + axis + "Label" ).removeClass( "inError" )
+                  if (isMoving) {
+                    $( "#" + axis + "Label" ).addClass( "inMotion" )
+                  } else {
+                    $( "#" + axis + "Label" ).removeClass( "inMotion" )
+                  }
+                }
 
         var level = 0
         if ( topAcceleration != 0 )
@@ -94,8 +95,9 @@ function MotorStatus( modules )
           level = Math.min( level, 1.0 )
         }
 
-        if ( ! isMoving )
+        if (! isMoving) {
           level = 0
+        }
 
         level *= $( "#" + axis + "AccelerationBar" ).parent().width() + 10
         $( "#" + axis + "AccelerationBar" ).width( "" + Math.round( level ) + "px" )
@@ -107,8 +109,9 @@ function MotorStatus( modules )
         level = Math.abs( position - startPosition ) / Math.abs( desiredPosition - startPosition )
         level = Math.min( level, 1.0 )
 
-        if ( ! isMoving )
+        if (! isMoving) {
           level = 1
+        }
 
         level *= $( "#" + axis + "PositionBar" ).parent().width() + 10
         $( "#" + axis + "PositionBar" ).width( "" + Math.round( level ) + "px" )
@@ -123,8 +126,9 @@ function MotorStatus( modules )
           level = Math.min( level, 1.0 )
         }
 
-        if ( ! isMoving )
+        if (! isMoving) {
           level = 0
+        }
 
         level *= $( "#" + axis + "VelocityBar" ).parent().width() + 10
         $( "#" + axis + "VelocityBar" ).width( "" + Math.round( level ) + "px" )
@@ -143,14 +147,12 @@ function MotorStatus( modules )
   //-----------------------------------------------------------------------------
   var formatFunction = function( data, decimals )
   {
-    if ( $.isNumeric( data ) )
-    {
-
+    if ($.isNumeric( data )) {
       var multiplier = Math.pow( 10, decimals )
       data = Math.round( data * multiplier ) / multiplier
-    }
-    else
+    } else {
       data = "-"
+    }
 
     return data
   }
@@ -167,11 +169,13 @@ function MotorStatus( modules )
       var headPosition = 0
       if ( value )
       {
-        if ( value[ 0 ] )
+        if (value[ 0 ]) {
           headPosition += 1
+        }
 
-        if ( value[ 1 ] )
+        if (value[ 1 ]) {
           headPosition += 2
+        }
       }
 
       self.motor[ "headSide" ] = headPosition

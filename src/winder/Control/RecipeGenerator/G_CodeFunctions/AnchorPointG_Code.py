@@ -18,7 +18,7 @@ class AnchorPointG_Code( G_CodeFunction ) :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, pin, orientation=None ) :
+  def __init__( self, pin, orientation=None ):
     """
     Constructor.
 
@@ -27,7 +27,7 @@ class AnchorPointG_Code( G_CodeFunction ) :
       orientation: Orientation of wire around pin.  0=None, TR/TL/RB/RT/BL/BR/LT/LB.
     """
 
-    if None == orientation :
+    if orientation is None:
       orientation = "0"
 
     G_CodeFunction.__init__( self, G_Codes.ANCHOR_POINT, [ pin, orientation ] )

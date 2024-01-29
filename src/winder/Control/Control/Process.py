@@ -47,7 +47,7 @@ class Process :
   }
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log, configuration, systemTime, machineCalibration ) :
+  def __init__( self, io, log, configuration, systemTime, machineCalibration ):
     """
     Constructor.
 
@@ -80,8 +80,8 @@ class Process :
       os.makedirs( path )
 
     path = self._configuration.get( "recipeDirectory" )
-    if not os.path.exists( path ) :
-      raise Exception( "Recipe directory (" + path + ") does not exist." )
+    if not os.path.exists( path ):
+      raise Exception(f"Recipe directory ({path}) does not exist.")
 
     self.gCodeHandler = G_CodeHandler( io, self.spool, machineCalibration, self.headCompensation )
     self.controlStateMachine.gCodeHandler = self.gCodeHandler
@@ -283,7 +283,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def setStage( self, stage, message="<unspecified>" ) :
+  def setStage( self, stage, message="<unspecified>" ):
     """
     Set the APA progress stage.
 
@@ -302,8 +302,8 @@ class Process :
         [ stage, message ]
       )
 
-    if not isError :
-      if stage in Process.STAGE_TABLE :
+    if not isError:
+      if stage in Process.STAGE_TABLE:
         settings = Process.STAGE_TABLE[ stage ]
         self.apa.setStage( stage, message )
         self.apa.closeLoadedRecipe()
@@ -314,18 +314,18 @@ class Process :
 
           self.apa.setupBlankCalibration( layer, geometry )
           self.apa.loadRecipe( layer, recipe )
-      else :
+      else:
         isError = True
 
         self._log.add(
-          self.__class__.__name__,
-          "STATE_SET",
-          "Unable to set state--unknown state " + str( stage ),
-          [ stage, message ]
+            self.__class__.__name__,
+            "STATE_SET",
+            f"Unable to set state--unknown state {str(stage)}",
+            [stage, message],
         )
 
   #---------------------------------------------------------------------
-  def getG_CodeList( self, center, delta ) :
+  def getG_CodeList( self, center, delta ):
     """
     Fetch a sub-set of the loaded G-Code self.lines.  Useful for showing what
     has recently executed, and what is to come.
@@ -338,8 +338,8 @@ class Process :
       List of G-Code lines, or empty list of no G-Code is loaded.
     """
     result = []
-    if self.gCodeHandler.isG_CodeLoaded() :
-      if None == center :
+    if self.gCodeHandler.isG_CodeLoaded():
+      if center is None:
         center = self.gCodeHandler.getLine()
 
       result = self.gCodeHandler.fetchLines( center, delta )
@@ -347,7 +347,7 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
-  def setG_CodeLine( self, line ) :
+  def setG_CodeLine( self, line ):
     """
     Set a new line number from loaded recipe to seek.
 
@@ -358,24 +358,24 @@ class Process :
       True if there was an error, False if not.
     """
     isError = True
-    if self.gCodeHandler.isG_CodeLoaded() :
+    if self.gCodeHandler.isG_CodeLoaded():
       initialLine = self.gCodeHandler.getLine()
       isError = self.gCodeHandler.setLine( line )
 
-      if not isError :
+      if not isError:
         self._log.add(
-          self.__class__.__name__,
-          "LINE",
-          "G-Code line changed from " + str( initialLine ) + " to " + str( line ),
-          [ initialLine, line ]
+            self.__class__.__name__,
+            "LINE",
+            f"G-Code line changed from {str(initialLine)} to {str(line)}",
+            [initialLine, line],
         )
 
-    if isError :
+    if isError:
       self._log.add(
-        self.__class__.__name__,
-        "LINE",
-        "Unable to change G-Code line changed to " + str( line ),
-        [ line ]
+          self.__class__.__name__,
+          "LINE",
+          f"Unable to change G-Code line changed to {str(line)}",
+          [line],
       )
 
     return isError
@@ -392,7 +392,7 @@ class Process :
     return self.gCodeHandler.isPositionLogging()
 
   #---------------------------------------------------------------------
-  def setPositionLogging( self, isEnabled ) :
+  def setPositionLogging( self, isEnabled ):
     """
     Enable/disable position logging.  Test function.
 
@@ -403,9 +403,9 @@ class Process :
       True if logging was enabled, False if not.
     """
     fileName = None
-    if isEnabled :
-      if self.apa :
-        fileName = self.apa.getPath() + "positionLog.csv"
+    if isEnabled:
+      if self.apa:
+        fileName = f"{self.apa.getPath()}positionLog.csv"
         self._log.add(
           self.__class__.__name__,
           "POSITION_LOGGING",
@@ -432,7 +432,7 @@ class Process :
     return self.getPositionLogging()
 
   #---------------------------------------------------------------------
-  def getG_CodeDirection( self ) :
+  def getG_CodeDirection( self ):
     """
     Get the direction of G-Code execution.
 
@@ -440,14 +440,11 @@ class Process :
       True for normal direction, False to run in reverse.  True if no G-Code
       is loaded.
     """
-    result = True
-    if self.gCodeHandler.isG_CodeLoaded() :
-      result = self.gCodeHandler.getDirection()
-
-    return result
+    return (self.gCodeHandler.getDirection()
+            if self.gCodeHandler.isG_CodeLoaded() else True)
 
   #---------------------------------------------------------------------
-  def setG_CodeDirection( self, isForward ) :
+  def setG_CodeDirection( self, isForward ):
     """
     Set the direction of G-Code execution.
 
@@ -455,55 +452,55 @@ class Process :
       isForward: True for normal direction, False to run in reverse.
     """
     isError = True
-    if self.gCodeHandler.isG_CodeLoaded() :
+    if self.gCodeHandler.isG_CodeLoaded():
       initialDirection = self.gCodeHandler.getDirection()
       isError = self.gCodeHandler.setDirection( isForward )
 
-      if not isError :
+      if not isError:
         self._log.add(
-          self.__class__.__name__,
-          "DIRECTION",
-          "G-Code direction changed from " + str( initialDirection ) + " to " + str( isForward ),
-          [ initialDirection, isForward ]
+            self.__class__.__name__,
+            "DIRECTION",
+            f"G-Code direction changed from {str(initialDirection)} to {str(isForward)}",
+            [initialDirection, isForward],
         )
 
-    if isError :
+    if isError:
       self._log.add(
-        self.__class__.__name__,
-        "LINE",
-        "Unable to change G-Code direction changed to " + str( isForward ),
-        [ isForward ]
+          self.__class__.__name__,
+          "LINE",
+          f"Unable to change G-Code direction changed to {str(isForward)}",
+          [isForward],
       )
 
 
     return isError
 
   #---------------------------------------------------------------------
-  def setG_CodeRunToLine( self, line ) :
+  def setG_CodeRunToLine( self, line ):
     """
     Set the line number to run G-Code and then stop.
     """
     isError = True
-    if self.gCodeHandler.isG_CodeLoaded() :
+    if self.gCodeHandler.isG_CodeLoaded():
       initialRunTo = self.gCodeHandler.runToLine
       #isError = self.gCodeHandler.setDirection( isForward )
       self.gCodeHandler.runToLine = line
       isError = False
 
-      if not isError :
+      if not isError:
         self._log.add(
-          self.__class__.__name__,
-          "RUN_TO",
-          "G-Code finial line changed from " + str( initialRunTo ) + " to " + str( line ),
-          [ initialRunTo, line ]
+            self.__class__.__name__,
+            "RUN_TO",
+            f"G-Code finial line changed from {str(initialRunTo)} to {str(line)}",
+            [initialRunTo, line],
         )
 
-    if isError :
+    if isError:
       self._log.add(
-        self.__class__.__name__,
-        "LINE",
-        "Unable to change G-Code run to line to " + str( line ),
-        [ line ]
+          self.__class__.__name__,
+          "LINE",
+          f"Unable to change G-Code run to line to {str(line)}",
+          [line],
       )
 
 
@@ -562,18 +559,17 @@ class Process :
     self.gCodeHandler.setVelocityScale( scaleFactor )
 
   #---------------------------------------------------------------------
-  def getAPA_List( self ) :
+  def getAPA_List( self ):
     """
     Return a list of all the available APAs based on file in APA directory.
 
     Returns:
       List of all the available APAs.
     """
-    apaList = os.listdir( self._configuration.get( "APA_LogDirectory" ) )
-    return apaList
+    return os.listdir( self._configuration.get( "APA_LogDirectory" ) )
 
   #---------------------------------------------------------------------
-  def getAPA_DetailedList( self ) :
+  def getAPA_DetailedList( self ):
     """
     Return a detailed list of all the available APAs.
 
@@ -583,11 +579,7 @@ class Process :
 
     directory = self._configuration.get( "APA_LogDirectory" )
 
-    apaList = []
-    for apaName in self.getAPA_List() :
-      apaList.append( self.getAPA_Details( apaName ) )
-
-    return apaList
+    return [self.getAPA_Details( apaName ) for apaName in self.getAPA_List()]
 
   #---------------------------------------------------------------------
   def getAPA_Details( self, name ) :
@@ -607,35 +599,27 @@ class Process :
     return apa.toDictionary()
 
   #---------------------------------------------------------------------
-  def getLoadedAPA_Name( self ) :
+  def getLoadedAPA_Name( self ):
     """
     Get the name of the loaded APA.
 
     Returns:
       Name of the loaded APA or an empty string if no APA is loaded.
     """
-    result = ""
-    if self.apa :
-      result = self.apa.getName()
-
-    return result
+    return self.apa.getName() if self.apa else ""
 
   #---------------------------------------------------------------------
-  def getRecipeName( self ) :
+  def getRecipeName( self ):
     """
     Return the name of the loaded recipe.
 
     Returns:
       String name of the loaded recipe.  Empty string if no recipe loaded.
     """
-    result = ""
-    if self.apa :
-      result = self.apa.getRecipe()
-
-    return result
+    return self.apa.getRecipe() if self.apa else ""
 
   #---------------------------------------------------------------------
-  def getRecipeLayer( self ) :
+  def getRecipeLayer( self ):
     """
     Return the current layer of the APA.
 
@@ -643,28 +627,20 @@ class Process :
       String name of the current layer of the APA.  None if no recipe
       loaded.
     """
-    result = None
-    if self.apa :
-      result = self.apa.getLayer()
-
-    return result
+    return self.apa.getLayer() if self.apa else None
 
   #---------------------------------------------------------------------
-  def getStage( self ) :
+  def getStage( self ):
     """
     Return the current stage of APA progress.
 
     Returns:
       Integer number (table in APA.Stages) of APA progress.
     """
-    result = ""
-    if self.apa :
-      result = self.apa.getStage()
-
-    return result
+    return self.apa.getStage() if self.apa else ""
 
   #---------------------------------------------------------------------
-  def maxVelocity( self, maxVelocity=None ) :
+  def maxVelocity( self, maxVelocity=None ):
     """
     Set/get the maximum velocity used by PLC logic and G-Code handler.
 
@@ -675,7 +651,7 @@ class Process :
       Maximum velocity.
     """
 
-    if None != maxVelocity :
+    if maxVelocity != None:
       self._maxVelocity = maxVelocity
       self._io.plcLogic.maxVelocity( maxVelocity )
       self.gCodeHandler.setLimitVelocity( maxVelocity )
@@ -716,7 +692,7 @@ class Process :
       self.apa = None
 
   #---------------------------------------------------------------------
-  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ) :
+  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ):
     """
     Jog the X/Y axis at a given velocity.
 
@@ -732,7 +708,8 @@ class Process :
     """
 
     isError = False
-    if ( 0 != xVelocity or 0 != yVelocity ) and self.controlStateMachine.isMovementReady() :
+    if (xVelocity != 0
+        or yVelocity != 0) and self.controlStateMachine.isMovementReady():
       #Current coordinates to find out if we are in Safety Zone
       x = self._io.xAxis.getPosition()
       y = self._io.yAxis.getPosition()
@@ -744,17 +721,16 @@ class Process :
           yVelocity = math.copysign(self._maxSlowVelocity,yVelocity)
 
       self._log.add(
-        self.__class__.__name__,
-        "JOG",
-        "Jog X/Y at " + str( xVelocity ) + ", " + str( yVelocity ) + " m/s, "
-          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
-        [ xVelocity, yVelocity, acceleration, deceleration ]
+          self.__class__.__name__,
+          "JOG",
+          f"Jog X/Y at {str(xVelocity)}, {str(yVelocity)} m/s, {str(acceleration)}, {str(deceleration)} m/s^2.",
+          [xVelocity, yVelocity, acceleration, deceleration],
       )
 
       self.controlStateMachine.manualRequest = True
       self.controlStateMachine.isJogging = True
       self._io.plcLogic.jogXY( xVelocity, yVelocity, acceleration, deceleration )
-    elif 0 == xVelocity and 0 == yVelocity and self.controlStateMachine.isJogging :
+    elif xVelocity == 0 and yVelocity == 0 and self.controlStateMachine.isJogging:
       self._log.add(
         self.__class__.__name__,
         "JOG",
@@ -774,7 +750,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def manualSeekXY( self, xPosition=None, yPosition=None, velocity=None, acceleration=None, deceleration=None ) :
+  def manualSeekXY( self, xPosition=None, yPosition=None, velocity=None, acceleration=None, deceleration=None ):
     """
     Seek an X/Y location.
 
@@ -789,15 +765,13 @@ class Process :
     """
 
     isError = True
-    if self.controlStateMachine.isMovementReady() :
+    if self.controlStateMachine.isMovementReady():
       isError = False
       self._log.add(
-        self.__class__.__name__,
-        "JOG",
-        "Manual move X/Y to (" + str( xPosition )
-          + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
-          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
-        [ xPosition, yPosition, velocity, acceleration, deceleration ]
+          self.__class__.__name__,
+          "JOG",
+          f"Manual move X/Y to ({str(xPosition)}, {str(yPosition)}) at {str(velocity)}, {str(acceleration)}, {str(deceleration)} m/s^2.",
+          [xPosition, yPosition, velocity, acceleration, deceleration],
       )
       self.controlStateMachine.seekX = xPosition
       self.controlStateMachine.seekY = yPosition
@@ -805,7 +779,7 @@ class Process :
       self.controlStateMachine.seekAcceleration = acceleration
       self.controlStateMachine.seekDeceleration = deceleration
       self.controlStateMachine.manualRequest = True
-    else :
+    else:
       self._log.add(
         self.__class__.__name__,
         "JOG",
@@ -816,7 +790,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def manualSeekZ( self, position, velocity=None ) :
+  def manualSeekZ( self, position, velocity=None ):
     """
     Seek an Z location.
 
@@ -828,18 +802,18 @@ class Process :
     """
 
     isError = True
-    if self.controlStateMachine.isMovementReady() :
+    if self.controlStateMachine.isMovementReady():
       isError = False
       self._log.add(
-        self.__class__.__name__,
-        "JOG",
-        "Manual move Z to " + str( position ) + " at " + str( velocity ) + ".",
-        [ position, velocity ]
+          self.__class__.__name__,
+          "JOG",
+          f"Manual move Z to {str(position)} at {str(velocity)}.",
+          [position, velocity],
       )
       self.controlStateMachine.seekZ = position
       self.controlStateMachine.seekVelocity = velocity
       self.controlStateMachine.manualRequest = True
-    else :
+    else:
       self._log.add(
         self.__class__.__name__,
         "JOG",
@@ -850,7 +824,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def manualHeadPosition( self, position, velocity ) :
+  def manualHeadPosition( self, position, velocity ):
     """
     Manually position the head.
 
@@ -863,20 +837,20 @@ class Process :
     """
     isError = True
 
-    if self.controlStateMachine.isMovementReady() and self._io.head.getPosition() != position :
+    if self.controlStateMachine.isMovementReady() and self._io.head.getPosition() != position:
       isError = False
 
       self._log.add(
-        self.__class__.__name__,
-        "HEAD",
-        "Manual head position to " + str( position ) + " at " + str( velocity ) + ".",
-        [ position, velocity ]
+          self.__class__.__name__,
+          "HEAD",
+          f"Manual head position to {str(position)} at {str(velocity)}.",
+          [position, velocity],
       )
       self.controlStateMachine.setHeadPosition = position
       self.controlStateMachine.seekVelocity = velocity
       self.controlStateMachine.manualRequest = True
 
-    else :
+    else:
       self._log.add(
         self.__class__.__name__,
         "HEAD",
@@ -887,7 +861,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def jogZ( self, velocity ) :
+  def jogZ( self, velocity ):
     """
     Jog the Z axis at a given velocity.
 
@@ -899,17 +873,17 @@ class Process :
     """
 
     isError = False
-    if 0 != velocity and self.controlStateMachine.isMovementReady() :
+    if velocity != 0 and self.controlStateMachine.isMovementReady():
       self._log.add(
-        self.__class__.__name__,
-        "JOG",
-        "Jog Z at " + str( velocity ) + ".",
-        [ velocity ]
+          self.__class__.__name__,
+          "JOG",
+          f"Jog Z at {str(velocity)}.",
+          [velocity],
       )
       self.controlStateMachine.manualRequest = True
       self.controlStateMachine.isJogging = True
       self._io.plcLogic.jogZ( velocity )
-    elif 0 == velocity and self.controlStateMachine.isJogging :
+    elif velocity == 0 and self.controlStateMachine.isJogging:
       self._log.add(
         self.__class__.__name__,
         "JOG",
@@ -929,7 +903,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def seekPin( self, pin, velocity ) :
+  def seekPin( self, pin, velocity ):
     """
     Manually seek out a pin location.
 
@@ -945,7 +919,7 @@ class Process :
     isError = True
 
     # Do we have a calibration file?
-    if calibration :
+    if calibration:
 
       # Two pins may be specified.  If they are, get both names.  If not, set
       # both names to the single name given.
@@ -956,23 +930,23 @@ class Process :
 
       # Does request pin exist?
       if calibration.getPinExists( pinNameA ) \
-        and calibration.getPinExists( pinNameB ) :
-          self._log.add(
+          and calibration.getPinExists( pinNameB ):
+        self._log.add(
             self.__class__.__name__,
             "SEEK_PIN",
-            "Manual pin seek " + pin + " at " + str( velocity ) +".",
-            [ pin, velocity ]
-          )
+            f"Manual pin seek {pin} at {str(velocity)}.",
+            [pin, velocity],
+        )
 
-          # Get the center of the pins.
-          pinA = calibration.getPinLocation( pinNameA )
-          pinB = calibration.getPinLocation( pinNameB )
-          position = pinA.center( pinB )
-          position = position.add( calibration.offset )
+        # Get the center of the pins.
+        pinA = calibration.getPinLocation( pinNameA )
+        pinB = calibration.getPinLocation( pinNameB )
+        position = pinA.center( pinB )
+        position = position.add( calibration.offset )
 
-          # Run a manual seek to pin/center position.
-          self.manualSeekXY( position.x, position.y, velocity )
-          isError = False
+        # Run a manual seek to pin/center position.
+        self.manualSeekXY( position.x, position.y, velocity )
+        isError = False
       else:
         self._log.add(
           self.__class__.__name__,
@@ -991,7 +965,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def seekPinNominal( self, pin, velocity ) :
+  def seekPinNominal( self, pin, velocity ):
     """
     Seek out the nominal pin location.
     Useful for calibration scan setup.
@@ -1004,7 +978,7 @@ class Process :
       True if there was an error, False if not.
     """
     isError = True
-    if self.apa :
+    if self.apa:
       # Get the name of this layer.
       layer = self.apa.getLayer()
 
@@ -1012,12 +986,12 @@ class Process :
       calibration = DefaultLayerCalibration( None, None, layer )
 
       # Does request pin exist?
-      if calibration.getPinExists( pin ) :
+      if calibration.getPinExists( pin ):
         self._log.add(
-          self.__class__.__name__,
-          "SEEK_PIN_NOMINAL",
-          "Nominal pin seek " + pin + " at " + str( velocity ) +".",
-          [ pin, velocity ]
+            self.__class__.__name__,
+            "SEEK_PIN_NOMINAL",
+            f"Nominal pin seek {pin} at {str(velocity)}.",
+            [pin, velocity],
         )
 
         # Get the center of the pins.
@@ -1045,7 +1019,7 @@ class Process :
     return isError
 
   #---------------------------------------------------------------------
-  def setAnchorPoint( self, pinA, pinB = None ) :
+  def setAnchorPoint( self, pinA, pinB = None ):
     """
     Specify the anchor point--location where the wire is assume to be fixed.
 
@@ -1058,23 +1032,20 @@ class Process :
     isError = True
 
     # Do we have a calibration file?
-    if calibration :
+    if calibration:
 
-      # Get first pin location.
-      pinA = calibration.getPinLocation( pinA )
-
-      if pinA :
+      if pinA := calibration.getPinLocation(pinA):
         # Do we have a second pin?
-        if pinB :
+        if pinB:
           # Center between two pins.
           pinB = calibration.getPinLocation( pinB )
 
-          if pinB :
-            location = pinA.center( pinB )
-        else :
+        else:
           # Use the specified location.
           location = pinA
 
+        if pinB :
+          location = pinA.center( pinB )
         location = location.add( calibration.offset )
 
         self.headCompensation.anchorPoint( location )
@@ -1113,7 +1084,7 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
-  def executeG_CodeLine( self, line ) :
+  def executeG_CodeLine( self, line ):
     """
     Run a line of G-code.
 
@@ -1124,7 +1095,7 @@ class Process :
       Failure data.  None if there was no failure.
     """
     error = None
-    if not self.controlStateMachine.isMovementReady() :
+    if not self.controlStateMachine.isMovementReady():
       error = "Machine not ready."
       self._log.add(
         self.__class__.__name__,
@@ -1132,8 +1103,8 @@ class Process :
         "Failed to execute manual G-Code line as machine was not ready.",
         [ line ]
       )
-      
-    else :
+
+    else:
       #Check the format of the string matches a VALID PATTERN
       xy = '(\ *[X]\d{1,4}(\.\d{1,2})?\ *[Y]\d{1,4}(\.\d{1,2})?\ *$)'   # 'X1234 Y1234','X0 Y1234'
       gxy = '(\ *[G]105\ *[P][XY]-?\d{1,3}(\.\d{1,2})?\ *$)'  # 'G105 PX123','G105  PY123',G105  PY-12', 'G105  PX-123'
@@ -1144,8 +1115,9 @@ class Process :
       gx_yf = '(\ *[G]105\ *[P][X]-?\d{1,3}(\.\d{1,2})?\ *[P][Y]-?\d{1,3}(\.\d{1,2})?\ *[F]\d{1,3}\ *$)' # 'G105  PX123 PY123 F123'
       gp = '(\ *[G]106\ *P[0123]\ *$)' # 'G106 P0', ..., 'G106 P4'
       z = '(\ *[Z]\d{1,3}(\.\d{1,2})?\ *$)'  # 'Z123' , 'Z-123' , 'Z123.45' 
-      if not re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf+'|'+gp+'|'+z, line) :
-        error = "Invalid G-code format or coordinates exceeding the maximun digits allowed [X1234] : "+line
+      if not re.match(f'{xy}|{gxy}|{xyf}|{fxy}|{gxyf}|{gx_y}|{gx_yf}|{gp}|{z}',
+                      line):
+        error = f"Invalid G-code format or coordinates exceeding the maximun digits allowed [X1234] : {line}"
 
       #Check that X and Y input coordinate are within limits
       #Get the current positions 
@@ -1155,47 +1127,47 @@ class Process :
       codeLineSplit = line.split()
       x = float(0)
       y = float(0)
-      for cmd in codeLineSplit :
-        if "X" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
+      for cmd in codeLineSplit:
+        if "X" in cmd and re.match(
+            f'{xy}|{gxy}|{xyf}|{fxy}|{gxyf}|{gx_y}|{gx_yf}', line):
           xCmd = cmd.split("X")
           x = float(xCmd[1])
-          if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):   # if G105 is used then add relative coordinate
-            x = x + xPosition
-            if x < self._transferLeft -10 and yPosition > 1000 :
-              error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(x)+" < "+str(self._transferLeft - 10)+" , Y="+str(yPosition)+" > "+str(1000)+"]"
-          if x < self._limitLeft or x > self._limitRight :     # if X is exeeding safety limit 
-            error = "Invalid X-axis Coordinates, exceeding limit ["+str(self._limitLeft)+" , "+str(self._limitRight)+"]"
-        if "Y" in cmd and re.match(xy+'|'+gxy+'|'+xyf+'|'+fxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line) :
+          if re.match(f'{gxy}|{gxyf}|{gx_y}|{gx_yf}', line):   # if G105 is used then add relative coordinate
+            x += xPosition
+            if x < self._transferLeft -10 and yPosition > 1000:
+              error = f"Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X={str(x)} < {str(self._transferLeft - 10)} , Y={str(yPosition)} > 1000]"
+          if x < self._limitLeft or x > self._limitRight:     # if X is exeeding safety limit 
+            error = f"Invalid X-axis Coordinates, exceeding limit [{str(self._limitLeft)} , {str(self._limitRight)}]"
+        if "Y" in cmd and re.match(
+            f'{xy}|{gxy}|{xyf}|{fxy}|{gxyf}|{gx_y}|{gx_yf}', line):
           yCmd = cmd.split("Y")
           y = float(yCmd[1])
-          if re.match( gxy+'|'+gxyf+'|'+gx_y+'|'+gx_yf, line):
-            y = y + yPosition
-            if xPosition < self._transferLeft -10 and y > 1000 :
-              error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(xPosition)+" < "+str(self._transferLeft - 10)+" , Y="+str(y)+" > "+str(1000)+"]"
-          if y < self._limitBottom or y > self._limitTop :
-            error = "Invalid Y-axis Coordinates, exceeding limit ["+str(self._limitBottom)+" , "+str(self._limitTop)+"]"
+          if re.match(f'{gxy}|{gxyf}|{gx_y}|{gx_yf}', line):
+            y += yPosition
+            if xPosition < self._transferLeft -10 and y > 1000:
+              error = f"Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X={str(xPosition)} < {str(self._transferLeft - 10)} , Y={str(y)} > 1000]"
+          if y < self._limitBottom or y > self._limitTop:
+            error = f"Invalid Y-axis Coordinates, exceeding limit [{str(self._limitBottom)} , {str(self._limitTop)}]"
 
-        if x < self._transferLeft -10 and y > 1000 and re.match(xy+'|'+xyf+'|'+fxy, line) :
-          error = "Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X="+str(x)+" < "+str(self._transferLeft - 10)+" , Y="+str(y)+" > "+str(1000)+"]"
-          
-        if "Z" in cmd and re.match(z, line) :
+        if (x < self._transferLeft - 10 and y > 1000
+            and re.match(f'{xy}|{xyf}|{fxy}', line)):
+          error = f"Invalid XY-axis Coordinates, forbiden area due to safety of winder head [X={str(x)} < {str(self._transferLeft - 10)} , Y={str(y)} > {str(1000)}]"
+
+        if "Z" in cmd and re.match(z, line):
           zCmd = cmd.split("Z")
           z = float(zCmd[1])
-          if z < self._zlimitFront or z > self._zlimitRear :
-            error = "Invalid Z-axis Coordinates, exceeding limit ["+str(z)+" > "+str(self._zlimitRear)+"]"            
+          if z < self._zlimitFront or z > self._zlimitRear:
+            error = f"Invalid Z-axis Coordinates, exceeding limit [{str(z)} > {str(self._zlimitRear)}]"            
 
-      if error != None :
+      if error != None:
         self._log.add(
           self.__class__.__name__,
           "MANUAL_GCODE",
           "Failed to execute manual G-Code line. Coordinates exceeding limit.",
           [ line ]
         )
-      else :
-        #Excute G_CodeLine
-        errorData = self.gCodeHandler.executeG_CodeLine( line )
-
-        if errorData :
+      else:
+        if errorData := self.gCodeHandler.executeG_CodeLine(line):
           error = errorData[ "message" ]
           self._log.add(
             self.__class__.__name__,
@@ -1242,7 +1214,7 @@ class Process :
     velocity=None,
     acceleration=None,
     deceleration=None
-  ) :
+  ):
     """
     Begin the calibration sequence.
 
@@ -1258,23 +1230,19 @@ class Process :
       deceleration: Maximum negative acceleration.  None for default.
     """
 
-    if not self.controlStateMachine.isMovementReady() :
+    if not self.controlStateMachine.isMovementReady():
       self._log.add(
         self.__class__.__name__,
         "CALIBRATION_ERROR",
         "Calibration scan error--machine not idle.",
         [ startPin, endPin, deltaX, deltaY, velocity, acceleration, deceleration ]
       )
-      isError = True
-    else :
+      return True
+    else:
 
       # Determine direction of travel.
       pinDelta = endPin - startPin
-      if pinDelta < 0 :
-        direction = -1
-      else :
-        direction = 1
-
+      direction = -1 if pinDelta < 0 else 1
       # Get the scan parameters setup.
       self.cameraCalibration.setupCalibration( side, startPin, direction, maxPins )
       self._io.camera.startScan( deltaX, deltaY )
@@ -1295,21 +1263,24 @@ class Process :
       self.controlStateMachine.calibrationRequest = True
 
       self._log.add(
-        self.__class__.__name__,
-        "CALIBRATION",
-        "Calibration scan from pin " + str( startPin ) + " to " + str( endPin )
-          + ".  X/Y to (" + str( xPosition )
-          + ", " + str( yPosition ) + ") at " + str( velocity ) + ", "
-          + str( acceleration ) + ", " + str( deceleration ) + " m/s^2.",
-        [ startPin, endPin, xPosition, yPosition, velocity, acceleration, deceleration ]
+          self.__class__.__name__,
+          "CALIBRATION",
+          f"Calibration scan from pin {str(startPin)} to {str(endPin)}.  X/Y to ({str(xPosition)}, {str(yPosition)}) at {str(velocity)}, {str(acceleration)}, {str(deceleration)} m/s^2.",
+          [
+              startPin,
+              endPin,
+              xPosition,
+              yPosition,
+              velocity,
+              acceleration,
+              deceleration,
+          ],
       )
 
-      isError = False
-
-    return isError
+      return False
 
   #---------------------------------------------------------------------
-  def getAPA_Side( self ) :
+  def getAPA_Side( self ):
     """
     Get the front-facing side of the APA.
 
@@ -1319,14 +1290,14 @@ class Process :
       None for either no loaded APA, or APA in an invalid state for such a query.
     """
     result = None
-    if None != self.apa :
+    if self.apa != None:
       stage = self.apa.getStage()
       result = self.apa.STAGE_SIDE[ stage ]
 
     return result
 
   #---------------------------------------------------------------------
-  def getLayerPinGeometry( self ) :
+  def getLayerPinGeometry( self ):
     """
     Get the pin geometry for current layer.
 
@@ -1336,7 +1307,7 @@ class Process :
       each edge).  Returns None if no APA is loaded.
     """
     result = None
-    if None != self.apa :
+    if self.apa != None:
       stage = self.apa.getStage()
       side = self.apa.STAGE_SIDE[ stage ]
       layer = self.apa.getLayer()
@@ -1354,7 +1325,7 @@ class Process :
       frontSumY = 0
       backSumX = 0
       backSumY = 0
-      for edgeIndex in range( 0, 4 ) :
+      for edgeIndex in range(4) :
 
         frontCount  = geometry.gridFront[ edgeIndex ][ 0 ]
         frontDeltaX = geometry.gridFront[ edgeIndex ][ 1 ]
@@ -1399,7 +1370,7 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
-  def commitCalibration( self, side, offsetX, offsetY ) :
+  def commitCalibration( self, side, offsetX, offsetY ):
     """
     Commit the scan data to the calibration file.
 
@@ -1412,27 +1383,23 @@ class Process :
       True if there was an error, False if not.
     """
     isError = True
-    if None != self.apa :
+    if self.apa != None:
       isError = False
       layer = self.apa.getLayer()
       geometry = GeometrySelection( layer )
       calibration = self.gCodeHandler.getLayerCalibration()
       calibrationFileName = calibration.getFileName()
-      cameraDataPath = self.apa.getPath() + "Scans"
+      cameraDataPath = f"{self.apa.getPath()}Scans"
 
       # Create directory if it doesn't exist.
       if not os.path.exists( cameraDataPath ) :
         os.makedirs( cameraDataPath )
 
       cameraDataFile = str( self._systemTime.get() )
-      cameraDataFile = cameraDataFile.replace( " ", "_" ).replace( ":", "_" ).replace( ".", "_" )
-      cameraDataFile += ".csv"
-
-      if self.apa.Side.FRONT == side :
-        isFrontSide = True
-      else :
-        isFrontSide = False
-
+      cameraDataFile = (
+          cameraDataFile.replace(" ", "_").replace(":", "_").replace(".", "_") +
+          ".csv")
+      isFrontSide = self.apa.Side.FRONT == side
       self.cameraCalibration.commitCalibration(
         calibration,
         geometry,
@@ -1445,17 +1412,22 @@ class Process :
       calibration.save()
 
       self._log.add(
-        self.__class__.__name__,
-        "CALIBRATION_SAVED",
-        "Updated calibration information from scan for layer " + layer + " to " \
-          + calibrationFileName + ".",
-        [ layer, calibrationFileName, calibration.hashValue, cameraDataFile, cameraDataHash ]
+          self.__class__.__name__,
+          "CALIBRATION_SAVED",
+          f"Updated calibration information from scan for layer {layer} to {calibrationFileName}.",
+          [
+              layer,
+              calibrationFileName,
+              calibration.hashValue,
+              cameraDataFile,
+              cameraDataHash,
+          ],
       )
 
     return isError
 
   #---------------------------------------------------------------------
-  def cameraSeekCenter( self, velocity=None ) :
+  def cameraSeekCenter( self, velocity=None ):
     """
     Seek to the center of the pin currently in view.
     Only useful if camera has a pin location to work with.
@@ -1468,17 +1440,17 @@ class Process :
     """
     isError = False
     [ x, y ] = self.cameraCalibration.centerCurrentLocation()
-    if None != x and None != y :
+    if x != None != y:
 
       self.manualSeekXY( x, y, velocity )
 
       self._log.add(
-        self.__class__.__name__,
-        "PIN_CENTER",
-        "Seeking pin center: " + str( x ) + " " + str( y ) + ".",
-        [ x, y ]
+          self.__class__.__name__,
+          "PIN_CENTER",
+          f"Seeking pin center: {str(x)} {str(y)}.",
+          [x, y],
       )
-    else :
+    else:
       isError = True
       self._log.add(
         self.__class__.__name__,

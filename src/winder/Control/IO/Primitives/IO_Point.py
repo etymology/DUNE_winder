@@ -19,14 +19,14 @@ class IO_Point(six.with_metaclass(ABCMeta)):
   map = {}
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor. Save name and insert self into list of NamedIO.
 
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in IO_Point.list )
+    assert name not in IO_Point.list
 
     IO_Point.list.append( self )
     IO_Point.map[ name ] = self

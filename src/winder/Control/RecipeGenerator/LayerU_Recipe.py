@@ -35,7 +35,7 @@ class LayerU_Recipe( LayerUV_Recipe ) :
 
 
   #---------------------------------------------------------------------
-  def __init__( self, geometry, windsOverride=None ) :
+  def __init__( self, geometry, windsOverride=None ):
     """
     Constructor.  Does all calculations.
 
@@ -69,20 +69,19 @@ class LayerU_Recipe( LayerUV_Recipe ) :
 
     # Define the first few net locations.
     # All following locations are just modifications of this initial set.
-    self.net = \
-    [
-      "F" + str( geometry.columns + geometry.rows + 1 ),         # 1201
-      "F" + str( 2 * geometry.columns + geometry.rows + 1 ),     # 2001
-      "B" + str( geometry.columns + 1 ),                         # 801
-      "B" + str( 2 * geometry.columns + 2 * geometry.rows + 1 ), # 2401
-      "F" + str( geometry.rows + 1 ),                            # 401
-      "F" + str( geometry.rows ),                                # 400
-      "B" + str( 1 ),                                            # 1
-      "B" + str( geometry.columns ),                             # 800
-      "F" + str( 2 * geometry.columns + geometry.rows + 2 ),     # 2002
-      "F" + str( geometry.columns + geometry.rows ),             # 1200
-      "B" + str( 2 * geometry.columns + 2 ),                     # 1602
-      "B" + str( 2 * geometry.columns ),                         # 1600
+    self.net = [
+        f"F{str(geometry.columns + geometry.rows + 1)}",
+        f"F{str(2 * geometry.columns + geometry.rows + 1)}",
+        f"B{str(geometry.columns + 1)}",
+        f"B{str(2 * geometry.columns + 2 * geometry.rows + 1)}",
+        f"F{str(geometry.rows + 1)}",
+        f"F{str(geometry.rows)}",
+        'B1',
+        f"B{str(geometry.columns)}",
+        f"F{str(2 * geometry.columns + geometry.rows + 2)}",
+        f"F{str(geometry.columns + geometry.rows)}",
+        f"B{str(2 * geometry.columns + 2)}",
+        f"B{str(2 * geometry.columns)}",
     ]
 
     # Total number of steps to do a complete wind.

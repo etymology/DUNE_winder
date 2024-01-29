@@ -52,7 +52,7 @@ class SoftwareMotor( Motor ) :
     return True
 
   #---------------------------------------------------------------------
-  def setDesiredPosition( self, position ) :
+  def setDesiredPosition( self, position ):
     """
     Go to a location.
 
@@ -61,11 +61,11 @@ class SoftwareMotor( Motor ) :
 
     """
 
-    if not position == self._position :
-        self._inMotion = True
-        self._seekPosition = position
-        self._startTime = self._simulationTime.get()
-        self._motion =                    \
+    if position != self._position:
+      self._inMotion = True
+      self._seekPosition = position
+      self._startTime = self._simulationTime.get()
+      self._motion =                    \
           Motion                          \
           (                               \
             self._jerk,                   \

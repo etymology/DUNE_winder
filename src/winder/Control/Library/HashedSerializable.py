@@ -25,7 +25,7 @@ class HashedSerializable( Serializable ) :
     """
 
     #-----------------------------------------------------------------
-    def __init__( self, message, data=[] ) :
+    def __init__(self, message, data=None):
       """
       Constructor.
 
@@ -33,6 +33,8 @@ class HashedSerializable( Serializable ) :
         message: Error message.
         data: An array of data related to the exception.
       """
+      if data is None:
+        data = []
       ValueError.__init__( self, message )
       self.data = data
 
@@ -57,7 +59,7 @@ class HashedSerializable( Serializable ) :
     self.hashValue = ""
 
   #-------------------------------------------------------------------
-  def _calculateStringHash( self, lines ) :
+  def _calculateStringHash( self, lines ):
     """
     Calculate a hash of a string of XML lines.
 
@@ -77,15 +79,12 @@ class HashedSerializable( Serializable ) :
     lines = re.sub( '[\s]+', '', lines )
 
     # Ignore the hash entry completely.
-    lines = re.sub( '(<strname="hashValue">' + Hash.HASH_PATTERN + '?</str>)', '', lines )
+    lines = re.sub(f'(<strname="hashValue">{Hash.HASH_PATTERN}?</str>)', '', lines)
 
-    # Create hash of G-Code, including description.
-    hashValue = Hash.singleLine( lines )
-
-    return hashValue
+    return Hash.singleLine( lines )
 
   #-------------------------------------------------------------------
-  def load( self, filePath, fileName, nameOverride=None, exceptionForMismatch=True ) :
+  def load( self, filePath, fileName, nameOverride=None, exceptionForMismatch=True ):
     """
     Load an XML file and return instance.
 
@@ -111,26 +110,26 @@ class HashedSerializable( Serializable ) :
     Serializable.load( self, filePath, fileName, nameOverride )
 
     # Get all XML lines.
-    with open( filePath + "/" + fileName ) as inputFile :
+    with open(f"{filePath}/{fileName}") as inputFile:
       lines = inputFile.read()
 
     # Extract the hash from the raw XML.
     body = re.search( '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>', lines )
-    self.hashValue = body.group( 1 )
+    self.hashValue = body[1]
 
     hashValue = self._calculateStringHash( lines )
 
     isError = hashValue != self.hashValue
-    if isError and exceptionForMismatch :
+    if isError and exceptionForMismatch:
       raise HashedSerializable.Error(
-        str( hashValue ) + " does not match " + str( self.hashValue ),
-        [ str( hashValue ), str( self.hashValue ) ]
+          f"{str(hashValue)} does not match {str(self.hashValue)}",
+          [str(hashValue), str(self.hashValue)],
       )
 
     return isError
 
   #-------------------------------------------------------------------
-  def getFullFileName( self ) :
+  def getFullFileName( self ):
     """
     Get the full path to file.
     File must have been saved/loaded prior to calling.
@@ -139,7 +138,7 @@ class HashedSerializable( Serializable ) :
       Full path to file.
     """
 
-    return self._filePath + "/" + self._fileName
+    return f"{self._filePath}/{self._fileName}"
 
   #-------------------------------------------------------------------
   def getFileName( self ) :
@@ -166,7 +165,7 @@ class HashedSerializable( Serializable ) :
     return self._filePath
 
   #-------------------------------------------------------------------
-  def save( self, filePath=None, fileName=None, nameOverride=None ) :
+  def save( self, filePath=None, fileName=None, nameOverride=None ):
     """
     Write XML data to disk.
 
@@ -177,7 +176,7 @@ class HashedSerializable( Serializable ) :
     """
 
     # File name/path omitted?
-    if None == filePath and None == fileName :
+    if filePath == None == fileName:
       filePath = self._filePath
       fileName = self._fileName
 
@@ -191,15 +190,14 @@ class HashedSerializable( Serializable ) :
     self.hashValue = self._calculateStringHash( outputText )
 
     # Replace hash value with updated value.
-    outputText = \
-      re.sub(
+    outputText = re.sub(
         '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>',
-        '<str name="hashValue">' + self.hashValue + '</str>' ,
-        outputText
-      )
+        f'<str name="hashValue">{self.hashValue}</str>',
+        outputText,
+    )
 
     # Write XML data to file.
-    with open( filePath + "/" + fileName, "wb" ) as outputFile :
+    with open(f"{filePath}/{fileName}", "wb") as outputFile:
       outputFile.write( outputText )
 
 # end class
@@ -216,8 +214,8 @@ if __name__ == "__main__":
       self.cc = None
       self.dd = None
 
-    def __str__( self ) :
-      return str( self.aa ) + "," + str( self.bb ) + "," + str( self.cc ) + "," + str( self.dd )
+    def __str__( self ):
+      return f"{str(self.aa)},{str(self.bb)},{str(self.cc)},{str(self.dd)}"
 
     def bar() :
       pass

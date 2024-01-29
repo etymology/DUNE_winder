@@ -104,7 +104,7 @@ class TrapezoidalMotion( Motion ) :
     velocity = 0,
     startPosition = 0,
     endPosition = 0
-    ) :
+    ):
     """
     Constructor with full parameter set.
 
@@ -116,9 +116,9 @@ class TrapezoidalMotion( Motion ) :
     """
     self._point = [ self.Point() for _ in range( self.Point.POINTS ) ]
 
-    if None == endPosition :
+    if endPosition is None:
       self.computeJog( maxAcceleration, velocity, startPosition )
-    else :
+    else:
       self.compute( maxAcceleration, minAcceleration, velocity, startPosition, endPosition )
 
     # for point in self._point :
@@ -165,7 +165,7 @@ class TrapezoidalMotion( Motion ) :
     self._nextPoint( self.Point.T3, self.Point.T2, 0, 0 )
 
   #---------------------------------------------------------------------
-  def computeJog( self, maxAcceleration, velocity, startPosition ) :
+  def computeJog( self, maxAcceleration, velocity, startPosition ):
     """
     Compute internal poin table for a jog operation.  Call before using
     'interpolatePosition'.
@@ -182,7 +182,7 @@ class TrapezoidalMotion( Motion ) :
     # Jerk, acceleration and velocity are magnitudes, so force an absolute value.
     maxAcceleration = abs( float( maxAcceleration ) )
 
-    if None == startPosition :
+    if startPosition is None:
       startPosition = 0
 
     forwardAcceleration =  maxAcceleration
@@ -219,7 +219,7 @@ class TrapezoidalMotion( Motion ) :
 
 
   #---------------------------------------------------------------------
-  def compute( self, maxAcceleration, minAcceleration, velocity, startPosition, endPosition ) :
+  def compute( self, maxAcceleration, minAcceleration, velocity, startPosition, endPosition ):
     """
     Compute internal point table using the specified settings. Call before using
     'interpolatePosition'.
@@ -240,10 +240,10 @@ class TrapezoidalMotion( Motion ) :
     minAcceleration = abs( float( minAcceleration ) )
     velocity        = abs( float( velocity        ) )
 
-    if None == endPosition :
+    if endPosition is None:
       endPosition = 0
 
-    if None == startPosition :
+    if startPosition is None:
       startPosition = 0
 
     forwardAcceleration =  maxAcceleration
@@ -257,11 +257,12 @@ class TrapezoidalMotion( Motion ) :
       svelocity   = -velocity
 
     # We must either not be moving or have a acceleration and velocity term.
-    assert ( 0 == position or ( 0 != maxAcceleration and 0 != minAcceleration ) ), "Cannot move without a acceleration term"
-    assert ( 0 == position or 0 != velocity ), "Cannot move without a velocity term"
+    assert (position == 0 or maxAcceleration != 0 != minAcceleration
+            ), "Cannot move without a acceleration term"
+    assert position == 0 or velocity != 0, "Cannot move without a velocity term"
 
     # If actually moving...
-    if not 0 == position :
+    if position != 0:
 
       # First point is the starting position and no motion.
       self._point[ self.Point.T0 ].t = 0.0
@@ -288,11 +289,7 @@ class TrapezoidalMotion( Motion ) :
 
       self._nextPoint( self.Point.T2, self.Point.T1, 0, dwellTime )
 
-      if dwellTime :
-        fallTime = decelerationTime
-      else :
-        fallTime = t2
-
+      fallTime = decelerationTime if dwellTime else t2
       self._nextPoint( self.Point.T3, self.Point.T2, reverseAcceleration, fallTime )
 
       # Force the last position to end at the right location and time.
@@ -460,7 +457,7 @@ class TrapezoidalMotion( Motion ) :
     maxVelocity,
     startPosition,
     endPosition
-  ) :
+  ):
     """
     Return total time need for travel.
 
@@ -480,7 +477,7 @@ class TrapezoidalMotion( Motion ) :
     result = 0
 
     # Don't bother if there isn't any motion.
-    if delta > 0 :
+    if delta > 0:
       # Time if max maxVelocity is reached.
       t1  = delta / maxVelocity
       t1 += maxVelocity / ( 2 * maxAcceleration )
@@ -501,11 +498,7 @@ class TrapezoidalMotion( Motion ) :
 
       # We can use t2 (which should always be lower) if it does not exceed the
       # maximum maxVelocity.
-      if finialVelocity < maxVelocity :
-        result = t2
-      else :
-        result = t1
-
+      result = t2 if finialVelocity < maxVelocity else t1
     return result
 
   #---------------------------------------------------------------------
@@ -627,7 +620,7 @@ if __name__ == "__main__":
   motion = TrapezoidalMotion( maxAcceleration, minAcceleration, velocity, startPosition, endPosition )
 
   # Print the transition points.
-  for index in range( 0, motion.Point.POINTS ) :
+  for index in range(motion.Point.POINTS) :
     print("T%u %9.4f: %9.4f %9.4f %9.2f" % \
       (                                      \
         index,                               \

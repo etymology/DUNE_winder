@@ -19,7 +19,7 @@ class PLC_Motor( Motor ) :
   list = []
 
   #---------------------------------------------------------------------
-  def __init__( self, name, plc, tagBase ) :
+  def __init__( self, name, plc, tagBase ):
     """
     Constructor.
 
@@ -38,25 +38,27 @@ class PLC_Motor( Motor ) :
     # Write tags.
     attributes = PLC.Tag.Attributes()
     attributes.defaultValue = 0
-    self._setPosition  = PLC.Tag( plc, tagBase + "_POSITION", attributes, "REAL" )
-    self._jogSpeed     = PLC.Tag( plc, tagBase + "_SPEED", attributes, "REAL" )
-    self._jogDirection = PLC.Tag( plc, tagBase + "_DIR", attributes, "DINT" )
+    self._setPosition = PLC.Tag(plc, f"{tagBase}_POSITION", attributes, "REAL")
+    self._jogSpeed = PLC.Tag(plc, f"{tagBase}_SPEED", attributes, "REAL")
+    self._jogDirection = PLC.Tag(plc, f"{tagBase}_DIR", attributes, "DINT")
 
     # Read-only attributes tags.
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     attributes.canWrite = False
-    self._position     = PLC.Tag( plc, tagBase + "_Axis.ActualPosition", attributes )
-    self._velocity     = PLC.Tag( plc, tagBase + "_Axis.ActualVelocity", attributes )
-    self._acceleration = PLC.Tag( plc, tagBase + "_Axis.CommandAcceleration", attributes )
-    self._movement     = PLC.Tag( plc, tagBase + "_Axis.CoordinatedMotionStatus", attributes )
+    self._position = PLC.Tag(plc, f"{tagBase}_Axis.ActualPosition", attributes)
+    self._velocity = PLC.Tag(plc, f"{tagBase}_Axis.ActualVelocity", attributes)
+    self._acceleration = PLC.Tag(plc, f"{tagBase}_Axis.CommandAcceleration",
+                                 attributes)
+    self._movement = PLC.Tag(plc, f"{tagBase}_Axis.CoordinatedMotionStatus",
+                             attributes)
 
     # Motor status tag defaults to a faulted state in case read fails.
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     attributes.canWrite = False
     attributes.defaultValue = True
-    self._faulted = PLC.Tag( plc, tagBase + "_Axis.ModuleFault", attributes )
+    self._faulted = PLC.Tag(plc, f"{tagBase}_Axis.ModuleFault", attributes)
 
     self._seekStartPosition = 0
 
@@ -103,7 +105,7 @@ class PLC_Motor( Motor ) :
     return self._setPosition.get()
 
   #---------------------------------------------------------------------
-  def isSeeking( self ) :
+  def isSeeking( self ):
     """
     See if the motor is in motion.
 
@@ -111,9 +113,7 @@ class PLC_Motor( Motor ) :
       True if seeking desired position, False if at desired position.
     """
 
-    result = bool( self._movement.get() )
-
-    return result
+    return bool( self._movement.get() )
 
   #---------------------------------------------------------------------
   def getPosition( self ) :

@@ -135,8 +135,9 @@ var Page = function()
     // actually load the data.  Otherwise, the browser may used a cached
     // version.
     var randomLine = ""
-    if ( FORCE_RELOAD )
+    if (FORCE_RELOAD) {
       randomLine = "?random=" + Math.random()
+    }
 
     var cssLink =
       $( "<link rel='stylesheet' type='text/css' href='" + pageName + ".css" + randomLine + "'>" )
@@ -158,16 +159,18 @@ var Page = function()
             function()
             {
               // If there is a callback once page is finished loading, run it.
-              if ( callback )
+              if (callback) {
                 callback( callbackParameters )
+              }
 
               // One more page is finished loading.
               pagesLoading -= 1
 
               // If all pages have been loaded, run fully loaded callbacks.
-              if ( 0 == pagesLoading )
+              if (pagesLoading == 0) {
                 for ( var index in onFullyLoadedCallbacks )
                   onFullyLoadedCallbacks[ index ]()
+              }
             }
           )
         }
@@ -195,8 +198,9 @@ var Page = function()
       || ( activePage != loadedPages[ pageName ] ) )
     {
       // If there is a page already active, shut it down.
-      if ( activePage )
+      if (activePage) {
         activePage[ "modules" ].shutdown()
+      }
 
       // Is this page already loaded?
       if ( pageName in loadedPages )
@@ -275,11 +279,13 @@ var Page = function()
         {
           // Run the pre-callback.  Checks to see if the load should be skipped.
           isSkip = false
-          if ( preCallback )
+          if (preCallback) {
             isSkip = preCallback( preCallbackParameters )
+          }
 
-          if ( ! isSkip )
+          if (! isSkip) {
             self.load( pageName, targetTag )
+          }
         }
       )
 

@@ -53,8 +53,9 @@ var Modules = function()
   //---------------------------------------------------------------------------
   this.registerLoadFailureCallback = function( callback )
   {
-    if ( callback )
+    if (callback) {
       loadFailureCallbacks.push( callback )
+    }
 
     return this
   }
@@ -90,7 +91,7 @@ var Modules = function()
     // This function run all the callbacks if all modules have loaded.
     var checkCallbacks = function()
     {
-      if ( 0 == modulesLoading )
+      if ( modulesLoading == 0 )
       {
         var callbacksToRun = loadingCallbacks
         loadingCallbacks = []
@@ -105,8 +106,9 @@ var Modules = function()
     // Function to run should there be a problem loading the module.
     var errorFunction = function()
     {
-      if ( failCallback )
+      if (failCallback) {
         failCallback( module )
+      }
 
       // Run all load failure callbacks.
       for ( var index in loadFailureCallbacks )
@@ -162,8 +164,9 @@ var Modules = function()
 
               // If there is a callback, add it to list of callbacks to run once
               // all modules have been loaded.
-              if ( callback )
+              if (callback) {
                 loadingCallbacks.unshift( [ callback, modules[ module ] ] )
+              }
             }
             catch ( exception )
             {

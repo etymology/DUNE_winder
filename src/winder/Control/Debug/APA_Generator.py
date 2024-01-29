@@ -25,7 +25,7 @@ class APA_Generator :
       process: Instance of Process.
       number: Number of random APAs to create.
     """
-    for _ in range( 0, number ) :
+    for _ in range(number) :
       random1 = random.randint( 0, 999 )
       random2 = random.randint( 0, 99 )
       random3 = random.randint( 0, 9999 )

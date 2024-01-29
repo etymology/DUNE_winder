@@ -76,15 +76,17 @@ function Jog( modules )
   {
     var velocity = this.getVelocity()
 
-    if ( x )
+    if (x) {
       x = "process.apa._gCodeHandler." + x
-    else
+    } else {
       x = "None"
+    }
 
-    if ( y )
+    if (y) {
       y = "process.apa._gCodeHandler." + y
-    else
+    } else {
       y = "None"
+    }
 
     winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
   }
@@ -96,8 +98,9 @@ function Jog( modules )
   this.seekZ = function( position )
   {
     var z = position
-    if ( null == z )
+    if (null == z) {
       z = $( "#seekZ" ).val()
+    }
 
     var velocity = this.getVelocity()
     winder.remoteAction( "process.manualSeekZ(" + z + "," + velocity + ")"  )
@@ -238,10 +241,11 @@ function Jog( modules )
       'process.executeG_CodeLine( "' + gCode + '" )',
       function( data )
       {
-        if ( ! data )
+        if (! data) {
           $( "#gExecutionCodeStatus" ).html( "Executed with no errors." )
-        else
+        } else {
           $( "#gExecutionCodeStatus" ).html( "Error interpreting line: " + data )
+        }
       }
     )
   }

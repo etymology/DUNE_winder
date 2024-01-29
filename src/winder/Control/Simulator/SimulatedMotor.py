@@ -20,14 +20,14 @@ class SimulatedMotor :
   JITTER = 0.015
 
   #---------------------------------------------------------------------
-  def positionDelta( self ) :
+  def positionDelta( self ):
     """
     Return the amount of distance that needs to be traversed for motion.
 
     Returns:
       Amount of distance that needs to be traversed for motion.
     """
-    if self._plc.getTag( self._desiredPositionTag ) == None :
+    if self._plc.getTag(self._desiredPositionTag) is None:
       return -self._position
     return self._plc.getTag( self._desiredPositionTag ) - self._position
 
@@ -137,16 +137,14 @@ class SimulatedMotor :
       )
 
   #---------------------------------------------------------------------
-  def startJog( self, acceleration, deceleration ) :
+  def startJog( self, acceleration, deceleration ):
     """
     Start jogging.
     """
     velocity = seekPosition = self._plc.getTag( self._speedTag )
 
-    if velocity != 0 :
-      direction = self._plc.getTag( self._directionTag )
-
-      if direction :
+    if velocity != 0:
+      if direction := self._plc.getTag(self._directionTag):
         velocity = -velocity
 
       self._startTime = self._simulationTime.get()
@@ -154,13 +152,13 @@ class SimulatedMotor :
       self._maxDeceleration = deceleration
 
       self._motion =                                          \
-        TrapezoidalMotion                                     \
-        (                                                     \
-          acceleration,                                       \
-          deceleration,                                       \
-          velocity,                                           \
-          self._position,                                     \
-          None
+          TrapezoidalMotion                                     \
+          (                                                     \
+            acceleration,                                       \
+            deceleration,                                       \
+            velocity,                                           \
+            self._position,                                     \
+            None
         )
 
       self._startPosition = self._position
@@ -259,7 +257,7 @@ class SimulatedMotor :
 
 
   #---------------------------------------------------------------------
-  def __init__( self, plc, tagBase, simulationTime ) :
+  def __init__( self, plc, tagBase, simulationTime ):
     """
     Constructor.
     """
@@ -284,15 +282,15 @@ class SimulatedMotor :
     self._lastTime        = 0
     self._motion = TrapezoidalMotion( 0, 0, 0, 0, 0 )
 
-    self._desiredPositionTag = plc.setupTag( tagBase + "_POSITION", 0                     )
-    self._desiredVelocityTag = plc.setupTag( tagBase + "_Axis.CommandVelocity", 0         )
-    self._speedTag           = plc.setupTag( tagBase + "_SPEED", 0                        )
-    self._directionTag       = plc.setupTag( tagBase + "_DIR", 0                          )
-    self._positionTag        = plc.setupTag( tagBase + "_Axis.ActualPosition", 0          )
-    self._velocityTag        = plc.setupTag( tagBase + "_Axis.ActualVelocity", 0          )
-    self._accelerationTag    = plc.setupTag( tagBase + "_Axis.CommandAcceleration", 0     )
-    self._motionTag          = plc.setupTag( tagBase + "_Axis.CoordinatedMotionStatus", 0 )
-    self._faultTag           = plc.setupTag( tagBase + "_Axis.ModuleFault", 0             )
+    self._desiredPositionTag = plc.setupTag(f"{tagBase}_POSITION", 0)
+    self._desiredVelocityTag = plc.setupTag(f"{tagBase}_Axis.CommandVelocity", 0)
+    self._speedTag = plc.setupTag(f"{tagBase}_SPEED", 0)
+    self._directionTag = plc.setupTag(f"{tagBase}_DIR", 0)
+    self._positionTag = plc.setupTag(f"{tagBase}_Axis.ActualPosition", 0)
+    self._velocityTag = plc.setupTag(f"{tagBase}_Axis.ActualVelocity", 0)
+    self._accelerationTag = plc.setupTag(f"{tagBase}_Axis.CommandAcceleration", 0)
+    self._motionTag = plc.setupTag(f"{tagBase}_Axis.CoordinatedMotionStatus", 0)
+    self._faultTag = plc.setupTag(f"{tagBase}_Axis.ModuleFault", 0)
 
   #---------------------------------------------------------------------
   def getSpeedTag( self ) :

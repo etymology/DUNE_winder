@@ -12,8 +12,9 @@ function ConfigurationList( winder, remotePrefix, tagPrefix )
   var triggers = 0
   var values = {}
 
-  if ( null == tagPrefix )
+  if (null == tagPrefix) {
     tagPrefix = remotePrefix
+  }
 
   //-----------------------------------------------------------------------------
   // Uses:
@@ -97,8 +98,9 @@ function ConfigurationList( winder, remotePrefix, tagPrefix )
   this.display = function( name, item, tag, verifyFunction )
   {
     // If no verify function is specified, assume it should be numeric.
-    if ( null == verifyFunction )
+    if (null == verifyFunction) {
       verifyFunction = $.isNumeric
+    }
 
     var div = $( "<div />" ).appendTo( tag )
     var id = remotePrefix + "." + item
@@ -147,8 +149,9 @@ function ConfigurationList( winder, remotePrefix, tagPrefix )
                   // If this is the last input to have been changed in the sequence,
                   // save the new values.
                   triggers -= 1
-                  if ( 0 == triggers )
+                  if (triggers == 0) {
                     self.save()
+                  }
                 }
               )
 
@@ -162,22 +165,19 @@ function ConfigurationList( winder, remotePrefix, tagPrefix )
             {
               var value = $( this ).val()
               // Different from initial value?
-              if ( value != values[ item ] )
-              {
-                // Make sure this is a number
-                if ( verifyFunction( value ) )
-                  // The change function will only denote that a change has taken
-                  // place--it will not commit this change.
+              if (value != values[ item ]) {
+                if (verifyFunction( value )) {
                   $( this ).attr( "class", "changed" )
-                else
+                } else {
                   $( this ).attr( "class", "error" )
-              }
-              else
+                }
+              } else {
                 $( this ).attr( "class", "" )
+              }
 
               // Set the save button enable/disable based on any whether or not
               // there are are any modified input fields.
-              var disabled = ( 0 == $( '.changed' ).length )
+              var disabled = ( $( '.changed' ).length == 0 )
               $( "#" + tagPrefix + "Save" ).prop( "disabled", disabled )
             }
           )

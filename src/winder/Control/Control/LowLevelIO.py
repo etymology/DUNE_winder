@@ -21,7 +21,7 @@ from IO.Devices.PLC import PLC
 class LowLevelIO :
   #---------------------------------------------------------------------
   @staticmethod
-  def _getIO_List( ioList ) :
+  def _getIO_List( ioList ):
     """
     Get a list of each I/O point name and the current value.
 
@@ -32,11 +32,7 @@ class LowLevelIO :
       A list of two lists.  The first element of sub-list is the I/O name and
       the second element is the I/O value.
     """
-    result = []
-    for ioPoint in ioList :
-      result.append( [ ioPoint.getName(), ioPoint.get() ] )
-
-    return result
+    return [[ ioPoint.getName(), ioPoint.get() ] for ioPoint in ioList]
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -92,7 +88,7 @@ class LowLevelIO :
 
   #---------------------------------------------------------------------
   @staticmethod
-  def getTags() :
+  def getTags():
     """
     Get a list of every PLC tag in system.
 
@@ -102,9 +98,9 @@ class LowLevelIO :
     """
     tags = []
     result = []
-    for tag in PLC.Tag.list :
+    for tag in PLC.Tag.list:
       name = tag.getName()
-      if not name in tags :
+      if name not in tags:
         tags.append( name )
         result.append( [ name, tag.get() ] )
 

@@ -40,7 +40,7 @@ class HeadCompensation :
     self._orientation  = None
 
   #---------------------------------------------------------------------
-  def orientation( self, value = None ) :
+  def orientation( self, value = None ):
     """
     Get/set orientation of connecting wire.
 
@@ -51,13 +51,13 @@ class HeadCompensation :
       The current orientation.
     """
 
-    if None != value :
+    if value != None:
       self._orientation = value
 
     return self._orientation
 
   #---------------------------------------------------------------------
-  def anchorPoint( self, location = None ) :
+  def anchorPoint( self, location = None ):
     """
     Get/set anchor point.
 
@@ -67,7 +67,7 @@ class HeadCompensation :
     Returns:
       The current anchor point.
     """
-    if None != location :
+    if location != None:
       self._anchorPoint = location.copy()
       self._anchorOffset = Location()
 
@@ -278,7 +278,7 @@ class HeadCompensation :
     return x
 
   #---------------------------------------------------------------------
-  def _transferCorrect( self, machineLocation, zDesired, direction ) :
+  def _transferCorrect( self, machineLocation, zDesired, direction ):
     """
     Calculate correction for a transfer.
 
@@ -320,11 +320,11 @@ class HeadCompensation :
     x = anchorPoint.x
     y = anchorPoint.y
 
-    if 0 != lengthXZ :
+    if lengthXZ != 0:
       xCorrection = travelZ * deltaX / lengthXZ
       x += xCorrection
 
-    if 0 != lengthYZ :
+    if lengthYZ != 0:
       yCorrection = travelZ * deltaY / lengthYZ
       y += yCorrection
       print("$$$$$ yCorrection: ", yCorrection, anchorPoint.y)

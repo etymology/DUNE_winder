@@ -31,7 +31,7 @@ from .Hash import Hash
 
 class Recipe :
   #---------------------------------------------------------------------
-  def __init__( self, fileName, archiveDirectory ) :
+  def __init__( self, fileName, archiveDirectory ):
     """
     Constructor.
 
@@ -52,15 +52,15 @@ class Recipe :
     # Where the description is a text field ending with a comma, and the hash
     # fields.
     headerCheck = '\( (.+?)[ ]+(?:' \
-      + Hash.HASH_PATTERN + '[ ]+)?(?:' + Hash.HASH_PATTERN + '[ ]+)?\)'
+        + Hash.HASH_PATTERN + '[ ]+)?(?:' + Hash.HASH_PATTERN + '[ ]+)?\)'
 
     expression = re.search( headerCheck, header, re.IGNORECASE )
     if not expression :
       raise Exception( "Recipe contains no heading." )
 
-    self._description = expression.group( 1 )
-    self._headerHash  = expression.group( 2 )
-    self._parentHash  = expression.group( 3 )
+    self._description = expression[1]
+    self._headerHash = expression[2]
+    self._parentHash = expression[3]
 
     # Create hash of G-Code, including description.
     bodyHash = Hash()
@@ -72,26 +72,27 @@ class Recipe :
     bodyHash = str( bodyHash )
 
     # Does the caclulated hash not match the hash from the header?
-    if bodyHash != self._headerHash :
+    if bodyHash != self._headerHash:
 
       # If there was a hash, it is the parent hash.
-      if None == self._headerHash :
+      if self._headerHash is None:
         self._headerHash = ""
       else:
         self._headerHash += " "
 
       # Rewrite the recipe file with the correct header.
-      with open( fileName, "w" ) as outputFile :
-        outputFile.write( "( " + self._description + " " + bodyHash + " " + self._headerHash + ")\n" )
+      with open( fileName, "w" ) as outputFile:
+        outputFile.write(f"( {self._description} {bodyHash} {self._headerHash}" +
+                         ")\n")
         outputFile.writelines( self._lines )
 
       # Setup correct current and parent hash.
       self._parentHash = self._headerHash
       self._headerHash = bodyHash
 
-    if archiveDirectory :
+    if archiveDirectory:
       # If this file does not exist in the archive, copy it there.
-      archiveFile = archiveDirectory + "/" + bodyHash
+      archiveFile = f"{archiveDirectory}/{bodyHash}"
       if not os.path.isfile( archiveFile ) :
         # Make an archive copy of the file.
         shutil.copy2( fileName, archiveFile )

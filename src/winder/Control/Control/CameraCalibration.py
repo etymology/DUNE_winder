@@ -32,7 +32,7 @@ class CameraCalibration :
     self._pinMax    = None
 
   #---------------------------------------------------------------------
-  def pixelsPer_mm( self, pixelsPer_mm = None ) :
+  def pixelsPer_mm( self, pixelsPer_mm = None ):
     """
     Get/set pixels/mm.
 
@@ -43,7 +43,7 @@ class CameraCalibration :
       Current pixels/mm value.
     """
 
-    if None != pixelsPer_mm :
+    if pixelsPer_mm != None:
       self._pixelsPer_mm = float( pixelsPer_mm )
 
     return self._pixelsPer_mm
@@ -76,14 +76,14 @@ class CameraCalibration :
 
 
   #---------------------------------------------------------------------
-  def poll( self ) :
+  def poll( self ):
     """
     Periodic update function to call while calibration is taking place.
     Used to clear the capture FIFO and convert this data to machine coordinates.
     """
 
     calibrationData = []
-    if None != self._startPin :
+    if self._startPin != None:
 
       pin = self._startPin
       for entry in self._io.camera.captureFIFO :
@@ -94,7 +94,7 @@ class CameraCalibration :
 
         # Convert pixels to millimeters.
         [ x, y ] = \
-          self._correct(
+            self._correct(
             entry[ "MotorX" ],
             entry[ "MotorY" ],
             entry[ "CameraX" ],
@@ -117,7 +117,7 @@ class CameraCalibration :
     self._calibrationData = calibrationData
 
   #---------------------------------------------------------------------
-  def centerCurrentLocation( self ) :
+  def centerCurrentLocation( self ):
     """
     Compute pin center based on current image and motor position.
     Use for manual triggering and incremental motion (do not use while moving).
@@ -130,7 +130,7 @@ class CameraCalibration :
     y = None
     status = self._io.camera.cameraResultStatus.get()
 
-    if 1 == status :
+    if status == 1:
       cameraX = self._io.camera.cameraResultX.get()
       cameraY = self._io.camera.cameraResultY.get()
       motorX = self._io.xAxis.getPosition()
@@ -141,7 +141,7 @@ class CameraCalibration :
     return [ x, y ]
 
   #---------------------------------------------------------------------
-  def commitCalibration( self, layerCalibration, geometry, isFront, offsetX, offsetY ) :
+  def commitCalibration( self, layerCalibration, geometry, isFront, offsetX, offsetY ):
     """
     Update the layer with the acquired calibration data.
 
@@ -163,8 +163,8 @@ class CameraCalibration :
       sideA = "B"
       sideB = "F"
 
-    for entry in self._calibrationData :
-      if 1 == entry[ "Status" ] :
+    for entry in self._calibrationData:
+      if entry["Status"] == 1:
         pin = entry[ "Pin" ]
         pinName = sideA + str( pin )
         location = Location( entry[ "MotorX" ], entry[ "MotorY" ], geometry.mostlyExtend )

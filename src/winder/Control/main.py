@@ -71,7 +71,7 @@ isRealTime = True
 #==============================================================================
 
 #-----------------------------------------------------------------------
-def commandHandler( _, command ) :
+def commandHandler( _, command ):
   """
   Handle a remote command.
   This is define in main so that is has the most global access possible.
@@ -106,9 +106,9 @@ def commandHandler( _, command ) :
   # raise an exception.)
   try:
     result = json.dumps( result, encoding="unicode_escape" )
-  except TypeError :
+  except TypeError:
     # If it cannot be made JSON, just make it a string.
-    result = json.dumps( str( result ), encoding="unicode_escape" )
+    result = json.dumps(result, encoding="unicode_escape")
 
   return result
 
@@ -134,22 +134,22 @@ for argument in sys.argv:
   argument = argument.upper()
   option = argument
   value = "TRUE"
-  if -1 != argument.find( "=" ) :
+  if argument.find("=") != -1:
     option, value = argument.split( "=" )
 
-  if "APA" == option :
+  if option == "APA":
     loadAPA_File = value
-  elif "START" == option :
-    isStartAPA = ( "TRUE" == value )
-  elif "SIMULATED" == option or "SIMULATOR" == option :
-    isSimulated = ( "TRUE" == value )
-  elif "REAL_TIME" == option :
-    isRealTime = ( "TRUE" == value )
-  elif "LOG" == option :
-    isLogEchoed = ( "TRUE" == value )
-  elif "LOG_IO" == option :
-    isIO_Logged = ( "TRUE" == value )
-  elif "VERIFY_VERSION" == option :
+  elif option == "START":
+    isStartAPA = value == "TRUE"
+  elif option in ["SIMULATED", "SIMULATOR"]:
+    isSimulated = value == "TRUE"
+  elif option == "REAL_TIME":
+    isRealTime = value == "TRUE"
+  elif option == "LOG":
+    isLogEchoed = value == "TRUE"
+  elif option == "LOG_IO":
+    isIO_Logged = value == "TRUE"
+  elif option == "VERIFY_VERSION":
     version = Version( Settings.VERSION_FILE, ".", Settings.CONTROL_FILES )
     uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
 
@@ -207,38 +207,34 @@ try:
     log.add( "Main", "VERSION_UI_CHANGE", "User interface has changed." )
 
   log.add(
-    "Main",
-    "VERSION",
-    "Control software version " + str( version.getVersion() ),
-    [
-      version.getVersion(),
-      version.getHash(),
-      version.getDate()
-    ]
+      "Main",
+      "VERSION",
+      f"Control software version {str(version.getVersion())}",
+      [version.getVersion(),
+       version.getHash(),
+       version.getDate()],
   )
 
   log.add(
-    "Main",
-    "VERSION_UI",
-    "User interface version " + str( uiVersion.getVersion() ),
-    [
-      uiVersion.getVersion(),
-      uiVersion.getHash(),
-      uiVersion.getDate()
-    ]
+      "Main",
+      "VERSION_UI",
+      f"User interface version {str(uiVersion.getVersion())}",
+      [uiVersion.getVersion(),
+       uiVersion.getHash(),
+       uiVersion.getDate()],
   )
 
   # Create I/O map.
-  if isSimulated :
+  if isSimulated:
     from .Simulator.PLC_Simulator import PLC_Simulator
     from .IO.Maps.SimulatedIO import SimulatedIO
     io = SimulatedIO()
     plcSimulator = PLC_Simulator( io, systemTime )
     log.add(
-      "Main",
-      "SIMULATION",
-      "Running in simulation mode, real-time: " + str( isRealTime ) + ".",
-      [ isRealTime ]
+        "Main",
+        "SIMULATION",
+        f"Running in simulation mode, real-time: {str(isRealTime)}.",
+        [isRealTime],
     )
   else:
     from IO.Maps.ProductionIO import ProductionIO
@@ -311,7 +307,7 @@ elapsedTime = systemTime.getDelta( startTime )
 deltaString = systemTime.getElapsedString( elapsedTime )
 
 # Log run-time of this operation.
-log.add( "Main", "RUN_TIME", "Ran for " + deltaString + ".", [ elapsedTime ] )
+log.add("Main", "RUN_TIME", f"Ran for {deltaString}.", [ elapsedTime ])
 
 # Sign off.
 log.add( "Main", "END", "Control system stops." )
