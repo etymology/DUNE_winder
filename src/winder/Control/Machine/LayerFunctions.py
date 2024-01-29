@@ -4,7 +4,9 @@
 # Date: 2017-01-17
 # Author(s):
 #   Andrew Que <aque@bb7.com>
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
+
 
 class LayerFunctions :
   #-------------------------------------------------------------------

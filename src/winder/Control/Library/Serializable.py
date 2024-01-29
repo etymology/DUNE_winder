@@ -4,7 +4,9 @@
 # Date: 2016-03-01
 # Author(s):
 #   Andrew Que <aque@bb7.com>
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
+
 
 from __future__ import absolute_import
 import xml.dom.minidom
@@ -289,7 +291,7 @@ class Serializable :
 
     # Write XML data to file.
     with open( fullName, "wb" ) as outputFile :
-      outputFile.write( outputText )
+      outputFile.write( str.encode(outputText) )
 
 
   #-------------------------------------------------------------------
@@ -303,7 +305,7 @@ class Serializable :
       nameOverride: Top-level XML name.
     """
 
-    fullName = filePath + "/" + fileName
+    fullName = filePath + fileName
     xmlDocument = xml.dom.minidom.parse( fullName )
 
     name = self.__class__.__name__

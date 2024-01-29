@@ -4,7 +4,9 @@
 # Date: 2016-04-18
 # Author(s):
 #   Andrew Que <aque@bb7.com>
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
+
 
 class Head :
 

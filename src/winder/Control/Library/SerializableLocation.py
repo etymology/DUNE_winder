@@ -4,7 +4,9 @@
 # Date: 2016-04-19
 # Author(s):
 #   Andrew Que <aque@bb7.com>
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
+
 
 from __future__ import absolute_import
 from Library.Serializable import Serializable

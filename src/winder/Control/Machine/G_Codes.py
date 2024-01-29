@@ -4,7 +4,9 @@
 # Date: 2016-03-31
 # Author(s):
 #   Andrew Que <aque@bb7.com>
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
+
 
 class G_Codes :
   LATCH            = 100 # No parameters.
