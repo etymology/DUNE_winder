@@ -18,7 +18,7 @@ class Settings :
   IO_UPDATE_TIME              = 0.1   # In seconds.  Currently 10 times/sec.
 
   # Path to configuration file.
-  CONFIG_FILE = "../configuration.xml"
+  CONFIG_FILE = "/home/ben/DUNE/dune_winder/src/winder/configuration.xml"
 
   # Path and name of version information file.
   VERSION_FILE = "version.xml"
@@ -30,7 +30,7 @@ class Settings :
 
   MACHINE_CALIBRATION_FILE = "machineCalibration.xml"
 
-  WEB_DIRECTORY = "../WebUI"
+  WEB_DIRECTORY = "/home/ben/DUNE/dune_winder/src/winder/WebUI"
 
   # File making up the version for the control software.
   CONTROL_FILES = ".*\.py$"
@@ -62,7 +62,7 @@ class Settings :
     configuration.default( "machineCalibrationPath", "../Data/" )
     configuration.default( "machineCalibrationFile", Settings.MACHINE_CALIBRATION_FILE )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
-    configuration.default( "recipeDirectory", "../Recipes" )
+    configuration.default( "recipeDirectory", "../Data/Recipes" )
     configuration.default( "recipeArchiveDirectory", "../Data/Recipes" )
 
     # Velocity limits.

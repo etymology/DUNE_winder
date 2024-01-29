@@ -1,6 +1,0 @@
-Time	Module	Type	Message
-2024-01-29 04:00:47.637722	Main	START	Control system starts.
-2024-01-29 04:00:47.643383	Main	VERSION_CHANGE	Control software has changed.
-2024-01-29 04:00:47.643658	Main	FAILURE	Caught an exception.	[Errno 2] No such file or directory: '/home/ben/DUNE/dune_winder/WebUI/version.xml'	<type 'exceptions.IOError'>	[Errno 2] No such file or directory: '/home/ben/DUNE/dune_winder/WebUI/version.xml'	['  File "winder/Control/main.py", line 203, in <module>\n    if uiVersion.update() :\n', '  File "/home/ben/DUNE/dune_winder/src/winder/Control/Library/Version.py", line 115, in update\n    self.save()\n', '  File "/home/ben/DUNE/dune_winder/src/winder/Control/Library/Version.py", line 219, in save\n    with open( self._fileName, "wb" ) as outputFile :\n']
-2024-01-29 04:00:47.643690	Main	RUN_TIME	Ran for 0.008s.	0.007767
-2024-01-29 04:00:47.643699	Main	END	Control system stops.

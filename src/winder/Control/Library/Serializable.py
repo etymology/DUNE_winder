@@ -178,7 +178,7 @@ class Serializable :
       else:
         # Figure out the type by the name and make a cast from the string
         # representation.
-        module = importlib.import_module( '__builtin__' )
+        module = importlib.import_module( 'builtins' )
         typeCast = getattr( module, node.nodeName )
         result = typeCast( node.firstChild.nodeValue )
 
@@ -203,8 +203,7 @@ class Serializable :
       if xml.dom.minidom.Node.ELEMENT_NODE == node.nodeType:
 
         # Name of variable.
-        name = node.getAttribute( "name" ).encode()
-
+        name = node.getAttribute( "name" )#.decode()
         # Is this a legitimate class variable?
         if name in self.__dict__:
           if isinstance( self.__dict__[ name ], Serializable ) :

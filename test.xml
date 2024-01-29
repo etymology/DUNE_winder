@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<SerializableData>
+	<SomeClass>
+		<float name="a">11.0</float>
+		<int name="b">12</int>
+		<int name="c">13</int>
+		<str name="d">14</str>
+		<SomeClass2 name="someClass2">
+			<int name="aa">11</int>
+			<int name="bb">22</int>
+			<int name="cc">33</int>
+			<int name="dd">44</int>
+		</SomeClass2>
+		<list name="e">
+			<int name="0">100</int>
+			<float name="1">200.0</float>
+			<int name="2">300</int>
+			<str name="3">400</str>
+			<float name="4">3140000000.0</float>
+		</list>
+		<dict name="f">
+			<int name="apple">1</int>
+			<int name="orange">2</int>
+		</dict>
+	</SomeClass>
+</SerializableData>

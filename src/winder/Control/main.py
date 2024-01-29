@@ -20,7 +20,7 @@ from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
 from Library.Version import Version
-from Library.RemoteSession import RemoteSession
+# from Library.RemoteSession import RemoteSession
 
 from Machine.Settings import Settings
 
@@ -226,8 +226,8 @@ try:
 
   # Create I/O map.
   if isSimulated:
-    from .Simulator.PLC_Simulator import PLC_Simulator
-    from .IO.Maps.SimulatedIO import SimulatedIO
+    from Simulator.PLC_Simulator import PLC_Simulator
+    from IO.Maps.SimulatedIO import SimulatedIO
     io = SimulatedIO()
     plcSimulator = PLC_Simulator( io, systemTime )
     log.add(
@@ -311,6 +311,3 @@ log.add("Main", "RUN_TIME", f"Ran for {deltaString}.", [ elapsedTime ])
 
 # Sign off.
 log.add( "Main", "END", "Control system stops." )
-
-# "If you think you understand quantum mechanics, you don't understand quantum
-# mechanics." -- Richard Feynman
