@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from IO.Primitives.DigitalInput import DigitalInput
 
 class SoftwareInput( DigitalInput ) :

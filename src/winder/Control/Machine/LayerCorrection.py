@@ -6,11 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import math
 
 from Library.Geometry.Location import Location
 
-from GeometrySelection import GeometrySelection
+from .GeometrySelection import GeometrySelection
+from six.moves import range
 
 class LayerCorrection :
 
@@ -106,7 +108,7 @@ class LayerCorrection :
       sumXY = 0
 
       # For all pins in this row/column...
-      for _ in xrange( 0, count ) :
+      for _ in range( 0, count ) :
 
         # Get the pin location.
         pinName = "F" + str( pinNumber )
@@ -177,7 +179,7 @@ class LayerCorrection :
 # Unit test.
 if __name__ == "__main__" :
   from Simulator.LayerError import LayerError
-  from DefaultCalibration import DefaultLayerCalibration
+  from .DefaultCalibration import DefaultLayerCalibration
   import random
   from Library.MathExtra import MathExtra
   import sys
@@ -201,7 +203,7 @@ if __name__ == "__main__" :
   # Check perfect (i.e. no noise) rotational error.
   for layer in [ 'X', 'V', 'U', 'G' ] :
     layerDefault = DefaultLayerCalibration( None, None, layer )
-    for _ in xrange( 0, 10 ) :
+    for _ in range( 0, 10 ) :
       layer = layerDefault.copy()
 
       rotation = random.uniform( -90, 90 )

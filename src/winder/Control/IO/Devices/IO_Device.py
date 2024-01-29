@@ -11,13 +11,12 @@
 #   would have be an IO_Device child.
 ###############################################################################
 
+from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
+import six
 
-class IO_Device :
+class IO_Device(six.with_metaclass(ABCMeta)) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all IO devices.
   list = []
 
   #---------------------------------------------------------------------

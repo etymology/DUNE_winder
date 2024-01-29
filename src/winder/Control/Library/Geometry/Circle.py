@@ -6,6 +6,8 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import math
 from Library.Geometry.Location import Location
 
@@ -50,7 +52,7 @@ class Circle :
 
     sign = lambda intermediate: (intermediate>0) - (intermediate<0)
     orientation = ORIENTATION_TABLE[ orientationString ]
-    print "$$$$$  %s %s x=%f y=%f target x= %f target y = %f" %(orientationString, repr(orientation), self._center.x, self._center.y, target.x, target.y)
+    print("$$$$$  %s %s x=%f y=%f target x= %f target y = %f" %(orientationString, repr(orientation), self._center.x, self._center.y, target.x, target.y))
     if    orientation[ 0 ] == -sign( deltaX ) \
       and orientation[ 1 ] == -sign( deltaY ) :
 
@@ -61,10 +63,10 @@ class Circle :
 
         x = orientation[ 3 ] * intermediate * self._radius + self._center.x
         y = orientation[ 4 ] * self._radius * math.sqrt( 1 - intermediate**2 ) + self._center.y
-        print "$$$$$ circle.py ln 64 x: %f y: %f center: %s" % (x, y, repr(self._center))
+        print("$$$$$ circle.py ln 64 x: %f y: %f center: %s" % (x, y, repr(self._center)))
         result = Location( x, y, self._center.z )
 
-    print "$$$$$ %s" % repr(result)
+    print("$$$$$ %s" % repr(result))
     return result
 
   #-------------------------------------------------------------------
@@ -80,7 +82,7 @@ class Circle :
       Circles are always 2d and in the X/Y plane.  The Z component is preserved
       but otherwise unused.
     """
-    print("$$$$$ Circle._init_ x: %f, y: %f" %(center.x, center.y))
+    print(("$$$$$ Circle._init_ x: %f, y: %f" %(center.x, center.y)))
     self._center = center
     self._radius = radius
 

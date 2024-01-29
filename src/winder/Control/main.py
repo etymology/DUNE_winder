@@ -6,8 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import signal
-import os
 import sys
 import traceback
 import time
@@ -33,8 +34,8 @@ from Threads.CameraThread import CameraThread
 from Simulator.SimulationTime import SimulationTime
 
 # $$$TEMPORARY - Temporary.
-import xml.dom.minidom
-from Debug.APA_Generator import APA_Generator
+# import xml.dom.minidom
+# from .Debug.APA_Generator import APA_Generator
 from Machine.DefaultCalibration import DefaultMachineCalibration
 
 #==============================================================================
@@ -152,16 +153,16 @@ for argument in sys.argv:
 
     returnResult = 0
     if not version.verify() :
-      print "Control version incorrect."
+      print("Control version incorrect.")
       returnResult -= 1
     else :
-      print "Control version correct."
+      print("Control version correct.")
 
     if not uiVersion.verify() :
-      print "UI version incorrect."
+      print("UI version incorrect.")
       returnResult -= 2
     else :
-      print "UI version correct."
+      print("UI version correct.")
 
     sys.exit( returnResult )
 
@@ -227,8 +228,8 @@ try:
 
   # Create I/O map.
   if isSimulated :
-    from Simulator.PLC_Simulator import PLC_Simulator
-    from IO.Maps.SimulatedIO import SimulatedIO
+    from .Simulator.PLC_Simulator import PLC_Simulator
+    from .IO.Maps.SimulatedIO import SimulatedIO
     io = SimulatedIO()
     plcSimulator = PLC_Simulator( io, systemTime )
     log.add(

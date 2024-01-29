@@ -10,6 +10,7 @@
 #
 ###############################################################################
 
+from __future__ import absolute_import
 from IO.Primitives.Motor import Motor
 from IO.Devices.PLC import PLC
 

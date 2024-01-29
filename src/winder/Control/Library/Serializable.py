@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import xml.dom.minidom
 import importlib
 import types
@@ -14,7 +15,7 @@ class Serializable :
 
   # Only the following built-in types are supported.
   # (Basically, anything that can easily be turned to/from a string.)
-  SUPPORTED_PRIMITIVES = (int, long, float, complex, str, bool, list, dict, types.NoneType )
+  SUPPORTED_PRIMITIVES = (int, int, float, complex, str, bool, list, dict, type(None) )
 
   #---------------------------------------------------------------------
   def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ) :
@@ -54,7 +55,7 @@ class Serializable :
     # Make a list of the variables that will be saved.
     # There can either be a list of variables to include, or a list to exclude.
     # If neither, all are included.
-    variables = self.__dict__.keys()
+    variables = list(self.__dict__.keys())
     if "_serializeIncludeOnly" in self.__dict__ :
       variables = self._serializeIncludeOnly
     elif "_serializeIgnore" in self.__dict__ :
@@ -359,9 +360,9 @@ if __name__ == "__main__":
   someClass = SomeClass()
   someClass.a = 11.0
   someClass.b = 12
-  someClass.c = 13L
+  someClass.c = 13
   someClass.d = "14"
-  someClass.e = [ 100, 200.0, 300L, "400", 3.14e9 ]
+  someClass.e = [ 100, 200.0, 300, "400", 3.14e9 ]
   someClass.f = { 'apple': 1, "orange": 2 }
   someClass.someClass2.aa = 11
   someClass.someClass2.bb = 22

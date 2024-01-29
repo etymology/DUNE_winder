@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from Library.SystemSemaphore import SystemSemaphore
 from Threads.PrimaryThread import PrimaryThread
 

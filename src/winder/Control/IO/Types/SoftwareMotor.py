@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from IO.Primitives.Motor import Motor
 from Simulator.Motion import Motion
 

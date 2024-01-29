@@ -35,7 +35,7 @@ class StateMachine :
     """
     result = -1
     if self.state :
-      result = (key for key,value in self.states.items() if value==self.state).next()
+      result = next((key for key,value in self.states.items() if value==self.state))
 
     return result
 

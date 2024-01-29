@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from Library.Geometry.Location import Location
 from Library.Geometry.Line import Line
 

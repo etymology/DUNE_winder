@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import random
 
 from Library.Geometry.Location import Location
@@ -13,6 +14,7 @@ from Machine.G_Codes import G_Codes
 
 from .Path3d import Path3d
 from .G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
+import six
 
 class G_CodePath( Path3d ) :
   """
@@ -185,7 +187,7 @@ class G_CodePath( Path3d ) :
 
     if enableLables :
       output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\n" )
-      for index, gCodeList in self._gCode.iteritems() :
+      for index, gCodeList in six.iteritems(self._gCode) :
 
         location = self.path[ index ]
 

@@ -5,9 +5,11 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+from __future__ import absolute_import
 import random
 from Control.Process import Process
 from Control.APA_Base import APA_Base
+from six.moves import range
 
 class APA_Generator :
 

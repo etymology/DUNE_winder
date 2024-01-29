@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import xml.dom.minidom
 import os.path
 
@@ -15,7 +16,7 @@ from Library.Recipe import Recipe
 from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
 
-from APA_Base import APA_Base
+from .APA_Base import APA_Base
 
 class AnodePlaneArray( APA_Base ) :
 

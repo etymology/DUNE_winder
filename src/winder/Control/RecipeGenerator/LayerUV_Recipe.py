@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import math
 
 from Library.Geometry.Location import Location
@@ -24,6 +25,7 @@ from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
 from .Path3d import Path3d
 from .G_CodePath import G_CodePath
+from six.moves import range
 
 class LayerUV_Recipe( RecipeGenerator ) :
 

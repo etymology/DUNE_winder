@@ -6,12 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import xml.dom.minidom
 import os.path
 import re
 
-from Hash import Hash
-from Serializable import Serializable
+from .Hash import Hash
+from .Serializable import Serializable
 
 class HashedSerializable( Serializable ) :
 
@@ -247,9 +248,9 @@ if __name__ == "__main__":
   testClass = TestClass()
   testClass.a = 11.0
   testClass.b = 12
-  testClass.c = 13L
+  testClass.c = 13
   testClass.d = "14"
-  testClass.e = [ 100, 200.0, 300L, "400", 3.14e9 ]
+  testClass.e = [ 100, 200.0, 300, "400", 3.14e9 ]
   testClass.f = { 'apple': 1, "orange": 2 }
   testClass.testClass2.aa = 11
   testClass.testClass2.bb = 22

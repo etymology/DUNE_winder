@@ -6,7 +6,8 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from LayerGX_Recipe import LayerGX_Recipe
+from __future__ import absolute_import
+from .LayerGX_Recipe import LayerGX_Recipe
 
 class LayerX_Recipe( LayerGX_Recipe ) :
 

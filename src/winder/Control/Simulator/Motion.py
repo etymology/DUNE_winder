@@ -6,14 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
+import six
 
-class Motion :
+class Motion(six.with_metaclass(ABCMeta)) :
 
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  #---------------------------------------------------------------------
   @abstractmethod
   def isMoving( self, time ):
     """

@@ -5,9 +5,10 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from BaseHTTPServer import HTTPServer
-from SocketServer import ThreadingMixIn
-import httplib
+from __future__ import absolute_import
+from six.moves.BaseHTTPServer import HTTPServer
+from six.moves.socketserver import ThreadingMixIn
+import six.moves.http_client
 import os
 
 from Threads.PrimaryThread import PrimaryThread
@@ -55,7 +56,7 @@ class WebServerThread( PrimaryThread ):
 
     try :
       # HEAD request just so thread unblocks.  This will throw an exception.
-      connection = httplib.HTTPConnection( "127.0.0.1" )
+      connection = six.moves.http_client.HTTPConnection( "127.0.0.1" )
       connection.request( "HEAD","/" )
     except :
       pass

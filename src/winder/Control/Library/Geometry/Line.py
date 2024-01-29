@@ -7,10 +7,11 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import math
 
-from Location import Location
-from Segment import Segment
+from .Location import Location
+from .Segment import Segment
 
 class Line :
   """

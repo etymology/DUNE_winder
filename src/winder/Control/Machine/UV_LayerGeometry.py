@@ -6,8 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import math
-from LayerGeometry import LayerGeometry
+from .LayerGeometry import LayerGeometry
 
 class UV_LayerGeometry( LayerGeometry ) :
 

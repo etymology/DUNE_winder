@@ -5,6 +5,7 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+from __future__ import absolute_import
 from IO.Primitives.DigitalOutput import DigitalOutput
 
 class SoftwareOutput( DigitalOutput ) :

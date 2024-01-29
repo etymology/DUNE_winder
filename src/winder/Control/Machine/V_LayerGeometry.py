@@ -6,8 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import math
-from UV_LayerGeometry import UV_LayerGeometry
+from .UV_LayerGeometry import UV_LayerGeometry
 
 from Library.Geometry.Location import Location
 

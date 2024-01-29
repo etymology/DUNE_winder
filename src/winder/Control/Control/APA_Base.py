@@ -8,6 +8,8 @@
 #   Contains just the data portion of the APA, but no process control.
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os.path
 
 from Library.Serializable import Serializable
@@ -228,7 +230,7 @@ class APA_Base( Serializable ) :
       z: Z location.
       headLocation: Position of the winder head (front/back).
     """
-    print("$$$$$ APA_Base.setLocation SETTING X: %f Y: %f" %(self._x, self._y))
+    print(("$$$$$ APA_Base.setLocation SETTING X: %f Y: %f" %(self._x, self._y)))
     self._x = x
     self._y = y
     self._headLocation = headLocation

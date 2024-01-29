@@ -20,7 +20,7 @@ class Settings :
 
   # Path and name of version information file.
   VERSION_FILE = "version.xml"
-  UI_VERSION_FILE = "../WebUI/version.xml"
+  UI_VERSION_FILE = "../dune_winder/src/winder/WebUI/version.xml"
 
   G_CODE_LOG_FILE = "_gCode.gc"
 

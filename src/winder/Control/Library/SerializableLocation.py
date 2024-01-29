@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from Library.Serializable import Serializable
 from Library.Geometry.Location import Location
 

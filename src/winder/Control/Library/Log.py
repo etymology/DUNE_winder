@@ -5,9 +5,12 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+from __future__ import absolute_import
+from __future__ import print_function
 import threading
 import os.path
 import collections
+import six
 
 class Log:
 
@@ -42,7 +45,7 @@ class Log:
 
     self._localEcho = localEcho
     if self._localEcho :
-      print "Time                       Message"
+      print("Time                       Message")
 
   #---------------------------------------------------------------------
   def attach( self, outputFileName ):
@@ -150,7 +153,7 @@ class Log:
       An array of each line of the log file.
     """
 
-    fileName = self._outputFileList.keys()[ 0 ]
+    fileName = list(self._outputFileList.keys())[ 0 ]
 
     if -1 == numberOfLines :
       with open( fileName ) as inputFile :
@@ -200,7 +203,7 @@ class Log:
     # Write the message to each open log file.
     self._lock.acquire()
     self._recent.append( line )
-    for _, outputFile in self._outputFileList.iteritems():
+    for _, outputFile in six.iteritems(self._outputFileList):
       outputFile.write( line + "\n" )
       outputFile.flush()
     self._lock.release()
@@ -221,4 +224,4 @@ class Log:
 
       line += parameterLine
 
-      print line
+      print(line)

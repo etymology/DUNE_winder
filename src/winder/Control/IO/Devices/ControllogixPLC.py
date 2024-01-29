@@ -12,8 +12,9 @@
 #   class provides the I/O device.
 ###############################################################################
 
-from PLC import PLC
-from pycomm.ab_comm.clx import Driver as ClxDriver
+from __future__ import absolute_import
+from .PLC import PLC
+from pycomm3 import LogixDriver as ClxDriver
 import threading
 
 class ControllogixPLC( PLC ) :

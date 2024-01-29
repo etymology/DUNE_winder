@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import print_function
 class MathExtra :
   #---------------------------------------------------------------------
   @staticmethod
@@ -42,5 +43,5 @@ class MathExtra :
     Notes:
       This function comes from Python 3.5 but is not in 2.7.  Copied verbatim.
     """
-    print '$$$$$ IsClose a=%e b=%e rtol*max(ab)=%e' % (a, b, rel_tol * max(abs(a), abs(b)))
+    print('$$$$$ IsClose a=%e b=%e rtol*max(ab)=%e' % (a, b, rel_tol * max(abs(a), abs(b))))
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)

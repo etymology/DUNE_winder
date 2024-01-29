@@ -7,7 +7,9 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from G_CodeFunction import G_CodeFunction
+from __future__ import absolute_import
+from __future__ import print_function
+from .G_CodeFunction import G_CodeFunction
 from Machine.G_Codes import G_Codes
 
 class SeekTransferG_Code( G_CodeFunction ) :

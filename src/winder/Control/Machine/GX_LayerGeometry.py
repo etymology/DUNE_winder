@@ -6,7 +6,8 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from LayerGeometry import LayerGeometry
+from __future__ import absolute_import
+from .LayerGeometry import LayerGeometry
 
 class GX_LayerGeometry( LayerGeometry ) :
 

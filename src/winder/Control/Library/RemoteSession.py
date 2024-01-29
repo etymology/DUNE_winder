@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import uuid      # <- To generate session IDs.
 import datetime  # <- Keeping track of session age.
 import os        # <- For streams of random data used for salt generation.

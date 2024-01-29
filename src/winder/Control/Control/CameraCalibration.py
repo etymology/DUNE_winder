@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import xml.dom.minidom
 
 from Library.Geometry.Location import Location
@@ -215,7 +216,7 @@ class CameraCalibration :
     items = self._calibrationData
 
     # Find row for pin in capture FIFO.
-    row = ( item for item in items if item[ "Pin" ] == pin ).next()
+    row = next(( item for item in items if item[ "Pin" ] == pin ))
 
     # Update data.
     row[ "Status" ] = 1

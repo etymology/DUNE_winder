@@ -5,7 +5,8 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from StateMachine import StateMachine
+from __future__ import absolute_import
+from .StateMachine import StateMachine
 
 class LoggedStateMachine( StateMachine ) :
   #---------------------------------------------------------------------

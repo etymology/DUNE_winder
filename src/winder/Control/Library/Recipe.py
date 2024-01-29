@@ -22,11 +22,12 @@
 #   the file is also loaded and can be pass to something that can work with
 #   the G-Code.
 ###############################################################################
+from __future__ import absolute_import
 import re
 import os.path
 import shutil
 
-from Hash import Hash
+from .Hash import Hash
 
 class Recipe :
   #---------------------------------------------------------------------

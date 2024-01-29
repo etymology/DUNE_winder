@@ -6,14 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from IO_Point import IO_Point
+from __future__ import absolute_import
+from .IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
+import six
 
-class AnalogOutput( IO_Point ) :
+class AnalogOutput( six.with_metaclass(ABCMeta, IO_Point) ) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all analog outputs.
   list = []
 
   # Current output level.

@@ -6,7 +6,8 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from APA_Geometry import APA_Geometry
+from __future__ import absolute_import
+from .APA_Geometry import APA_Geometry
 
 class LayerGeometry( APA_Geometry ) :
   #-------------------------------------------------------------------

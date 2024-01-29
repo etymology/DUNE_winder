@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from IO_Point import IO_Point
+from .IO_Point import IO_Point
 
 class AnalogInput( IO_Point ) :
 

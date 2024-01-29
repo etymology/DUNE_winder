@@ -12,6 +12,8 @@
 #   Spreadsheet file "2016-08-25 -- Tangent circle worksheet.ods".
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import math
 from Library.MathExtra import MathExtra
 from Library.Geometry.Location import Location
@@ -90,7 +92,7 @@ class HeadCompensation :
     if self._orientation :
       pinRadius = self._machineCalibration.pinDiameter / 2
       circle = Circle( self._anchorPoint, pinRadius )
-      print "$$$$$", self._orientation
+      print("$$$$$", self._orientation)
       result = circle.tangentPoint( self._orientation, endPoint )
       self._anchorOffset = result.sub( self._anchorPoint )
     else :
@@ -235,7 +237,7 @@ class HeadCompensation :
 
     # Correct the Y position with two offsets.
     correctedY = machineLocation.y + headCorrection + rollerCorrection
-    print "$$$$$ correctY: %f" %correctedY
+    print("$$$$$ correctY: %f" %correctedY)
     return correctedY
 
   #---------------------------------------------------------------------
@@ -272,7 +274,7 @@ class HeadCompensation :
     rollerX *= deltaX / abs( deltaY )
 
     x += rollerX
-    print "$$$$$ correctX: %f" %x
+    print("$$$$$ correctX: %f" %x)
     return x
 
   #---------------------------------------------------------------------
@@ -305,15 +307,15 @@ class HeadCompensation :
 
     deltaX = machineLocation.x - anchorPoint.x
     deltaY = machineLocation.y - anchorPoint.y
-    print "$$$$$ deltaY: ", deltaY, machineLocation.y
+    print("$$$$$ deltaY: ", deltaY, machineLocation.y)
     deltaZ = machineLocation.z - anchorPoint.z
-    print "$$$$$ deltaZ: ", deltaZ, machineLocation.z
+    print("$$$$$ deltaZ: ", deltaZ, machineLocation.z)
 
     travelZ = abs( zDesired - anchorPoint.z )
-    print "$$$$$ travelZ: ", travelZ, zDesired, anchorPoint.z
+    print("$$$$$ travelZ: ", travelZ, zDesired, anchorPoint.z)
     lengthXZ = math.sqrt( deltaX**2 + deltaZ**2 )
     lengthYZ = math.sqrt( deltaY**2 + deltaZ**2 )
-    print "$$$$$ lengthYZ: ", lengthYZ
+    print("$$$$$ lengthYZ: ", lengthYZ)
 
     x = anchorPoint.x
     y = anchorPoint.y
@@ -325,7 +327,7 @@ class HeadCompensation :
     if 0 != lengthYZ :
       yCorrection = travelZ * deltaY / lengthYZ
       y += yCorrection
-      print "$$$$$ yCorrection: ", yCorrection, anchorPoint.y
+      print("$$$$$ yCorrection: ", yCorrection, anchorPoint.y)
 
     return [ x, y ]
 
@@ -367,7 +369,7 @@ class HeadCompensation :
 
 
 if __name__ == "__main__":
-  from MachineCalibration import MachineCalibration
+  from .MachineCalibration import MachineCalibration
 
   # Make up a calibration setup for all tests.
   machineCalibration = MachineCalibration()

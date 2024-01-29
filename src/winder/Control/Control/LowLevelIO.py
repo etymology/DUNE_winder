@@ -8,6 +8,7 @@
 #   Designed to provide access to all the low-level primitive I/O lists.
 ###############################################################################
 
+from __future__ import absolute_import
 from IO.Primitives.IO_Point import IO_Point
 from IO.Primitives.DigitalIO import DigitalIO
 from IO.Primitives.DigitalInput import DigitalInput

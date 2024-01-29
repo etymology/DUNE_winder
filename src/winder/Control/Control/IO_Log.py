@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from IO.Primitives.IO_Point import IO_Point
 from IO.Devices.PLC import PLC
 import os.path

@@ -11,6 +11,7 @@
 # accumulates capture data.  These two systems must be implemented in the PLC
 # for maximum speed.
 ###############################################################################
+from __future__ import absolute_import
 import random
 from IO.Devices.PLC import PLC
 

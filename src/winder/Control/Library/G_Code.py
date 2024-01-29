@@ -9,7 +9,10 @@
 #
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import re
+from six.moves import map
 
 #=============================================================================
 #
@@ -360,7 +363,7 @@ class G_Code :
     """
 
     # Strip off line feeds and other white space from end of line.
-    self.lines = map( str.strip, lines )
+    self.lines = list(map( str.strip, lines ))
 
     self.index = 0
     self.callbacks = callbacks
@@ -432,7 +435,7 @@ class G_Code :
 if __name__ == "__main__":
 
   def printf( text ):
-    print text
+    print(text)
 
   callbacks = G_CodeCallbacks()
   callbacks.registerCallback( 'G', lambda parameter: printf( "Command: " + str( parameter ) ) )

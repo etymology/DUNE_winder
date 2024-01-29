@@ -6,21 +6,19 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from IO_Device import IO_Device
-from IO_Device import IO_Device
+from __future__ import absolute_import
+from .IO_Device import IO_Device
 from abc import ABCMeta, abstractmethod
+import six
+from six.moves import range
 
-class PLC( IO_Device ) :
+class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
 
   # There is a limit to the length of packets to/from the PLC.  When reading
   # tags the request must be limited.  I have found no documentation as to how
   # to calculate this limit, but found I could read 18 with the tag name sizes
   # currently in the queue.  So 14 seems a safe number.
   MAX_TAG_READS = 14
-
-
-  # Make class abstract.
-  __metaclass__ = ABCMeta
 
   #============================================================================
   class Tag :
@@ -121,7 +119,7 @@ class PLC( IO_Device ) :
       tagSubset = \
         [
           tagList[ tag : tag + PLC.MAX_TAG_READS ]
-            for tag in xrange( 0, len( tagList ), PLC.MAX_TAG_READS )
+            for tag in range( 0, len( tagList ), PLC.MAX_TAG_READS )
         ]
 
       # For each tag subset...

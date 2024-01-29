@@ -6,6 +6,8 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import random
 
 from Library.G_Code import G_Code
@@ -19,6 +21,7 @@ from Machine.HeadCompensation import HeadCompensation
 
 from .G_CodePath import G_CodePath
 from .G_CodeFunctions.G_CodeFunction import G_CodeFunction
+from six.moves import range
 
 class G_CodeToPath( G_CodeHandlerBase ) :
 
@@ -90,9 +93,9 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       try :
         self._gCode.executeNextLine( line )
       except Exception as exception:
-        print "Unable to execute line", line
-        print "  " + self._gCode.lines[ line ]
-        print "  " + str( exception )
+        print("Unable to execute line", line)
+        print("  " + self._gCode.lines[ line ])
+        print("  " + str( exception ))
         raise Exception( "Problems executing G-Code: " + str( exception ) )
 
       for function in self._functions :

@@ -6,8 +6,12 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Motion import Motion
+from __future__ import absolute_import
+from __future__ import print_function
+from .Motion import Motion
 from math import sqrt, pow
+from six.moves import map
+from six.moves import range
 
 class TrapezoidalMotion( Motion ) :
   #------------------------------------
@@ -613,7 +617,7 @@ if __name__ == "__main__":
   import sys
 
   # Get command line parameters.
-  maxAcceleration, minAcceleration, velocity, startPosition, endPosition = map( float, sys.argv[ 1:6 ] )
+  maxAcceleration, minAcceleration, velocity, startPosition, endPosition = list(map( float, sys.argv[ 1:6 ] ))
 
   # print maxAcceleration, minAcceleration, velocity, startPosition, endPosition
 
@@ -622,21 +626,20 @@ if __name__ == "__main__":
 
   # Print the transition points.
   for index in range( 0, motion.Point.POINTS ) :
-    print                                    \
-      "T%u %9.4f: %9.4f %9.4f %9.2f" % \
+    print("T%u %9.4f: %9.4f %9.4f %9.2f" % \
       (                                      \
         index,                               \
         motion._point[ index ].t,            \
         motion._point[ index ].a,            \
         motion._point[ index ].v,            \
         motion._point[ index ].x             \
-      )
+      ))
 
-  print ""
+  print("")
 
   # Print an interpolation.
   COUNT = 50
   OVER  = 5
   for count in range( -OVER, COUNT + OVER + 1 ) :
     time = count * motion._point[ motion.Point.T3 ].t / COUNT
-    print "%f,%f,%f,%f" % ( time, motion.interpolatePosition( time ), motion.interpolateVelocity( time ), motion.interpolateAcceleration( time ) )
+    print("%f,%f,%f,%f" % ( time, motion.interpolatePosition( time ), motion.interpolateVelocity( time ), motion.interpolateAcceleration( time ) ))

@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from Library.Geometry.Location import Location
 
 from .G_CodeFunctions.WireLengthG_Code import WireLengthG_Code
@@ -18,6 +19,7 @@ from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
 from .Path3d import Path3d
 from .G_CodePath import G_CodePath
+from six.moves import range
 
 class LayerGX_Recipe( RecipeGenerator ) :
 
@@ -145,7 +147,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for self.netIndex in xrange( 1, totalCount ) :
+    for self.netIndex in range( 1, totalCount ) :
 
       # Location of the the next pinOffset.
       location = self.location( self.netIndex )

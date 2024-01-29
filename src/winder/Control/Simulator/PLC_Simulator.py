@@ -6,8 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 import math
-import Queue
+import six.moves.queue
 import random
 from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
@@ -494,7 +495,7 @@ class PLC_Simulator :
     self._cameraDeltaY = 0.0
     self._nextPinX = None
     self._nextPinY = None
-    self._cameraFIFO = Queue.Queue()
+    self._cameraFIFO = six.moves.queue.Queue()
 
     self._latchDelay = Delay( self._simulationTime )
 

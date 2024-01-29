@@ -1,9 +1,0 @@
-*.pyc
-/src/Control/log.txt
-*.bak
-/src/Control/log.csv
-/src/winder/Data
-/src/winder/configuration.xml
-/src/winder/Recipes
-/src/winder/WebUI/GetFile.bat
-/src/winder/Control/version.xml

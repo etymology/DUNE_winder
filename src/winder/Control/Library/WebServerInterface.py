@@ -5,15 +5,17 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-import Cookie
+from __future__ import absolute_import
+from __future__ import print_function
+import six.moves.http_cookies
 import xml.sax.saxutils
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 import uuid
 import json
 import re
 
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+from six.moves.BaseHTTPServer import HTTPServer
+from six.moves.SimpleHTTPServer import SimpleHTTPRequestHandler
 from Library.RemoteSession import RemoteSession
 
 class WebServerInterface( SimpleHTTPRequestHandler ):
@@ -144,7 +146,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
         id, query = command.split( "=" )
 
         # Unquote the command.
-        query = urllib.unquote_plus( query )
+        query = six.moves.urllib.parse.unquote_plus( query )
 
         # See if this is a basic query (i.e. changes nothing).
         isBasicQuery = re.search( WebServerInterface.BASIC_QUERIES, query )
@@ -179,6 +181,6 @@ if __name__ == "__main__":
   server_address = ( '', 80 )
   httpd = HTTPServer( server_address, WebServerInterface )
 
-  print 'Starting httpd...'
+  print('Starting httpd...')
   while True :
     httpd.handle_request()

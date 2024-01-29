@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from Library.Hash import Hash
 
 class ArrayToCSV :
@@ -30,7 +31,7 @@ class ArrayToCSV :
 
     with open( fullName, "w" ) as outputFile :
 
-      keys = data[ 0 ].keys()
+      keys = list(data[ 0 ].keys())
       for key in keys :
         outputFile.write( str( key ) + separator )
 

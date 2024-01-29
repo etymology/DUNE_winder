@@ -7,13 +7,12 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
+import six
 
-class IO_Point:
+class IO_Point(six.with_metaclass(ABCMeta)):
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all IO_Point objects in system.
   list = []
   map = {}
 

@@ -6,14 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from IO_Point import IO_Point
+from __future__ import absolute_import
+from .IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
+import six
 
-class Camera( IO_Point ) :
+class Camera( six.with_metaclass(ABCMeta, IO_Point) ) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all motors.
   list = []
   map = {}
 

@@ -6,11 +6,13 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import xml.dom.minidom
 import re
 import os
 import datetime
-from Hash import Hash
+from .Hash import Hash
 
 class Version :
   #-------------------------------------------------------------------
@@ -170,7 +172,7 @@ class Version :
             # This fixes the fact the version control software can change
             # line ending types upon checkout which would otherwise cause a
             # different hash.
-            buffer = buffer.replace( "\r", "" )
+            # buffer = buffer.replace( "\r", "" )
 
             hashValue += buffer
 
@@ -217,14 +219,14 @@ class Version :
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
     with open( self._fileName, "wb" ) as outputFile :
-      outputFile.write( outputText )
+      outputFile.write( str.encode(outputText) )
 
 #------------------------------------------------------------------------------
 # Unit test.
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
   version = Version( 'testVersion.xml', ".", ".*\.py" )
-  print version.update()
-  print version.getVersion()
-  print version.getDate()
-  print version.verify()
+  print(version.update())
+  print(version.getVersion())
+  print(version.getDate())
+  print(version.verify())

@@ -10,6 +10,7 @@
 #   stop when PrimaryThread.isRunning to False.  When this occurs, each thread must
 #   shutdown.
 ###############################################################################
+from __future__ import absolute_import
 import threading
 import sys
 import traceback

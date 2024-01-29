@@ -5,6 +5,7 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+from __future__ import absolute_import
 import os.path
 import shutil
 
@@ -115,7 +116,7 @@ class LayerCalibration( HashedSerializable ) :
     Returns:
       List of pin names.
     """
-    return self._locations.keys()
+    return list(self._locations.keys())
 
   #---------------------------------------------------------------------
   def getLayerNames( self ) :

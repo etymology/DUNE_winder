@@ -14,14 +14,13 @@
 #   be a time.time() object.
 ###############################################################################
 
+from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
+import six
 
-class TimeSource :
+class TimeSource(six.with_metaclass(ABCMeta)) :
 
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  #-------------------------------------------------------------------
   @abstractmethod
   def sleep( self, sleepTime ) :
     """

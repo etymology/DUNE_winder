@@ -6,7 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
+from __future__ import absolute_import
+from __future__ import print_function
+from .G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
 
 class HeadPosition :
 
@@ -58,7 +60,7 @@ class HeadPosition :
       elif HeadPosition.FRONT == self._currentPostion :
         location = HeadPosition.PARTIAL_FRONT
       else :
-        print location, self._currentPostion
+        print(location, self._currentPostion)
         raise Exception()
 
     # Switch to other side.

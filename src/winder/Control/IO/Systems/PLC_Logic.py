@@ -12,6 +12,7 @@
 #   PLC.  No operation that isn't specific to the ladder logic should be in
 #   this unit.
 ###############################################################################
+from __future__ import absolute_import
 from IO.Devices.PLC import PLC
 
 class PLC_Logic :
