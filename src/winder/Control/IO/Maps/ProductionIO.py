@@ -7,7 +7,8 @@
 ###############################################################################
 
 from __future__ import absolute_import
-from IO.Devices.ControllogixPLC import ControllogixPLC
+# from IO.Devices.ControllogixPLC import ControllogixPLC
+from pycomm3 import LogixDriver as CLXPLC
 from .BaseIO import BaseIO
 
 class ProductionIO( BaseIO ) :
@@ -19,7 +20,7 @@ class ProductionIO( BaseIO ) :
     Only need to create the correct type of PLC and call the base I/O
     constructor.
     """
-    plc = ControllogixPLC( plcAddress )
+    plc = CLXPLC( plcAddress )
     BaseIO.__init__( self, plc )
 
 # end class
