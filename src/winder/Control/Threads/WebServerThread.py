@@ -8,6 +8,7 @@
 ###############################################################################
 
 from __future__ import absolute_import
+import contextlib
 from six.moves.BaseHTTPServer import HTTPServer
 from six.moves.socketserver import ThreadingMixIn
 import six.moves.http_client
@@ -56,11 +57,9 @@ class WebServerThread( PrimaryThread ):
     Send a dummy request to server to cause connection to close.
     """
 
-    try:
+    with contextlib.suppress(Exception):
       # HEAD request just so thread unblocks.  This will throw an exception.
       connection = six.moves.http_client.HTTPConnection( "127.0.0.1" )
       connection.request( "HEAD","/" )
-    except Exception:
-      pass
 
 # end class

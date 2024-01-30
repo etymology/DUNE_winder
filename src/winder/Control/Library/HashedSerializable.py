@@ -9,8 +9,7 @@
 
 
 from __future__ import absolute_import
-import xml.dom.minidom
-import os.path
+import pathlib
 import re
 
 from .Hash import Hash
@@ -110,9 +109,7 @@ class HashedSerializable( Serializable ) :
     Serializable.load( self, filePath, fileName, nameOverride )
 
     # Get all XML lines.
-    with open(f"{filePath}/{fileName}") as inputFile:
-      lines = inputFile.read()
-
+    lines = pathlib.Path(f"{filePath}/{fileName}").read_text()
     # Extract the hash from the raw XML.
     body = re.search( '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>', lines )
     self.hashValue = body[1]

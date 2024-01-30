@@ -17,8 +17,8 @@ function getParameterByName( name, url )
     url = window.location.href
   }
 
-  name = name.replace( /[\[\]]/g, "\\$&" )
-  var regex = new RegExp( "[?&]" + name + "(=([^&#]*)|&|#|$)" )
+  nameClean = name.replace( /[\[\]]/g, "\\$&" )
+  var regex = new RegExp( "[?&]" + nameClean + "(=([^&#]*)|&|#|$)" )
   var results = regex.exec( url )
 
   var returnResult

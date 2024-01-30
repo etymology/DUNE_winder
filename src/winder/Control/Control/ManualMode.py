@@ -53,29 +53,7 @@ class ManualMode( StateMachineState ) :
 
     # X/Y axis move?
     if self.stateMachine.seekX != None or self.stateMachine.seekY != None:
-
-      x = self.stateMachine.seekX
-      if x is None:
-        x = self._io.xAxis.getPosition()
-
-      y = self.stateMachine.seekY
-      if y is None:
-        y = self._io.yAxis.getPosition()
-
-      self._io.plcLogic.setXY_Position(
-        x,
-        y,
-        self.stateMachine.seekVelocity,
-        self.stateMachine.seekAcceleration,
-        self.stateMachine.seekDeceleration
-      )
-
-      self.stateMachine.seekX = None
-      self.stateMachine.seekY = None
-      self.stateMachine.seekVelocity = None
-      self.stateMachine.seekAcceleration = None
-      self.stateMachine.seekDeceleration = None
-      isError = False
+      isError = self.xySeek()
 
     if self.stateMachine.isJogging :
       self._wasJogging = True
@@ -110,6 +88,30 @@ class ManualMode( StateMachineState ) :
 
     return isError
 
+  def xySeek(self):
+    x = self.stateMachine.seekX
+    if x is None:
+      x = self._io.xAxis.getPosition()
+
+    y = self.stateMachine.seekY
+    if y is None:
+      y = self._io.yAxis.getPosition()
+
+    self._io.plcLogic.setXY_Position(
+      x,
+      y,
+      self.stateMachine.seekVelocity,
+      self.stateMachine.seekAcceleration,
+      self.stateMachine.seekDeceleration
+    )
+
+    self.stateMachine.seekX = None
+    self.stateMachine.seekY = None
+    self.stateMachine.seekVelocity = None
+    self.stateMachine.seekAcceleration = None
+    self.stateMachine.seekDeceleration = None
+    return False
+
   #---------------------------------------------------------------------
   def update( self ):
     """
@@ -135,29 +137,22 @@ class ManualMode( StateMachineState ) :
 
       # If we were seeking and stopped pre-maturely, note where.
       if self._noteSeekStop:
-        x = self._io.xAxis.getPosition()
-        y = self._io.yAxis.getPosition()
-        z = self._io.zAxis.getPosition()
-        self._log.add(
-            self.__class__.__name__,
-            "SEEK_STOP_LOCATION",
-            f"Seek stopped at ({str(x)},{str(y)},{str(z)})",
-            [x, y, z],
-        )
-
+        self.logCurrentPosition("SEEK_STOP_LOCATION", 'Seek stopped at (')
       # If we were jogging, note where it stopped.
       if self._wasJogging:
-        x = self._io.xAxis.getPosition()
-        y = self._io.yAxis.getPosition()
-        z = self._io.zAxis.getPosition()
-        self._log.add(
-            self.__class__.__name__,
-            "JOG_STOP",
-            f"Jog stopped at ({str(x)},{str(y)},{str(z)})",
-            [x, y, z],
-        )
-
+        self.logCurrentPosition("JOG_STOP", 'Jog stopped at (')
       self.changeState( self.stateMachine.States.STOP )
+
+  def logCurrentPosition(self, status, message):
+    x = self._io.xAxis.getPosition()
+    y = self._io.yAxis.getPosition()
+    z = self._io.zAxis.getPosition()
+    self._log.add(
+        self.__class__.__name__,
+        status,
+        f"{message}{str(x)},{str(y)},{str(z)})",
+        [x, y, z],
+    )
 
 
 #end class

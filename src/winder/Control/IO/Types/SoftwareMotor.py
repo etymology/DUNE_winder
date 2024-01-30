@@ -246,7 +246,7 @@ class SoftwareMotor( Motor ) :
     self._torque = torque
 
   #---------------------------------------------------------------------
-  def poll( self ) :
+  def poll( self ):
     """
     Update motion. Call after a change to simulation time.
 
@@ -255,21 +255,20 @@ class SoftwareMotor( Motor ) :
     delta = self._simulationTime.get() - self._startTime
     time = delta.total_seconds()
 
-    if self._inMotion :
+    if self._inMotion:
       self._inMotion     = self._motion.isMoving( time )
-      self._position     = self._motion.interpolatePosition( time )
-      self._velocity     = self._motion.interpolateVelocity( time )
-      self._acceleration = self._motion.interpolateAcceleration( time )
-
-      #if not self._inMotion and None != self._seekSemaphore :
-      #  self._seekSemaphore.release()
-      #  self._seekSemaphore = None
-    elif self._wasEnabled :
+      self.interpolateMotion(time)
+        #if not self._inMotion and None != self._seekSemaphore :
+        #  self._seekSemaphore.release()
+        #  self._seekSemaphore = None
+    elif self._wasEnabled:
       self._motion.hardStop( time )
-      self._position     = self._motion.interpolatePosition( time )
-      self._velocity     = self._motion.interpolateVelocity( time )
-      self._acceleration = self._motion.interpolateAcceleration( time )
-
+      self.interpolateMotion(time)
     self._wasEnabled = self._inMotion
+
+  def interpolateMotion(self, time):
+    self._position     = self._motion.interpolatePosition( time )
+    self._velocity     = self._motion.interpolateVelocity( time )
+    self._acceleration = self._motion.interpolateAcceleration( time )
 
 # end class

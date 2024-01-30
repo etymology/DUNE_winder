@@ -118,7 +118,7 @@ class PLC_Logic :
     self._maxZ_Velocity.set( 0 )
 
   #---------------------------------------------------------------------
-  def setXY_Position( self, x, y, velocity=None, acceleration=None, deceleration=None ):
+  def xySeek( self, x, y, velocity=None, acceleration=None, deceleration=None ):
     """
     Make a coordinated move of the X/Y axis.
 
@@ -142,7 +142,7 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.SEEK_XY )
 
   #---------------------------------------------------------------------
-  def jogXY( self, xVelocity, yVelocity, acceleration=None, deceleration=None ):
+  def xyJog( self, xVelocity, yVelocity, acceleration=None, deceleration=None ):
     """
     Jog the X/Y axis at a given velocity.
 
@@ -163,7 +163,7 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.JOG_XY )
 
   #---------------------------------------------------------------------
-  def setZ_Position( self, position, velocity=None ):
+  def zSeek( self, position, velocity=None ):
     """
     Move Z-axis to a position.
 
@@ -180,7 +180,7 @@ class PLC_Logic :
     self._moveType.set( self.MoveTypes.SEEK_Z )
 
   #---------------------------------------------------------------------
-  def jogZ( self, velocity ) :
+  def zJog( self, velocity ) :
     """
     Jog the Z axis at a given velocity.
 
@@ -252,8 +252,6 @@ class PLC_Logic :
     """
 
     self._moveType.set( self.MoveTypes.PLC_INIT ) 
-
-  
 
   #--------------------------------------------------------------------- 
   

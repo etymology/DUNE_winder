@@ -46,38 +46,36 @@ class CalibrationMode( StateMachineState ) :
       True if there was an error, false if not.  The error can happen
       if there isn't a manual action to preform.
     """
-    isError = True
-
     self._noteSeekStop = False
     self._shutdownCount = None
 
-    # X/Y axis move?
-    if self.stateMachine.seekX != None or self.stateMachine.seekY != None:
+    return (self.xySeek() if self.stateMachine.seekX != None
+            or self.stateMachine.seekY != None else True)
 
-      x = self.stateMachine.seekX
-      if x is None:
-        x = self._io.xAxis.getPosition()
+  # TODO Rename this here and in `enter`
+  def xySeek(self):
+    x = self.stateMachine.seekX
+    if x is None:
+      x = self._io.xAxis.getPosition()
 
-      y = self.stateMachine.seekY
-      if y is None:
-        y = self._io.yAxis.getPosition()
+    y = self.stateMachine.seekY
+    if y is None:
+      y = self._io.yAxis.getPosition()
 
-      self._io.plcLogic.setXY_Position(
-        x,
-        y,
-        self.stateMachine.seekVelocity,
-        self.stateMachine.seekAcceleration,
-        self.stateMachine.seekDeceleration
-      )
+    self._io.plcLogic.setXY_Position(
+      x,
+      y,
+      self.stateMachine.seekVelocity,
+      self.stateMachine.seekAcceleration,
+      self.stateMachine.seekDeceleration
+    )
 
-      self.stateMachine.seekX = None
-      self.stateMachine.seekY = None
-      self.stateMachine.seekVelocity = None
-      self.stateMachine.seekAcceleration = None
-      self.stateMachine.seekDeceleration = None
-      isError = False
-
-    return isError
+    self.stateMachine.seekX = None
+    self.stateMachine.seekY = None
+    self.stateMachine.seekVelocity = None
+    self.stateMachine.seekAcceleration = None
+    self.stateMachine.seekDeceleration = None
+    return False
 
   #---------------------------------------------------------------------
   def exit( self ) :

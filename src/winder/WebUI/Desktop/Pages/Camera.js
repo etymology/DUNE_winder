@@ -307,6 +307,7 @@ function Camera( modules )
     canvas.beginPath()
     canvas.moveTo( x1, y1 )
     canvas.lineTo( x2, y2 )
+    canvas.strokeStyle = 'yellow'
     canvas.stroke()
   }
 
