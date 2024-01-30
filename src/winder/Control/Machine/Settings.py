@@ -30,7 +30,7 @@ class Settings :
 
   MACHINE_CALIBRATION_FILE = "machineCalibration.xml"
 
-  WEB_DIRECTORY = "../WebUI"
+  WEB_DIRECTORY = "C:/Users/Dune Admin/winder_py3/src/winder/WebUI"
 
   # File making up the version for the control software.
   CONTROL_FILES = ".*\.py$"
