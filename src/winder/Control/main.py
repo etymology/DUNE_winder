@@ -101,7 +101,7 @@ def commandHandler( _, command ):
       [ command, exception, exceptionTypeName, exceptionValues, tracebackAsString ]
     )
 
-  # Try and make JSON object of result.
+  # Try to make JSON object of result.
   # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
   # raise an exception.)
   try:
