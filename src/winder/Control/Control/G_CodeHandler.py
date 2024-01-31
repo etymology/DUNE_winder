@@ -341,41 +341,43 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     # Place adjusted line in G-Code output log.
     if self._gCodeLog:
+      self.logAdjustedGCode()
 
-      line = ""
+  def logAdjustedGCode(self):
+    line = ""
 
-      #
-      # Only log what has changed since the self._last line.
-      #
+    #
+    # Only log what has changed since the self._last line.
+    #
 
-      if self._line != None:
-        line += f"N{str(self._line)} "
+    if self._line != None:
+      line += f"N{str(self._line)} "
 
-      if self._lastX != self._x:
-        line += f"X{str(self._x)} "
+    if self._lastX != self._x:
+      line += f"X{str(self._x)} "
 
-      if self._lastY != self._y:
-        line += f"Y{str(self._y)} "
+    if self._lastY != self._y:
+      line += f"Y{str(self._y)} "
 
-      if self._lastZ != self._z:
-        line += f"Z{str(self._z)} "
+    if self._lastZ != self._z:
+      line += f"Z{str(self._z)} "
 
-      if self._lastVelocity != self._velocity:
-        line += f"F{str(self._velocity)} "
+    if self._lastVelocity != self._velocity:
+      line += f"F{str(self._velocity)} "
 
-      for function in self._functions:
-        line += f"G{str(function[0])} "
-        for parameter in function[ 1: ]:
-          line += f"P{str(parameter)} "
+    for function in self._functions:
+      line += f"G{str(function[0])} "
+      for parameter in function[ 1: ]:
+        line += f"P{str(parameter)} "
 
-      # Strip trailing space.
-      line = line.strip()
+    # Strip trailing space.
+    line = line.strip()
 
-      # Add line-feed.
-      line += "\n"
+    # Add line-feed.
+    line += "\n"
 
-      # Place in G-Code log.
-      self._gCodeLog.write( line )
+    # Place in G-Code log.
+    self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
   def closeG_Code( self ) :

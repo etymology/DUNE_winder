@@ -432,15 +432,17 @@ class G_Code :
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
 
-  def printf( text ):
-    print(text)
-
   callbacks = G_CodeCallbacks()
-  callbacks.registerCallback( 'G', lambda parameter: printf( "Command: " + str( parameter ) ) )
-  callbacks.registerCallback( 'M', lambda parameter: printf( "Function: " + str( parameter ) ) )
-  callbacks.registerCallback( 'X', lambda parameter: printf( "Set X: " + str( parameter ) ) )
-  callbacks.registerCallback( 'Y', lambda parameter: printf( "Set Y: " + str( parameter ) ) )
-  callbacks.registerCallback( 'Z', lambda parameter: printf( "Set Z: " + str( parameter ) ) )
+  callbacks.registerCallback(
+      'G', lambda parameter: print(f"Command: {str(parameter)}"))
+  callbacks.registerCallback(
+      'M', lambda parameter: print(f"Function: {str(parameter)}"))
+  callbacks.registerCallback(
+      'X', lambda parameter: print(f"Set X: {str(parameter)}"))
+  callbacks.registerCallback(
+      'Y', lambda parameter: print(f"Set Y: {str(parameter)}"))
+  callbacks.registerCallback(
+      'Z', lambda parameter: print(f"Set Z: {str(parameter)}"))
 
   gCode = G_Code( 'G_CodeTest.txt', callbacks )
 

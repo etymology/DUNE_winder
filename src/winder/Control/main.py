@@ -20,7 +20,6 @@ from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
 from Library.Version import Version
-# from Library.RemoteSession import RemoteSession
 
 from Machine.Settings import Settings
 
@@ -35,9 +34,6 @@ from Threads.CameraThread import CameraThread
 
 from Simulator.SimulationTime import SimulationTime
 
-# $$$TEMPORARY - Temporary.
-# import xml.dom.minidom
-# from .Debug.APA_Generator import APA_Generator
 from Machine.DefaultCalibration import DefaultMachineCalibration
 
 #==============================================================================
@@ -253,7 +249,7 @@ try:
   # Primary control process.
   process = Process( io, log, configuration, systemTime, machineCalibration )
 
-  # For the simulator, use a local file for the capture image.
+  # For the simulator, use a local file for the capture imauuge.
   if isSimulated :
     process.setCameraImageURL( "/capture.bmp" )
 

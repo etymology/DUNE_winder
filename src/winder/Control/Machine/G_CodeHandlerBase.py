@@ -276,7 +276,7 @@ class G_CodeHandlerBase :
         str( segment )
       ]
 
-      raise G_CodeException( "G-Code seek transfer could not establish a finial location.", data )
+      raise G_CodeException( "G-Code seek transfer could not establish a final location.", data )
     self._x = location.x
     self._y = location.y
     self._xyChange = True
