@@ -1084,7 +1084,7 @@ class Process :
     return result
 
   #---------------------------------------------------------------------
-  def executeG_CodeLine( self, line ):
+  def executeG_CodeLine( self, line ):  # sourcery skip: low-code-quality
     """
     Run a line of G-code.
 
