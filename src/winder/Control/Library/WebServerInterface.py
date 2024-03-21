@@ -76,7 +76,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     """
 
     # Get post data length.
-    length = int( self.headers.getheader( 'content-length' ) )
+    length = int( self.headers.get( 'content-length' ) )
 
     # Get cookie data.
     cookies = {}
@@ -137,14 +137,12 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       postData = self.rfile.read( length )
 
       # Split the data by commands.
-      commands = postData.split( "&" )
-
+      commands = postData.split(b"&")  # Use b"&" to denote bytes
       # For each command...
       for command in commands:
 
         # Break up the command.
-        id, query = command.split( "=" )
-
+        id, query = command.split(b"=")  # Use b"=" to denote bytes
         # Unquote the command.
         query = six.moves.urllib.parse.unquote_plus( query )
 

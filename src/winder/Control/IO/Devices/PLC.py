@@ -118,14 +118,14 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
             tagList.append( tagName )
 
       # Break list into sub-sets of no more than 'maxTagsAtOnce' tags.
-      tagSubset = \
+      tagSubsets = \
             [
           tagList[ tag : tag + PLC.MAX_TAG_READS ]
             for tag in range( 0, len( tagList ), PLC.MAX_TAG_READS )
         ]
 
       # For each tag subset...
-      for tagList in tagSubset:
+      for tagList in tagSubsets:
         # Read all the tags in this subset.
         results = plc.read( tagList )
 

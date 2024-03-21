@@ -32,6 +32,8 @@ from Threads.ControlThread import ControlThread
 from Threads.WebServerThread import WebServerThread
 from Threads.CameraThread import CameraThread
 
+from IO.Maps.ProductionIO import ProductionIO
+
 from Simulator.SimulationTime import SimulationTime
 
 from Machine.DefaultCalibration import DefaultMachineCalibration
@@ -101,10 +103,10 @@ def commandHandler( _, command ):
   # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
   # raise an exception.)
   try:
-    result = json.dumps( result, encoding="unicode_escape" )
+    result = json.dumps( result, ensure_ascii=True)
   except TypeError:
     # If it cannot be made JSON, just make it a string.
-    result = json.dumps(result, encoding="unicode_escape")
+    result = json.dumps(result, ensure_ascii=True)
 
   return result
 
@@ -171,11 +173,11 @@ signal.signal( signal.SIGINT, signalHandler )
 # Create various objects.
 #
 
-if not isSimulated :
-  systemTime = SystemTime()
-else:
-  systemTime = SimulationTime( isRealTime = isRealTime )
+# if not isSimulated :
+#   systemTime = SystemTime()
+# else:
 
+systemTime = SimulationTime( isRealTime = isRealTime )
 startTime = systemTime.get()
 
 # Load configuration and setup default values.
@@ -191,50 +193,50 @@ log = Log( systemTime, configuration.get( "LogDirectory" ) + '/log.csv', isLogEc
 log.add( "Main", "START", "Control system starts." )
 
 try:
-  # Version information for control software.
-  version = Version( Settings.VERSION_FILE, ".", Settings.CONTROL_FILES )
+  # # Version information for control software.
+  # version = Version( Settings.VERSION_FILE, ".", Settings.CONTROL_FILES )
 
-  if version.update() :
-    log.add( "Main", "VERSION_CHANGE", "Control software has changed." )
+  # if version.update() :
+  #   log.add( "Main", "VERSION_CHANGE", "Control software has changed." )
 
-  # Version information for user interface.
-  uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
-  if uiVersion.update() :
-    log.add( "Main", "VERSION_UI_CHANGE", "User interface has changed." )
+  # # Version information for user interface.
+  # uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
+  # if uiVersion.update() :
+  #   log.add( "Main", "VERSION_UI_CHANGE", "User interface has changed." )
 
-  log.add(
-      "Main",
-      "VERSION",
-      f"Control software version {str(version.getVersion())}",
-      [version.getVersion(),
-       version.getHash(),
-       version.getDate()],
-  )
+  # log.add(
+  #     "Main",
+  #     "VERSION",
+  #     f"Control software version {str(version.getVersion())}",
+  #     [version.getVersion(),
+  #      version.getHash(),
+  #      version.getDate()],
+  # )
 
-  log.add(
-      "Main",
-      "VERSION_UI",
-      f"User interface version {str(uiVersion.getVersion())}",
-      [uiVersion.getVersion(),
-       uiVersion.getHash(),
-       uiVersion.getDate()],
-  )
+  # log.add(
+  #     "Main",
+  #     "VERSION_UI",
+  #     f"User interface version {str(uiVersion.getVersion())}",
+  #     [uiVersion.getVersion(),
+  #      uiVersion.getHash(),
+  #      uiVersion.getDate()],
+  # )
 
   # Create I/O map.
-  if isSimulated:
-    from Simulator.PLC_Simulator import PLC_Simulator
-    from IO.Maps.SimulatedIO import SimulatedIO
-    io = SimulatedIO()
-    plcSimulator = PLC_Simulator( io, systemTime )
-    log.add(
-        "Main",
-        "SIMULATION",
-        f"Running in simulation mode, real-time: {str(isRealTime)}.",
-        [isRealTime],
-    )
-  else:
-    from IO.Maps.ProductionIO import ProductionIO
-    io = ProductionIO( configuration.get( "plcAddress" ) )
+  # if isSimulated:
+  #   from Simulator.PLC_Simulator import PLC_Simulator
+  #   from IO.Maps.SimulatedIO import SimulatedIO
+  #   io = SimulatedIO()
+  #   plcSimulator = PLC_Simulator( io, systemTime )
+  #   log.add(
+  #       "Main",
+  #       "SIMULATION",
+  #       f"Running in simulation mode, real-time: {str(isRealTime)}.",
+  #       [isRealTime],
+  #   )
+  # else:
+
+  io = ProductionIO( configuration.get( "plcAddress" ) )
 
   # Use low-level I/O to avoid warning.
   # (Low-level I/O is needed by remote commands.)
@@ -250,8 +252,8 @@ try:
   process = Process( io, log, configuration, systemTime, machineCalibration )
 
   # For the simulator, use a local file for the capture imauuge.
-  if isSimulated :
-    process.setCameraImageURL( "/capture.bmp" )
+  # if isSimulated :
+  #   process.setCameraImageURL( "/capture.bmp" )
 
   #
   # Initialize threads.
