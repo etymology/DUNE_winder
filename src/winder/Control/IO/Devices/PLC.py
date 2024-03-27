@@ -107,40 +107,37 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
         Ethernet traffic.
       """
 
-      tagList = []
+      tags_to_read = []
       for tag in PLC.Tag.list:
         # If this tag is polled...
         if tag._attributes.isPolled:
           tagName = tag.getReadTag()
 
           # If this tag is not already in the list...
-          if tagName not in tagList:
-            tagList.append( tagName )
+          if tagName not in tags_to_read:
+            tags_to_read.append( tagName )
+      
+      results = {}
+      for tag_name in tags_to_read:
+          try:
+              tag_value = plc.read(tag_name)
+              results[tag_name] = tag_value
+          except Exception as e:
+              print(f"Error reading tag {tag_name}: {e}")
+              results[tag_name] = None
 
-      # Break list into sub-sets of no more than 'maxTagsAtOnce' tags.
-      tagSubsets = \
-            [
-          tagList[ tag : tag + PLC.MAX_TAG_READS ]
-            for tag in range( 0, len( tagList ), PLC.MAX_TAG_READS )
-        ]
+      if results is None:
+        for tagName in tags_to_read :
+          for tag in PLC.Tag.map[ tagName ] :
+            tag._value = tag._attributes.defaultValue
 
-      # For each tag subset...
-      for tagList in tagSubsets:
-        # Read all the tags in this subset.
-        results = plc.read( tagList )
-
-        if results is None:
-          for tagName in tagList :
-            for tag in PLC.Tag.map[ tagName ] :
-              tag._value = tag._attributes.defaultValue
-
-        else:
-          # Distribute the results to the tag objects.
-          for result in results :
-            # For each object that uses this tag name...
-            for tag in PLC.Tag.map[ result[ 0 ] ] :
-              # Send it the result.
-              tag.updateFromReadTag( result[ 1 ] )
+      else:
+        # Distribute the results to the tag objects.
+        for tag_name in results :
+          # For each object that uses this tag name...
+          for tag in PLC.Tag.map[tag_name] :
+            # Send it the result.
+            tag.updateFromReadTag( results[tag_name] )
 
 
     #---------------------------------------------------------------------

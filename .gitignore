@@ -216,3 +216,4 @@ src/winder/Data/Recipes/F37-285-EBA0
 src/winder/Data/Recipes/F69-F26-F2F7
 version.xml
 src/winder/WebUI/version.xml
+.aider*

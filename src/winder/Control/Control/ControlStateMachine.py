@@ -24,7 +24,7 @@ class ControlStateMachine( LoggedStateMachine ) :
     WIND        = 2,
     CALIBRATE   = 3,
     MANUAL      = 4,
-    TENTION     = 5
+    TENSION     = 5
   # end class
 
   #---------------------------------------------------------------------
