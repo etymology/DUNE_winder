@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import
 from IO.Primitives.DigitalOutput import DigitalOutput
-from IO.Devices.PLC import PLC
+from IO.PLC import PLC
 
 class PLC_Output( DigitalOutput ) :
 

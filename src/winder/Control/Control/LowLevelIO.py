@@ -16,7 +16,7 @@ from IO.Primitives.DigitalOutput import DigitalOutput
 from IO.Primitives.Motor import Motor
 from IO.Primitives.AnalogInput import AnalogInput
 from IO.Primitives.AnalogOutput import AnalogOutput
-from IO.Devices.PLC import PLC
+from IO.PLC import PLC
 
 class LowLevelIO :
   #---------------------------------------------------------------------

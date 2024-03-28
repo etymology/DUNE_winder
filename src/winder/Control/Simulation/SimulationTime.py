@@ -4,18 +4,15 @@
 # Date: 2016-02-07
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
-from __future__ import absolute_import
 import time
 import datetime
 from Library.TimeSource import TimeSource
 
 class SimulationTime( TimeSource ) :
   #-------------------------------------------------------------------
-  def __init__(self, initialTime=datetime.datetime.now(datetime.timezone.utc), isRealTime=True):
+  def __init__( self, initialTime = datetime.datetime.utcnow(), isRealTime=True ) :
     """
     Constructor.
 
@@ -68,16 +65,16 @@ class SimulationTime( TimeSource ) :
     self._time = time
 
   #-------------------------------------------------------------------
-  def setLocal( self ):
+  def setLocal( self ) :
     """
     Set current simulation time to the local system time.
 
     """
 
-    self._time = datetime.datetime.now(datetime.timezone.utc)
+    self._time = datetime.datetime.utcnow()
 
   #-------------------------------------------------------------------
-  def getDelta( self, then, now=None ):
+  def getDelta( self, then, now=None ) :
     """
     Return the amount of time between two time stamps.
 
@@ -89,7 +86,7 @@ class SimulationTime( TimeSource ) :
       Time between to time stamps.
     """
 
-    if now is None:
+    if None == now :
       now = self.get()
 
     delta = now - then

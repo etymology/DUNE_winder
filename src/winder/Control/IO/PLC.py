@@ -4,25 +4,15 @@
 # Date: 2016-02-26
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024 - present]
 ###############################################################################
 
+import threading
+from pycomm3 import LogixDriver
+from typing import List
 
-from __future__ import absolute_import
-from .IO_Device import IO_Device
-from abc import ABCMeta, abstractmethod
-import six
-from six.moves import range
+class PLC :
 
-class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
-
-  # There is a limit to the length of packets to/from the PLC.  When reading
-  # tags the request must be limited.  I have found no documentation as to how
-  # to calculate this limit, but found I could read 18 with the tag name sizes
-  # currently in the queue.  So 14 seems a safe number.
-  MAX_TAG_READS = 14
-
-  #============================================================================
   class Tag :
     """
     PLC Tag.  System PLC's use to represent data.
@@ -31,7 +21,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
     """
 
     # List of all tags.
-    list = []
+    list: List['Tag'] = []
 
     # Look-up table to match tag names to instances of Tag.  The look-up is
     # a list of tag instances in case there are multiple Tag instances for the
@@ -47,7 +37,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
     # end class
 
     #---------------------------------------------------------------------
-    def __init__( self, plc, tagName, attributes = Attributes(), tagType="DINT" ) :
+    def __init__( self, plc: 'PLC', tagName: str, attributes = Attributes(), tagType="DINT" ) :
       """
       Constructor.
 
@@ -73,7 +63,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       self._tagName    = tagName
       self._attributes = attributes
       self._type       = tagType
-      self._value      = attributes.defaultValue
+      self.value      = attributes.defaultValue
 
     #---------------------------------------------------------------------
     def getName( self ) :
@@ -94,17 +84,14 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       if value is not None and not self._plc.isNotFunctional():
         self.updateFromReadTag( value[ 0 ] )
       else:
-        self._value = self._attributes.defaultValue
+        self.value = self._attributes.defaultValue
 
     #---------------------------------------------------------------------
     @staticmethod
-    def pollAll( plc ):
+    def pollAll( plc):
       """
       Update all tags.
 
-      Future:
-        All tags could be read at once, which may be useful in reducing
-        Ethernet traffic.
       """
 
       tags_to_read = []
@@ -120,8 +107,8 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       results = {}
       for tag_name in tags_to_read:
           try:
-              tag_value = plc.read(tag_name)
-              results[tag_name] = tag_value
+              tagvalue = plc.read(tag_name)[1]
+              results[tag_name] = tagvalue
           except Exception as e:
               print(f"Error reading tag {tag_name}: {e}")
               results[tag_name] = None
@@ -129,7 +116,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       if results is None:
         for tagName in tags_to_read :
           for tag in PLC.Tag.map[ tagName ] :
-            tag._value = tag._attributes.defaultValue
+            tag.value = tag._attributes.defaultValue
 
       else:
         # Distribute the results to the tag objects.
@@ -157,7 +144,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       been done at once to feed back data.
       """
       if self._attributes.canRead :
-        self._value = value
+        self.value = value
 
 
     #---------------------------------------------------------------------
@@ -172,7 +159,7 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
         Does not reflect any useful value until polled.  If the PLC isn't
         functional, this value returns a default value.
       """
-      return self._value
+      return self.value
 
     #---------------------------------------------------------------------
     def set( self, value ):
@@ -191,14 +178,24 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
       if result is None:
         isError = True
       else:
-        self._value = value
+        self.value = value
 
       return isError
   # end class
   #============================================================================
+  def __init__( self, ipAddress ) :
+    """
+    Constructor.
 
-  #---------------------------------------------------------------------
-  @abstractmethod
+    Args:
+      ipAddress: IP address of PLC to communicate with.
+    """
+    self._ipAddress = ipAddress
+    self._plcDriver = LogixDriver(ipAddress)
+    self._isFunctional = False
+    self._lock = threading.Lock()
+    self.initialize()
+  
   def initialize( self ) :
     """
     Try and establish a connection to the PLC.
@@ -206,10 +203,18 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
     Returns:
       True if there was an error, False if connection was made.
     """
-    pass
+    self._lock.acquire()
+    
+    if self._plcDriver.open():
+      self._isFunctional = True
+    else:
+      self._isFunctional = False
+
+    self._lock.release()
+
+    return self._isFunctional
 
   #---------------------------------------------------------------------
-  @abstractmethod
   def isNotFunctional( self ) :
     """
     See if the PLC is communicating correctly.
@@ -217,10 +222,9 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
     Returns:
       True there is a problem with hardware, false if not.
     """
-    pass
+    return not self._isFunctional
 
   #---------------------------------------------------------------------
-  @abstractmethod
   def read( self, tag ) :
     """
     Read a tag(s) from the PLC.
@@ -231,10 +235,21 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
     Returns:
       Result of the data read, or None if there was a problem.
     """
-    pass
+
+    self._lock.acquire()
+    result = None
+    if self._isFunctional :
+      try :
+        result = self._plcDriver.read( tag )
+      except Exception:
+        # If tag reading threw an exception, the connection is dead.
+        self._isFunctional = False
+
+    self._lock.release()
+
+    return result
 
   #---------------------------------------------------------------------
-  @abstractmethod
   def write( self, tag, data=None, typeName=None ) :
     """
     Write a tag(s) to the PLC.
@@ -247,6 +262,21 @@ class PLC( six.with_metaclass(ABCMeta, IO_Device) ) :
     Returns:
         None is returned in case of error otherwise the tag list is returned.
     """
-    pass
 
-# end class
+    self._lock.acquire()
+    result = None
+    if self._isFunctional :
+      try :
+        result = self._plcDriver.write( tag, data )
+      except Exception:
+        # If tag reading threw an exception, the connection is dead.
+        self._isFunctional = False
+
+    self._lock.release()
+    return result
+
+  #---------------------------------------------------------------------
+
+    
+
+  # end class

@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import
 from IO.Primitives.IO_Point import IO_Point
-from IO.Devices.PLC import PLC
+from IO.PLC import PLC
 import os.path
 
 class IO_Log :

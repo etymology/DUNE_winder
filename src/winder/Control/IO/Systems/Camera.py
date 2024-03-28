@@ -13,7 +13,7 @@
 ###############################################################################
 from __future__ import absolute_import
 import random
-from IO.Devices.PLC import PLC
+from IO.PLC import PLC
 
 class Camera:
 

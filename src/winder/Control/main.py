@@ -4,7 +4,7 @@
 # Date: 2016-02-03
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024 - present]
 ###############################################################################
 
 
@@ -32,11 +32,13 @@ from Threads.ControlThread import ControlThread
 from Threads.WebServerThread import WebServerThread
 from Threads.CameraThread import CameraThread
 
-from IO.Maps.ProductionIO import ProductionIO
+from IO.IO_map import IO_map
+from IO.PLC import PLC
 
-from Simulator.SimulationTime import SimulationTime
+from Simulation.SimulationTime import SimulationTime
 
 from Machine.DefaultCalibration import DefaultMachineCalibration
+from datetime import datetime
 
 #==============================================================================
 # Debug settings.
@@ -102,13 +104,15 @@ def commandHandler( _, command ):
   # Try to make JSON object of result.
   # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
   # raise an exception.)
+  if isinstance(result, datetime):
+    result = result.strftime('%Y-%m-%d %H:%M:%S')
+  if isinstance(result, PLC.Tag):
+    result = result._tagName
   try:
-    result = json.dumps( result, ensure_ascii=True)
+    return json.dumps( result, ensure_ascii=True)
   except TypeError:
     # If it cannot be made JSON, just make it a string.
-    result = json.dumps(result, ensure_ascii=True)
-
-  return result
+    return json.dumps(result, ensure_ascii=True)
 
 #-----------------------------------------------------------------------
 def signalHandler( signalNumber, frame ):
@@ -169,13 +173,6 @@ for argument in sys.argv:
 # Install signal handler for Ctrl-C shutdown.
 signal.signal( signal.SIGINT, signalHandler )
 
-#
-# Create various objects.
-#
-
-# if not isSimulated :
-#   systemTime = SystemTime()
-# else:
 
 systemTime = SimulationTime( isRealTime = isRealTime )
 startTime = systemTime.get()
@@ -193,50 +190,7 @@ log = Log( systemTime, configuration.get( "LogDirectory" ) + '/log.csv', isLogEc
 log.add( "Main", "START", "Control system starts." )
 
 try:
-  # # Version information for control software.
-  # version = Version( Settings.VERSION_FILE, ".", Settings.CONTROL_FILES )
-
-  # if version.update() :
-  #   log.add( "Main", "VERSION_CHANGE", "Control software has changed." )
-
-  # # Version information for user interface.
-  # uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )
-  # if uiVersion.update() :
-  #   log.add( "Main", "VERSION_UI_CHANGE", "User interface has changed." )
-
-  # log.add(
-  #     "Main",
-  #     "VERSION",
-  #     f"Control software version {str(version.getVersion())}",
-  #     [version.getVersion(),
-  #      version.getHash(),
-  #      version.getDate()],
-  # )
-
-  # log.add(
-  #     "Main",
-  #     "VERSION_UI",
-  #     f"User interface version {str(uiVersion.getVersion())}",
-  #     [uiVersion.getVersion(),
-  #      uiVersion.getHash(),
-  #      uiVersion.getDate()],
-  # )
-
-  # Create I/O map.
-  # if isSimulated:
-  #   from Simulator.PLC_Simulator import PLC_Simulator
-  #   from IO.Maps.SimulatedIO import SimulatedIO
-  #   io = SimulatedIO()
-  #   plcSimulator = PLC_Simulator( io, systemTime )
-  #   log.add(
-  #       "Main",
-  #       "SIMULATION",
-  #       f"Running in simulation mode, real-time: {str(isRealTime)}.",
-  #       [isRealTime],
-  #   )
-  # else:
-
-  io = ProductionIO( configuration.get( "plcAddress" ) )
+  io = IO_map( configuration.get( "plcAddress" ) )
 
   # Use low-level I/O to avoid warning.
   # (Low-level I/O is needed by remote commands.)

@@ -2,14 +2,14 @@ from pycomm3 import LogixDriver
 
 winder_plc_address = '192.168.140.13'
 
-tags_to_read = ['X_Axis']
-#     'X_Axis.ActualPosition', 'X_Axis.ActualVelocity', 'X_Axis.CommandAcceleration',
-#     'X_Axis.CoordinatedMotionStatus', 'X_Axis.ModuleFault', 'Y_Axis.ActualPosition',
-#     'Y_Axis.ActualVelocity', 'Y_Axis.CommandAcceleration', 'Y_Axis.CoordinatedMotionStatus',
-#     'Y_Axis.ModuleFault', 'Z_Axis.ActualPosition', 'Z_Axis.ActualVelocity',
-#     'Z_Axis.CommandAcceleration', 'Z_Axis.CoordinatedMotionStatus', 'Z_Axis.ModuleFault',
+tags_to_read = ['X_axis']
+#     'X_axis.ActualPosition', 'X_axis.ActualVelocity', 'X_axis.CommandAcceleration',
+#     'X_axis.CoordinatedMotionStatus', 'X_axis.ModuleFault', 'Y_axis.ActualPosition',
+#     'Y_axis.ActualVelocity', 'Y_axis.CommandAcceleration', 'Y_axis.CoordinatedMotionStatus',
+#     'Y_axis.ModuleFault', 'Z_axis.ActualPosition', 'Z_axis.ActualVelocity',
+#     'Z_axis.CommandAcceleration', 'Z_axis.CoordinatedMotionStatus', 'Z_axis.ModuleFault',
 #     'STATE', 'ERROR_CODE', 'Cam_F:I.InspectionResults[0]', 'Cam_F:I.InspectionResults[1]',
-#     'Cam_F:I.InspectionResults[2]', 'Cam_F:I.InspectionResults[3]', 'Machine_SW_Stat', 'MORE_STATS_S'
+#     'Cam_F:I.InspectionResults[2]', 'Cam_F:I.InspectionResults[3]', 'MACHINE_SW_STAT', 'MORE_STATS_S'
 # ]
 
 def read_all_tags(plc):
@@ -23,17 +23,11 @@ def read_all_tags(plc):
             all_tags_data[tag_name] = None
     return all_tags_data
 
-# Connect to the PLC
-with LogixDriver(winder_plc_address) as plc:
-    if plc:
-    #     all_tags_data = read_all_tags(plc)
-    #     for key in all_tags_data:
-    #         print(key)
-    # else:
-    #     print("couldn't open connection")
 
-        for tagname in tags_to_read:
-            try:
-                print(plc.read(tagname))
-            except:
-                print(f"error reading tag {tagname}")
+if __name__ == "__main__":
+    # # Connect to the PLC
+    with LogixDriver(winder_plc_address) as plc:
+        all_tags_data = read_all_tags(plc)
+        for key in all_tags_data:
+            print(key)
+        print(plc.read('X_axis.ModuleFault'))
