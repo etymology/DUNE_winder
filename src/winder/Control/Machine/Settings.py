@@ -66,8 +66,8 @@ class Settings :
     configuration.default( "machineCalibrationPath", "../Data/" )
     configuration.default( "machineCalibrationFile", Settings.MACHINE_CALIBRATION_FILE )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
-    configuration.default( "recipeDirectory", "../Data/Recipes" )
-    configuration.default( "recipeArchiveDirectory", "../Data/Recipes" )
+    configuration.default( "recipeDirectory", "../Recipes" )
+    configuration.default( "recipeArchiveDirectory", "../Recipes" )
 
     # Velocity limits.
     configuration.default( "maxVelocity", 16 * 25.4 ) # 16 inches/second
