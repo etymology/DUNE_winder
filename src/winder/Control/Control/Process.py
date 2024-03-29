@@ -14,8 +14,10 @@ import os
 import re
 import math
 
+from Library.Configuration import Configuration
 from Library.Geometry.Location import Location
 from Library.G_Code import G_Code
+from Library.Log import Log
 
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
@@ -28,7 +30,11 @@ from Machine.HeadCompensation import HeadCompensation
 from Machine.GeometrySelection import GeometrySelection
 from Machine.LayerFunctions import LayerFunctions
 from Machine.DefaultCalibration import DefaultLayerCalibration
-from six.moves import range
+from Machine.MachineCalibration import MachineCalibration
+
+from IO.IO_map import IO_map
+
+from Simulation.SimulationTime import TimeSource
 
 class Process :
 
@@ -47,7 +53,7 @@ class Process :
   }
 
   #---------------------------------------------------------------------
-  def __init__( self, io, log, configuration, systemTime, machineCalibration ):
+  def __init__( self, io: IO_map, log: Log, configuration: Configuration, systemTime: TimeSource, machineCalibration: MachineCalibration ):
     """
     Constructor.
 
@@ -1071,11 +1077,6 @@ class Process :
       x = self._io.xAxis.getPosition()
       y = self._io.yAxis.getPosition()
       z = self._io.zAxis.getPosition()
-
-      # $$$FUTURE - This doesn't work.  Not too important.  Fix it one day.
-      # if self._io.head.BACK == self._io.head.getSide() :
-      #   print "Back"
-      #   z = self._io.head.getTargetAxisPosition()
 
       location = Location( x, y, z )
 

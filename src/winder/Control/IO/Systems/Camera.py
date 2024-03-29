@@ -31,8 +31,8 @@ class Camera:
     """
 
     # PLC tags for pin capture.
-    self.cameraTrigger        = PLC.Tag( plc, "Cam_F_Trigger", tagType="BOOL" )
-    self.cameraTriggerEnable  = PLC.Tag( plc, "Cam_F_En", tagType="BOOL" )
+    self.cameraTrigger        = PLC.Tag( plc, "CAM_F_TRIGGER", tagType="BOOL" )
+    self.cameraTriggerEnable  = PLC.Tag( plc, "CAM_F_EN", tagType="BOOL" )
 
     self.cameraDeltaEnable     = PLC.Tag( plc, "EN_POS_TRIGGERS", tagType="BOOL" )
     self.cameraX_Delta         = PLC.Tag( plc, "X_DELTA", tagType="REAL" )
@@ -48,12 +48,14 @@ class Camera:
 
 
     # Direct to camera tags.
-    attributes = PLC.Tag.Attributes()
-    attributes.isPolled = True
-    self.cameraResultStatus = PLC.Tag( plc, "Cam_F:I.InspectionResults[0]", attributes, tagType="REAL" )
-    self.cameraResultScore  = PLC.Tag( plc, "Cam_F:I.InspectionResults[1]", attributes, tagType="REAL" )
-    self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
-    self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
+    # These tags apparently do not exist on the plc?
+    
+    # attributes = PLC.Tag.Attributes()
+    # attributes.isPolled = True
+    # self.cameraResultStatus = PLC.Tag( plc, "Cam_F:I.InspectionResults[0]", attributes, tagType="REAL" )
+    # self.cameraResultScore  = PLC.Tag( plc, "Cam_F:I.InspectionResults[1]", attributes, tagType="REAL" )
+    # self.cameraResultX      = PLC.Tag( plc, "Cam_F:I.InspectionResults[2]", attributes, tagType="REAL" )
+    # self.cameraResultY      = PLC.Tag( plc, "Cam_F:I.InspectionResults[3]", attributes, tagType="REAL" )
 
     # Data from camera FIFO.
     self.captureFIFO = []

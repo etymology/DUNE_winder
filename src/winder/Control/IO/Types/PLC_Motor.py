@@ -46,11 +46,11 @@ class PLC_Motor( Motor ) :
     attributes = PLC.Tag.Attributes()
     attributes.isPolled = True
     attributes.canWrite = False
-    self._position = PLC.Tag(plc, f"{tagBase}_Axis.ActualPosition", attributes)
-    self._velocity = PLC.Tag(plc, f"{tagBase}_Axis.ActualVelocity", attributes)
-    self._acceleration = PLC.Tag(plc, f"{tagBase}_Axis.CommandAcceleration",
+    self._position = PLC.Tag(plc, f"{tagBase}_axis.ActualPosition", attributes, "REAL")
+    self._velocity = PLC.Tag(plc, f"{tagBase}_axis.ActualVelocity", attributes, "REAL")
+    self._acceleration = PLC.Tag(plc, f"{tagBase}_axis.CommandAcceleration",
                                  attributes)
-    self._movement = PLC.Tag(plc, f"{tagBase}_Axis.CoordinatedMotionStatus",
+    self._movement = PLC.Tag(plc, f"{tagBase}_axis.CoordinatedMotionStatus",
                              attributes)
 
     # Motor status tag defaults to a faulted state in case read fails.
@@ -58,7 +58,7 @@ class PLC_Motor( Motor ) :
     attributes.isPolled = True
     attributes.canWrite = False
     attributes.defaultValue = True
-    self._faulted = PLC.Tag(plc, f"{tagBase}_Axis.ModuleFault", attributes)
+    self._faulted = PLC.Tag(plc, f"{tagBase}_axis.ModuleFault", attributes)
 
     self._seekStartPosition = self._position
 

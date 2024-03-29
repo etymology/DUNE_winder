@@ -7,6 +7,7 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
+from IO.PLC import PLC
 
 class Head :
 
@@ -81,7 +82,7 @@ class Head :
       self._state = self.States.SEEK
 
   #---------------------------------------------------------------------
-  def __init__( self, plcLogic ) :
+  def __init__( self, plcLogic: PLC  ) :
     """
     Constructor.
 

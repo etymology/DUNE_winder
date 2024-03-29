@@ -9,11 +9,14 @@
 
 
 from __future__ import absolute_import
+from Library.Log import Log
 from Library.StateMachineState import StateMachineState
+from Library.StateMachine import StateMachine
+from IO.IO_map import IO_map
 
 class HardwareMode( StateMachineState ) :
   #---------------------------------------------------------------------
-  def __init__( self, stateMachine, state, io, log ) :
+  def __init__( self, stateMachine: StateMachine, state: int, io: IO_map, log: Log) :
     """
     Constructor.
 
@@ -27,9 +30,9 @@ class HardwareMode( StateMachineState ) :
     self.io = io
     self.log = log
     self.isPLC_Working = True
-    self.isX_AxisWorking = True
-    self.isY_AxisWorking = True
-    self.isZ_AxisWorking = True
+    self.isX_axisWorking = True
+    self.isY_axisWorking = True
+    self.isZ_axisWorking = True
     self.isStateClear    = True
 
   #---------------------------------------------------------------------
@@ -110,54 +113,54 @@ class HardwareMode( StateMachineState ) :
         )
         self.isStateClear = False
 
-      if not xWorking and self.isX_AxisWorking :
+      if not xWorking and self.isX_axisWorking :
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
           "Fault on x-axis."
         )
-        self.isX_AxisWorking = False
+        self.isX_axisWorking = False
 
-      if not yWorking and self.isY_AxisWorking :
+      if not yWorking and self.isY_axisWorking :
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
           "Fault on y-axis."
         )
-        self.isY_AxisWorking = False
+        self.isY_axisWorking = False
 
-      if not zWorking and self.isZ_AxisWorking :
+      if not zWorking and self.isZ_axisWorking :
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
           "Fault on z-axis."
         )
-        self.isZ_AxisWorking = False
+        self.isZ_axisWorking = False
 
 
-      if xWorking and not self.isX_AxisWorking :
+      if xWorking and not self.isX_axisWorking :
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
           "X-axis fault clear."
         )
-        self.isX_AxisWorking = True
+        self.isX_axisWorking = True
 
-      if yWorking and not self.isY_AxisWorking :
+      if yWorking and not self.isY_axisWorking :
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
           "Y-axis fault clear."
         )
-        self.isY_AxisWorking = True
+        self.isY_axisWorking = True
 
-      if zWorking and not self.isZ_AxisWorking :
+      if zWorking and not self.isZ_axisWorking :
         self.log.add(
           self.__class__.__name__,
           "HARD_ERROR",
           "Z-axis fault clear."
         )
-        self.isZ_AxisWorking = True
+        self.isZ_axisWorking = True
 
       # If everything is functional...
       if self.io.isFunctional() :

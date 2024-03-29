@@ -7,6 +7,7 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024 - present]
 ###############################################################################
 
+from __future__ import annotations
 import threading
 from pycomm3 import LogixDriver
 from typing import List
@@ -21,7 +22,7 @@ class PLC :
     """
 
     # List of all tags.
-    list: List['Tag'] = []
+    list: List[Tag] = []
 
     # Look-up table to match tag names to instances of Tag.  The look-up is
     # a list of tag instances in case there are multiple Tag instances for the
@@ -63,7 +64,7 @@ class PLC :
       self._tagName    = tagName
       self._attributes = attributes
       self._type       = tagType
-      self.value      = attributes.defaultValue
+      self._value      = attributes.defaultValue
 
     #---------------------------------------------------------------------
     def getName( self ) :
@@ -82,9 +83,9 @@ class PLC :
       """
       value = self._plc.read( self._tagName )
       if value is not None and not self._plc.isNotFunctional():
-        self.updateFromReadTag( value[ 0 ] )
+        self.updateFromReadTag( value )
       else:
-        self.value = self._attributes.defaultValue
+        self._value = self._attributes.defaultValue
 
     #---------------------------------------------------------------------
     @staticmethod
@@ -105,13 +106,13 @@ class PLC :
             tags_to_read.append( tagName )
       
       results = {}
-      for tag_name in tags_to_read:
+      for tagName in tags_to_read:
           try:
-              tagvalue = plc.read(tag_name)[1]
-              results[tag_name] = tagvalue
+              tagvalue = plc.read(tagName)
+              results[tagName] = tagvalue
           except Exception as e:
-              print(f"Error reading tag {tag_name}: {e}")
-              results[tag_name] = None
+              print(f"Error reading tag {tagName}: {e}")
+              results[tagName] = None
 
       if results is None:
         for tagName in tags_to_read :
@@ -144,7 +145,7 @@ class PLC :
       been done at once to feed back data.
       """
       if self._attributes.canRead :
-        self.value = value
+        self._value = value
 
 
     #---------------------------------------------------------------------
@@ -159,7 +160,8 @@ class PLC :
         Does not reflect any useful value until polled.  If the PLC isn't
         functional, this value returns a default value.
       """
-      return self.value
+      self.poll()
+      return self._value
 
     #---------------------------------------------------------------------
     def set( self, value ):
@@ -178,7 +180,7 @@ class PLC :
       if result is None:
         isError = True
       else:
-        self.value = value
+        self._value = value
 
       return isError
   # end class
@@ -225,7 +227,7 @@ class PLC :
     return not self._isFunctional
 
   #---------------------------------------------------------------------
-  def read( self, tag ) :
+  def read( self, tagName:str) :
     """
     Read a tag(s) from the PLC.
 
@@ -237,17 +239,18 @@ class PLC :
     """
 
     self._lock.acquire()
-    result = None
     if self._isFunctional :
       try :
-        result = self._plcDriver.read( tag )
+        resultingTag = self._plcDriver.read( tagName )
+        if resultingTag.error:
+          print(f"While reading tag {tagName}, PLC threw error {resultingTag.error}")
       except Exception:
         # If tag reading threw an exception, the connection is dead.
         self._isFunctional = False
 
     self._lock.release()
 
-    return result
+    return resultingTag.value
 
   #---------------------------------------------------------------------
   def write( self, tag, data=None, typeName=None ) :
