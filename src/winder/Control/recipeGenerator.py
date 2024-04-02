@@ -77,10 +77,10 @@ def writeRubyCode( layer, recipe, geometry ) :
     geometry - Geometry for layer.
   """
 
-  print "Generating SketchUp Ruby code"
+  print("Generating SketchUp Ruby code")
 
   # Generate an ideal calibration file for layer.
-  print "  Generate an ideal calibration file for layer."
+  print("  Generate an ideal calibration file for layer.")
   calibration = recipe.defaultCalibration( layer, geometry, isCalibration )
   if zeroOffset :
     calibration.offset = Location()
@@ -88,7 +88,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   outputFileName = layer + "-Layer.rb"
 
   # Construct G-Code for first half.
-  print "  Construct G-Code for first half."
+  print("  Construct G-Code for first half.")
   gCodePath = G_CodeToPath(
     recipeDirectory + "/" + layer + "-Layer_1.gc",
     geometry,
@@ -96,7 +96,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   )
 
   # Write 1st wind G-Code path.
-  print "  Write 1st wind G-Code path."
+  print("  Write 1st wind G-Code path.")
   gCodePath.writeRubyCode(
     outputFileName,
     layer,
@@ -107,7 +107,7 @@ def writeRubyCode( layer, recipe, geometry ) :
   )
 
   # Write wire path.
-  print "  Write wire path."
+  print("  Write wire path.")
   recipe.writeRubyCode(
     layer,
     0,
@@ -120,7 +120,7 @@ def writeRubyCode( layer, recipe, geometry ) :
 
   if overrideLaps > 1 or None == overrideLaps :
     # Construct G-Code for second half.
-    print "  Construct G-Code for second half."
+    print("  Construct G-Code for second half.")
     gCodePath = G_CodeToPath(
       recipeDirectory + "/" + layer + "-Layer_2.gc",
       geometry,
@@ -128,7 +128,7 @@ def writeRubyCode( layer, recipe, geometry ) :
     )
 
     # Write 2nd wind G-Code path.
-    print "  Write 2nd wind G-Code path."
+    print("  Write 2nd wind G-Code path.")
     gCodePath.writeRubyCode(
       outputFileName,
       layer,
@@ -150,7 +150,7 @@ def generateLayer( layer, recipeClass, geometry, enable ) :
     enable - True to generate data for this layer, False to skip.
   """
   if enable :
-    print "Generating " + layer + "-layer recipe"
+    print("Generating " + layer + "-layer recipe")
     recipe = recipeClass( geometry, overrideLaps )
     recipe.writeG_Code( recipeDirectory + "/" + layer + "-Layer", "gc", layer + " Layer" )
 
@@ -162,8 +162,8 @@ def generateLayer( layer, recipeClass, geometry, enable ) :
 
     recipe.printStats()
   else :
-    print "Skipping " + layer + "-layer recipe"
-  print
+    print("Skipping " + layer + "-layer recipe")
+  print()
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -223,7 +223,7 @@ if __name__ == "__main__":
   # Ignoring offsets?
   # (Typically used for SketchUp models without offsets).
   if zeroOffset :
-    print "APA offsets set to zero"
+    print("APA offsets set to zero")
 
     geometryX.apaOffsetX = 0
     geometryX.apaOffsetY = 0
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     geometryG.apaOffsetY = 0
     geometryG.apaOffsetZ = 0
 
-  print
+  print()
 
   generateLayer( "X", LayerX_Recipe, geometryX, enableX )
   generateLayer( "V", LayerV_Recipe, geometryV, enableV )

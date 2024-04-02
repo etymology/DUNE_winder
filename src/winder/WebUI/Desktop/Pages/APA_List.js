@@ -43,8 +43,9 @@ function APA_List( modules )
       ampm = "PM"
     }
     else
-    if ( 0 == hours )
+    if (hours == 0) {
       hours = 12
+    }
 
     // String together result.
     // The slice code zero pads the numbers.

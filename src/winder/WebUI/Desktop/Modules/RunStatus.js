@@ -68,7 +68,7 @@ function RunStatus( modules )
   //-----------------------------------------------------------------------------
   modules.load
   (
-    [ "/Scripts/Winder" ],
+    [ "../../Scripts/Winder" ],
     function()
     {
       var winder = modules.get( "Winder" )
@@ -95,8 +95,7 @@ function RunStatus( modules )
         "io.plcLogic.getState()",
         function( value )
         {
-          if ( null !== value )
-          {
+          if (null !== value) {
             var stateTranslateTable =
             [
               "Init",          // 0
@@ -111,20 +110,20 @@ function RunStatus( modules )
               "Unservo",       // 9
               "Error"          // 10
             ]
-
+          
             var stringValue = stateTranslateTable[ value ]
             self.states[ "plcState" ] = stringValue
             $( "#plcState" ).text( stringValue )
-
+          
             // Change the CSS class for a PLC state error.
-            if ( 10 == value )
+            if (value == 10) {
               $( "#plcState" ).attr( 'class', 'plcError' )
-            else
+            } else {
               $( "#plcState" ).attr( 'class', '' )
-
-          }
-          else
+            }
+          } else {
             $( "#plcState" ).html( winder.errorString )
+          }
         }
       )
 

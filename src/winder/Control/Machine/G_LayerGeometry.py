@@ -9,7 +9,7 @@
 
 from Library.Geometry.Location import Location
 
-from GX_LayerGeometry import GX_LayerGeometry
+from .GX_LayerGeometry import GX_LayerGeometry
 
 class G_LayerGeometry( GX_LayerGeometry ) :
 

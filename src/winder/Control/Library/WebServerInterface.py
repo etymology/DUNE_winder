@@ -5,15 +5,15 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-import Cookie
+import http.cookies
 import xml.sax.saxutils
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import uuid
 import json
 import re
 
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+from http.server import HTTPServer
+from http.server import SimpleHTTPRequestHandler
 from Library.RemoteSession import RemoteSession
 
 class WebServerInterface( SimpleHTTPRequestHandler ):
@@ -48,9 +48,12 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       tag: Name of tag to encapsulate data.
       data: Data associated with tag.
     """
-    data = xml.sax.saxutils.escape( str( data ) )
-    data = "<" + tag + ">" + str( data ) + "</" + tag + ">"
-    self.wfile.write( data )
+    try:
+        data = xml.sax.saxutils.escape(str(data))
+        data = "<" + tag + ">" + str(data) + "</" + tag + ">"
+        self.wfile.write(data)
+    except Exception as e:
+        print("Error occurred while sending data:", e)
 
   #---------------------------------------------------------------------
   def _JSON_send( self, tag, data ) :
@@ -74,8 +77,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     result = None
 
     # Get post data length.
-    length = int( self.headers.getheader( 'content-length' ) )
-
+    length = int(self.headers.get('content-length'))
     # Get cookie data.
     cookies = {}
     if "Cookie" in self.headers :
@@ -135,8 +137,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       postData = self.rfile.read( length )
 
       # Split the data by commands.
-      commands = postData.split( "&" )
-
+      commands = postData.decode().split("&")
       # For each command...
       for command in commands :
 
@@ -144,7 +145,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
         id, query = command.split( "=" )
 
         # Unquote the command.
-        query = urllib.unquote_plus( query )
+        query = urllib.parse.unquote_plus( query )
 
         # See if this is a basic query (i.e. changes nothing).
         isBasicQuery = re.search( WebServerInterface.BASIC_QUERIES, query )
@@ -179,6 +180,6 @@ if __name__ == "__main__":
   server_address = ( '', 80 )
   httpd = HTTPServer( server_address, WebServerInterface )
 
-  print 'Starting httpd...'
+  print('Starting httpd...')
   while True :
     httpd.handle_request()

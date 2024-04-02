@@ -26,7 +26,7 @@ import re
 import os.path
 import shutil
 
-from Hash import Hash
+from .Hash import Hash
 
 class Recipe :
   #---------------------------------------------------------------------

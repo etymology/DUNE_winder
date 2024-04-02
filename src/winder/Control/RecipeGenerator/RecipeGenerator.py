@@ -325,12 +325,12 @@ class RecipeGenerator :
     Print some statistics about the layer.
     """
 
-    print "Wire consumed:", "{:,.2f}mm".format( self.nodePath.totalLength() )
+    print("Wire consumed:", "{:,.2f}mm".format( self.nodePath.totalLength() ))
     if self.firstHalf :
-      print "G-Code lines (1st half):", len( self.firstHalf )
+      print("G-Code lines (1st half):", len( self.firstHalf ))
 
     if self.secondHalf :
-      print "G-Code lines (2nd half):", len( self.secondHalf )
+      print("G-Code lines (2nd half):", len( self.secondHalf ))
 
   #---------------------------------------------------------------------
   @staticmethod
@@ -372,7 +372,7 @@ class RecipeGenerator :
       side = node[ 0 ]
       pin = node[ 1: ]
       location = str( self.nodes[ node ] )[ 1:-1 ].replace( ' ', '' )
-      print side + "," + pin + "," + location
+      print(side + "," + pin + "," + location)
 
   #---------------------------------------------------------------------
   def printNet( self ) :
@@ -381,4 +381,4 @@ class RecipeGenerator :
     these pins.
     """
     for net in self.net :
-      print net, self.nodes[ net ]
+      print(net, self.nodes[ net ])

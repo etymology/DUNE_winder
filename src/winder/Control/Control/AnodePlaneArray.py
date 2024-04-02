@@ -15,7 +15,7 @@ from Library.Recipe import Recipe
 from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
 
-from APA_Base import APA_Base
+from .APA_Base import APA_Base
 
 class AnodePlaneArray( APA_Base ) :
 

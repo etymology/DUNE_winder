@@ -12,8 +12,8 @@
 #   class provides the I/O device.
 ###############################################################################
 
-from PLC import PLC
-from pycomm.ab_comm.clx import Driver as ClxDriver
+from .PLC import PLC
+from pycomm3.logix_driver import LogixDriver as ClxDriver
 import threading
 
 class ControllogixPLC( PLC ) :
@@ -29,7 +29,7 @@ class ControllogixPLC( PLC ) :
     isFunctional = True
     try :
       # Attempt to open a connection to PLC.
-      isOk = self._plcDriver.open( self._ipAddress )
+      isOk = self._plcDriver.open()
       if not isOk :
         isFunctional = False
     except Exception:
@@ -54,7 +54,7 @@ class ControllogixPLC( PLC ) :
     return not self._isFunctional
 
   #---------------------------------------------------------------------
-  def read( self, tag ) :
+  def read( self, tagName:str) :
     """
     Read a tag(s) from the PLC.
 
@@ -66,17 +66,18 @@ class ControllogixPLC( PLC ) :
     """
 
     self._lock.acquire()
-    result = None
     if self._isFunctional :
       try :
-        result = self._plcDriver.read_tag( tag )
+        resultingTag = self._plcDriver.read( tagName )
+        # if resultingTag.error:
+          # print(f"While reading tag {tagName}, PLC threw error {resultingTag.error}")
       except Exception:
         # If tag reading threw an exception, the connection is dead.
         self._isFunctional = False
 
     self._lock.release()
 
-    return result
+    return resultingTag.value
 
   #---------------------------------------------------------------------
   def write( self, tag, data=None, typeName=None ) :
@@ -96,7 +97,7 @@ class ControllogixPLC( PLC ) :
     result = None
     if self._isFunctional :
       try :
-        result = self._plcDriver.write_tag( tag, data, typeName )
+        result = self._plcDriver.write( tag, data )
       except Exception:
         # If tag reading threw an exception, the connection is dead.
         self._isFunctional = False
@@ -114,7 +115,7 @@ class ControllogixPLC( PLC ) :
     """
     PLC.__init__( self, "ControllogixPLC" )
     self._ipAddress = ipAddress
-    self._plcDriver = ClxDriver()
+    self._plcDriver = ClxDriver(ipAddress)
     self._isFunctional = False
     self._lock = threading.Lock()
     self.initialize()

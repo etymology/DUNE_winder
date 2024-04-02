@@ -9,8 +9,8 @@
 
 import math
 
-from Location import Location
-from Segment import Segment
+from .Location import Location
+from .Segment import Segment
 
 class Line :
   """

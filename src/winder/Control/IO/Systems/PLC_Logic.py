@@ -43,6 +43,7 @@ class PLC_Logic :
     LATCH_UNLOCK = 7
     UNSERVO    = 8
     PLC_INIT   = 9
+    EOT_RESET  = 99
   # end class
 
   class LatchPosition :

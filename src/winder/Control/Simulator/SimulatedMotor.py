@@ -282,14 +282,14 @@ class SimulatedMotor :
     self._motion = TrapezoidalMotion( 0, 0, 0, 0, 0 )
 
     self._desiredPositionTag = plc.setupTag( tagBase + "_POSITION", 0                     )
-    self._desiredVelocityTag = plc.setupTag( tagBase + "_Axis.CommandVelocity", 0         )
+    self._desiredVelocityTag = plc.setupTag( tagBase + "_axis.CommandVelocity", 0         )
     self._speedTag           = plc.setupTag( tagBase + "_SPEED", 0                        )
     self._directionTag       = plc.setupTag( tagBase + "_DIR", 0                          )
-    self._positionTag        = plc.setupTag( tagBase + "_Axis.ActualPosition", 0          )
-    self._velocityTag        = plc.setupTag( tagBase + "_Axis.ActualVelocity", 0          )
-    self._accelerationTag    = plc.setupTag( tagBase + "_Axis.CommandAcceleration", 0     )
-    self._motionTag          = plc.setupTag( tagBase + "_Axis.CoordinatedMotionStatus", 0 )
-    self._faultTag           = plc.setupTag( tagBase + "_Axis.ModuleFault", 0             )
+    self._positionTag        = plc.setupTag( tagBase + "_axis.ActualPosition", 0          )
+    self._velocityTag        = plc.setupTag( tagBase + "_axis.ActualVelocity", 0          )
+    self._accelerationTag    = plc.setupTag( tagBase + "_axis.CommandAcceleration", 0     )
+    self._motionTag          = plc.setupTag( tagBase + "_axis.CoordinatedMotionStatus", 0 )
+    self._faultTag           = plc.setupTag( tagBase + "_axis.ModuleFault", 0             )
 
   #---------------------------------------------------------------------
   def getSpeedTag( self ) :

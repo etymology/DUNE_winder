@@ -188,8 +188,9 @@ function PositionGraphic( modules )
     var canvas = document.getElementById( canvasName )
     var context
 
-    if ( canvas )
+    if (canvas) {
       context = canvas.getContext( "2d" )
+    }
 
     return context
   }
@@ -257,10 +258,11 @@ function PositionGraphic( modules )
     (
       function()
       {
-        if ( ! motorStatus.motor[ "yFunctional" ] )
+        if (! motorStatus.motor[ "yFunctional" ]) {
           $( "#loopImage" ).addClass( "axisFault" )
-        else
+        } else {
           $( "#loopImage" ).removeClass( "axisFault" )
+        }
 
         // Motor position history.
         debounceLastX = debounceX
@@ -323,31 +325,32 @@ function PositionGraphic( modules )
 
         var zArm = rescale( zPosition, MIN_ARM_Z, MAX_ARM_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
 
-        if ( 0 != motorStatus.motor[ "headSide" ] )
-        {
+        if (motorStatus.motor[ "headSide" ] != 0) {
           var zHead =
             rescale( zPosition, MIN_HEAD_Z, MAX_HEAD_Z, MIN_Z_POSITION, MAX_Z_POSITION, 0 )
-
-          if ( 1 != motorStatus.motor[ "headSide" ] )
+        
+          if (motorStatus.motor[ "headSide" ] != 1) {
             zHead = MAX_HEAD_Z
-
+          }
+        
           $( "#zHeadImage" )
             .show()
             .css( "left", zHead + "px" )
-
+        
           //
           // Position arm (Z image).
           //
           $( "#zArmImage" )
             .css( "left", zArm + "px" )
-
+        
           //
           // Draw angle of arm on head.
           //
           var z = zPosition
-          if ( 1 != motorStatus.motor[ "headSide" ] )
+          if (motorStatus.motor[ "headSide" ] != 1) {
             z = MAX_Z_POSITION
-
+          }
+        
           var zHeadArm =
             rescale
             (
@@ -358,18 +361,17 @@ function PositionGraphic( modules )
               MAX_Z_POSITION,
               Z_HEAD_ARM_X
             )
-
+        
           var zHeadArmWidth = ( Z_HEAD_ARM_MAX_WIDTH - Z_HEAD_ARM_MIN_WIDTH )
           zHeadArmWidth *= -Math.sin( readData[ 'headAngle' ] )
-
-          if ( zHeadArmWidth < 0 )
-          {
+        
+          if (zHeadArmWidth < 0) {
             zHeadArm += zHeadArmWidth
             zHeadArmWidth = Z_HEAD_ARM_MIN_WIDTH - zHeadArmWidth
-          }
-          else
+          } else {
             zHeadArmWidth += Z_HEAD_ARM_MIN_WIDTH
-
+          }
+        
           zStatusCanvas.fillStyle = "grey"
           zStatusCanvas.fillRect
           (
@@ -387,13 +389,13 @@ function PositionGraphic( modules )
             zHeadArmWidth,
             Z_HEAD_ARM_HEIGHT
           )
-
+        
           var radius = HEAD_ANGLE_RADIUS
           zStatusCanvas.beginPath()
           zStatusCanvas.arc( HEAD_ANGLE_X, HEAD_ANGLE_Y, radius, 0, 2 * Math.PI )
           zStatusCanvas.lineWidth = 2 * scale
           zStatusCanvas.stroke()
-
+        
           zStatusCanvas.beginPath()
           var x = -Math.sin( readData[ 'headAngle' ] ) * radius
           var y =  Math.cos( readData[ 'headAngle' ] ) * radius
@@ -401,9 +403,9 @@ function PositionGraphic( modules )
           zStatusCanvas.lineTo( x + HEAD_ANGLE_X, y + HEAD_ANGLE_Y )
           zStatusCanvas.lineWidth = 2 * scale
           zStatusCanvas.stroke()
-        }
-        else
+        } else {
           $( "#zHeadImage" ).hide()
+        }
 
 
         var xyStatusCanvas = getCanvas( "xyStatusCanvas" )
@@ -494,8 +496,9 @@ function PositionGraphic( modules )
           lines.push( [ x, y ] )
 
           // Get rid of the oldest line segments.
-          while ( lines.length > ( LINES + 1 ) )
-            lines.shift()
+          while (lines.length > ( LINES + 1 )) {
+              lines.shift()
+          }
 
           var pathCanvas = getCanvas( "pathCanvas" )
 
@@ -513,7 +516,7 @@ function PositionGraphic( modules )
 
             // If this isn't the first point (we need two points to draw a line
             // segment)...
-            if ( 0 != lineIndex )
+            if ( lineIndex != 0 )
             {
               // Start line segment.
               pathCanvas.beginPath()
@@ -627,13 +630,15 @@ function PositionGraphic( modules )
   //-----------------------------------------------------------------------------
   this.initialize = function( scaleParameter )
   {
-    if ( scaleParameter )
+    if (scaleParameter) {
       scale = scaleParameter
-    else
+    } else {
       scale = DEFAULT_SCALE
+    }
 
-    if ( winder )
+    if (winder) {
       startSetup()
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -813,8 +818,9 @@ function PositionGraphic( modules )
         }
       )
 
-      if ( scale )
+      if (scale) {
         startSetup()
+      }
 
     }
   )

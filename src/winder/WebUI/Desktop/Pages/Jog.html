@@ -108,7 +108,7 @@
 
       <article id="manualGCodeDiv">
         <h2>Manual G-Code</h2>
-        <input id="manualGCode" />
+        <input id="manualGCode" oninput="this.value = this.value.toUpperCase()"/>
         <button onclick="jog.executeGCode()">Execute</button>
         <p id="gExecutionCodeStatus">Ready.</p>
       </article>

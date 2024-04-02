@@ -9,11 +9,8 @@
 
 from abc import ABCMeta, abstractmethod
 
-class IO_Point:
+class IO_Point(metaclass=ABCMeta):
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all IO_Point objects in system.
   list = []
   map = {}
 

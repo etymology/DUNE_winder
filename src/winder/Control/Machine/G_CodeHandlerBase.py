@@ -98,7 +98,7 @@ class G_CodeHandlerBase :
     self._line = line
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "Line", line
+      print("Line", line)
 
 
   #---------------------------------------------------------------------
@@ -226,14 +226,14 @@ class G_CodeHandlerBase :
     endLocation = Location( self._x, self._y, self._z )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  SEEK_TRANSFER starting at", endLocation,
+      print("  SEEK_TRANSFER starting at", endLocation, end=' ')
 
     # Starting location based on anchor point.  Actual location has compensation
     # for pin diameter.
     startLocation = self._headCompensation.pinCompensation( endLocation )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "Pin correction", startLocation,
+      print("Pin correction", startLocation, end=' ')
 
     if None == startLocation :
       data = [
@@ -257,7 +257,7 @@ class G_CodeHandlerBase :
 
     location = edges.intersectSegment( segment )
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "Finial location", location
+      print("Finial location", location)
 
     if None == location :
       data = [
@@ -282,7 +282,7 @@ class G_CodeHandlerBase :
     axies = self._parameterExtract( function, 3, None, str, "pin center" )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  PIN_CENTER", pinNumberA, pinNumberB,
+      print("  PIN_CENTER", pinNumberA, pinNumberB, end=' ')
 
     if not self._layerCalibration :
       raise G_CodeException( "G-Code request for calibrated move, but no layer calibration to use." )
@@ -292,7 +292,7 @@ class G_CodeHandlerBase :
     center = pinA.center( pinB )
     center = center.add( self._layerCalibration.offset )
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print pinA, pinB, center
+      print(pinA, pinB, center)
 
     if "X" in axies :
       self._x = center.x
@@ -318,7 +318,7 @@ class G_CodeHandlerBase :
     self._x = min( self._x, self._machineCalibration.transferRight )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  CLIP", oldX, oldY, "->", self._x, self._y
+      print("  CLIP", oldX, oldY, "->", self._x, self._y)
 
     self._xyChange |= ( oldX != self._x ) or ( oldY != self._y )
 
@@ -326,7 +326,7 @@ class G_CodeHandlerBase :
     # Offset coordinates.
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  OFFSET",
+      print("  OFFSET", end=' ')
 
     parameters = function[ 1: ]
     for parameter in parameters :
@@ -335,20 +335,20 @@ class G_CodeHandlerBase :
 
       if "X" == axis :
         if G_CodeHandlerBase.DEBUG_UNIT :
-          print "x", offset,
+          print("x", offset, end=' ')
 
         self._x += offset
         self._xyChange = True
 
       if "Y" == axis :
         if G_CodeHandlerBase.DEBUG_UNIT :
-          print "y", offset,
+          print("y", offset, end=' ')
 
         self._y += offset
         self._xyChange = True
 
       if G_CodeHandlerBase.DEBUG_UNIT :
-        print
+        print()
 
   #---------------------------------------------------------------------
   def _headLocation( self, function ) :
@@ -360,7 +360,7 @@ class G_CodeHandlerBase :
     self._headPositionChange = True
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  HEAD_LOCATION", self._headPosition
+      print("  HEAD_LOCATION", self._headPosition)
 
   #---------------------------------------------------------------------
   def _delay( self, function ) :
@@ -391,7 +391,7 @@ class G_CodeHandlerBase :
     self._headCompensation.orientation( orientation )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  ANCHOR_POINT", pinNumber, pin, orientation
+      print("  ANCHOR_POINT", pinNumber, pin, orientation)
 
   #---------------------------------------------------------------------
   def _armCorrect( self, function ) :
@@ -403,13 +403,13 @@ class G_CodeHandlerBase :
 
     currentLocation = Location( self._x, self._y, z )
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  ARM_CORRECT", currentLocation,
+      print("  ARM_CORRECT", currentLocation, end=' ')
 
     if   MathExtra.isclose( self._y, self._machineCalibration.transferTop ) \
       or MathExtra.isclose( self._y, self._machineCalibration.transferBottom ) :
         self._x = self._headCompensation.correctX( currentLocation )
         if G_CodeHandlerBase.DEBUG_UNIT :
-          print "new X", self._x,
+          print("new X", self._x, end=' ')
 
         edge = None
 
@@ -434,14 +434,14 @@ class G_CodeHandlerBase :
           self._y = self._headCompensation.correctY( location )
           self._x = location.x
           if G_CodeHandlerBase.DEBUG_UNIT :
-            print "Edge", self._x, self._y,
+            print("Edge", self._x, self._y, end=' ')
     else :
       self._y = self._headCompensation.correctY( currentLocation )
       if G_CodeHandlerBase.DEBUG_UNIT :
-        print "new Y", self._y,
+        print("new Y", self._y, end=' ')
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print
+      print()
 
     self._xyChange = True
 
@@ -458,7 +458,7 @@ class G_CodeHandlerBase :
     zHead = self._getHeadPosition( self._headPosition )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "  TRANSFER_CORRECT", self._headCompensation.anchorPoint(), start, zHead,
+      print("  TRANSFER_CORRECT", self._headCompensation.anchorPoint(), start, zHead, end=' ')
 
     # Wire orientation and desired head position.
     correction = self._parameterExtract( function, 1, None, str, "correction" )
@@ -466,7 +466,7 @@ class G_CodeHandlerBase :
 
     orientation = self._headCompensation.orientation()
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "correction", correction, "orientation", orientation,
+      print("correction", correction, "orientation", orientation, end=' ')
 
     if "X" == correction :
       # Which side of the anchor point pin the wire sits (left or right).
@@ -499,7 +499,7 @@ class G_CodeHandlerBase :
       raise G_CodeException( "Unknown correction type: " + str( correction ) + ".", data )
 
     if G_CodeHandlerBase.DEBUG_UNIT :
-      print "x", self._x, "y", self._y
+      print("x", self._x, "y", self._y)
 
   #---------------------------------------------------------------------
   def _break( self, function ) :
@@ -541,7 +541,7 @@ class G_CodeHandlerBase :
     self._functions.append( function )
 
     # Toggle spool latch.
-    if number in G_CodeHandlerBase.G_CODE_FUNCTION_TABLE.keys() :
+    if number in list(G_CodeHandlerBase.G_CODE_FUNCTION_TABLE.keys()) :
       G_CodeHandlerBase.G_CODE_FUNCTION_TABLE[ number ]( self, function )
     else:
       data = [ str( number ) ]

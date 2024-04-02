@@ -10,8 +10,8 @@ from Machine.U_LayerGeometry import U_LayerGeometry
 from Machine.G_LayerGeometry import G_LayerGeometry
 
 if len( sys.argv ) != 4 :
-  print "Syntax:"
-  print "  csv2calibration <layer> <input CSV> <output XML>"
+  print("Syntax:")
+  print("  csv2calibration <layer> <input CSV> <output XML>")
   sys.exit( -1 )
 
 layer          = sys.argv[ 1 ]

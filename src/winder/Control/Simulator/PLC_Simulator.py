@@ -7,7 +7,7 @@
 ###############################################################################
 
 import math
-import Queue
+import queue
 import random
 from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
@@ -494,7 +494,7 @@ class PLC_Simulator :
     self._cameraDeltaY = 0.0
     self._nextPinX = None
     self._nextPinY = None
-    self._cameraFIFO = Queue.Queue()
+    self._cameraFIFO = queue.Queue()
 
     self._latchDelay = Delay( self._simulationTime )
 
@@ -507,32 +507,32 @@ class PLC_Simulator :
     self._zMin = self._machineGeometry.limitRetracted - self.POSITION_ERROR
     self._zMax = self._machineGeometry.limitExtended + self.POSITION_ERROR
 
-    self._machine_SW_Stat = io.plc.setupTag( "Machine_SW_Stat", 0 )
+    self._MACHINE_SW_STAT = io.plc.setupTag( "MACHINE_SW_STAT", 0 )
 
-    self.Latch_Homed          = self.SimulatedInput( io, "Machine_SW_Stat", 0, False )
-    self.Z_Retracted_1A       = self.SimulatedInput( io, "Machine_SW_Stat", 1, False )
-    self.Z_Retracted_2B       = self.SimulatedInput( io, "Machine_SW_Stat", 2, False )
-    self.Z_Retracted_2A       = self.SimulatedInput( io, "Machine_SW_Stat", 3, False )
-    self.Z_Retracted_2B       = self.SimulatedInput( io, "Machine_SW_Stat", 4, False )
-    self.Z_Extended           = self.SimulatedInput( io, "Machine_SW_Stat", 5, False )
-    self.Z_Stage_Latched      = self.SimulatedInput( io, "Machine_SW_Stat", 6, False )
-    self.Z_Fixed_Latched      = self.SimulatedInput( io, "Machine_SW_Stat", 7, False )
-    self.Z_End_of_Travel      = self.SimulatedInput( io, "Machine_SW_Stat", 8, False )
-    self.Z_Stage_Present      = self.SimulatedInput( io, "Machine_SW_Stat", 9, False )
-    self.Z_Fixed_Present      = self.SimulatedInput( io, "Machine_SW_Stat", 10, False )
-    self.Z_Spring_Comp        = self.SimulatedInput( io, "Machine_SW_Stat", 11, False )
-    self.Latch_Actuator_Top   = self.SimulatedInput( io, "Machine_SW_Stat", 12, False )
-    self.Latch_Actuator_Mid   = self.SimulatedInput( io, "Machine_SW_Stat", 13, False )
+    self.Latch_Homed          = self.SimulatedInput( io, "MACHINE_SW_STAT", 0, False )
+    self.Z_Retracted_1A       = self.SimulatedInput( io, "MACHINE_SW_STAT", 1, False )
+    self.Z_Retracted_2B       = self.SimulatedInput( io, "MACHINE_SW_STAT", 2, False )
+    self.Z_Retracted_2A       = self.SimulatedInput( io, "MACHINE_SW_STAT", 3, False )
+    self.Z_Retracted_2B       = self.SimulatedInput( io, "MACHINE_SW_STAT", 4, False )
+    self.Z_Extended           = self.SimulatedInput( io, "MACHINE_SW_STAT", 5, False )
+    self.Z_Stage_Latched      = self.SimulatedInput( io, "MACHINE_SW_STAT", 6, False )
+    self.Z_Fixed_Latched      = self.SimulatedInput( io, "MACHINE_SW_STAT", 7, False )
+    self.Z_End_of_Travel      = self.SimulatedInput( io, "MACHINE_SW_STAT", 8, False )
+    self.Z_Stage_Present      = self.SimulatedInput( io, "MACHINE_SW_STAT", 9, False )
+    self.Z_Fixed_Present      = self.SimulatedInput( io, "MACHINE_SW_STAT", 10, False )
+    self.Z_Spring_Comp        = self.SimulatedInput( io, "MACHINE_SW_STAT", 11, False )
+    self.Latch_Actuator_Top   = self.SimulatedInput( io, "MACHINE_SW_STAT", 12, False )
+    self.Latch_Actuator_Mid   = self.SimulatedInput( io, "MACHINE_SW_STAT", 13, False )
 
-    self.X_Park_OK           = self.SimulatedInput( io, "Machine_SW_Stat", 14, False )
-    self.X_Transfer_OK       = self.SimulatedInput( io, "Machine_SW_Stat", 15, False )
-    self.Y_Mount_Transfer_OK = self.SimulatedInput( io, "Machine_SW_Stat", 16, False )
-    self.Y_Transfer_OK       = self.SimulatedInput( io, "Machine_SW_Stat", 17, False )
-    self.endOfTravel_Yp      = self.SimulatedInput( io, "Machine_SW_Stat", 18, True )
-    self.endOfTravel_Ym      = self.SimulatedInput( io, "Machine_SW_Stat", 19, True )
-    self.endOfTravel_Xp      = self.SimulatedInput( io, "Machine_SW_Stat", 20, True )
-    self.endOfTravel_Xm      = self.SimulatedInput( io, "Machine_SW_Stat", 21, True )
-    self.Rotation_Lock_key   = self.SimulatedInput( io, "Machine_SW_Stat", 22, True  )
+    self.X_Park_OK           = self.SimulatedInput( io, "MACHINE_SW_STAT", 14, False )
+    self.X_Transfer_OK       = self.SimulatedInput( io, "MACHINE_SW_STAT", 15, False )
+    self.Y_Mount_Transfer_OK = self.SimulatedInput( io, "MACHINE_SW_STAT", 16, False )
+    self.Y_Transfer_OK       = self.SimulatedInput( io, "MACHINE_SW_STAT", 17, False )
+    self.endOfTravel_Yp      = self.SimulatedInput( io, "MACHINE_SW_STAT", 18, True )
+    self.endOfTravel_Ym      = self.SimulatedInput( io, "MACHINE_SW_STAT", 19, True )
+    self.endOfTravel_Xp      = self.SimulatedInput( io, "MACHINE_SW_STAT", 20, True )
+    self.endOfTravel_Xm      = self.SimulatedInput( io, "MACHINE_SW_STAT", 21, True )
+    self.Rotation_Lock_key   = self.SimulatedInput( io, "MACHINE_SW_STAT", 22, True  )
 
     # True to use real-time for simulations, False for using a time delta.
     self._realTime = True

@@ -16,12 +16,9 @@
 
 from abc import ABCMeta, abstractmethod
 
-class TimeSource :
+class TimeSource(metaclass=ABCMeta) :
 
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  #-------------------------------------------------------------------
   @abstractmethod
   def sleep( self, sleepTime ) :
     """

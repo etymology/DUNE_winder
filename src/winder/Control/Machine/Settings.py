@@ -4,7 +4,9 @@
 # Date: 2016-02-11
 # Author(s):
 #   Andrew Que <aque@bb7.com>
+#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
+import platform
 
 class Settings :
 
@@ -16,11 +18,22 @@ class Settings :
   IO_UPDATE_TIME              = 0.1   # In seconds.  Currently 10 times/sec.
 
   # Path to configuration file.
-  CONFIG_FILE = "../configuration.xml"
+  # Check the operating system
+  if platform.system() == "Windows":
+      CONFIG_FILE = "C:/Users/Dune Admin/winder_py2/src/winder/configuration.xml"
+      UI_VERSION_FILE = "C:/Users/Dune Admin/winder_py2/src/winder/WebUI/version.xml"
+      WEB_DIRECTORY = "C:/Users/Dune Admin/winder_py2/dune_winder2/src/winder\WebUI"
+  elif platform.system() == "Linux":
+      CONFIG_FILE = "../configuration.xml"
+      UI_VERSION_FILE = "../dune_winder/src/winder/WebUI/version.xml"
+      WEB_DIRECTORY = "/home/ben/DUNE/dune_winder/src/winder/WebUI"
+  else:
+      # Handle other operating systems if needed
+      print("Unsupported operating system")
 
   # Path and name of version information file.
-  VERSION_FILE = "version.xml"
-  UI_VERSION_FILE = "../WebUI/version.xml"
+  VERSION_FILE = "C:\\Users\\Dune Admin\\winder_py2\\dune_winder2\\src\\winder\\Control\\version.xml"
+
 
   G_CODE_LOG_FILE = "_gCode.gc"
 
@@ -28,7 +41,7 @@ class Settings :
 
   MACHINE_CALIBRATION_FILE = "machineCalibration.xml"
 
-  WEB_DIRECTORY = "../WebUI"
+
 
   # File making up the version for the control software.
   CONTROL_FILES = ".*\.py$"
@@ -42,10 +55,10 @@ class Settings :
     """
     Setup default values for configuration.
     """
-    configuration.default( "plcAddress", "192.168.16.49" )
+    configuration.default( "plcAddress", "192.168.140.13" )
 
     # Location of camera's last captured image.
-    configuration.default( "cameraURL", "ftp://admin@192.168.16.55/image.bmp" )
+    configuration.default( "cameraURL", "ftp://admin@192.168.140.19/image.bmp" )
     configuration.default( "pixelsPer_mm", 18 )
 
     # Default for GUI server.
@@ -61,7 +74,7 @@ class Settings :
     configuration.default( "machineCalibrationFile", Settings.MACHINE_CALIBRATION_FILE )
     configuration.default( "APA_LogDirectory", "../Data/APA" )
     configuration.default( "recipeDirectory", "../Recipes" )
-    configuration.default( "recipeArchiveDirectory", "../Data/Recipes" )
+    configuration.default( "recipeArchiveDirectory", "../Recipes" )
 
     # Velocity limits.
     configuration.default( "maxVelocity", 16 * 25.4 ) # 16 inches/second

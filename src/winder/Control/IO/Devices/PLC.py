@@ -6,21 +6,17 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from IO_Device import IO_Device
-from IO_Device import IO_Device
+from .IO_Device import IO_Device
+from .IO_Device import IO_Device
 from abc import ABCMeta, abstractmethod
 
-class PLC( IO_Device ) :
+class PLC( IO_Device, metaclass=ABCMeta ) :
 
   # There is a limit to the length of packets to/from the PLC.  When reading
   # tags the request must be limited.  I have found no documentation as to how
   # to calculate this limit, but found I could read 18 with the tag name sizes
   # currently in the queue.  So 14 seems a safe number.
   MAX_TAG_READS = 14
-
-
-  # Make class abstract.
-  __metaclass__ = ABCMeta
 
   #============================================================================
   class Tag :
@@ -107,39 +103,37 @@ class PLC( IO_Device ) :
         Ethernet traffic.
       """
 
-      tagList = []
-      for tag in PLC.Tag.list :
+      tags_to_read = []
+      for tag in PLC.Tag.list:
         # If this tag is polled...
-        if tag._attributes.isPolled :
+        if tag._attributes.isPolled:
           tagName = tag.getReadTag()
 
           # If this tag is not already in the list...
-          if not tagName in tagList :
-            tagList.append( tagName )
+          if tagName not in tags_to_read:
+            tags_to_read.append( tagName )
+      
+      results = {}
+      for tagName in tags_to_read:
+          try:
+              tagvalue = plc.read(tagName)
+              results[tagName] = tagvalue
+          except Exception as e:
+              print(f"Error reading tag {tagName}: {e}")
+              results[tagName] = None
 
-      # Break list into sub-sets of no more than 'maxTagsAtOnce' tags.
-      tagSubset = \
-        [
-          tagList[ tag : tag + PLC.MAX_TAG_READS ]
-            for tag in xrange( 0, len( tagList ), PLC.MAX_TAG_READS )
-        ]
+      if results is None:
+        for tagName in tags_to_read :
+          for tag in PLC.Tag.map[ tagName ] :
+            tag._value = tag._attributes.defaultValue
 
-      # For each tag subset...
-      for tagList in tagSubset :
-        # Read all the tags in this subset.
-        results = plc.read( tagList )
-
-        if None != results :
-          # Distribute the results to the tag objects.
-          for result in results :
-            # For each object that uses this tag name...
-            for tag in PLC.Tag.map[ result[ 0 ] ] :
-              # Send it the result.
-              tag.updateFromReadTag( result[ 1 ] )
-        else:
-          for tagName in tagList :
-            for tag in PLC.Tag.map[ tagName ] :
-              tag._value = tag._attributes.defaultValue
+      else:
+        # Distribute the results to the tag objects.
+        for tag_name in results :
+          # For each object that uses this tag name...
+          for tag in PLC.Tag.map[tag_name] :
+            # Send it the result.
+            tag.updateFromReadTag( results[tag_name] )
 
 
     #---------------------------------------------------------------------

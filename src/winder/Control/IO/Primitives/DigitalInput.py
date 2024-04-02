@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from DigitalIO import DigitalIO
+from .DigitalIO import DigitalIO
 
 class DigitalInput( DigitalIO ) :
 

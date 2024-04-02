@@ -7,7 +7,7 @@
 ###############################################################################
 
 import math
-from UV_LayerGeometry import UV_LayerGeometry
+from .UV_LayerGeometry import UV_LayerGeometry
 
 from Library.Geometry.Location import Location
 

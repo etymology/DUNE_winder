@@ -7,7 +7,7 @@
 ###############################################################################
 
 import math
-from LayerGeometry import LayerGeometry
+from .LayerGeometry import LayerGeometry
 
 class UV_LayerGeometry( LayerGeometry ) :
 

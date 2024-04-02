@@ -6,14 +6,11 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from IO_Point import IO_Point
+from .IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
 
-class Motor( IO_Point ) :
+class Motor( IO_Point, metaclass=ABCMeta ) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all motors.
   list = []
   map = {}
 

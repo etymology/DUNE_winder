@@ -65,7 +65,8 @@ class Hash :
     Notes:
       Modifies internals by hash.
     """
-    self._hashValue.update( data )
+    self._hashValue.update(data.encode('utf-8'))
+    # self._hashValue.update( data )
     return self
 
   #-------------------------------------------------------------------

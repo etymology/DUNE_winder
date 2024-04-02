@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from MachineGeometry import MachineGeometry
+from .MachineGeometry import MachineGeometry
 from Library.Geometry.Location import Location
 
 class APA_Geometry( MachineGeometry ) :

@@ -13,11 +13,8 @@
 
 from abc import ABCMeta, abstractmethod
 
-class IO_Device :
+class IO_Device(metaclass=ABCMeta) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all IO devices.
   list = []
 
   #---------------------------------------------------------------------

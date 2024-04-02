@@ -36,6 +36,7 @@ from Simulator.SimulationTime import SimulationTime
 import xml.dom.minidom
 from Debug.APA_Generator import APA_Generator
 from Machine.DefaultCalibration import DefaultMachineCalibration
+from datetime import datetime
 
 #==============================================================================
 # Debug settings.
@@ -101,8 +102,15 @@ def commandHandler( _, command ) :
   # Try and make JSON object of result.
   # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
   # raise an exception.)
+
   try:
-    result = json.dumps( result, encoding="unicode_escape" )
+    if isinstance(result, datetime):
+    # Handle the case where result is a datetime object
+    # For example, you can convert it to a string representation
+      json_data = json.dumps({"datetime": result.isoformat()})
+    else:
+      # Handle other cases
+      result = json.dumps( result)
   except TypeError :
     # If it cannot be made JSON, just make it a string.
     result = json.dumps( str( result ), encoding="unicode_escape" )
@@ -152,16 +160,16 @@ for argument in sys.argv:
 
     returnResult = 0
     if not version.verify() :
-      print "Control version incorrect."
+      print("Control version incorrect.")
       returnResult -= 1
     else :
-      print "Control version correct."
+      print("Control version correct.")
 
     if not uiVersion.verify() :
-      print "UI version incorrect."
+      print("UI version incorrect.")
       returnResult -= 2
     else :
-      print "UI version correct."
+      print("UI version correct.")
 
     sys.exit( returnResult )
 

@@ -110,7 +110,7 @@ class WindMode( StateMachineState ) :
     #Want to print G-Code line
     
     # If stop requested...
-    if self.stateMachine.stopRequest :
+    if self.stateMachine.stopRequest : # and self.io.Tension_10N.get() :
       # We didn't finish this line.  Run it again.
       self._io.plcLogic.stopSeek()
       self.changeState( self.stateMachine.States.STOP )

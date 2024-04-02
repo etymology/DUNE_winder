@@ -20,8 +20,9 @@ function Log( modules )
         )
 
     var query = "log.getAll( 50 )"
-    if ( loadAll )
+    if (loadAll) {
       query = "log.getAll()"
+    }
 
     var loadingText = $( "<p />" )
       .attr( "id", "logTable" )

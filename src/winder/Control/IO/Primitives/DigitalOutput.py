@@ -6,13 +6,10 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 from abc import ABCMeta, abstractmethod
-from DigitalIO import DigitalIO
+from .DigitalIO import DigitalIO
 
-class DigitalOutput( DigitalIO ) :
+class DigitalOutput( DigitalIO, metaclass=ABCMeta ) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all digital outputs.
   list = []
   map = {}
 

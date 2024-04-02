@@ -13,12 +13,14 @@
 #   name = configuration.get( "Name" )  # <- 'name' will be "Andrew Que"
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import xml.dom.minidom
 
 class Configuration :
 
   #---------------------------------------------------------------------
-  def __init__( self, fileName = "configuration.xml" ) :
+  def __init__( self, fileName = "./configuration.xml" ) :
     """
     Constructor.
 
@@ -59,8 +61,8 @@ class Configuration :
     outputText = \
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
-    with open( self._fileName, "wb" ) as outputFile :
-      outputFile.write( outputText )
+    with open('output_file.txt', 'wb') as outputFile:  # Note the 'wb' mode for writing bytes
+        outputFile.write(outputText.encode('utf-8'))
 
   #---------------------------------------------------------------------
   def set( self, tag, value ) :
@@ -132,5 +134,5 @@ if __name__ == "__main__":
   value = int( config.get( "test" ) )
   value += 1
   config.set( "test", value )
-  print config.get( "test" )
+  print(config.get( "test" ))
   config.save()

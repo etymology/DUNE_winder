@@ -6,11 +6,11 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from LayerGeometry import LayerGeometry
-from X_LayerGeometry import X_LayerGeometry
-from V_LayerGeometry import V_LayerGeometry
-from U_LayerGeometry import U_LayerGeometry
-from G_LayerGeometry import G_LayerGeometry
+from .LayerGeometry import LayerGeometry
+from .X_LayerGeometry import X_LayerGeometry
+from .V_LayerGeometry import V_LayerGeometry
+from .U_LayerGeometry import U_LayerGeometry
+from .G_LayerGeometry import G_LayerGeometry
 
 class GeometrySelection( LayerGeometry ) :
 

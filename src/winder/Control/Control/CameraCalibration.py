@@ -215,7 +215,7 @@ class CameraCalibration :
     items = self._calibrationData
 
     # Find row for pin in capture FIFO.
-    row = ( item for item in items if item[ "Pin" ] == pin ).next()
+    row = next(( item for item in items if item[ "Pin" ] == pin ))
 
     # Update data.
     row[ "Status" ] = 1

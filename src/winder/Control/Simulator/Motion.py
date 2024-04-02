@@ -8,12 +8,9 @@
 
 from abc import ABCMeta, abstractmethod
 
-class Motion :
+class Motion(metaclass=ABCMeta) :
 
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  #---------------------------------------------------------------------
   @abstractmethod
   def isMoving( self, time ):
     """

@@ -44,21 +44,23 @@ function Jog( modules )
 
     // When both velocities are the same, calculate the maximum linear velocity
     // and use that.
-    if ( ( 0 != x )
-      && ( 0 != y )
+    if ( ( x != 0 )
+      && ( y != 0 )
       && ( Math.abs( x ) == Math.abs( y ) ) )
     {
       velocity = Math.sqrt( x * x / 2.0 )
 
-      if ( x < 0 )
+      if (x < 0) {
         x = -velocity
-      else
+      } else {
         x = velocity
+      }
 
-      if ( y < 0 )
+      if (y < 0) {
         y = -velocity
-      else
+      } else {
         y = velocity
+      }
     }
 
     var acceleration = maxAcceleration
@@ -85,11 +87,13 @@ function Jog( modules )
   //-----------------------------------------------------------------------------
   this.seekXY = function( x, y )
   {
-    if ( null == x )
+    if (null == x) {
       x = $( "#seekX" ).val()
+    }
 
-    if ( null == y )
+    if (null == y) {
       y = $( "#seekY" ).val()
+    }
 
     var velocity = maxVelocity
     var acceleration = maxAcceleration
@@ -116,15 +120,17 @@ function Jog( modules )
   {
     var velocity = maxVelocity
 
-    if ( x )
+    if (x) {
       x = "process.apa._gCodeHandler." + x
-    else
+    } else {
       x = "None"
+    }
 
-    if ( y )
+    if (y) {
       y = "process.apa._gCodeHandler." + y
-    else
+    } else {
       y = "None"
+    }
 
     winder.remoteAction( "process.manualSeekXY( " + x + ", " + y + "," + velocity + ")"  )
   }
@@ -136,8 +142,9 @@ function Jog( modules )
   this.seekZ = function( position )
   {
     var z = position
-    if ( null == z )
+    if (null == z) {
       z = $( "#seekZ" ).val()
+    }
 
     var velocity = maxVelocity
     winder.remoteAction( "process.manualSeekZ(" + z + "," + velocity + ")"  )

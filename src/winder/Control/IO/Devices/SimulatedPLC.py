@@ -50,7 +50,7 @@ class SimulatedPLC( PLC ) :
       Result of the data read, or None if there was a problem.
     """
     result = None
-    if tag in SimulatedPLC.tags.keys() :
+    if tag in list(SimulatedPLC.tags.keys()) :
       result = SimulatedPLC.tags[ tag ]
 
       if tag in SimulatedPLC.readCallbacks :
@@ -95,7 +95,7 @@ class SimulatedPLC( PLC ) :
     Returns:
         None is returned in case of error otherwise the tag list is returned.
     """
-    if tag in SimulatedPLC.tags.keys() :
+    if tag in list(SimulatedPLC.tags.keys()) :
       if tag in SimulatedPLC.writeCallbacks :
         data = SimulatedPLC.writeCallbacks[ tag ]( tag, data )
 

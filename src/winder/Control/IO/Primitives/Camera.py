@@ -9,11 +9,8 @@
 from IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
 
-class Camera( IO_Point ) :
+class Camera( IO_Point, metaclass=ABCMeta ) :
   # Make class abstract.
-  __metaclass__ = ABCMeta
-
-  # Static list of all motors.
   list = []
   map = {}
 

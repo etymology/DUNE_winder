@@ -139,8 +139,9 @@ var Winder = function( modules )
             {
               $( tagId ).val( data )
 
-              if ( additionalCallback )
+              if (additionalCallback) {
                 additionalCallback()
+              }
             }
           )
         }
@@ -159,7 +160,7 @@ var Winder = function( modules )
   {
     // Use a semaphore to prevent a stack-up of multiple instances.  Could
     // happen if there are long network delays.
-    if ( ( 0 == periodicUpdateSemaphore )
+    if ( ( periodicUpdateSemaphore == 0 )
       && ( ! self.periodicShutdown )
       && ( Object.keys( periodicQuery ).length > 0 ) )
     {
@@ -269,8 +270,9 @@ var Winder = function( modules )
                   callbackFunction = periodicCallbackTable[ id ]
 
                   // Send the retrieved data to the callback.
-                  if ( callbackFunction )
+                  if (callbackFunction) {
                     callbackFunction( valueString )
+                  }
 
                   // Save the current data.
                   periodicHistory[ id ] = valueString
@@ -401,8 +403,9 @@ var Winder = function( modules )
         variableMap[ variableIndex ] = value
 
         // Run callback if requested.
-        if ( callback )
+        if (callback) {
           callback( value, callbackParameters )
+        }
       }
     )
   }
@@ -425,8 +428,9 @@ var Winder = function( modules )
       function( xml, field )
       {
         var value = xml.find( field ).text()
-        if ( value )
+        if (value) {
           value = jQuery.parseJSON( value )
+        }
 
         return value
       }
@@ -441,8 +445,9 @@ var Winder = function( modules )
       function()
       {
         // Any failure is a failure to login.
-        if ( callback )
+        if (callback) {
           callback( false )
+        }
       }
     )
     .done
@@ -477,8 +482,9 @@ var Winder = function( modules )
             function()
             {
               // Any failure is a failure to login.
-              if ( callback )
+              if (callback) {
                 callback( false )
+              }
             }
           )
           .done
@@ -491,15 +497,17 @@ var Winder = function( modules )
               var loginResult = fetchField( xml, "loginResult" )
 
               // Run callback with results.
-              if ( callback )
+              if (callback) {
                 callback( loginResult )
+              }
             }
           )
         }
         else
           // If we are already logged in, run callback in the affirmative.
-          if ( callback )
+          if (callback) {
             callback( true )
+          }
       }
     )
 
@@ -530,8 +538,9 @@ var Winder = function( modules )
     (
       function()
       {
-        if ( callback )
+        if (callback) {
           callback( null )
+        }
       }
     )
     .done
@@ -544,11 +553,13 @@ var Winder = function( modules )
           var xml = $( data )
           var value = xml.find( "action" ).text()
 
-          if ( value )
+          if (value) {
             value = jQuery.parseJSON( value )
+          }
 
-          if ( callback )
+          if (callback) {
             callback( value )
+          }
         }
       }
     )
@@ -590,13 +601,15 @@ var Winder = function( modules )
   )
   {
     // If this value needs to be saved...
-    if ( ( variableMap )
-      && ( variableIndex ) )
-        variableMap[ variableIndex ] = value
+    if (( variableMap )
+          && ( variableIndex )) {
+      variableMap[ variableIndex ] = value
+    }
 
     // If the value needs to be formatted...
-    if ( formatFunction )
+    if (formatFunction) {
       value = formatFunction( value, formatParameters )
+    }
 
     // Display value.
     $( displayId ).text( value )
@@ -714,8 +727,9 @@ var Winder = function( modules )
     buttonStates[ inputTag ] = $( inputTag ).prop( "disabled" )
     buttonStates[ submitButton ] = $( submitButton ).prop( "disabled" )
 
-    if ( null == verifyFunction )
+    if (null == verifyFunction) {
       verifyFunction = function() { return true }
+    }
 
     var updateFunction =
       function( value )
@@ -730,8 +744,9 @@ var Winder = function( modules )
         editFieldValues[ inputTag ] = value
         $( inputTag ).val( value )
 
-        if ( getCallback )
+        if (getCallback) {
           getCallback( data )
+        }
       }
 
     if ( getQuery )
@@ -793,14 +808,16 @@ var Winder = function( modules )
                 updateFunction( value )
 
                 // Run additional callback.
-                if ( setCallback )
+                if (setCallback) {
                   setCallback ( value )
+                }
               }
             )
           }
           else
-          if ( setCallback )
+          if (setCallback) {
             setCallback( value )
+          }
         }
       )
 
@@ -816,12 +833,11 @@ var Winder = function( modules )
           if ( value != editFieldValues[ inputTag ] )
           {
             // Make sure this is a number
-            if ( verifyFunction( value ) )
-              // The change function will only denote that a change has taken
-              // place--it will not commit this change.
+            if (verifyFunction( value )) {
               $( this ).attr( "class", "changed" )
-            else
+            } else {
               $( this ).attr( "class", "error" )
+            }
           }
           else
           {
@@ -830,7 +846,7 @@ var Winder = function( modules )
 
           // Set the save button enable/disable based on any whether or not
           // there are are any modified input fields.
-          var disabled = ( 0 == $( '.changed' ).length )
+          var disabled = ( $( '.changed' ).length == 0 )
           disabled &= ! buttonStates[ submitButton ]
           $( submitButton ).prop( "disabled", disabled )
         }
@@ -870,27 +886,28 @@ var Winder = function( modules )
 
         // Get appropriate class name and button value.
         var className = "toggle"
-        if ( value )
-        {
+        if (value) {
           className = "toggleDown"
           value = 1
-        }
-        else
+        } else {
           value = 0
+        }
 
         $( tagId ).attr( 'class', className )
         $( tagId ).val( value )
 
-        if ( getCallback )
+        if (getCallback) {
           getCallback( data )
+        }
       }
 
     // Function to get the current state of button.
     var queryFunction = function()
     {
       // Query (if there is a query to run).
-      if ( getQuery )
+      if (getQuery) {
         self.remoteAction( getQuery, updateFunction )
+      }
     }
 
     // If there is a function that can query the current state of button...
@@ -931,8 +948,9 @@ var Winder = function( modules )
           $( this ).toggleClass( "toggleDown" )
 
           var value = 0
-          if ( $( this ).attr( 'class' ) == "toggleDown" )
+          if ($( this ).attr( 'class' ) == "toggleDown") {
             value = 1
+          }
 
           $( this ).val( value )
 
@@ -947,21 +965,23 @@ var Winder = function( modules )
               function( value )
               {
                 // Call query function to make sure the transition took place.
-                if ( getQuery )
+                if (getQuery) {
                   queryFunction()
-                else
-                  // If there isn't a query to run, just update using the new value.
+                } else {
                   update( value )
+                }
 
                 // Run additional callback.
-                if ( setCallback )
+                if (setCallback) {
                   setCallback ( value )
+                }
               }
             )
           }
           else
-          if ( setCallback )
+          if (setCallback) {
             setCallback( value )
+          }
         }
       )
 
@@ -1015,10 +1035,11 @@ var Winder = function( modules )
   //---------------------------------------------------------------------------
   this.inhibitUpdates = function( isInhibit )
   {
-    if ( isInhibit )
+    if (isInhibit) {
       periodicUpdateSemaphore += 1
-    else
+    } else {
       periodicUpdateSemaphore -= 1
+    }
   }
 
   //---------------------------------------------------------------------------
@@ -1029,12 +1050,14 @@ var Winder = function( modules )
   this.shutdown = function()
   {
     // Shutdown timer.
-    if ( periodicTimer )
+    if (periodicTimer) {
       clearInterval( periodicTimer )
+    }
 
     // Abort any running loads in progress.
-    if ( periodicLoadInstance )
+    if (periodicLoadInstance) {
       periodicLoadInstance.abort()
+    }
 
     periodicLoadInstance = null
     periodicTimer = null
@@ -1050,13 +1073,14 @@ var Winder = function( modules )
     var wasShutdown = this.periodicShutdown
     self.periodicShutdown = false
 
-    if ( null == periodicTimer )
+    if (null == periodicTimer) {
       periodicTimer = setInterval( self.periodicUpdate, updateRate )
+    }
 
-    if ( wasShutdown )
-      // Run error-clear callbacks.
+    if (wasShutdown) {
       for ( var index in onErrorClearCallbacks )
         onErrorClearCallbacks[ index ]()
+    }
   }
 
   //---------------------------------------------------------------------------

@@ -52,14 +52,12 @@ function Position( modules )
   //-----------------------------------------------------------------------------
   var formatFunction = function( data, decimals )
   {
-    if ( $.isNumeric( data ) )
-    {
-
+    if ($.isNumeric( data )) {
       var multiplier = Math.pow( 10, decimals )
       data = Math.round( data * multiplier ) / multiplier
-    }
-    else
+    } else {
       data = "-"
+    }
 
     return data
   }

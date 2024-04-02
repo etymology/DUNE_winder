@@ -49,21 +49,23 @@ function JogJoystick( modules )
 
     // When both velocities are the same, calculate the maximum linear velocity
     // and use that.
-    if ( ( 0 != x )
-      && ( 0 != y )
+    if ( ( x != 0 )
+      && ( y != 0 )
       && ( Math.abs( x ) == Math.abs( y ) ) )
     {
       velocity = Math.sqrt( x * x / 2.0 )
 
-      if ( x < 0 )
+      if (x < 0) {
         x = -velocity
-      else
+      } else {
         x = velocity
+      }
 
-      if ( y < 0 )
+      if (y < 0) {
         y = -velocity
-      else
+      } else {
         y = velocity
+      }
     }
 
     var acceleration = getAcceleration()

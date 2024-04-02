@@ -57,18 +57,19 @@ function Sliders( modules )
   {
     // The slider may not yet be initialized.  For such cases, the create
     // function is latched to set the value.
-    if ( isLoaded[ slider ] )
+    if (isLoaded[ slider ]) {
       $( "#" + slider ).slider( "value", value )
-    else
+    } else {
       $( "#" + slider )
-        .on
-        (
-          "slidecreate",
-          function()
-          {
-            $( "#" + slider ).slider( "value", value )
-          }
-        )
+       .on
+       (
+         "slidecreate",
+         function()
+         {
+           $( "#" + slider ).slider( "value", value )
+         }
+       )
+    }
   }
 
   //-----------------------------------------------------------------------------

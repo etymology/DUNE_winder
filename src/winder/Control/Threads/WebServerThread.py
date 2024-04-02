@@ -5,9 +5,9 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
-from BaseHTTPServer import HTTPServer
-from SocketServer import ThreadingMixIn
-import httplib
+from http.server import HTTPServer
+from socketserver import ThreadingMixIn
+import http.client
 import os
 
 from Threads.PrimaryThread import PrimaryThread
@@ -55,7 +55,7 @@ class WebServerThread( PrimaryThread ):
 
     try :
       # HEAD request just so thread unblocks.  This will throw an exception.
-      connection = httplib.HTTPConnection( "127.0.0.1" )
+      connection = http.client.HTTPConnection( "127.0.0.1" )
       connection.request( "HEAD","/" )
     except :
       pass

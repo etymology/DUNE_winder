@@ -162,5 +162,9 @@ if (typeof String.prototype.utf8Decode == 'undefined') {
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-if (typeof module != 'undefined' && module.exports) module.exports = Sha256; // CommonJs export
-if (typeof define == 'function' && define.amd) define([], function() { return Sha256; }); // AMD
+if (typeof module != 'undefined' && module.exports) {
+  module.exports = Sha256;
+} // CommonJs export
+if (typeof define == 'function' && define.amd) {
+  define([], function() { return Sha256; });
+} // AMD

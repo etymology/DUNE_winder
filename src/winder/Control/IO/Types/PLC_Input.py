@@ -58,14 +58,14 @@ class PLC_Input( DigitalInput ) :
       functional, this value returns a default value.
     """
     value = self._tag.get()
-    if None != value :
+    if value is None:
+      value = self._defaultState
+
+    else:
       value = int( value )
       value >>= self._bit
       value &= 0x01
-      value = bool( value == 1 )
-    else :
-      value = self._defaultState
-
+      value = value == 1
     return value
 
 # end class

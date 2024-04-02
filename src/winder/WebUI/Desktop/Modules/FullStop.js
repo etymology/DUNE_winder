@@ -1,28 +1,24 @@
 function FullStop( modules )
 {
-  var self = this
+  var self = this;
+  var winder;
 
-  var winder
+  try {
+      modules.load(["../../Scripts/Winder", "/Desktop/Modules/RunStatus"], function() {
+          winder = modules.get("Winder");
+          var runStatus = modules.get("RunStatus");
 
-  modules.load
-  (
-    [ "/Scripts/Winder", "/Desktop/Modules/RunStatus" ],
-    function()
-    {
-      winder = modules.get( "Winder" )
-      var runStatus = modules.get( "RunStatus" )
-
-      // Button enable.
-      winder.addPeriodicEndCallback
-      (
-        function()
-        {
-          var isDisabled = ! runStatus.isInMotion()
-          $( "#fullStopButton" ).prop( "disabled", isDisabled )
-        }
-      )
-    }
-  )
+          // Button enable.
+          winder.addPeriodicEndCallback(function() {
+              var isDisabled = !runStatus.isInMotion();
+              $("#fullStopButton").prop("disabled", isDisabled);
+          });
+      });
+  } catch (error) {
+      console.error("Error loading modules:", error);
+      // Handle the error as needed
+  }
+  
 
   //-----------------------------------------------------------------------------
   // Uses:

@@ -7,7 +7,7 @@
 ###############################################################################
 
 from IO.Devices.SimulatedPLC import SimulatedPLC
-from .BaseIO import BaseIO
+from BaseIO import BaseIO
 
 class SimulatedIO( BaseIO ) :
 

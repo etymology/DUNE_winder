@@ -30,7 +30,7 @@ class ArrayToCSV :
 
     with open( fullName, "w" ) as outputFile :
 
-      keys = data[ 0 ].keys()
+      keys = list(data[ 0 ].keys())
       for key in keys :
         outputFile.write( str( key ) + separator )
 

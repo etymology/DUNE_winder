@@ -20,7 +20,7 @@ import threading     # For additional threads.
 #------------------------------------------------------------------------------
 class _Client( threading.Thread ):
   #---------------------------------------------------------------------
-  def __init__( self, ( clientSocket, address ), callback, log ):
+  def __init__( self, xxx_todo_changeme, callback, log ):
     """
     Constructor.
 
@@ -30,6 +30,7 @@ class _Client( threading.Thread ):
       callback: Function to send data from client. What the callback returns is then sent back to client.
 
     """
+    ( clientSocket, address ) = xxx_todo_changeme
     threading.Thread.__init__( self )
 
     address = address
@@ -74,7 +75,7 @@ class _Client( threading.Thread ):
         chunks = \
           [
             dataString[ index : index + Settings.SERVER_MAX_DATA_SIZE ]
-              for index in xrange( 0, len( dataString ), Settings.SERVER_MAX_DATA_SIZE )
+              for index in range( 0, len( dataString ), Settings.SERVER_MAX_DATA_SIZE )
           ]
 
         # Send each chunk of data.

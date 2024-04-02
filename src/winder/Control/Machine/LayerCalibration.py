@@ -115,7 +115,7 @@ class LayerCalibration( HashedSerializable ) :
     Returns:
       List of pin names.
     """
-    return self._locations.keys()
+    return list(self._locations.keys())
 
   #---------------------------------------------------------------------
   def getLayerNames( self ) :

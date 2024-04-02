@@ -145,7 +145,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
 
     # A single loop completes one circuit of the APA starting and ending on the
     # lower left.
-    for self.netIndex in xrange( 1, totalCount ) :
+    for self.netIndex in range( 1, totalCount ) :
 
       # Location of the the next pinOffset.
       location = self.location( self.netIndex )

@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from G_CodeFunction import G_CodeFunction
+from RecipeGenerator.G_CodeFunctions.G_CodeFunction import G_CodeFunction
 from Machine.G_Codes import G_Codes
 
 class HeadLocationG_Code( G_CodeFunction ) :

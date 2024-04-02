@@ -6,12 +6,17 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import re
 import math
 
+from Library.Configuration import Configuration
 from Library.Geometry.Location import Location
 from Library.G_Code import G_Code
+from Library.Log import Log
+
 
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
@@ -158,7 +163,7 @@ class Process :
 
     # Filter just the G-Code file extension.
     expression = re.compile( r'\.gc$' )
-    recipeList = filter( lambda index: expression.search( index ), recipeList )
+    recipeList = [index for index in recipeList if expression.search( index )]
 
     return recipeList
 
@@ -222,6 +227,14 @@ class Process :
   #
   #---------------------------------------------------------------------
   def acknowledgePLC_Init( self ) :
+  #  """
+  #  Request that the winding process init.
+  #  """
+  
+    print("Hello World!")
+    self._io.plcLogic.PLC_init()
+  
+  def EOT_reset( self ) :
   #  """
   #  Request that the winding process init.
   #  """
@@ -1349,7 +1362,7 @@ class Process :
       frontSumY = 0
       backSumX = 0
       backSumY = 0
-      for edgeIndex in xrange( 0, 4 ) :
+      for edgeIndex in range( 0, 4 ) :
 
         frontCount  = geometry.gridFront[ edgeIndex ][ 0 ]
         frontDeltaX = geometry.gridFront[ edgeIndex ][ 1 ]

@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from LayerGeometry import LayerGeometry
+from .LayerGeometry import LayerGeometry
 
 class GX_LayerGeometry( LayerGeometry ) :
 

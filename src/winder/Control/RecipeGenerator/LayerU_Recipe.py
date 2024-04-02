@@ -8,7 +8,7 @@
 
 from Library.Geometry.Location import Location
 
-from LayerUV_Recipe import LayerUV_Recipe
+from .LayerUV_Recipe import LayerUV_Recipe
 
 class LayerU_Recipe( LayerUV_Recipe ) :
   """
