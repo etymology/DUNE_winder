@@ -9,7 +9,6 @@
 
 
 from __future__ import absolute_import
-import xml.dom.minidom
 
 from Library.Geometry.Location import Location
 from Library.ArrayToCSV import ArrayToCSV

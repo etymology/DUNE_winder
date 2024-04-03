@@ -30,6 +30,7 @@ class PLC_Logic :
     LATCH_RELEASE = 8
     UNSERVO       = 9
     ERROR         = 10
+    EOT_TRIP      = 11
   # end class
 
   # States for move type state machine.
@@ -44,6 +45,7 @@ class PLC_Logic :
     LATCH_UNLOCK = 7
     UNSERVO    = 8
     PLC_INIT   = 9
+    EOT_RESET  = 99
   # end class
 
   class LatchPosition :
@@ -252,6 +254,15 @@ class PLC_Logic :
     """
 
     self._moveType.set( self.MoveTypes.PLC_INIT ) 
+  
+  #---------------------------------------------------------------------
+  def EOT_reset( self ) :
+
+    """ 
+    Initilize PLC logic. 
+    """
+
+    self._moveType.set( self.MoveTypes.EOT_RESET ) 
 
   #--------------------------------------------------------------------- 
   

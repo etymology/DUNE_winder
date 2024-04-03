@@ -13,7 +13,6 @@ from __future__ import print_function
 import os.path
 
 from Library.Serializable import Serializable
-from Machine.Settings import Settings
 
 class APA_Base( Serializable ) :
 

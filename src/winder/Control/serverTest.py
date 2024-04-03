@@ -39,40 +39,8 @@ from Simulation.SimulationTime import SimulationTime
 from Machine.DefaultCalibration import DefaultMachineCalibration
 from datetime import datetime
 
-# ==============================================================================
-# Debug settings.
-# These should all be set to False for production.
-# Can be overridden from the command-line.
-# ==============================================================================
-
-
-# True if using simulated I/O.
-isSimulated = False
-
-# True to use debug interface.
-debugInterface = False
-
-# True to echo log to screen.
-isLogEchoed = True
-
-# True to log I/O.
-# CAUTION: Log file will get large very quickly.
-isIO_Logged = False
-
-# APA file to load.
-loadAPA_File = None
-
-# True to start APA (must be used with 'loadAPA_File'.
-isStartAPA = False
-
-# True if system should run in real-time.  Simulation option.
-isRealTime = True
-
-# ==============================================================================
 
 # -----------------------------------------------------------------------
-
-
 def commandHandler(_, command):
     """
     Handle a remote command.
@@ -92,8 +60,7 @@ def commandHandler(_, command):
 
         exceptionTypeName, exceptionValues, tracebackValue = sys.exc_info()
 
-        if debugInterface:
-            traceback.print_tb(tracebackValue)
+        traceback.print_tb(tracebackValue)
 
         tracebackAsString = repr(traceback.format_tb(tracebackValue))
         log.add(
@@ -132,56 +99,15 @@ def signalHandler(signalNumber, frame):
     frame = frame
     PrimaryThread.stopAllThreads()
 
+
 # -----------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------
-
-
-# Handle command line.
-for argument in sys.argv:
-    argument = argument.upper()
-    option = argument
-    value = "TRUE"
-    if argument.find("=") != -1:
-        option, value = argument.split("=")
-
-    if option == "APA":
-        loadAPA_File = value
-    elif option == "START":
-        isStartAPA = value == "TRUE"
-    elif option in ["SIMULATED", "SIMULATOR"]:
-        isSimulated = value == "TRUE"
-    elif option == "REAL_TIME":
-        isRealTime = value == "TRUE"
-    elif option == "LOG":
-        isLogEchoed = value == "TRUE"
-    elif option == "LOG_IO":
-        isIO_Logged = value == "TRUE"
-    elif option == "VERIFY_VERSION":
-        version = Version(Settings.VERSION_FILE, ".", Settings.CONTROL_FILES)
-        uiVersion = Version(Settings.UI_VERSION_FILE,
-                            Settings.WEB_DIRECTORY, Settings.UI_FILES)
-
-        returnResult = 0
-        if not version.verify():
-            print("Control version incorrect.")
-            returnResult -= 1
-        else:
-            print("Control version correct.")
-
-        if not uiVersion.verify():
-            print("UI version incorrect.")
-            returnResult -= 2
-        else:
-            print("UI version correct.")
-
-        sys.exit(returnResult)
-
 # Install signal handler for Ctrl-C shutdown.
 signal.signal(signal.SIGINT, signalHandler)
 
 
-systemTime = SimulationTime(isRealTime=isRealTime)
+systemTime = SimulationTime()
 startTime = systemTime.get()
 
 # Load configuration and setup default values.
@@ -193,76 +119,22 @@ Settings.defaultConfig(configuration)
 configuration.save()
 
 # Setup log file.
-log = Log(systemTime, configuration.get(
-    "LogDirectory") + '/log.csv', isLogEchoed)
+log = Log(systemTime, configuration.get("LogDirectory") + '/log.csv')
 log.add("Main", "START", "Control system starts.")
 
 try:
-    io = IO_map(configuration.get("plcAddress"))
-
-    # Use low-level I/O to avoid warning.
-    # (Low-level I/O is needed by remote commands.)
-    LowLevelIO.getTags()
-
-    # $$$TEMPORARY
-    machineCalibration = DefaultMachineCalibration(
-        configuration.get("machineCalibrationPath"),
-        configuration.get("machineCalibrationFile")
-    )
-
-    # Primary control process.
-    process = Process(io, log, configuration, systemTime, machineCalibration)
-
-    # Initialize threads.
-
     uiServer = UI_ServerThread(commandHandler, log)
     webServerThread = WebServerThread(commandHandler, log)
-    controlThread = ControlThread(
-        io, log, process.controlStateMachine, systemTime, isIO_Logged)
-    cameraThread = CameraThread(io.camera, log, systemTime)
-
-    # Begin operation.
     PrimaryThread.startAllThreads()
 
-    # If there is an APA file from the command line...
-    if loadAPA_File:
-        process.switchAPA(loadAPA_File)
-
-        if isStartAPA:
-            process.start()
-
-    # While the program is running...
     while (PrimaryThread.isRunning):
         time.sleep(0.1)
-
-    PrimaryThread.stopAllThreads()
-
-    # Shutdown the current processes.
-    process.closeAPA()
-
-    # Save configuration.
-    configuration.save()
+        PrimaryThread.stopAllThreads()
+        # Shutdown the current processes.
 
 except Exception as exception:
     PrimaryThread.stopAllThreads()
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     tracebackString = repr(traceback.format_tb(exceptionTraceback))
-    if debugInterface:
-        traceback.print_tb(exceptionTraceback)
-        raise exception
-    else:
-        log.add(
-            "Main",
-            "FAILURE",
-            "Caught an exception.",
-            [exception, exceptionType, exceptionValue, tracebackString]
-        )
-
-elapsedTime = systemTime.getDelta(startTime)
-deltaString = systemTime.getElapsedString(elapsedTime)
-
-# Log run-time of this operation.
-log.add("Main", "RUN_TIME", f"Ran for {deltaString}.", [elapsedTime])
-
-# Sign off.
-log.add("Main", "END", "Control system stops.")
+    traceback.print_tb(exceptionTraceback)
+    raise exception
