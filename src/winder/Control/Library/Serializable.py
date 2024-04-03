@@ -9,6 +9,7 @@
 import xml.dom.minidom
 import importlib
 import types
+from pathlib import Path
 
 class Serializable :
 
@@ -285,11 +286,9 @@ class Serializable :
     # Convert to XML string.
     outputText = self.toXML_String( nameOverride )
 
-    fullName = filePath + "/" + fileName
-
     # Write XML data to file.
-    with open( fullName, "wb" ) as outputFile :
-      outputFile.write( outputText )
+    with open( str(Path(filePath) / fileName), "wb" ) as outputFile :
+      outputFile.write( outputText.encode() )
 
 
   #-------------------------------------------------------------------
@@ -302,9 +301,8 @@ class Serializable :
       fileName: File name to load.
       nameOverride: Top-level XML name.
     """
-
-    fullName = filePath + "/" + fileName
-    xmlDocument = xml.dom.minidom.parse( fullName )
+    print(str(Path(filePath) / fileName))
+    xmlDocument = xml.dom.minidom.parse( str(Path(filePath) / fileName) )
 
     name = self.__class__.__name__
     if None != nameOverride :

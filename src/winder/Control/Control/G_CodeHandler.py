@@ -8,8 +8,50 @@
 ###############################################################################
 from Library.G_Code import G_Code, G_CodeException
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
+from IO.Maps.BaseIO import BaseIO
 
 class G_CodeHandler( G_CodeHandlerBase ) :
+  def __init__( self, io: BaseIO, spool, machineCalibration, headCompensation ):
+    """
+    Constructor.
+
+    Args:
+      io: Instance of I/O map.
+      spool: Instance of Spool.
+      machineCalibration: Machine calibration instance.
+      headCompensation: Instance of HeadCompensation.
+    """
+    G_CodeHandlerBase.__init__( self, machineCalibration, headCompensation )
+
+    self._gCode = None
+
+    self._io = io
+    self._spool = spool
+
+    self._direction = 1
+    self.runToLine = -1
+    self._currentLine = None
+    self._nextLine = None
+    self._gCodeLog = None
+    self._positionLog = None
+
+    self._stopNextMove = False
+    self.singleStep = False
+
+    # Add a pause between every G-Code instructions by setting _PAUSE to
+    # non-zero value.
+    self._PAUSE = 0
+    self._pauseCount = 0
+
+    # Delay from G-Code file.
+    self._delay = 0
+
+    self._velocityScale = 1.0
+
+    self._firstMove = False
+    self._isG_CodeError = False
+    self._isG_CodeErrorMessage = ""
+    self._isG_CodeErrorData = []
 
   #---------------------------------------------------------------------
   def isOutOfWire( self ) :
@@ -504,44 +546,3 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._positionLog = None
 
   #---------------------------------------------------------------------
-  def __init__( self, io, spool, machineCalibration, headCompensation ):
-    """
-    Constructor.
-
-    Args:
-      io: Instance of I/O map.
-      spool: Instance of Spool.
-      machineCalibration: Machine calibration instance.
-      headCompensation: Instance of HeadCompensation.
-    """
-    G_CodeHandlerBase.__init__( self, machineCalibration, headCompensation )
-
-    self._gCode = None
-
-    self._io = io
-    self._spool = spool
-
-    self._direction = 1
-    self.runToLine = -1
-    self._currentLine = None
-    self._nextLine = None
-    self._gCodeLog = None
-    self._positionLog = None
-
-    self._stopNextMove = False
-    self.singleStep = False
-
-    # Add a pause between every G-Code instructions by setting _PAUSE to
-    # non-zero value.
-    self._PAUSE = 0
-    self._pauseCount = 0
-
-    # Delay from G-Code file.
-    self._delay = 0
-
-    self._velocityScale = 1.0
-
-    self._firstMove = False
-    self._isG_CodeError = False
-    self._isG_CodeErrorMessage = ""
-    self._isG_CodeErrorData = []

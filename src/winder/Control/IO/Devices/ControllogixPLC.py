@@ -36,8 +36,8 @@ class ControllogixPLC( PLC ) :
       isFunctional = False
 
     self._isFunctional = isFunctional
-    if not self._isFunctional :
-      self._plcDriver.clean_up()
+    # if not self._isFunctional :
+    #   self._plcDriver.clean_up()
 
     self._lock.release()
 

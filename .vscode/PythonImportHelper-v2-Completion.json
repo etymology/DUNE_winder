@@ -1,0 +1,3763 @@
+[
+    {
+        "label": "xml.dom.minidom",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "xml.dom.minidom",
+        "description": "xml.dom.minidom",
+        "detail": "xml.dom.minidom",
+        "documentation": {}
+    },
+    {
+        "label": "os.path",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os.path",
+        "description": "os.path",
+        "detail": "os.path",
+        "documentation": {}
+    },
+    {
+        "label": "Serializable",
+        "importPath": "Library.Serializable",
+        "description": "Library.Serializable",
+        "isExtraImport": true,
+        "detail": "Library.Serializable",
+        "documentation": {}
+    },
+    {
+        "label": "Serializable",
+        "importPath": "Library.Serializable",
+        "description": "Library.Serializable",
+        "isExtraImport": true,
+        "detail": "Library.Serializable",
+        "documentation": {}
+    },
+    {
+        "label": "Serializable",
+        "importPath": "Library.Serializable",
+        "description": "Library.Serializable",
+        "isExtraImport": true,
+        "detail": "Library.Serializable",
+        "documentation": {}
+    },
+    {
+        "label": "Serializable",
+        "importPath": "Library.Serializable",
+        "description": "Library.Serializable",
+        "isExtraImport": true,
+        "detail": "Library.Serializable",
+        "documentation": {}
+    },
+    {
+        "label": "Recipe",
+        "importPath": "Library.Recipe",
+        "description": "Library.Recipe",
+        "isExtraImport": true,
+        "detail": "Library.Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "Recipe",
+        "importPath": "Library.Recipe",
+        "description": "Library.Recipe",
+        "isExtraImport": true,
+        "detail": "Library.Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "Machine.Settings",
+        "description": "Machine.Settings",
+        "isExtraImport": true,
+        "detail": "Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCalibration",
+        "importPath": "Machine.LayerCalibration",
+        "description": "Machine.LayerCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.LayerCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCalibration",
+        "importPath": "Machine.LayerCalibration",
+        "description": "Machine.LayerCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.LayerCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCalibration",
+        "importPath": "Machine.LayerCalibration",
+        "description": "Machine.LayerCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.LayerCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCalibration",
+        "importPath": "Machine.LayerCalibration",
+        "description": "Machine.LayerCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.LayerCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCalibration",
+        "importPath": "Machine.LayerCalibration",
+        "description": "Machine.LayerCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.LayerCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachineState",
+        "importPath": "Library.StateMachineState",
+        "description": "Library.StateMachineState",
+        "isExtraImport": true,
+        "detail": "Library.StateMachineState",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachineState",
+        "importPath": "Library.StateMachineState",
+        "description": "Library.StateMachineState",
+        "isExtraImport": true,
+        "detail": "Library.StateMachineState",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachineState",
+        "importPath": "Library.StateMachineState",
+        "description": "Library.StateMachineState",
+        "isExtraImport": true,
+        "detail": "Library.StateMachineState",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachineState",
+        "importPath": "Library.StateMachineState",
+        "description": "Library.StateMachineState",
+        "isExtraImport": true,
+        "detail": "Library.StateMachineState",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachineState",
+        "importPath": "Library.StateMachineState",
+        "description": "Library.StateMachineState",
+        "isExtraImport": true,
+        "detail": "Library.StateMachineState",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Location",
+        "importPath": "Library.Geometry.Location",
+        "description": "Library.Geometry.Location",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "ArrayToCSV",
+        "importPath": "Library.ArrayToCSV",
+        "description": "Library.ArrayToCSV",
+        "isExtraImport": true,
+        "detail": "Library.ArrayToCSV",
+        "documentation": {}
+    },
+    {
+        "label": "LayerFunctions",
+        "importPath": "Machine.LayerFunctions",
+        "description": "Machine.LayerFunctions",
+        "isExtraImport": true,
+        "detail": "Machine.LayerFunctions",
+        "documentation": {}
+    },
+    {
+        "label": "LayerFunctions",
+        "importPath": "Machine.LayerFunctions",
+        "description": "Machine.LayerFunctions",
+        "isExtraImport": true,
+        "detail": "Machine.LayerFunctions",
+        "documentation": {}
+    },
+    {
+        "label": "LoggedStateMachine",
+        "importPath": "Library.LoggedStateMachine",
+        "description": "Library.LoggedStateMachine",
+        "isExtraImport": true,
+        "detail": "Library.LoggedStateMachine",
+        "documentation": {}
+    },
+    {
+        "label": "LoggedStateMachine",
+        "importPath": "Library.LoggedStateMachine",
+        "description": "Library.LoggedStateMachine",
+        "isExtraImport": true,
+        "detail": "Library.LoggedStateMachine",
+        "documentation": {}
+    },
+    {
+        "label": "HardwareMode",
+        "importPath": "Control.HardwareMode",
+        "description": "Control.HardwareMode",
+        "isExtraImport": true,
+        "detail": "Control.HardwareMode",
+        "documentation": {}
+    },
+    {
+        "label": "StopMode",
+        "importPath": "Control.StopMode",
+        "description": "Control.StopMode",
+        "isExtraImport": true,
+        "detail": "Control.StopMode",
+        "documentation": {}
+    },
+    {
+        "label": "WindMode",
+        "importPath": "Control.WindMode",
+        "description": "Control.WindMode",
+        "isExtraImport": true,
+        "detail": "Control.WindMode",
+        "documentation": {}
+    },
+    {
+        "label": "ManualMode",
+        "importPath": "Control.ManualMode",
+        "description": "Control.ManualMode",
+        "isExtraImport": true,
+        "detail": "Control.ManualMode",
+        "documentation": {}
+    },
+    {
+        "label": "CalibrationMode",
+        "importPath": "Control.CalibrationMode",
+        "description": "Control.CalibrationMode",
+        "isExtraImport": true,
+        "detail": "Control.CalibrationMode",
+        "documentation": {}
+    },
+    {
+        "label": "G_Code",
+        "importPath": "Library.G_Code",
+        "description": "Library.G_Code",
+        "isExtraImport": true,
+        "detail": "Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeException",
+        "importPath": "Library.G_Code",
+        "description": "Library.G_Code",
+        "isExtraImport": true,
+        "detail": "Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_Code",
+        "importPath": "Library.G_Code",
+        "description": "Library.G_Code",
+        "isExtraImport": true,
+        "detail": "Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_Code",
+        "importPath": "Library.G_Code",
+        "description": "Library.G_Code",
+        "isExtraImport": true,
+        "detail": "Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeHandlerBase",
+        "importPath": "Machine.G_CodeHandlerBase",
+        "description": "Machine.G_CodeHandlerBase",
+        "isExtraImport": true,
+        "detail": "Machine.G_CodeHandlerBase",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeHandlerBase",
+        "importPath": "Machine.G_CodeHandlerBase",
+        "description": "Machine.G_CodeHandlerBase",
+        "isExtraImport": true,
+        "detail": "Machine.G_CodeHandlerBase",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Point",
+        "importPath": "IO.Primitives.IO_Point",
+        "description": "IO.Primitives.IO_Point",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.IO_Point",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Point",
+        "importPath": "IO.Primitives.IO_Point",
+        "description": "IO.Primitives.IO_Point",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.IO_Point",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "IO.Devices.PLC",
+        "description": "IO.Devices.PLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalIO",
+        "importPath": "IO.Primitives.DigitalIO",
+        "description": "IO.Primitives.DigitalIO",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalIO",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalInput",
+        "importPath": "IO.Primitives.DigitalInput",
+        "description": "IO.Primitives.DigitalInput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalInput",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalInput",
+        "importPath": "IO.Primitives.DigitalInput",
+        "description": "IO.Primitives.DigitalInput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalInput",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalInput",
+        "importPath": "IO.Primitives.DigitalInput",
+        "description": "IO.Primitives.DigitalInput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalInput",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalOutput",
+        "importPath": "IO.Primitives.DigitalOutput",
+        "description": "IO.Primitives.DigitalOutput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalOutput",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalOutput",
+        "importPath": "IO.Primitives.DigitalOutput",
+        "description": "IO.Primitives.DigitalOutput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalOutput",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalOutput",
+        "importPath": "IO.Primitives.DigitalOutput",
+        "description": "IO.Primitives.DigitalOutput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.DigitalOutput",
+        "documentation": {}
+    },
+    {
+        "label": "Motor",
+        "importPath": "IO.Primitives.Motor",
+        "description": "IO.Primitives.Motor",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.Motor",
+        "documentation": {}
+    },
+    {
+        "label": "Motor",
+        "importPath": "IO.Primitives.Motor",
+        "description": "IO.Primitives.Motor",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.Motor",
+        "documentation": {}
+    },
+    {
+        "label": "Motor",
+        "importPath": "IO.Primitives.Motor",
+        "description": "IO.Primitives.Motor",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.Motor",
+        "documentation": {}
+    },
+    {
+        "label": "AnalogInput",
+        "importPath": "IO.Primitives.AnalogInput",
+        "description": "IO.Primitives.AnalogInput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.AnalogInput",
+        "documentation": {}
+    },
+    {
+        "label": "AnalogInput",
+        "importPath": "IO.Primitives.AnalogInput",
+        "description": "IO.Primitives.AnalogInput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.AnalogInput",
+        "documentation": {}
+    },
+    {
+        "label": "AnalogOutput",
+        "importPath": "IO.Primitives.AnalogOutput",
+        "description": "IO.Primitives.AnalogOutput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.AnalogOutput",
+        "documentation": {}
+    },
+    {
+        "label": "AnalogOutput",
+        "importPath": "IO.Primitives.AnalogOutput",
+        "description": "IO.Primitives.AnalogOutput",
+        "isExtraImport": true,
+        "detail": "IO.Primitives.AnalogOutput",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "math",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "math",
+        "description": "math",
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "sqrt",
+        "importPath": "math",
+        "description": "math",
+        "isExtraImport": true,
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "pow",
+        "importPath": "math",
+        "description": "math",
+        "isExtraImport": true,
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "sqrt",
+        "importPath": "math",
+        "description": "math",
+        "isExtraImport": true,
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "pow",
+        "importPath": "math",
+        "description": "math",
+        "isExtraImport": true,
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "AnodePlaneArray",
+        "importPath": "Control.AnodePlaneArray",
+        "description": "Control.AnodePlaneArray",
+        "isExtraImport": true,
+        "detail": "Control.AnodePlaneArray",
+        "documentation": {}
+    },
+    {
+        "label": "APA_Base",
+        "importPath": "Control.APA_Base",
+        "description": "Control.APA_Base",
+        "isExtraImport": true,
+        "detail": "Control.APA_Base",
+        "documentation": {}
+    },
+    {
+        "label": "APA_Base",
+        "importPath": "Control.APA_Base",
+        "description": "Control.APA_Base",
+        "isExtraImport": true,
+        "detail": "Control.APA_Base",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeHandler",
+        "importPath": "Control.G_CodeHandler",
+        "description": "Control.G_CodeHandler",
+        "isExtraImport": true,
+        "detail": "Control.G_CodeHandler",
+        "documentation": {}
+    },
+    {
+        "label": "ControlStateMachine",
+        "importPath": "Control.ControlStateMachine",
+        "description": "Control.ControlStateMachine",
+        "isExtraImport": true,
+        "detail": "Control.ControlStateMachine",
+        "documentation": {}
+    },
+    {
+        "label": "CameraCalibration",
+        "importPath": "Control.CameraCalibration",
+        "description": "Control.CameraCalibration",
+        "isExtraImport": true,
+        "detail": "Control.CameraCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "Spool",
+        "importPath": "Machine.Spool",
+        "description": "Machine.Spool",
+        "isExtraImport": true,
+        "detail": "Machine.Spool",
+        "documentation": {}
+    },
+    {
+        "label": "HeadCompensation",
+        "importPath": "Machine.HeadCompensation",
+        "description": "Machine.HeadCompensation",
+        "isExtraImport": true,
+        "detail": "Machine.HeadCompensation",
+        "documentation": {}
+    },
+    {
+        "label": "HeadCompensation",
+        "importPath": "Machine.HeadCompensation",
+        "description": "Machine.HeadCompensation",
+        "isExtraImport": true,
+        "detail": "Machine.HeadCompensation",
+        "documentation": {}
+    },
+    {
+        "label": "GeometrySelection",
+        "importPath": "Machine.GeometrySelection",
+        "description": "Machine.GeometrySelection",
+        "isExtraImport": true,
+        "detail": "Machine.GeometrySelection",
+        "documentation": {}
+    },
+    {
+        "label": "DefaultLayerCalibration",
+        "importPath": "Machine.DefaultCalibration",
+        "description": "Machine.DefaultCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.DefaultCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "DefaultMachineCalibration",
+        "importPath": "Machine.DefaultCalibration",
+        "description": "Machine.DefaultCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.DefaultCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "DefaultMachineCalibration",
+        "importPath": "Machine.DefaultCalibration",
+        "description": "Machine.DefaultCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.DefaultCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "Process",
+        "importPath": "Control.Process",
+        "description": "Control.Process",
+        "isExtraImport": true,
+        "detail": "Control.Process",
+        "documentation": {}
+    },
+    {
+        "label": "Process",
+        "importPath": "Control.Process",
+        "description": "Control.Process",
+        "isExtraImport": true,
+        "detail": "Control.Process",
+        "documentation": {}
+    },
+    {
+        "label": "LogixDriver",
+        "importPath": "pycomm3.logix_driver",
+        "description": "pycomm3.logix_driver",
+        "isExtraImport": true,
+        "detail": "pycomm3.logix_driver",
+        "documentation": {}
+    },
+    {
+        "label": "threading",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "threading",
+        "description": "threading",
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABCMeta",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "importPath": "PLC",
+        "description": "PLC",
+        "isExtraImport": true,
+        "detail": "PLC",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Input",
+        "importPath": "IO.Types.PLC_Input",
+        "description": "IO.Types.PLC_Input",
+        "isExtraImport": true,
+        "detail": "IO.Types.PLC_Input",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Output",
+        "importPath": "IO.Types.PLC_Output",
+        "description": "IO.Types.PLC_Output",
+        "isExtraImport": true,
+        "detail": "IO.Types.PLC_Output",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Motor",
+        "importPath": "IO.Types.PLC_Motor",
+        "description": "IO.Types.PLC_Motor",
+        "isExtraImport": true,
+        "detail": "IO.Types.PLC_Motor",
+        "documentation": {}
+    },
+    {
+        "label": "MultiAxisMotor",
+        "importPath": "IO.Systems.MultiAxisMotor",
+        "description": "IO.Systems.MultiAxisMotor",
+        "isExtraImport": true,
+        "detail": "IO.Systems.MultiAxisMotor",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Logic",
+        "importPath": "IO.Systems.PLC_Logic",
+        "description": "IO.Systems.PLC_Logic",
+        "isExtraImport": true,
+        "detail": "IO.Systems.PLC_Logic",
+        "documentation": {}
+    },
+    {
+        "label": "Head",
+        "importPath": "IO.Systems.Head",
+        "description": "IO.Systems.Head",
+        "isExtraImport": true,
+        "detail": "IO.Systems.Head",
+        "documentation": {}
+    },
+    {
+        "label": "Camera",
+        "importPath": "IO.Systems.Camera",
+        "description": "IO.Systems.Camera",
+        "isExtraImport": true,
+        "detail": "IO.Systems.Camera",
+        "documentation": {}
+    },
+    {
+        "label": "ControllogixPLC",
+        "importPath": "IO.Devices.ControllogixPLC",
+        "description": "IO.Devices.ControllogixPLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.ControllogixPLC",
+        "documentation": {}
+    },
+    {
+        "label": "SimulatedPLC",
+        "importPath": "IO.Devices.SimulatedPLC",
+        "description": "IO.Devices.SimulatedPLC",
+        "isExtraImport": true,
+        "detail": "IO.Devices.SimulatedPLC",
+        "documentation": {}
+    },
+    {
+        "label": "BaseIO",
+        "importPath": "BaseIO",
+        "description": "BaseIO",
+        "isExtraImport": true,
+        "detail": "BaseIO",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Point",
+        "importPath": "IO_Point",
+        "description": "IO_Point",
+        "isExtraImport": true,
+        "detail": "IO_Point",
+        "documentation": {}
+    },
+    {
+        "label": "Motion",
+        "importPath": "Simulator.Motion",
+        "description": "Simulator.Motion",
+        "isExtraImport": true,
+        "detail": "Simulator.Motion",
+        "documentation": {}
+    },
+    {
+        "label": "Line",
+        "importPath": "Library.Geometry.Line",
+        "description": "Library.Geometry.Line",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Line",
+        "documentation": {}
+    },
+    {
+        "label": "Line",
+        "importPath": "Library.Geometry.Line",
+        "description": "Library.Geometry.Line",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Line",
+        "documentation": {}
+    },
+    {
+        "label": "Line",
+        "importPath": "Library.Geometry.Line",
+        "description": "Library.Geometry.Line",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Line",
+        "documentation": {}
+    },
+    {
+        "label": "MathExtra",
+        "importPath": "Library.MathExtra",
+        "description": "Library.MathExtra",
+        "isExtraImport": true,
+        "detail": "Library.MathExtra",
+        "documentation": {}
+    },
+    {
+        "label": "MathExtra",
+        "importPath": "Library.MathExtra",
+        "description": "Library.MathExtra",
+        "isExtraImport": true,
+        "detail": "Library.MathExtra",
+        "documentation": {}
+    },
+    {
+        "label": "MathExtra",
+        "importPath": "Library.MathExtra",
+        "description": "Library.MathExtra",
+        "isExtraImport": true,
+        "detail": "Library.MathExtra",
+        "documentation": {}
+    },
+    {
+        "label": "Hash",
+        "importPath": "Library.Hash",
+        "description": "Library.Hash",
+        "isExtraImport": true,
+        "detail": "Library.Hash",
+        "documentation": {}
+    },
+    {
+        "label": "Hash",
+        "importPath": "Library.Hash",
+        "description": "Library.Hash",
+        "isExtraImport": true,
+        "detail": "Library.Hash",
+        "documentation": {}
+    },
+    {
+        "label": "absolute_import",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "print_function",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "absolute_import",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "print_function",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "hashlib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "hashlib",
+        "description": "hashlib",
+        "detail": "hashlib",
+        "documentation": {}
+    },
+    {
+        "label": "base64",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "base64",
+        "description": "base64",
+        "detail": "base64",
+        "documentation": {}
+    },
+    {
+        "label": "collections",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "collections",
+        "description": "collections",
+        "detail": "collections",
+        "documentation": {}
+    },
+    {
+        "label": "shutil",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "shutil",
+        "description": "shutil",
+        "detail": "shutil",
+        "documentation": {}
+    },
+    {
+        "label": "uuid",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "uuid",
+        "description": "uuid",
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "datetime",
+        "description": "datetime",
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "binascii",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "binascii",
+        "description": "binascii",
+        "detail": "binascii",
+        "documentation": {}
+    },
+    {
+        "label": "SystemSemaphore",
+        "importPath": "Library.SystemSemaphore",
+        "description": "Library.SystemSemaphore",
+        "isExtraImport": true,
+        "detail": "Library.SystemSemaphore",
+        "documentation": {}
+    },
+    {
+        "label": "SystemSemaphore",
+        "importPath": "Library.SystemSemaphore",
+        "description": "Library.SystemSemaphore",
+        "isExtraImport": true,
+        "detail": "Library.SystemSemaphore",
+        "documentation": {}
+    },
+    {
+        "label": "SystemSemaphore",
+        "importPath": "Library.SystemSemaphore",
+        "description": "Library.SystemSemaphore",
+        "isExtraImport": true,
+        "detail": "Library.SystemSemaphore",
+        "documentation": {}
+    },
+    {
+        "label": "importlib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "importlib",
+        "description": "importlib",
+        "detail": "importlib",
+        "documentation": {}
+    },
+    {
+        "label": "types",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "types",
+        "description": "types",
+        "detail": "types",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "TimeSource",
+        "importPath": "Library.TimeSource",
+        "description": "Library.TimeSource",
+        "isExtraImport": true,
+        "detail": "Library.TimeSource",
+        "documentation": {}
+    },
+    {
+        "label": "TimeSource",
+        "importPath": "Library.TimeSource",
+        "description": "Library.TimeSource",
+        "isExtraImport": true,
+        "detail": "Library.TimeSource",
+        "documentation": {}
+    },
+    {
+        "label": "socket",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "socket",
+        "description": "socket",
+        "detail": "socket",
+        "documentation": {}
+    },
+    {
+        "label": "http.cookies",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "http.cookies",
+        "description": "http.cookies",
+        "detail": "http.cookies",
+        "documentation": {}
+    },
+    {
+        "label": "xml.sax.saxutils",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "xml.sax.saxutils",
+        "description": "xml.sax.saxutils",
+        "detail": "xml.sax.saxutils",
+        "documentation": {}
+    },
+    {
+        "label": "urllib.request,",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "urllib.request.",
+        "description": "urllib.request.",
+        "detail": "urllib.request.",
+        "documentation": {}
+    },
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPServer",
+        "importPath": "http.server",
+        "description": "http.server",
+        "isExtraImport": true,
+        "detail": "http.server",
+        "documentation": {}
+    },
+    {
+        "label": "SimpleHTTPRequestHandler",
+        "importPath": "http.server",
+        "description": "http.server",
+        "isExtraImport": true,
+        "detail": "http.server",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPServer",
+        "importPath": "http.server",
+        "description": "http.server",
+        "isExtraImport": true,
+        "detail": "http.server",
+        "documentation": {}
+    },
+    {
+        "label": "RemoteSession",
+        "importPath": "Library.RemoteSession",
+        "description": "Library.RemoteSession",
+        "isExtraImport": true,
+        "detail": "Library.RemoteSession",
+        "documentation": {}
+    },
+    {
+        "label": "RemoteSession",
+        "importPath": "Library.RemoteSession",
+        "description": "Library.RemoteSession",
+        "isExtraImport": true,
+        "detail": "Library.RemoteSession",
+        "documentation": {}
+    },
+    {
+        "label": "SerializableLocation",
+        "importPath": "Library.SerializableLocation",
+        "description": "Library.SerializableLocation",
+        "isExtraImport": true,
+        "detail": "Library.SerializableLocation",
+        "documentation": {}
+    },
+    {
+        "label": "SerializableLocation",
+        "importPath": "Library.SerializableLocation",
+        "description": "Library.SerializableLocation",
+        "isExtraImport": true,
+        "detail": "Library.SerializableLocation",
+        "documentation": {}
+    },
+    {
+        "label": "SerializableLocation",
+        "importPath": "Library.SerializableLocation",
+        "description": "Library.SerializableLocation",
+        "isExtraImport": true,
+        "detail": "Library.SerializableLocation",
+        "documentation": {}
+    },
+    {
+        "label": "SerializableLocation",
+        "importPath": "Library.SerializableLocation",
+        "description": "Library.SerializableLocation",
+        "isExtraImport": true,
+        "detail": "Library.SerializableLocation",
+        "documentation": {}
+    },
+    {
+        "label": "SerializableLocation",
+        "importPath": "Library.SerializableLocation",
+        "description": "Library.SerializableLocation",
+        "isExtraImport": true,
+        "detail": "Library.SerializableLocation",
+        "documentation": {}
+    },
+    {
+        "label": "MachineCalibration",
+        "importPath": "Machine.MachineCalibration",
+        "description": "Machine.MachineCalibration",
+        "isExtraImport": true,
+        "detail": "Machine.MachineCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "UV_LayerGeometry",
+        "importPath": "Machine.UV_LayerGeometry",
+        "description": "Machine.UV_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.UV_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "X_LayerGeometry",
+        "importPath": "Machine.X_LayerGeometry",
+        "description": "Machine.X_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.X_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "X_LayerGeometry",
+        "importPath": "Machine.X_LayerGeometry",
+        "description": "Machine.X_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.X_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "X_LayerGeometry",
+        "importPath": "Machine.X_LayerGeometry",
+        "description": "Machine.X_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.X_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "V_LayerGeometry",
+        "importPath": "Machine.V_LayerGeometry",
+        "description": "Machine.V_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.V_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "V_LayerGeometry",
+        "importPath": "Machine.V_LayerGeometry",
+        "description": "Machine.V_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.V_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "V_LayerGeometry",
+        "importPath": "Machine.V_LayerGeometry",
+        "description": "Machine.V_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.V_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "U_LayerGeometry",
+        "importPath": "Machine.U_LayerGeometry",
+        "description": "Machine.U_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.U_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "U_LayerGeometry",
+        "importPath": "Machine.U_LayerGeometry",
+        "description": "Machine.U_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.U_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "U_LayerGeometry",
+        "importPath": "Machine.U_LayerGeometry",
+        "description": "Machine.U_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.U_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "G_LayerGeometry",
+        "importPath": "Machine.G_LayerGeometry",
+        "description": "Machine.G_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.G_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "G_LayerGeometry",
+        "importPath": "Machine.G_LayerGeometry",
+        "description": "Machine.G_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.G_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "G_LayerGeometry",
+        "importPath": "Machine.G_LayerGeometry",
+        "description": "Machine.G_LayerGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.G_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "LayerX_Recipe",
+        "importPath": "RecipeGenerator.LayerX_Recipe",
+        "description": "RecipeGenerator.LayerX_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerX_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerX_Recipe",
+        "importPath": "RecipeGenerator.LayerX_Recipe",
+        "description": "RecipeGenerator.LayerX_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerX_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerV_Recipe",
+        "importPath": "RecipeGenerator.LayerV_Recipe",
+        "description": "RecipeGenerator.LayerV_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerV_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerV_Recipe",
+        "importPath": "RecipeGenerator.LayerV_Recipe",
+        "description": "RecipeGenerator.LayerV_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerV_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerU_Recipe",
+        "importPath": "RecipeGenerator.LayerU_Recipe",
+        "description": "RecipeGenerator.LayerU_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerU_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerU_Recipe",
+        "importPath": "RecipeGenerator.LayerU_Recipe",
+        "description": "RecipeGenerator.LayerU_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerU_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerG_Recipe",
+        "importPath": "RecipeGenerator.LayerG_Recipe",
+        "description": "RecipeGenerator.LayerG_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerG_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerG_Recipe",
+        "importPath": "RecipeGenerator.LayerG_Recipe",
+        "description": "RecipeGenerator.LayerG_Recipe",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.LayerG_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeCallbacks",
+        "importPath": "Library.G_Code   ",
+        "description": "Library.G_Code   ",
+        "isExtraImport": true,
+        "detail": "Library.G_Code   ",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeException",
+        "importPath": "Library.G_Code   ",
+        "description": "Library.G_Code   ",
+        "isExtraImport": true,
+        "detail": "Library.G_Code   ",
+        "documentation": {}
+    },
+    {
+        "label": "Line",
+        "importPath": "Library.Geometry.Line    ",
+        "description": "Library.Geometry.Line    ",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Line    ",
+        "documentation": {}
+    },
+    {
+        "label": "Box",
+        "importPath": "Library.Geometry.Box     ",
+        "description": "Library.Geometry.Box     ",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Box     ",
+        "documentation": {}
+    },
+    {
+        "label": "Segment",
+        "importPath": "Library.Geometry.Segment ",
+        "description": "Library.Geometry.Segment ",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Segment ",
+        "documentation": {}
+    },
+    {
+        "label": "Circle",
+        "importPath": "Library.Geometry.Circle",
+        "description": "Library.Geometry.Circle",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Circle",
+        "documentation": {}
+    },
+    {
+        "label": "HashedSerializable",
+        "importPath": "Library.HashedSerializable",
+        "description": "Library.HashedSerializable",
+        "isExtraImport": true,
+        "detail": "Library.HashedSerializable",
+        "documentation": {}
+    },
+    {
+        "label": "GeometrySelection",
+        "importPath": "GeometrySelection",
+        "description": "GeometrySelection",
+        "isExtraImport": true,
+        "detail": "GeometrySelection",
+        "documentation": {}
+    },
+    {
+        "label": "Box",
+        "importPath": "Library.Geometry.Box",
+        "description": "Library.Geometry.Box",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Box",
+        "documentation": {}
+    },
+    {
+        "label": "platform",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "platform",
+        "description": "platform",
+        "detail": "platform",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_Codes",
+        "importPath": "Machine.G_Codes",
+        "description": "Machine.G_Codes",
+        "isExtraImport": true,
+        "detail": "Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFunction",
+        "importPath": "G_CodeFunction",
+        "description": "G_CodeFunction",
+        "isExtraImport": true,
+        "detail": "G_CodeFunction",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFunction",
+        "importPath": "G_CodeFunction",
+        "description": "G_CodeFunction",
+        "isExtraImport": true,
+        "detail": "G_CodeFunction",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFunction",
+        "importPath": "RecipeGenerator.G_CodeFunctions.G_CodeFunction",
+        "description": "RecipeGenerator.G_CodeFunctions.G_CodeFunction",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.G_CodeFunctions.G_CodeFunction",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodePath",
+        "importPath": "G_CodePath",
+        "description": "G_CodePath",
+        "isExtraImport": true,
+        "detail": "G_CodePath",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFunction",
+        "importPath": "G_CodeFunctions.G_CodeFunction",
+        "description": "G_CodeFunctions.G_CodeFunction",
+        "isExtraImport": true,
+        "detail": "G_CodeFunctions.G_CodeFunction",
+        "documentation": {}
+    },
+    {
+        "label": "RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "description": "RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "detail": "RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "Segment",
+        "importPath": "Library.Geometry.Segment",
+        "description": "Library.Geometry.Segment",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Segment",
+        "documentation": {}
+    },
+    {
+        "label": "Segment",
+        "importPath": "Library.Geometry.Segment",
+        "description": "Library.Geometry.Segment",
+        "isExtraImport": true,
+        "detail": "Library.Geometry.Segment",
+        "documentation": {}
+    },
+    {
+        "label": "RecipeGenerator",
+        "importPath": "RecipeGenerator.RecipeGenerator",
+        "description": "RecipeGenerator.RecipeGenerator",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.RecipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "queue",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "queue",
+        "description": "queue",
+        "detail": "queue",
+        "documentation": {}
+    },
+    {
+        "label": "SimulationTime",
+        "importPath": "Simulator.SimulationTime",
+        "description": "Simulator.SimulationTime",
+        "isExtraImport": true,
+        "detail": "Simulator.SimulationTime",
+        "documentation": {}
+    },
+    {
+        "label": "SimulationTime",
+        "importPath": "Simulator.SimulationTime",
+        "description": "Simulator.SimulationTime",
+        "isExtraImport": true,
+        "detail": "Simulator.SimulationTime",
+        "documentation": {}
+    },
+    {
+        "label": "SimulatedMotor",
+        "importPath": "Simulator.SimulatedMotor",
+        "description": "Simulator.SimulatedMotor",
+        "isExtraImport": true,
+        "detail": "Simulator.SimulatedMotor",
+        "documentation": {}
+    },
+    {
+        "label": "Delay",
+        "importPath": "Simulator.Delay",
+        "description": "Simulator.Delay",
+        "isExtraImport": true,
+        "detail": "Simulator.Delay",
+        "documentation": {}
+    },
+    {
+        "label": "MachineGeometry",
+        "importPath": "Machine.MachineGeometry",
+        "description": "Machine.MachineGeometry",
+        "isExtraImport": true,
+        "detail": "Machine.MachineGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "TrapezoidalMotion",
+        "importPath": "Simulator.TrapezoidalMotion",
+        "description": "Simulator.TrapezoidalMotion",
+        "isExtraImport": true,
+        "detail": "Simulator.TrapezoidalMotion",
+        "documentation": {}
+    },
+    {
+        "label": "Motion",
+        "importPath": "Motion",
+        "description": "Motion",
+        "isExtraImport": true,
+        "detail": "Motion",
+        "documentation": {}
+    },
+    {
+        "label": "PrimaryThread",
+        "importPath": "Threads.PrimaryThread",
+        "description": "Threads.PrimaryThread",
+        "isExtraImport": true,
+        "detail": "Threads.PrimaryThread",
+        "documentation": {}
+    },
+    {
+        "label": "PrimaryThread",
+        "importPath": "Threads.PrimaryThread",
+        "description": "Threads.PrimaryThread",
+        "isExtraImport": true,
+        "detail": "Threads.PrimaryThread",
+        "documentation": {}
+    },
+    {
+        "label": "PrimaryThread",
+        "importPath": "Threads.PrimaryThread",
+        "description": "Threads.PrimaryThread",
+        "isExtraImport": true,
+        "detail": "Threads.PrimaryThread",
+        "documentation": {}
+    },
+    {
+        "label": "PrimaryThread",
+        "importPath": "Threads.PrimaryThread",
+        "description": "Threads.PrimaryThread",
+        "isExtraImport": true,
+        "detail": "Threads.PrimaryThread",
+        "documentation": {}
+    },
+    {
+        "label": "PrimaryThread",
+        "importPath": "Threads.PrimaryThread",
+        "description": "Threads.PrimaryThread",
+        "isExtraImport": true,
+        "detail": "Threads.PrimaryThread",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Log",
+        "importPath": "Control.IO_Log",
+        "description": "Control.IO_Log",
+        "isExtraImport": true,
+        "detail": "Control.IO_Log",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "traceback",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "traceback",
+        "description": "traceback",
+        "detail": "traceback",
+        "documentation": {}
+    },
+    {
+        "label": "select",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "select",
+        "description": "select",
+        "detail": "select",
+        "documentation": {}
+    },
+    {
+        "label": "ThreadingMixIn",
+        "importPath": "socketserver",
+        "description": "socketserver",
+        "isExtraImport": true,
+        "detail": "socketserver",
+        "documentation": {}
+    },
+    {
+        "label": "http.client",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "http.client",
+        "description": "http.client",
+        "detail": "http.client",
+        "documentation": {}
+    },
+    {
+        "label": "WebServerInterface",
+        "importPath": "Library.WebServerInterface",
+        "description": "Library.WebServerInterface",
+        "isExtraImport": true,
+        "detail": "Library.WebServerInterface",
+        "documentation": {}
+    },
+    {
+        "label": "signal",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "signal",
+        "description": "signal",
+        "detail": "signal",
+        "documentation": {}
+    },
+    {
+        "label": "SystemTime",
+        "importPath": "Library.SystemTime",
+        "description": "Library.SystemTime",
+        "isExtraImport": true,
+        "detail": "Library.SystemTime",
+        "documentation": {}
+    },
+    {
+        "label": "Log",
+        "importPath": "Library.Log",
+        "description": "Library.Log",
+        "isExtraImport": true,
+        "detail": "Library.Log",
+        "documentation": {}
+    },
+    {
+        "label": "Configuration",
+        "importPath": "Library.Configuration",
+        "description": "Library.Configuration",
+        "isExtraImport": true,
+        "detail": "Library.Configuration",
+        "documentation": {}
+    },
+    {
+        "label": "Configuration",
+        "importPath": "Library.Configuration",
+        "description": "Library.Configuration",
+        "isExtraImport": true,
+        "detail": "Library.Configuration",
+        "documentation": {}
+    },
+    {
+        "label": "Version",
+        "importPath": "Library.Version",
+        "description": "Library.Version",
+        "isExtraImport": true,
+        "detail": "Library.Version",
+        "documentation": {}
+    },
+    {
+        "label": "LowLevelIO",
+        "importPath": "Control.LowLevelIO",
+        "description": "Control.LowLevelIO",
+        "isExtraImport": true,
+        "detail": "Control.LowLevelIO",
+        "documentation": {}
+    },
+    {
+        "label": "UI_ServerThread",
+        "importPath": "Threads.UI_ServerThread",
+        "description": "Threads.UI_ServerThread",
+        "isExtraImport": true,
+        "detail": "Threads.UI_ServerThread",
+        "documentation": {}
+    },
+    {
+        "label": "ControlThread",
+        "importPath": "Threads.ControlThread",
+        "description": "Threads.ControlThread",
+        "isExtraImport": true,
+        "detail": "Threads.ControlThread",
+        "documentation": {}
+    },
+    {
+        "label": "WebServerThread",
+        "importPath": "Threads.WebServerThread",
+        "description": "Threads.WebServerThread",
+        "isExtraImport": true,
+        "detail": "Threads.WebServerThread",
+        "documentation": {}
+    },
+    {
+        "label": "CameraThread",
+        "importPath": "Threads.CameraThread",
+        "description": "Threads.CameraThread",
+        "isExtraImport": true,
+        "detail": "Threads.CameraThread",
+        "documentation": {}
+    },
+    {
+        "label": "APA_Generator",
+        "importPath": "Debug.APA_Generator",
+        "description": "Debug.APA_Generator",
+        "isExtraImport": true,
+        "detail": "Debug.APA_Generator",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeToPath",
+        "importPath": "RecipeGenerator.G_CodeToPath",
+        "description": "RecipeGenerator.G_CodeToPath",
+        "isExtraImport": true,
+        "detail": "RecipeGenerator.G_CodeToPath",
+        "documentation": {}
+    },
+    {
+        "label": "AnodePlaneArray",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.AnodePlaneArray",
+        "description": "src.winder.Control.Control.AnodePlaneArray",
+        "peekOfCode": "class AnodePlaneArray( APA_Base ) :\n  # There can only be a single working instance of an APA, and it must be\n  # saved before loading or starting a new one.\n  activeAPA = None\n  #---------------------------------------------------------------------\n  def __init__(\n    self,\n    gCodeHandler,\n    apaDirectory,\n    recipeDirectory,",
+        "detail": "src.winder.Control.Control.AnodePlaneArray",
+        "documentation": {}
+    },
+    {
+        "label": "APA_Base",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.APA_Base",
+        "description": "src.winder.Control.Control.APA_Base",
+        "peekOfCode": "class APA_Base( Serializable ) :\n  # File name of the APA state (this object) on disk.\n  FILE_NAME = \"state.xml\"\n  LOG_FILE  = \"log.csv\"\n  class Stages :\n    # No actions have yet been done.\n    UNINITIALIZED = 0\n    # Stages for each half of each layer.\n    LAYER_X_FIRST  = 1\n    LAYER_X_SECOND = 2",
+        "detail": "src.winder.Control.Control.APA_Base",
+        "documentation": {}
+    },
+    {
+        "label": "CalibrationMode",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.CalibrationMode",
+        "description": "src.winder.Control.Control.CalibrationMode",
+        "peekOfCode": "class CalibrationMode( StateMachineState ) :\n  # After reaching the finial location, there is a pause to allow the camera\n  # FIFO to be emptied.  This is the number of counts of that pause.\n  # (At 100 ms/update, this is 500 ms.)\n  SHUTDOWN_COUNT = 5\n  #---------------------------------------------------------------------\n  def __init__( self, stateMachine, state, io, log ) :\n    \"\"\"\n    Constructor.\n    Args:",
+        "detail": "src.winder.Control.Control.CalibrationMode",
+        "documentation": {}
+    },
+    {
+        "label": "CameraCalibratio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.CameraCalibration",
+        "description": "src.winder.Control.Control.CameraCalibration",
+        "peekOfCode": "class CameraCalibration :\n  #---------------------------------------------------------------------\n  def __init__( self, io ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    self._io = io\n    self._pixelsPer_mm = 18\n    self._calibrationData = []\n    self._side      = None",
+        "detail": "src.winder.Control.Control.CameraCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "ControlStateMachine",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.ControlStateMachine",
+        "description": "src.winder.Control.Control.ControlStateMachine",
+        "peekOfCode": "class ControlStateMachine( LoggedStateMachine ) :\n  class States :\n    HARDWARE    = 0,\n    STOP        = 1,\n    WIND        = 2,\n    CALIBRATE   = 3,\n    MANUAL      = 4,\n    TENTION     = 5\n  # end class\n  #---------------------------------------------------------------------",
+        "detail": "src.winder.Control.Control.ControlStateMachine",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeHandler",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.G_CodeHandler",
+        "description": "src.winder.Control.Control.G_CodeHandler",
+        "peekOfCode": "class G_CodeHandler( G_CodeHandlerBase ) :\n  #---------------------------------------------------------------------\n  def isOutOfWire( self ) :\n    \"\"\"\n    Check to see if spool is low on wire.\n    Returns:\n      True if spool is low on wire, False if not.\n    \"\"\"\n    isOutOfWire = False\n    if self._spool :",
+        "detail": "src.winder.Control.Control.G_CodeHandler",
+        "documentation": {}
+    },
+    {
+        "label": "HardwareMode",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.HardwareMode",
+        "description": "src.winder.Control.Control.HardwareMode",
+        "peekOfCode": "class HardwareMode( StateMachineState ) :\n  #---------------------------------------------------------------------\n  def __init__( self, stateMachine, state, io, log ) :\n    \"\"\"\n    Constructor.\n    Args:\n      stateMachine: Parent state machine.\n      state: Integer representation of state.\n      io: Instance of I/O map.\n    \"\"\"",
+        "detail": "src.winder.Control.Control.HardwareMode",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Lo",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.IO_Log",
+        "description": "src.winder.Control.Control.IO_Log",
+        "peekOfCode": "class IO_Log :\n  #---------------------------------------------------------------------\n  def __init__( self, outputFileName ) :\n    \"\"\"\n    Constructor.\n    Args:\n      outputFileName: Name of log file to create/append.\n    \"\"\"\n    # Create the path if it does not exist.\n    path = os.path.dirname( outputFileName )",
+        "detail": "src.winder.Control.Control.IO_Log",
+        "documentation": {}
+    },
+    {
+        "label": "LowLevelI",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.LowLevelIO",
+        "description": "src.winder.Control.Control.LowLevelIO",
+        "peekOfCode": "class LowLevelIO :\n  #---------------------------------------------------------------------\n  @staticmethod\n  def _getIO_List( ioList ) :\n    \"\"\"\n    Get a list of each I/O point name and the current value.\n    Args:\n      ioList: List of I/O instances to fetch.\n    Returns:\n      A list of two lists.  The first element of sub-list is the I/O name and",
+        "detail": "src.winder.Control.Control.LowLevelIO",
+        "documentation": {}
+    },
+    {
+        "label": "ManualMode",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.ManualMode",
+        "description": "src.winder.Control.Control.ManualMode",
+        "peekOfCode": "class ManualMode( StateMachineState ) :\n  #---------------------------------------------------------------------\n  def __init__( self, stateMachine, state, io, log ) :\n    \"\"\"\n    Constructor.\n    Args:\n      stateMachine: Parent state machine.\n      state: Integer representation of state.\n      io: Instance of I/O map.\n      manualCommand: Instance of Control.ManualCommand",
+        "detail": "src.winder.Control.Control.ManualMode",
+        "documentation": {}
+    },
+    {
+        "label": "Proces",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.Process",
+        "description": "src.winder.Control.Control.Process",
+        "peekOfCode": "class Process :\n  STAGE_TABLE = {\n    0  : None,                                         # Uninitialized.\n    1  : { \"layer\" : \"X\", \"recipe\" : \"X-Layer_1.gc\" }, # X-first.\n    2  : { \"layer\" : \"X\", \"recipe\" : \"X-Layer_2.gc\" }, # X-second.\n    3  : { \"layer\" : \"V\", \"recipe\" : \"V-Layer_1.gc\" }, # V-first.\n    4  : { \"layer\" : \"V\", \"recipe\" : \"V-Layer_2.gc\" }, # V-second.\n    5  : { \"layer\" : \"U\", \"recipe\" : \"U-Layer_1.gc\" }, # U-first.\n    6  : { \"layer\" : \"U\", \"recipe\" : \"U-Layer_2.gc\" }, # U-second.\n    7  : { \"layer\" : \"G\", \"recipe\" : \"G-Layer_1.gc\" }, # G-first.",
+        "detail": "src.winder.Control.Control.Process",
+        "documentation": {}
+    },
+    {
+        "label": "StopMode",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.StopMode",
+        "description": "src.winder.Control.Control.StopMode",
+        "peekOfCode": "class StopMode( StateMachineState ) :\n  #====================================\n  # Idle mode.\n  # Idle means the machine isn't moving, but is ready to move.\n  #====================================\n  class Idle( StateMachineState ) :\n    #-------------------------------------------------------------------\n    def __init__( self, stateMachine, state, io, control ) :\n      \"\"\"\n      Constructor.",
+        "detail": "src.winder.Control.Control.StopMode",
+        "documentation": {}
+    },
+    {
+        "label": "WindMode",
+        "kind": 6,
+        "importPath": "src.winder.Control.Control.WindMode",
+        "description": "src.winder.Control.Control.WindMode",
+        "peekOfCode": "class WindMode( StateMachineState ) :\n  #---------------------------------------------------------------------\n  def __init__( self, stateMachine, state, io, log ) :\n    \"\"\"\n    Constructor.\n    Args:\n      stateMachine: Parent state machine.\n      state: Integer representation of state.\n      io: Instance of I/O map.\n      gCodeHandler: Instance of G-Code handler.",
+        "detail": "src.winder.Control.Control.WindMode",
+        "documentation": {}
+    },
+    {
+        "label": "APA_Generato",
+        "kind": 6,
+        "importPath": "src.winder.Control.Debug.APA_Generator",
+        "description": "src.winder.Control.Debug.APA_Generator",
+        "peekOfCode": "class APA_Generator :\n  #---------------------------------------------------------------------\n  @staticmethod\n  def create( process, number ) :\n    \"\"\"\n    Randomly generate a new APA.  Test function.\n    Args:\n      process: Instance of Process.\n      number: Number of random APAs to create.\n    \"\"\"",
+        "detail": "src.winder.Control.Debug.APA_Generator",
+        "documentation": {}
+    },
+    {
+        "label": "ControllogixPLC",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Devices.ControllogixPLC",
+        "description": "src.winder.Control.IO.Devices.ControllogixPLC",
+        "peekOfCode": "class ControllogixPLC( PLC ) :\n  #---------------------------------------------------------------------\n  def initialize( self ) :\n    \"\"\"\n    Try and establish a connection to the PLC.\n    Returns:\n      True if there was an error, False if connection was made.\n    \"\"\"\n    self._lock.acquire()\n    isFunctional = True",
+        "detail": "src.winder.Control.IO.Devices.ControllogixPLC",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Device",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Devices.IO_Device",
+        "description": "src.winder.Control.IO.Devices.IO_Device",
+        "peekOfCode": "class IO_Device(metaclass=ABCMeta) :\n  # Make class abstract.\n  list = []\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of IO device.\n    \"\"\"",
+        "detail": "src.winder.Control.IO.Devices.IO_Device",
+        "documentation": {}
+    },
+    {
+        "label": "PLC",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Devices.PLC",
+        "description": "src.winder.Control.IO.Devices.PLC",
+        "peekOfCode": "class PLC( IO_Device, metaclass=ABCMeta ) :\n  # There is a limit to the length of packets to/from the PLC.  When reading\n  # tags the request must be limited.  I have found no documentation as to how\n  # to calculate this limit, but found I could read 18 with the tag name sizes\n  # currently in the queue.  So 14 seems a safe number.\n  MAX_TAG_READS = 14\n  #============================================================================\n  class Tag :\n    \"\"\"\n    PLC Tag.  System PLC's use to represent data.",
+        "detail": "src.winder.Control.IO.Devices.PLC",
+        "documentation": {}
+    },
+    {
+        "label": "SimulatedPLC",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Devices.SimulatedPLC",
+        "description": "src.winder.Control.IO.Devices.SimulatedPLC",
+        "peekOfCode": "class SimulatedPLC( PLC ) :\n  tags = {}\n  writeCallbacks = {}\n  readCallbacks = {}\n  #---------------------------------------------------------------------\n  def initialize( self ) :\n    \"\"\"\n    Try and establish a connection to the PLC.\n    Returns:\n      True if there was an error, False if connection was made.",
+        "detail": "src.winder.Control.IO.Devices.SimulatedPLC",
+        "documentation": {}
+    },
+    {
+        "label": "BaseIO",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Maps.BaseIO",
+        "description": "src.winder.Control.IO.Maps.BaseIO",
+        "peekOfCode": "class BaseIO:\n  #---------------------------------------------------------------------\n  def isFunctional( self ) :\n    \"\"\"\n    Check to see that all hardware is functional.\n    Returns:\n      True if all hardware is functional, False for any error.\n    \"\"\"\n    result = True\n    result &= not self.plc.isNotFunctional()",
+        "detail": "src.winder.Control.IO.Maps.BaseIO",
+        "documentation": {}
+    },
+    {
+        "label": "ProductionIO",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Maps.ProductionIO",
+        "description": "src.winder.Control.IO.Maps.ProductionIO",
+        "peekOfCode": "class ProductionIO( BaseIO ) :\n  #---------------------------------------------------------------------\n  def __init__( self, plcAddress ) :\n    \"\"\"\n    Constructor.\n    Only need to create the correct type of PLC and call the base I/O\n    constructor.\n    \"\"\"\n    plc = ControllogixPLC( plcAddress )\n    BaseIO.__init__( self, plc )",
+        "detail": "src.winder.Control.IO.Maps.ProductionIO",
+        "documentation": {}
+    },
+    {
+        "label": "SimulatedIO",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Maps.SimulatedIO",
+        "description": "src.winder.Control.IO.Maps.SimulatedIO",
+        "peekOfCode": "class SimulatedIO( BaseIO ) :\n  #---------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    Only need to create the correct type of PLC and call the base I/O\n    constructor.\n    \"\"\"\n    plc = SimulatedPLC( \"PLC\" )\n    BaseIO.__init__( self, plc )",
+        "detail": "src.winder.Control.IO.Maps.SimulatedIO",
+        "documentation": {}
+    },
+    {
+        "label": "AnalogInput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.AnalogInput",
+        "description": "src.winder.Control.IO.Primitives.AnalogInput",
+        "peekOfCode": "class AnalogInput( IO_Point ) :\n  # Static list of all analog inputs.\n  list = []\n  map = {}\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of input.",
+        "detail": "src.winder.Control.IO.Primitives.AnalogInput",
+        "documentation": {}
+    },
+    {
+        "label": "AnalogOutput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.AnalogOutput",
+        "description": "src.winder.Control.IO.Primitives.AnalogOutput",
+        "peekOfCode": "class AnalogOutput( IO_Point, metaclass=ABCMeta ) :\n  # Make class abstract.\n  list = []\n  # Current output level.\n  _level = 0\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.\n    Args:",
+        "detail": "src.winder.Control.IO.Primitives.AnalogOutput",
+        "documentation": {}
+    },
+    {
+        "label": "Camera",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.Camera",
+        "description": "src.winder.Control.IO.Primitives.Camera",
+        "peekOfCode": "class Camera( IO_Point, metaclass=ABCMeta ) :\n  # Make class abstract.\n  list = []\n  map = {}\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of camera.",
+        "detail": "src.winder.Control.IO.Primitives.Camera",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalInput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.DigitalInput",
+        "description": "src.winder.Control.IO.Primitives.DigitalInput",
+        "peekOfCode": "class DigitalInput( DigitalIO ) :\n  # Static list of all digital inputs, and map of names to instances.\n  list = []\n  map = {}\n  #---------------------------------------------------------------------\n  def __str__( self ) :\n    \"\"\"\n    Convert state to string.\n    Returns:\n      \"1\" for on, \"0\" for off.",
+        "detail": "src.winder.Control.IO.Primitives.DigitalInput",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalIO",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.DigitalIO",
+        "description": "src.winder.Control.IO.Primitives.DigitalIO",
+        "peekOfCode": "class DigitalIO( IO_Point, metaclass=ABCMeta ) :\n  # Make class abstract.\n  list = []\n  # Software overrides of state.\n  _isForced = False\n  _forcedState = False\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.",
+        "detail": "src.winder.Control.IO.Primitives.DigitalIO",
+        "documentation": {}
+    },
+    {
+        "label": "DigitalOutput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.DigitalOutput",
+        "description": "src.winder.Control.IO.Primitives.DigitalOutput",
+        "peekOfCode": "class DigitalOutput( DigitalIO, metaclass=ABCMeta ) :\n  # Make class abstract.\n  list = []\n  map = {}\n  _state = False\n  #---------------------------------------------------------------------\n  def __str__( self ) :\n    \"\"\"\n    Convert state to string.\n    Returns:",
+        "detail": "src.winder.Control.IO.Primitives.DigitalOutput",
+        "documentation": {}
+    },
+    {
+        "label": "IO_Point",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.IO_Point",
+        "description": "src.winder.Control.IO.Primitives.IO_Point",
+        "peekOfCode": "class IO_Point(metaclass=ABCMeta):\n  # Make class abstract.\n  list = []\n  map = {}\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor. Save name and insert self into list of NamedIO.\n    \"\"\"\n    # Make sure this name isn't already in use.",
+        "detail": "src.winder.Control.IO.Primitives.IO_Point",
+        "documentation": {}
+    },
+    {
+        "label": "Motor",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Primitives.Motor",
+        "description": "src.winder.Control.IO.Primitives.Motor",
+        "peekOfCode": "class Motor( IO_Point, metaclass=ABCMeta ) :\n  # Make class abstract.\n  list = []\n  map = {}\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of motor.",
+        "detail": "src.winder.Control.IO.Primitives.Motor",
+        "documentation": {}
+    },
+    {
+        "label": "Camera",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Systems.Camera",
+        "description": "src.winder.Control.IO.Systems.Camera",
+        "peekOfCode": "class Camera:\n  # The dimensions of a captured frame from the camera.\n  FRAME_WIDTH  = 640\n  FRAME_HEIGHT = 480\n  #---------------------------------------------------------------------\n  def __init__( self, plc ) :\n    \"\"\"\n    Constructor.\n    Args:\n      plcLogic: Instance of PLC_Logic.",
+        "detail": "src.winder.Control.IO.Systems.Camera",
+        "documentation": {}
+    },
+    {
+        "label": "Hea",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Systems.Head",
+        "description": "src.winder.Control.IO.Systems.Head",
+        "peekOfCode": "class Head :\n  class States :\n    # Continuous states.\n    IDLE        = 0\n    SEEK        = 1\n    LATCH       = 2\n    # Momentary states.\n    START_DOUBLE_LATCH = 3\n    START_LATCH = 4\n    SECOND_SEEK = 5",
+        "detail": "src.winder.Control.IO.Systems.Head",
+        "documentation": {}
+    },
+    {
+        "label": "MultiAxisMoto",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Systems.MultiAxisMotor",
+        "description": "src.winder.Control.IO.Systems.MultiAxisMotor",
+        "peekOfCode": "class MultiAxisMotor :\n  #---------------------------------------------------------------------\n  def __init__( self, name, motors ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of IO device.\n      motors: A list of IO.Primitives.Motor types to be grouped.\n    \"\"\"\n    self._motors = motors",
+        "detail": "src.winder.Control.IO.Systems.MultiAxisMotor",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Logi",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Systems.PLC_Logic",
+        "description": "src.winder.Control.IO.Systems.PLC_Logic",
+        "peekOfCode": "class PLC_Logic :\n  # States for primary state machine.\n  class States :\n    INIT          = 0\n    READY         = 1\n    XY_JOG        = 2\n    XY_SEEK       = 3\n    Z_JOG         = 4\n    Z_SEEK        = 5\n    LATCHING      = 6",
+        "detail": "src.winder.Control.IO.Systems.PLC_Logic",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Input",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.PLC_Input",
+        "description": "src.winder.Control.IO.Types.PLC_Input",
+        "peekOfCode": "class PLC_Input( DigitalInput ) :\n  list = []\n  #---------------------------------------------------------------------\n  def __init__( self, name, plc, tagName=None, bit=0, defaultState=False, tagType=\"DINT\" ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of output.\n      plc: Instance of IO_Device.PLC.\n      tagName: Which PLC tag this input is assigned.  Default is None for when",
+        "detail": "src.winder.Control.IO.Types.PLC_Input",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Motor",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.PLC_Motor",
+        "description": "src.winder.Control.IO.Types.PLC_Motor",
+        "peekOfCode": "class PLC_Motor( Motor ) :\n  list = []\n  #---------------------------------------------------------------------\n  def __init__( self, name, plc, tagBase ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of motor.\n      plc: Instance of IO_Device.PLC.\n      tagBase: All tags will start with this prepended to the name.",
+        "detail": "src.winder.Control.IO.Types.PLC_Motor",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Output",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.PLC_Output",
+        "description": "src.winder.Control.IO.Types.PLC_Output",
+        "peekOfCode": "class PLC_Output( DigitalOutput ) :\n  # State of virtual input.\n  _state = False\n  #---------------------------------------------------------------------\n  def __init__( self, name, plc, tagName, state = False, immediate = True ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of output.\n      plc: Instance of IO_Device.PLC.",
+        "detail": "src.winder.Control.IO.Types.PLC_Output",
+        "documentation": {}
+    },
+    {
+        "label": "SoftwareAnalogInput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.SoftwareAnalogInput",
+        "description": "src.winder.Control.IO.Types.SoftwareAnalogInput",
+        "peekOfCode": "class SoftwareAnalogInput( AnalogInput ) :\n  # Level of virtual input.\n  _value = 0\n  #---------------------------------------------------------------------\n  def __init__( self, name, value = 0 ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of output.\n      value: Value to return.",
+        "detail": "src.winder.Control.IO.Types.SoftwareAnalogInput",
+        "documentation": {}
+    },
+    {
+        "label": "SoftwareAnalogOutput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.SoftwareAnalogOutput",
+        "description": "src.winder.Control.IO.Types.SoftwareAnalogOutput",
+        "peekOfCode": "class SoftwareAnalogOutput( AnalogOutput ) :\n  #---------------------------------------------------------------------\n  def __init__( self, name ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of output.\n      value: Value to return.\n    \"\"\"\n    AnalogOutput.__init__( self, name )",
+        "detail": "src.winder.Control.IO.Types.SoftwareAnalogOutput",
+        "documentation": {}
+    },
+    {
+        "label": "SoftwareInput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.SoftwareInput",
+        "description": "src.winder.Control.IO.Types.SoftwareInput",
+        "peekOfCode": "class SoftwareInput( DigitalInput ) :\n  # State of virtual input.\n  _state = False\n  #---------------------------------------------------------------------\n  def __init__( self, name, state = False ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of output.\n      state: Steady state of input. This is the value always returned.",
+        "detail": "src.winder.Control.IO.Types.SoftwareInput",
+        "documentation": {}
+    },
+    {
+        "label": "SoftwareMotor",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.SoftwareMotor",
+        "description": "src.winder.Control.IO.Types.SoftwareMotor",
+        "peekOfCode": "class SoftwareMotor( Motor ) :\n  #---------------------------------------------------------------------\n  def __init__( self, name, simulationTime ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of motor.\n    \"\"\"\n    Motor.__init__( self, name )\n    self._simulationTime  = simulationTime",
+        "detail": "src.winder.Control.IO.Types.SoftwareMotor",
+        "documentation": {}
+    },
+    {
+        "label": "SoftwareOutput",
+        "kind": 6,
+        "importPath": "src.winder.Control.IO.Types.SoftwareOutput",
+        "description": "src.winder.Control.IO.Types.SoftwareOutput",
+        "peekOfCode": "class SoftwareOutput( DigitalOutput ) :\n  #---------------------------------------------------------------------\n  def __init__( self, name, state = False ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of output.\n      state: Steady state of input. This is the value always returned.\n    \"\"\"\n    DigitalOutput.__init__( self, name, state )",
+        "detail": "src.winder.Control.IO.Types.SoftwareOutput",
+        "documentation": {}
+    },
+    {
+        "label": "Bo",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Geometry.Box",
+        "description": "src.winder.Control.Library.Geometry.Box",
+        "peekOfCode": "class Box :\n  #-------------------------------------------------------------------\n  def _intersection( self, start, lineA, lineB, limits, limit, limitValue ) :\n    \"\"\"\n    Intersect two lines.  If that point happened before the start point,\n    return it.  Otherwise return the start point.\n    Args:\n      start - Starting location.\n      lineA - First line.\n      lineB - Second line.",
+        "detail": "src.winder.Control.Library.Geometry.Box",
+        "documentation": {}
+    },
+    {
+        "label": "Circl",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Geometry.Circle",
+        "description": "src.winder.Control.Library.Geometry.Circle",
+        "peekOfCode": "class Circle :\n  #-------------------------------------------------------------------\n  def tangentPoint( self, orientationString, target ) :\n    \"\"\"\n    Return the location where intermediate line runs tangent to the target location.\n    Args:\n      orientationString: Defines quadrant for which to of two tangent points are\n        returned.  String in form nn where n=T/B/L/R for top/bottom/left/right.\n      target: Instance of Location defining the point at which the tangent line\n        originates.",
+        "detail": "src.winder.Control.Library.Geometry.Circle",
+        "documentation": {}
+    },
+    {
+        "label": "Lin",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Geometry.Line",
+        "description": "src.winder.Control.Library.Geometry.Line",
+        "peekOfCode": "class Line :\n  \"\"\"\n  2d line in the form of \"m x + b\" where m is the slope and b is the Y-Intercept.\n  \"\"\"\n  VERTICLE_SLOPE = float( \"inf\" )\n  #---------------------------------------------------------------------\n  @staticmethod\n  def fromAngle( angle, intercept ) :\n    \"\"\"\n    Create a line from an angle and intercept, or vector.",
+        "detail": "src.winder.Control.Library.Geometry.Line",
+        "documentation": {}
+    },
+    {
+        "label": "Locatio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Geometry.Location",
+        "description": "src.winder.Control.Library.Geometry.Location",
+        "peekOfCode": "class Location :\n  #---------------------------------------------------------------------\n  def __init__( self, x = 0, y = 0, z = 0 ) :\n    \"\"\"\n    Constructor.\n    Args:\n      x: Position on the x-axis.\n      y: Position on the y-axis.\n      z: Position on the z-axis.\n    \"\"\"",
+        "detail": "src.winder.Control.Library.Geometry.Location",
+        "documentation": {}
+    },
+    {
+        "label": "Segmen",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Geometry.Segment",
+        "description": "src.winder.Control.Library.Geometry.Segment",
+        "peekOfCode": "class Segment :\n  \"\"\"\n  A segment is two points connected by a line.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, start, finish ) :\n    \"\"\"\n    Constructor.\n    Args:\n      start: Instance of Location defining the starting location.",
+        "detail": "src.winder.Control.Library.Geometry.Segment",
+        "documentation": {}
+    },
+    {
+        "label": "ArrayToCS",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.ArrayToCSV",
+        "description": "src.winder.Control.Library.ArrayToCSV",
+        "peekOfCode": "class ArrayToCSV :\n  #---------------------------------------------------------------------\n  @staticmethod\n  def saveDictionarySet( data, filePath, fileName, separator=\",\", isHashed=False ) :\n    \"\"\"\n    Save an array of similarly keyed dictionaries to CSV file.\n    Args:\n      data: Array of similarly keyed dictionaries.\n      filePath: Directory of file.  Omit to use the path specified loading.\n      fileName: File name to save in.  Omit to use the name specified loading.",
+        "detail": "src.winder.Control.Library.ArrayToCSV",
+        "documentation": {}
+    },
+    {
+        "label": "Configuratio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Configuration",
+        "description": "src.winder.Control.Library.Configuration",
+        "peekOfCode": "class Configuration :\n  #---------------------------------------------------------------------\n  def __init__( self, fileName = \"./configuration.xml\" ) :\n    \"\"\"\n    Constructor.\n    Args:\n      fileName: File to use for configuration data.  This is an XML file.\n    \"\"\"\n    self._fileName = fileName\n    try:",
+        "detail": "src.winder.Control.Library.Configuration",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeException",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeException( Exception ) :\n  #---------------------------------------------------------------------\n  def __init__( self, message, data=[] ) :\n    Exception.__init__( self, message )\n    self.data = data\n#=============================================================================\n#\n#=============================================================================\nclass G_CodeClass :\n  #---------------------------------------------------------------------",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeClas",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeClass :\n  #---------------------------------------------------------------------\n  def __init__( self, parentLine ) :\n    \"\"\"\n    Constructor.\n    Args:\n      parentLine: Parent line that generated this code.\n    \"\"\"\n    self.parentLine = parentLine\n    self.parameters = []",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFeedRate",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeFeedRate( G_CodeClass ) :\n  pass\n#======================================\n# Command (G)\n#======================================\nclass G_CodeCommand( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( parameter )\n  def get( self ) :\n    return self.parameters",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeCommand",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeCommand( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( parameter )\n  def get( self ) :\n    return self.parameters\n#======================================\n# Function (M)\n#======================================\nclass G_CodeFunction( G_CodeClass ) :\n  def addParameter( self, parameter ) :",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFunction",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeFunction( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( int( parameter ) )\n#======================================\n# Line number (N)\n#======================================\nclass G_CodeLineNumber( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( int( parameter ) )\n#======================================",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeLineNumber",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeLineNumber( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( int( parameter ) )\n#======================================\n# Program name (O)\n#======================================\nclass G_CodeProgramName( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( parameter )\n#======================================",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeProgramName",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeProgramName( G_CodeClass ) :\n  def addParameter( self, parameter ) :\n    self.parameters.append( parameter )\n#======================================\n# Parameter (P)\n# (Not actually used.)\n#======================================\nclass G_CodeParameter( G_CodeClass ) :\n  pass\n#======================================",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeParameter",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeParameter( G_CodeClass ) :\n  pass\n#======================================\n# X position (X)\n#======================================\nclass G_CodeSetX( G_CodeClass ) :\n  pass\n#======================================\n# Y position (Y)\n#======================================",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeSetX",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeSetX( G_CodeClass ) :\n  pass\n#======================================\n# Y position (Y)\n#======================================\nclass G_CodeSetY( G_CodeClass ) :\n  pass\n#======================================\n# Z position (Z)\n#======================================",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeSetY",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeSetY( G_CodeClass ) :\n  pass\n#======================================\n# Z position (Z)\n#======================================\nclass G_CodeSetZ( G_CodeClass ) :\n  pass\n#=============================================================================\n# Table for holding callback functions run for each G-Code.\n#=============================================================================",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeSetZ",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeSetZ( G_CodeClass ) :\n  pass\n#=============================================================================\n# Table for holding callback functions run for each G-Code.\n#=============================================================================\nclass G_CodeCallbacks :\n  callbacks = \\\n  {\n    'F' : None,\n    'G' : None,",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeCallback",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeCallbacks :\n  callbacks = \\\n  {\n    'F' : None,\n    'G' : None,\n    'M' : None,\n    'N' : None,\n    'O' : None,\n    'P' : None,\n    'X' : None,",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeLin",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_CodeLine :\n  # A lookup table that will translate a code to a G-code object.\n  FUNCTION_TABLE = \\\n  {\n    'F' : lambda parent: G_CodeFeedRate(    parent ),\n    'G' : lambda parent: G_CodeCommand(     parent ),\n    'M' : lambda parent: G_CodeFunction(    parent ),\n    'N' : lambda parent: G_CodeLineNumber(  parent ),\n    'O' : lambda parent: G_CodeProgramName( parent ),\n    'P' : lambda parent: G_CodeParameter(   parent ),",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_Cod",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.G_Code",
+        "description": "src.winder.Control.Library.G_Code",
+        "peekOfCode": "class G_Code :\n  #---------------------------------------------------------------------\n  def __init__( self, lines, callbacks ) :\n    \"\"\"\n    Constructor.\n    Args:\n      lines: List of G-Code lines.\n      callbacks: Instance of G_CodeCallbacks.\n    Raises:\n      Exception: Malformed header in G-Code file.",
+        "detail": "src.winder.Control.Library.G_Code",
+        "documentation": {}
+    },
+    {
+        "label": "Has",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Hash",
+        "description": "src.winder.Control.Library.Hash",
+        "peekOfCode": "class Hash :\n  # Selected hashing algorithm.\n  ALGORITHM = hashlib.md5\n  HASH_PATTERN = \"([0-9A-F]{3}-[0-9A-F]{3}-[0-9A-F]{4})\"\n  IN_PATTERN   = r'(.{3})(.{3})(.{4}).*'\n  OUT_PATTERN  = '\\\\1-\\\\2-\\\\3'\n  #-------------------------------------------------------------------\n  @staticmethod\n  def singleLine( line ) :\n    \"\"\"",
+        "detail": "src.winder.Control.Library.Hash",
+        "documentation": {}
+    },
+    {
+        "label": "HashedSerializable",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.HashedSerializable",
+        "description": "src.winder.Control.Library.HashedSerializable",
+        "peekOfCode": "class HashedSerializable( Serializable ) :\n  #===================================================================\n  class Error( ValueError ) :\n    \"\"\"\n    Exception on hash match failure.\n    \"\"\"\n    #-----------------------------------------------------------------\n    def __init__( self, message, data=[] ) :\n      \"\"\"\n      Constructor.",
+        "detail": "src.winder.Control.Library.HashedSerializable",
+        "documentation": {}
+    },
+    {
+        "label": "Log",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Log",
+        "description": "src.winder.Control.Library.Log",
+        "peekOfCode": "class Log:\n  #---------------------------------------------------------------------\n  def _getTimestamp( self ):\n    \"\"\"\n    Get a timestamp.\n    Returns:\n      String of current system time.\n    \"\"\"\n    return str( self._systemTime.get() )\n  #---------------------------------------------------------------------",
+        "detail": "src.winder.Control.Library.Log",
+        "documentation": {}
+    },
+    {
+        "label": "LoggedStateMachine",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.LoggedStateMachine",
+        "description": "src.winder.Control.Library.LoggedStateMachine",
+        "peekOfCode": "class LoggedStateMachine( StateMachine ) :\n  #---------------------------------------------------------------------\n  def __init__( self, log ) :\n    \"\"\"\n    Constructor.\n    Args:\n      log: Log file to write transitions.\n    \"\"\"\n    StateMachine.__init__( self )\n    self.log = log",
+        "detail": "src.winder.Control.Library.LoggedStateMachine",
+        "documentation": {}
+    },
+    {
+        "label": "MathExtr",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.MathExtra",
+        "description": "src.winder.Control.Library.MathExtra",
+        "peekOfCode": "class MathExtra :\n  #---------------------------------------------------------------------\n  @staticmethod\n  def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):\n    \"\"\"\n    Return True if the values a and b are close to each other and False otherwise.\n    Whether or not two values are considered close is determined according to\n    given absolute and relative tolerances.\n    rel_tol is the relative tolerance - it is the maximum allowed difference\n    between a and b, relative to the larger absolute value of a or b. For example,",
+        "detail": "src.winder.Control.Library.MathExtra",
+        "documentation": {}
+    },
+    {
+        "label": "Recip",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Recipe",
+        "description": "src.winder.Control.Library.Recipe",
+        "peekOfCode": "class Recipe :\n  #---------------------------------------------------------------------\n  def __init__( self, fileName, archiveDirectory ) :\n    \"\"\"\n    Constructor.\n    Args:\n      fileName: File name of recipe to load.\n      archiveDirectory: Path to archive directory.\n    \"\"\"\n    # Read input file.",
+        "detail": "src.winder.Control.Library.Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "RemoteSessio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.RemoteSession",
+        "description": "src.winder.Control.Library.RemoteSession",
+        "peekOfCode": "class RemoteSession :\n  # Time (in seconds) until session expires.\n  # The two times prevent browsers that block cookies from creating a huge\n  # number of unused sessions by requiring the sessions be used at least once\n  # before using a longer expiration time.\n  INITIAL_EXPIRATION = 3     # Sessions until they are used at least once.\n  ACTIVE_EXPIRATION  = 3600  # Sessions that are in use.\n  # Bytes of salt data.\n  SALT_SIZE = 16\n  # $$$FUTURE - This should come from a configurtion file.",
+        "detail": "src.winder.Control.Library.RemoteSession",
+        "documentation": {}
+    },
+    {
+        "label": "Serializabl",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Serializable",
+        "description": "src.winder.Control.Library.Serializable",
+        "peekOfCode": "class Serializable :\n  # Only the following built-in types are supported.\n  # (Basically, anything that can easily be turned to/from a string.)\n  SUPPORTED_PRIMITIVES = (int, int, float, complex, str, bool, list, dict, type(None) )\n  #---------------------------------------------------------------------\n  def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ) :\n    \"\"\"\n    Constructor.\n    Args:\n      includeOnly: List of class variables to include in serialization.  None to",
+        "detail": "src.winder.Control.Library.Serializable",
+        "documentation": {}
+    },
+    {
+        "label": "SerializableLocation",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.SerializableLocation",
+        "description": "src.winder.Control.Library.SerializableLocation",
+        "peekOfCode": "class SerializableLocation( Location, Serializable ) :\n  #---------------------------------------------------------------------\n  @staticmethod\n  def fromLocation( location ) :\n    result = SerializableLocation()\n    result.x = location.x\n    result.y = location.y\n    result.z = location.z\n    return result",
+        "detail": "src.winder.Control.Library.SerializableLocation",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachin",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.StateMachine",
+        "description": "src.winder.Control.Library.StateMachine",
+        "peekOfCode": "class StateMachine :\n  #---------------------------------------------------------------------\n  def __init__( self, name = None ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: A name for the state machine (optional).\n    \"\"\"\n    if None == name :\n      name = self.__class__.__name__",
+        "detail": "src.winder.Control.Library.StateMachine",
+        "documentation": {}
+    },
+    {
+        "label": "StateMachineStat",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.StateMachineState",
+        "description": "src.winder.Control.Library.StateMachineState",
+        "peekOfCode": "class StateMachineState :\n  #---------------------------------------------------------------------\n  def __init__( self, stateMachine, stateIndex ) :\n    \"\"\"\n    Constructor.\n    Args:\n      stateMachine: Parent state machine.\n      stateIndex: Number that represents this state.\n    \"\"\"\n    self.stateMachine = stateMachine",
+        "detail": "src.winder.Control.Library.StateMachineState",
+        "documentation": {}
+    },
+    {
+        "label": "SystemSemaphor",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.SystemSemaphore",
+        "description": "src.winder.Control.Library.SystemSemaphore",
+        "peekOfCode": "class SystemSemaphore :\n  _activeList = []\n  _isActive = True\n  #---------------------------------------------------------------------\n  def __init__( self, count=1 ) :\n    \"\"\"\n    Constructor.\n    Args:\n      count: Initial semaphore count.\n    \"\"\"",
+        "detail": "src.winder.Control.Library.SystemSemaphore",
+        "documentation": {}
+    },
+    {
+        "label": "SystemTime",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.SystemTime",
+        "description": "src.winder.Control.Library.SystemTime",
+        "peekOfCode": "class SystemTime( TimeSource ) :\n  #-------------------------------------------------------------------\n  def sleep( self, sleepTime ) :\n    \"\"\"\n    Sleep for specified time (in seconds).\n    Args:\n      sleepTime: Time to sleep (in seconds and can be fractional).\n    \"\"\"\n    time.sleep( sleepTime )\n  #-------------------------------------------------------------------",
+        "detail": "src.winder.Control.Library.SystemTime",
+        "documentation": {}
+    },
+    {
+        "label": "TimeSource",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.TimeSource",
+        "description": "src.winder.Control.Library.TimeSource",
+        "peekOfCode": "class TimeSource(metaclass=ABCMeta) :\n  # Make class abstract.\n  @abstractmethod\n  def sleep( self, sleepTime ) :\n    \"\"\"\n    Sleep for specified time (in seconds).\n    Args:\n      sleepTime: Time to sleep (in seconds and can be fractional).\n    \"\"\"\n    pass",
+        "detail": "src.winder.Control.Library.TimeSource",
+        "documentation": {}
+    },
+    {
+        "label": "UI_ClientConnection",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.UI_ClientConnection",
+        "description": "src.winder.Control.Library.UI_ClientConnection",
+        "peekOfCode": "class UI_ClientConnection:\n  #---------------------------------------------------------------------\n  def __init__( self, address, port, maxReceiveSize ) :\n    \"\"\"\n    Constructor.\n    Args:\n      address - Address of server.\n      port - Port of server.\n      maxReceiveSize - Largest packet that can be read.\n    \"\"\"",
+        "detail": "src.winder.Control.Library.UI_ClientConnection",
+        "documentation": {}
+    },
+    {
+        "label": "Versio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.Version",
+        "description": "src.winder.Control.Library.Version",
+        "peekOfCode": "class Version :\n  #-------------------------------------------------------------------\n  def __init__( self, versionFileName, path=\".\", includeMask=\".*\", excludeMask=\"^$\" ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    self._fileName = os.path.abspath( versionFileName )\n    self._path = os.path.abspath( path )\n    self._includeMask = includeMask\n    self._excludeMask = excludeMask",
+        "detail": "src.winder.Control.Library.Version",
+        "documentation": {}
+    },
+    {
+        "label": "WebServerInterface",
+        "kind": 6,
+        "importPath": "src.winder.Control.Library.WebServerInterface",
+        "description": "src.winder.Control.Library.WebServerInterface",
+        "peekOfCode": "class WebServerInterface( SimpleHTTPRequestHandler ):\n  # $$$FUTURE - If we decide to use authentication, this must change.\n  BYPASS_AUTHENTICATION = True\n  # Queries an unauthenticated client can issue.\n  # Regular expression.  Includes \"get\", \"is\", and none-functional\n  # queries only--queries that change nothing but just return data.\n  BASIC_QUERIES = \\\n     r\"(\\.get[A-Za-z0-9_]*\\(.*\\)$)\" \\\n   + \"|(\\.is[A-Za-z0-9_]*\\(.*\\)$)\"  \\\n   + \"|(^[A-Za-z0-9_.]+)$\"",
+        "detail": "src.winder.Control.Library.WebServerInterface",
+        "documentation": {}
+    },
+    {
+        "label": "APA_Geometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.APA_Geometry",
+        "description": "src.winder.Control.Machine.APA_Geometry",
+        "peekOfCode": "class APA_Geometry( MachineGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    MachineGeometry.__init__( self )\n    # Dimensions of base APA steel frame.\n    self.apaLength    = 6060.2\n    self.apaHeight    = 2300",
+        "detail": "src.winder.Control.Machine.APA_Geometry",
+        "documentation": {}
+    },
+    {
+        "label": "DefaultMachineCalibration",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.DefaultCalibration",
+        "description": "src.winder.Control.Machine.DefaultCalibration",
+        "peekOfCode": "class DefaultMachineCalibration( MachineCalibration ) :\n  #---------------------------------------------------------------------\n  def __init__( self, outputFilePath=None, outputFileName=None ) :\n    \"\"\"\n    Constructor.\n    Args:\n      outputFilePath - Path to save/load data.\n      outputFileName - Name of data file.\n    \"\"\"\n    MachineCalibration.__init__( self, outputFilePath, outputFileName )",
+        "detail": "src.winder.Control.Machine.DefaultCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "DefaultLayerCalibration",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.DefaultCalibration",
+        "description": "src.winder.Control.Machine.DefaultCalibration",
+        "peekOfCode": "class DefaultLayerCalibration( LayerCalibration ) :\n  #---------------------------------------------------------------------\n  def __init__( self, outputFilePath, outputFileName, layerName ) :\n    \"\"\"\n    Export node list to calibration file.  Debug function.\n    Args:\n      outputFileName: File name to create.\n      layerName: Name of recipe.\n    \"\"\"\n    if \"X\" == layerName :",
+        "detail": "src.winder.Control.Machine.DefaultCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "GeometrySelection",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.GeometrySelection",
+        "description": "src.winder.Control.Machine.GeometrySelection",
+        "peekOfCode": "class GeometrySelection( LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __new__( _, layerName ):\n    \"\"\"\n    The new operator will actually not create an instance of this class, but\n    rather an instance of the requested layer's geometry class.\n    Args:\n      layerName: Name of layer geometry to create (X/V/U/G).\n    Returns:\n      Instance of the requested layer geometry.",
+        "detail": "src.winder.Control.Machine.GeometrySelection",
+        "documentation": {}
+    },
+    {
+        "label": "GX_LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.GX_LayerGeometry",
+        "description": "src.winder.Control.Machine.GX_LayerGeometry",
+        "peekOfCode": "class GX_LayerGeometry( LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    LayerGeometry.__init__( self )\n    # Spacing between wires.\n    # 230mm board width divided by 48 wires per board.\n    self.pinSpacing = 230.0 / 48",
+        "detail": "src.winder.Control.Machine.GX_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeHandlerBas",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.G_CodeHandlerBase",
+        "description": "src.winder.Control.Machine.G_CodeHandlerBase",
+        "peekOfCode": "class G_CodeHandlerBase :\n  DEBUG_UNIT = False\n  #---------------------------------------------------------------------\n  def _setX( self, x ) :\n    \"\"\"\n    Callback for setting x-axis.\n    Args:\n      x: Desired x-axis location.\n    Returns:\n      None.",
+        "detail": "src.winder.Control.Machine.G_CodeHandlerBase",
+        "documentation": {}
+    },
+    {
+        "label": "G_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.G_Codes",
+        "description": "src.winder.Control.Machine.G_Codes",
+        "peekOfCode": "class G_Codes :\n  LATCH            = 100 # No parameters.\n  WIRE_LENGTH      = 101 # Amount of wire (in mm) used in move.\n  SEEK_TRANSFER    = 102 # No parameters.\n  PIN_CENTER       = 103 # Pin 1, Pin 2, Axises (X/Y/XY).\n  CLIP             = 104 # No parameters.\n  OFFSET           = 105 # Axis (X/Y) and a number.  Can have multiple parameters.\n  HEAD_LOCATION    = 106 # 0=front, 1=level front, 2=level back, 3=back.\n  DELAY            = 107 # Time (milliseconds).\n  ARM_CORRECT      = 108 # No parameters.",
+        "detail": "src.winder.Control.Machine.G_Codes",
+        "documentation": {}
+    },
+    {
+        "label": "G_LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.G_LayerGeometry",
+        "description": "src.winder.Control.Machine.G_LayerGeometry",
+        "peekOfCode": "class G_LayerGeometry( GX_LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    GX_LayerGeometry.__init__( self )\n    # Number of rows.\n    self.rows = int( 481 / self.scale )\n    # Total number of pins.",
+        "detail": "src.winder.Control.Machine.G_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "HeadCompensatio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.HeadCompensation",
+        "description": "src.winder.Control.Machine.HeadCompensation",
+        "peekOfCode": "class HeadCompensation :\n  #---------------------------------------------------------------------\n  def __init__( self, machineCalibration ) :\n    \"\"\"\n    Constructor.\n    Args:\n      machineCalibration - Instance of MachineCalibration.\n    \"\"\"\n    self._machineCalibration = machineCalibration\n    self._anchorPoint  = Location( -1 )",
+        "detail": "src.winder.Control.Machine.HeadCompensation",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCalibration",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.LayerCalibration",
+        "description": "src.winder.Control.Machine.LayerCalibration",
+        "peekOfCode": "class LayerCalibration( HashedSerializable ) :\n  \"\"\"\n  Layer calibration is just a map that has an adjusted location for each\n  pin on a layer.  The pins are addressed by side and pin number.  Each\n  have a 2d location.\n  When uncalibrated, the pin locations are the nominal locations.\n  \"\"\"\n  #-------------------------------------------------------------------\n  def __init__( self, layer=None, filePath=None, fileName=None, archivePath=None ) :\n    \"\"\"",
+        "detail": "src.winder.Control.Machine.LayerCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "LayerCorrectio",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.LayerCorrection",
+        "description": "src.winder.Control.Machine.LayerCorrection",
+        "peekOfCode": "class LayerCorrection :\n  #-------------------------------------------------------------------\n  def __init__( self, layerCalibration ) :\n    \"\"\"\n    Constructor.\n    Args:\n      layerCalibration: Instance of LayerCalibration.\n    \"\"\"\n    self.layerCalibration = layerCalibration\n  #-------------------------------------------------------------------",
+        "detail": "src.winder.Control.Machine.LayerCorrection",
+        "documentation": {}
+    },
+    {
+        "label": "LayerFunction",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.LayerFunctions",
+        "description": "src.winder.Control.Machine.LayerFunctions",
+        "peekOfCode": "class LayerFunctions :\n  #-------------------------------------------------------------------\n  @staticmethod\n  def offsetPin( geometry, pin, offset ) :\n    \"\"\"\n    Offset the given pin number.\n    Args:\n      geometry: Instance of LayerGeometry.\n      pin: Starting pin number (number, not name).\n      offset: Value (+/-) to adjust by.",
+        "detail": "src.winder.Control.Machine.LayerFunctions",
+        "documentation": {}
+    },
+    {
+        "label": "LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.LayerGeometry",
+        "description": "src.winder.Control.Machine.LayerGeometry",
+        "peekOfCode": "class LayerGeometry( APA_Geometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    APA_Geometry.__init__( self )\n    # Pitches are the number of wire crossings.\n    self.pitches = 400\n    # Spacing between pins and X/Y.",
+        "detail": "src.winder.Control.Machine.LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "MachineCalibration",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.MachineCalibration",
+        "description": "src.winder.Control.Machine.MachineCalibration",
+        "peekOfCode": "class MachineCalibration( Serializable ) :\n  #-------------------------------------------------------------------\n  def __init__( self, outputFilePath = None, outputFileName = None ) :\n    \"\"\"\n    Constructor.\n    Args:\n      outputFilePath - Path to save/load data.\n      outputFileName - Name of data file.\n    \"\"\"\n    Serializable.__init__( self, exclude=[ \"_outputFilePath\", \"_outputFileName\" ] )",
+        "detail": "src.winder.Control.Machine.MachineCalibration",
+        "documentation": {}
+    },
+    {
+        "label": "MachineGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.MachineGeometry",
+        "description": "src.winder.Control.Machine.MachineGeometry",
+        "peekOfCode": "class MachineGeometry( object ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    # Scale down factor for geometry.\n    # Debug only.  Set to 1 for production.\n    self.scale = 1\n    # Handles on either side of the APA.",
+        "detail": "src.winder.Control.Machine.MachineGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "Setting",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.Settings",
+        "description": "src.winder.Control.Machine.Settings",
+        "peekOfCode": "class Settings :\n  SERVER_PORT                 = 6626  # Default TCP port number (plank's constant).\n  WEB_SERVER_PORT             = 80    # Port for web server (80 is default).\n  SERVER_MAX_DATA_SIZE        = 1024  # Max data that can be read from server at once.\n  SERVER_BACK_LOG             = 5     # Default recommended by Python manual.\n  CLIENT_MAX_DATA_SIZE        = 1024  # Max data that can be read from client at once.\n  IO_UPDATE_TIME              = 0.1   # In seconds.  Currently 10 times/sec.\n  # Path to configuration file.\n  # Check the operating system\n  if platform.system() == \"Windows\":",
+        "detail": "src.winder.Control.Machine.Settings",
+        "documentation": {}
+    },
+    {
+        "label": "Spoo",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.Spool",
+        "description": "src.winder.Control.Machine.Spool",
+        "peekOfCode": "class Spool :\n  #---------------------------------------------------------------------\n  def __init__( self, initialWire=0, lowWireQuantity=0 ) :\n    \"\"\"\n    Constructor.\n    Args:\n      initialWire: Amount of wire the spool has (in meters).\n      lowWireQuantity: Minimal amount of wire (in meters) before considered low.\n    \"\"\"\n    self._wire = initialWire",
+        "detail": "src.winder.Control.Machine.Spool",
+        "documentation": {}
+    },
+    {
+        "label": "UV_LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.UV_LayerGeometry",
+        "description": "src.winder.Control.Machine.UV_LayerGeometry",
+        "peekOfCode": "class UV_LayerGeometry( LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    LayerGeometry.__init__( self )\n    # The APA frame is divided into pitches--a place were two wires cross.\n    self.pitches = 400\n    self.rows    = self.pitches / self.scale",
+        "detail": "src.winder.Control.Machine.UV_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "U_LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.U_LayerGeometry",
+        "description": "src.winder.Control.Machine.U_LayerGeometry",
+        "peekOfCode": "class U_LayerGeometry( UV_LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    UV_LayerGeometry.__init__( self )\n    # Total number of pins.\n    self.pins = 2 * self.rows + 2 * self.columns + 1\n    # Values to translate front/back pin numbers.",
+        "detail": "src.winder.Control.Machine.U_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "V_LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.V_LayerGeometry",
+        "description": "src.winder.Control.Machine.V_LayerGeometry",
+        "peekOfCode": "class V_LayerGeometry( UV_LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    UV_LayerGeometry.__init__( self )\n    # Total number of pins.\n    self.pins = 2 * self.rows + 2 * self.columns - 1\n    # Values to translate front/back pin numbers.",
+        "detail": "src.winder.Control.Machine.V_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "X_LayerGeometry",
+        "kind": 6,
+        "importPath": "src.winder.Control.Machine.X_LayerGeometry",
+        "description": "src.winder.Control.Machine.X_LayerGeometry",
+        "peekOfCode": "class X_LayerGeometry( GX_LayerGeometry ) :\n  #-------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    GX_LayerGeometry.__init__( self )\n    # Number of rows.\n    self.rows = int( 480 / self.scale )\n    # Total number of pins.",
+        "detail": "src.winder.Control.Machine.X_LayerGeometry",
+        "documentation": {}
+    },
+    {
+        "label": "AnchorPointG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code",
+        "peekOfCode": "class AnchorPointG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to specify anchor point of wire during move.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, pin, orientation=None ) :\n    \"\"\"\n    Constructor.\n    Args:\n      pin: Anchor pin.",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "ArmCorrectG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code",
+        "peekOfCode": "class ArmCorrectG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to correct current position for arm on head.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    G_CodeFunction.__init__( self, G_Codes.ARM_CORRECT )",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "BreakG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code",
+        "peekOfCode": "class BreakG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to toggle the latch.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    G_CodeFunction.__init__( self, G_Codes.BREAK_POINT, [] )",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "ClipG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code",
+        "peekOfCode": "class ClipG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to clip the position based on Z-transfer location.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    G_CodeFunction.__init__( self, G_Codes.CLIP, [] )",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeFunctio",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction",
+        "peekOfCode": "class G_CodeFunction :\n  \"\"\"\n  Base object for a G-Code function.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, gCode, parameters = [] ) :\n    \"\"\"\n    Constructor.\n    Args:\n      gCode: The G-Code function number (integer).",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction",
+        "documentation": {}
+    },
+    {
+        "label": "HeadLocationG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "peekOfCode": "class HeadLocationG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to set the Z latch position.\n  \"\"\"\n  # Locations.\n  FRONT = 0\n  PARTIAL_FRONT = 1\n  PARTIAL_BACK  = 2\n  BACK = 3\n  #---------------------------------------------------------------------",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "LatchG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code",
+        "peekOfCode": "class LatchG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to toggle the latch.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    Args:\n      side: Which side (FRONT/PARTIAL_FRONT/PARTIAL_BACK/BACK) to latch to.",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "OffsetG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code",
+        "peekOfCode": "class OffsetG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to offset current position.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, x=None, y=None, z=None ) :\n    \"\"\"\n    Constructor.\n    Args:\n      pins: List of two pins.",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "PinCenterG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code",
+        "peekOfCode": "class PinCenterG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code for seeking between two pins.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, pins, axises=\"XY\" ) :\n    \"\"\"\n    Constructor.\n    Args:\n      pins: List of two pins.",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "SeekTransferG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code",
+        "peekOfCode": "class SeekTransferG_Code( G_CodeFunction ) :\n  \"\"\"\n  A seek transfer will instruct the target to follow the slope of the line\n  until it reaches a Z transfer area.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self ) :\n    \"\"\"\n    Constructor.\n    Args:",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "TransferCorrectG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code",
+        "peekOfCode": "class TransferCorrectG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, axis ) :\n    \"\"\"\n    Constructor.\n    Args:\n      axis: The axis to make correction (X or Y).",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "WireLengthG_Code",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code",
+        "peekOfCode": "class WireLengthG_Code( G_CodeFunction ) :\n  \"\"\"\n  G-Code to specify the amount of wire consumed by a move.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, length ) :\n    \"\"\"\n    Constructor.\n    Args:\n      length: How much wire was consumed by this motion.",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodePath",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodePath",
+        "description": "src.winder.Control.RecipeGenerator.G_CodePath",
+        "peekOfCode": "class G_CodePath( Path3d ) :\n  \"\"\"\n  A specific path that includes G-Code instructions.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, offset=Location() ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    Path3d.__init__( self, offset )",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodePath",
+        "documentation": {}
+    },
+    {
+        "label": "G_CodeToPath",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.G_CodeToPath",
+        "description": "src.winder.Control.RecipeGenerator.G_CodeToPath",
+        "peekOfCode": "class G_CodeToPath( G_CodeHandlerBase ) :\n  #---------------------------------------------------------------------\n  def __init__( self, fileName, geometry, calibration ) :\n    \"\"\"\n    Constructor.\n    Args:\n      fileName: G-Code file to use.\n      geometry: Layer/machine geometry.\n      calibration: Layer calibration.\n    \"\"\"",
+        "detail": "src.winder.Control.RecipeGenerator.G_CodeToPath",
+        "documentation": {}
+    },
+    {
+        "label": "HeadPositio",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.HeadPosition",
+        "description": "src.winder.Control.RecipeGenerator.HeadPosition",
+        "peekOfCode": "class HeadPosition :\n  FRONT = 0\n  PARTIAL_FRONT = 1\n  PARTIAL_BACK  = 2\n  BACK = 3\n  PARTIAL = 4\n  OTHER_SIDE = 5\n  #---------------------------------------------------------------------\n  def __init__( self, gCodePath, geometry, initialPosition ) :\n    \"\"\"",
+        "detail": "src.winder.Control.RecipeGenerator.HeadPosition",
+        "documentation": {}
+    },
+    {
+        "label": "LayerGX_Recipe",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.LayerGX_Recipe",
+        "description": "src.winder.Control.RecipeGenerator.LayerGX_Recipe",
+        "peekOfCode": "class LayerGX_Recipe( RecipeGenerator ) :\n  OVERSHOOT = 200\n  #---------------------------------------------------------------------\n  def _pinName( self, side, startingPin, offset ) :\n    \"\"\"\n    Get the name of a pin using side, starting number, and offset.\n    Args:\n      side: Front or back (F/B).\n      startingPin: Where numbering begins.\n      offset: Number to add to starting pin.",
+        "detail": "src.winder.Control.RecipeGenerator.LayerGX_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerG_Recipe",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.LayerG_Recipe",
+        "description": "src.winder.Control.RecipeGenerator.LayerG_Recipe",
+        "peekOfCode": "class LayerG_Recipe( LayerGX_Recipe ) :\n  #-------------------------------------------------------------------\n  def __init__( self, geometry, windsOverride=None ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    LayerGX_Recipe.__init__( self, geometry, windsOverride, 0 )",
+        "detail": "src.winder.Control.RecipeGenerator.LayerG_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerUV_Recipe",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.LayerUV_Recipe",
+        "description": "src.winder.Control.RecipeGenerator.LayerUV_Recipe",
+        "peekOfCode": "class LayerUV_Recipe( RecipeGenerator ) :\n  OVERSHOOT = 200\n  #---------------------------------------------------------------------\n  def __init__( self, geometry ) :\n    \"\"\"\n    Constructor.\n    Args:\n      geometry - Instance (or child) of UV_LayerGeometry.\n    \"\"\"\n    RecipeGenerator.__init__( self, geometry )",
+        "detail": "src.winder.Control.RecipeGenerator.LayerUV_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerU_Recipe",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.LayerU_Recipe",
+        "description": "src.winder.Control.RecipeGenerator.LayerU_Recipe",
+        "peekOfCode": "class LayerU_Recipe( LayerUV_Recipe ) :\n  \"\"\"\n    *  *  *  *  *  *  *  *\n            / \\/ \\\n  *        /  /\\  \\       *\n         /   /  \\  \\\n  *     /  /      \\ \\\n      /   /        \\  \\   *\n  *  /   /          \\  \\\n   /   /              \\ \\",
+        "detail": "src.winder.Control.RecipeGenerator.LayerU_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerV_Recipe",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.LayerV_Recipe",
+        "description": "src.winder.Control.RecipeGenerator.LayerV_Recipe",
+        "peekOfCode": "class LayerV_Recipe( LayerUV_Recipe ) :\n  \"\"\"\n    *  *  *  *  *  *  *  *\n            / \\/ \\\n  *        /  /\\  \\       *\n         /   /  \\  \\\n  *     /  /      \\ \\\n      /   /        \\  \\   *\n  *  /   /          \\  \\\n   /   /              \\ \\",
+        "detail": "src.winder.Control.RecipeGenerator.LayerV_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "LayerX_Recipe",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.LayerX_Recipe",
+        "description": "src.winder.Control.RecipeGenerator.LayerX_Recipe",
+        "peekOfCode": "class LayerX_Recipe( LayerGX_Recipe ) :\n  #-------------------------------------------------------------------\n  def __init__( self, geometry, windsOverride=None ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    LayerGX_Recipe.__init__( self, geometry, windsOverride, 0.5 )",
+        "detail": "src.winder.Control.RecipeGenerator.LayerX_Recipe",
+        "documentation": {}
+    },
+    {
+        "label": "Path3",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.Path3d",
+        "description": "src.winder.Control.RecipeGenerator.Path3d",
+        "peekOfCode": "class Path3d :\n  \"\"\"\n  A list of Location objects that define a path.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, baseOffset=Location() ) :\n    \"\"\"\n    Constructor.\n    \"\"\"\n    self.path = []",
+        "detail": "src.winder.Control.RecipeGenerator.Path3d",
+        "documentation": {}
+    },
+    {
+        "label": "RecipeGenerato",
+        "kind": 6,
+        "importPath": "src.winder.Control.RecipeGenerator.RecipeGenerator",
+        "description": "src.winder.Control.RecipeGenerator.RecipeGenerator",
+        "peekOfCode": "class RecipeGenerator :\n  \"\"\"\n  Base recipe class.\n  \"\"\"\n  #---------------------------------------------------------------------\n  def __init__( self, geometry ) :\n    \"\"\"\n    Constructor.\n    Args:\n      geometry: Instance of LayerGeometry (specifically one of its children).",
+        "detail": "src.winder.Control.RecipeGenerator.RecipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "Dela",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.Delay",
+        "description": "src.winder.Control.Simulator.Delay",
+        "peekOfCode": "class Delay :\n  #---------------------------------------------------------------------\n  def __init__( self, systemTime, delay=None ) :\n    \"\"\"\n    Constructor.\n    Args:\n      systemTime: Instance of SystemTime.\n      delay: Delay in milliseconds.  None to start disabled.\n    \"\"\"\n    self._systemTime = systemTime",
+        "detail": "src.winder.Control.Simulator.Delay",
+        "documentation": {}
+    },
+    {
+        "label": "LayerErro",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.LayerError",
+        "description": "src.winder.Control.Simulator.LayerError",
+        "peekOfCode": "class LayerError :\n  #---------------------------------------------------------------------\n  @staticmethod\n  def addError( layer, maxError, standardDeviations=3 ) :\n    \"\"\"\n    Introduce an error into pin locations.\n    Args:\n      layer: Layer to introduce error.\n      maxError: Maximum amount of error to introduce.\n      standardDeviations: Number of standard deviations to distribute noise.",
+        "detail": "src.winder.Control.Simulator.LayerError",
+        "documentation": {}
+    },
+    {
+        "label": "Motion",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.Motion",
+        "description": "src.winder.Control.Simulator.Motion",
+        "peekOfCode": "class Motion(metaclass=ABCMeta) :\n  # Make class abstract.\n  @abstractmethod\n  def isMoving( self, time ):\n    \"\"\"\n    See if there is motion for the given time.\n    Args:\n      time: Time for which to check.\n    Returns:\n      True if in motion at this time, False if not.",
+        "detail": "src.winder.Control.Simulator.Motion",
+        "documentation": {}
+    },
+    {
+        "label": "PLC_Simulato",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.PLC_Simulator",
+        "description": "src.winder.Control.Simulator.PLC_Simulator",
+        "peekOfCode": "class PLC_Simulator :\n  # Error margin (in mm) to allow position (for simulated jitter).\n  POSITION_ERROR = 2\n  # Error (in mm/s) to allow in velocity (for simulated jitter).\n  VELOCITY_ERROR = 0.1\n  # Random error (+/- in pixels) to introduce to camera pin captures.\n  CAMERA_JITTER = 5\n  # Enumeration for latch positions.\n  class LatchPosition :\n    TOP    = 0",
+        "detail": "src.winder.Control.Simulator.PLC_Simulator",
+        "documentation": {}
+    },
+    {
+        "label": "S_CurveMotion",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.S-CurveMotion",
+        "description": "src.winder.Control.Simulator.S-CurveMotion",
+        "peekOfCode": "class S_CurveMotion( Motion ) :\n  #------------------------------------\n  # Private data.\n  #------------------------------------\n  # Transition point.\n  # There are 8 such points needed to compute travel location.\n  class Point :\n    T0 = 0\n    T1 = 1\n    T2 = 2",
+        "detail": "src.winder.Control.Simulator.S-CurveMotion",
+        "documentation": {}
+    },
+    {
+        "label": "SimulatedMoto",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.SimulatedMotor",
+        "description": "src.winder.Control.Simulator.SimulatedMotor",
+        "peekOfCode": "class SimulatedMotor :\n  # Standard deviation for position jitter.  Emulates servo error.\n  # (Currently 0 because machine limits in rest of simulator don't like it).\n  JITTER = 0.015\n  #---------------------------------------------------------------------\n  def positionDelta( self ) :\n    \"\"\"\n    Return the amount of distance that needs to be traversed for motion.\n    Returns:\n      Amount of distance that needs to be traversed for motion.",
+        "detail": "src.winder.Control.Simulator.SimulatedMotor",
+        "documentation": {}
+    },
+    {
+        "label": "SimulationTime",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.SimulationTime",
+        "description": "src.winder.Control.Simulator.SimulationTime",
+        "peekOfCode": "class SimulationTime( TimeSource ) :\n  #-------------------------------------------------------------------\n  def __init__( self, initialTime = datetime.datetime.utcnow(), isRealTime=True ) :\n    \"\"\"\n    Constructor.\n    Args:\n      initialTime: Time at which to start simulator. Defaults to current system time.\n    \"\"\"\n    # State with system time.\n    self._time = initialTime",
+        "detail": "src.winder.Control.Simulator.SimulationTime",
+        "documentation": {}
+    },
+    {
+        "label": "TrapezoidalMotion",
+        "kind": 6,
+        "importPath": "src.winder.Control.Simulator.TrapezoidalMotion",
+        "description": "src.winder.Control.Simulator.TrapezoidalMotion",
+        "peekOfCode": "class TrapezoidalMotion( Motion ) :\n  #------------------------------------\n  # Private data.\n  #------------------------------------\n  # Transition point.\n  # There are 8 such points needed to compute travel location.\n  class Point :\n    T0 = 0\n    T1 = 1\n    T2 = 2",
+        "detail": "src.winder.Control.Simulator.TrapezoidalMotion",
+        "documentation": {}
+    },
+    {
+        "label": "CameraThread",
+        "kind": 6,
+        "importPath": "src.winder.Control.Threads.CameraThread",
+        "description": "src.winder.Control.Threads.CameraThread",
+        "peekOfCode": "class CameraThread( PrimaryThread ) :\n  SHUTDOWN_COUNT = 5\n  # Amount of time to sleep if FIFO is empty.\n  SLEEP_TIME = 0.050\n  #---------------------------------------------------------------------\n  def __init__( self, camera, log, systemTime ) :\n    \"\"\"\n    Constructor.\n    Args:\n      camera: Instance of IO.Systems.Camera.",
+        "detail": "src.winder.Control.Threads.CameraThread",
+        "documentation": {}
+    },
+    {
+        "label": "ControlThread",
+        "kind": 6,
+        "importPath": "src.winder.Control.Threads.ControlThread",
+        "description": "src.winder.Control.Threads.ControlThread",
+        "peekOfCode": "class ControlThread( PrimaryThread ) :\n  #---------------------------------------------------------------------\n  def __init__( self, io, log, stateMachine, systemTime, isIO_Logged ) :\n    \"\"\"\n    Constructor.\n    Args:\n      io: Instance of I/O map.\n      log: Instance of system log.\n      stateMachine: Instance of state machine.\n      systemTime: Instance of SystemTime.",
+        "detail": "src.winder.Control.Threads.ControlThread",
+        "documentation": {}
+    },
+    {
+        "label": "PrimaryThread",
+        "kind": 6,
+        "importPath": "src.winder.Control.Threads.PrimaryThread",
+        "description": "src.winder.Control.Threads.PrimaryThread",
+        "peekOfCode": "class PrimaryThread( threading.Thread ):\n  list = []\n  isRunning = False\n  useGracefulException = True\n  #---------------------------------------------------------------------\n  def __init__( self, name, log ) :\n    \"\"\"\n    Constructor.\n    Args:\n      name: Name of thread.",
+        "detail": "src.winder.Control.Threads.PrimaryThread",
+        "documentation": {}
+    },
+    {
+        "label": "_Client",
+        "kind": 6,
+        "importPath": "src.winder.Control.Threads.UI_ServerThread",
+        "description": "src.winder.Control.Threads.UI_ServerThread",
+        "peekOfCode": "class _Client( threading.Thread ):\n  #---------------------------------------------------------------------\n  def __init__( self, xxx_todo_changeme, callback, log ):\n    \"\"\"\n    Constructor.\n    Args:\n      clientSocket: Connection to client.\n      address: Address of client (ignored)\n      callback: Function to send data from client. What the callback returns is then sent back to client.\n    \"\"\"",
+        "detail": "src.winder.Control.Threads.UI_ServerThread",
+        "documentation": {}
+    },
+    {
+        "label": "UI_ServerThread",
+        "kind": 6,
+        "importPath": "src.winder.Control.Threads.UI_ServerThread",
+        "description": "src.winder.Control.Threads.UI_ServerThread",
+        "peekOfCode": "class UI_ServerThread( PrimaryThread ):\n  #---------------------------------------------------------------------\n  def __init__( self, commandCallback, log ):\n    \"\"\"\n    Constructor.\n    Args:\n      callback: Function to send data from client.\n    \"\"\"\n    PrimaryThread.__init__( self, \"UI_ServerThread\", log )\n    self._callback = commandCallback",
+        "detail": "src.winder.Control.Threads.UI_ServerThread",
+        "documentation": {}
+    },
+    {
+        "label": "WebServerThread",
+        "kind": 6,
+        "importPath": "src.winder.Control.Threads.WebServerThread",
+        "description": "src.winder.Control.Threads.WebServerThread",
+        "peekOfCode": "class WebServerThread( PrimaryThread ):\n  #---------------------------------------------------------------------\n  def __init__( self, commandCallback, log ):\n    \"\"\"\n    Constructor.\n    Args:\n      callback: Function to send data from client.\n    \"\"\"\n    os.chdir( Settings.WEB_DIRECTORY )\n    PrimaryThread.__init__( self, \"WebServerThread\", log )",
+        "detail": "src.winder.Control.Threads.WebServerThread",
+        "documentation": {}
+    },
+    {
+        "label": "commandHandler",
+        "kind": 2,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "def commandHandler( _, command ) :\n  \"\"\"\n  Handle a remote command.\n  This is define in main so that is has the most global access possible.\n  Args:\n    command: A command to evaluate.\n  Returns:\n    The data returned from the command.\n  \"\"\"\n  try:",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "signalHandler",
+        "kind": 2,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "def signalHandler( signalNumber, frame ):\n  \"\"\"\n  Keyboard interrupt handler. Used to shutdown system for Ctrl-C.\n  Args:\n    signal: Ignored.\n    frame: Ignored.\n  \"\"\"\n  signalNumber = signalNumber\n  frame = frame\n  PrimaryThread.stopAllThreads()",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "isSimulated",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "isSimulated = False\n# True to use debug interface.\ndebugInterface = False\n# True to echo log to screen.\nisLogEchoed = True\n# True to log I/O.\n# CAUTION: Log file will get large very quickly.\nisIO_Logged = False\n# APA file to load.\nloadAPA_File = None",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "debugInterface",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "debugInterface = False\n# True to echo log to screen.\nisLogEchoed = True\n# True to log I/O.\n# CAUTION: Log file will get large very quickly.\nisIO_Logged = False\n# APA file to load.\nloadAPA_File = None\n# True to start APA (must be used with 'loadAPA_File'.\nisStartAPA = False",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "isLogEchoed",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "isLogEchoed = True\n# True to log I/O.\n# CAUTION: Log file will get large very quickly.\nisIO_Logged = False\n# APA file to load.\nloadAPA_File = None\n# True to start APA (must be used with 'loadAPA_File'.\nisStartAPA = False\n# True if system should run in real-time.  Simulation option.\nisRealTime = True",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "isIO_Logged",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "isIO_Logged = False\n# APA file to load.\nloadAPA_File = None\n# True to start APA (must be used with 'loadAPA_File'.\nisStartAPA = False\n# True if system should run in real-time.  Simulation option.\nisRealTime = True\n#==============================================================================\n#-----------------------------------------------------------------------\ndef commandHandler( _, command ) :",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "loadAPA_File",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "loadAPA_File = None\n# True to start APA (must be used with 'loadAPA_File'.\nisStartAPA = False\n# True if system should run in real-time.  Simulation option.\nisRealTime = True\n#==============================================================================\n#-----------------------------------------------------------------------\ndef commandHandler( _, command ) :\n  \"\"\"\n  Handle a remote command.",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "isStartAPA",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "isStartAPA = False\n# True if system should run in real-time.  Simulation option.\nisRealTime = True\n#==============================================================================\n#-----------------------------------------------------------------------\ndef commandHandler( _, command ) :\n  \"\"\"\n  Handle a remote command.\n  This is define in main so that is has the most global access possible.\n  Args:",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "isRealTime",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "isRealTime = True\n#==============================================================================\n#-----------------------------------------------------------------------\ndef commandHandler( _, command ) :\n  \"\"\"\n  Handle a remote command.\n  This is define in main so that is has the most global access possible.\n  Args:\n    command: A command to evaluate.\n  Returns:",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "startTime",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "startTime = systemTime.get()\n# Load configuration and setup default values.\nconfiguration = Configuration( Settings.CONFIG_FILE )\nSettings.defaultConfig( configuration )\n# Save configuration (just in case it had not been created or new default\n# values added).\nconfiguration.save()\n# Setup log file.\nlog = Log( systemTime, configuration.get( \"LogDirectory\" ) + '/log.csv', isLogEchoed )\nlog.add( \"Main\", \"START\", \"Control system starts.\" )",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "configuration",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "configuration = Configuration( Settings.CONFIG_FILE )\nSettings.defaultConfig( configuration )\n# Save configuration (just in case it had not been created or new default\n# values added).\nconfiguration.save()\n# Setup log file.\nlog = Log( systemTime, configuration.get( \"LogDirectory\" ) + '/log.csv', isLogEchoed )\nlog.add( \"Main\", \"START\", \"Control system starts.\" )\ntry:\n  # Version information for control software.",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "log",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "log = Log( systemTime, configuration.get( \"LogDirectory\" ) + '/log.csv', isLogEchoed )\nlog.add( \"Main\", \"START\", \"Control system starts.\" )\ntry:\n  # Version information for control software.\n  version = Version( Settings.VERSION_FILE, \".\", Settings.CONTROL_FILES )\n  if version.update() :\n    log.add( \"Main\", \"VERSION_CHANGE\", \"Control software has changed.\" )\n  # Version information for user interface.\n  uiVersion = Version( Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES )\n  if uiVersion.update() :",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "elapsedTime",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "elapsedTime = systemTime.getDelta( startTime )\ndeltaString = systemTime.getElapsedString( elapsedTime )\n# Log run-time of this operation.\nlog.add( \"Main\", \"RUN_TIME\", \"Ran for \" + deltaString + \".\", [ elapsedTime ] )\n# Sign off.\nlog.add( \"Main\", \"END\", \"Control system stops.\" )\n# \"If you think you understand quantum mechanics, you don't understand quantum\n# mechanics.\" -- Richard Feynman",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "deltaString",
+        "kind": 5,
+        "importPath": "src.winder.Control.main",
+        "description": "src.winder.Control.main",
+        "peekOfCode": "deltaString = systemTime.getElapsedString( elapsedTime )\n# Log run-time of this operation.\nlog.add( \"Main\", \"RUN_TIME\", \"Ran for \" + deltaString + \".\", [ elapsedTime ] )\n# Sign off.\nlog.add( \"Main\", \"END\", \"Control system stops.\" )\n# \"If you think you understand quantum mechanics, you don't understand quantum\n# mechanics.\" -- Richard Feynman",
+        "detail": "src.winder.Control.main",
+        "documentation": {}
+    },
+    {
+        "label": "writeRubyCode",
+        "kind": 2,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "def writeRubyCode( layer, recipe, geometry ) :\n  \"\"\"\n  Generate the Ruby code for layer.\n  Args:\n    layer - Name of layer (X/U/V/G).\n    recipe - Instance of RecipeGenerator.\n    geometry - Geometry for layer.\n  \"\"\"\n  print(\"Generating SketchUp Ruby code\")\n  # Generate an ideal calibration file for layer.",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "generateLayer",
+        "kind": 2,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "def generateLayer( layer, recipeClass, geometry, enable ) :\n  \"\"\"\n  Generate recipe data for given layer.\n  Args:\n    layer - Name of layer (X/U/V/G).\n    recipeClass - Class to generate recipe (child of RecipeGenerator).\n    geometry - Geometry for layer.\n    enable - True to generate data for this layer, False to skip.\n  \"\"\"\n  if enable :",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "isRubyCode",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "isRubyCode = False\n# Enable G-Code path output for SketchUp.\nenablePath = True\n# Enable wire path output for SketchUp.\nenableWire = True\n# Enable G-Code labels.\nenablePathLabels = False\n# Enable pin labels.\nenablePinLabels = False\n# Do not use APA offsets in SketchUp output.",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enablePath",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enablePath = True\n# Enable wire path output for SketchUp.\nenableWire = True\n# Enable G-Code labels.\nenablePathLabels = False\n# Enable pin labels.\nenablePinLabels = False\n# Do not use APA offsets in SketchUp output.\nzeroOffset = False\n# Enable base path (i.e. path without compensation for pin radius).",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enableWire",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enableWire = True\n# Enable G-Code labels.\nenablePathLabels = False\n# Enable pin labels.\nenablePinLabels = False\n# Do not use APA offsets in SketchUp output.\nzeroOffset = False\n# Enable base path (i.e. path without compensation for pin radius).\nisRubyBasePath = False\n# Overriding number of loops to complete.",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enablePathLabels",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enablePathLabels = False\n# Enable pin labels.\nenablePinLabels = False\n# Do not use APA offsets in SketchUp output.\nzeroOffset = False\n# Enable base path (i.e. path without compensation for pin radius).\nisRubyBasePath = False\n# Overriding number of loops to complete.\noverrideLaps = None\n# Individual layer enables.",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enablePinLabels",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enablePinLabels = False\n# Do not use APA offsets in SketchUp output.\nzeroOffset = False\n# Enable base path (i.e. path without compensation for pin radius).\nisRubyBasePath = False\n# Overriding number of loops to complete.\noverrideLaps = None\n# Individual layer enables.\nenableX = True\nenableU = True",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "zeroOffset",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "zeroOffset = False\n# Enable base path (i.e. path without compensation for pin radius).\nisRubyBasePath = False\n# Overriding number of loops to complete.\noverrideLaps = None\n# Individual layer enables.\nenableX = True\nenableU = True\nenableV = True\nenableG = True",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "isRubyBasePath",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "isRubyBasePath = False\n# Overriding number of loops to complete.\noverrideLaps = None\n# Individual layer enables.\nenableX = True\nenableU = True\nenableV = True\nenableG = True\n# True to create calibration files for the layers.\nisCalibration = False",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "overrideLaps",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "overrideLaps = None\n# Individual layer enables.\nenableX = True\nenableU = True\nenableV = True\nenableG = True\n# True to create calibration files for the layers.\nisCalibration = False\n#==============================================================================\n#------------------------------------------------------------------------------",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enableX",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enableX = True\nenableU = True\nenableV = True\nenableG = True\n# True to create calibration files for the layers.\nisCalibration = False\n#==============================================================================\n#------------------------------------------------------------------------------\ndef writeRubyCode( layer, recipe, geometry ) :\n  \"\"\"",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enableU",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enableU = True\nenableV = True\nenableG = True\n# True to create calibration files for the layers.\nisCalibration = False\n#==============================================================================\n#------------------------------------------------------------------------------\ndef writeRubyCode( layer, recipe, geometry ) :\n  \"\"\"\n  Generate the Ruby code for layer.",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enableV",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enableV = True\nenableG = True\n# True to create calibration files for the layers.\nisCalibration = False\n#==============================================================================\n#------------------------------------------------------------------------------\ndef writeRubyCode( layer, recipe, geometry ) :\n  \"\"\"\n  Generate the Ruby code for layer.\n  Args:",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "enableG",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "enableG = True\n# True to create calibration files for the layers.\nisCalibration = False\n#==============================================================================\n#------------------------------------------------------------------------------\ndef writeRubyCode( layer, recipe, geometry ) :\n  \"\"\"\n  Generate the Ruby code for layer.\n  Args:\n    layer - Name of layer (X/U/V/G).",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "isCalibration",
+        "kind": 5,
+        "importPath": "src.winder.Control.recipeGenerator",
+        "description": "src.winder.Control.recipeGenerator",
+        "peekOfCode": "isCalibration = False\n#==============================================================================\n#------------------------------------------------------------------------------\ndef writeRubyCode( layer, recipe, geometry ) :\n  \"\"\"\n  Generate the Ruby code for layer.\n  Args:\n    layer - Name of layer (X/U/V/G).\n    recipe - Instance of RecipeGenerator.\n    geometry - Geometry for layer.",
+        "detail": "src.winder.Control.recipeGenerator",
+        "documentation": {}
+    },
+    {
+        "label": "outputFileName",
+        "kind": 5,
+        "importPath": "src.winder.Tools.csv2calibration",
+        "description": "src.winder.Tools.csv2calibration",
+        "peekOfCode": "outputFileName = sys.argv[ 3 ]\n# Read all lines.\nwith open( inputFileName, \"r\" ) as inputFile :\n  lines = inputFile.read().split( \"\\n\" )\npoints = []\nfor line in lines:\n  # Skip blank lines.\n  if line != \"\":\n    cols = line.split( \"\\t\" )\n    points.append( cols )",
+        "detail": "src.winder.Tools.csv2calibration",
+        "documentation": {}
+    },
+    {
+        "label": "points",
+        "kind": 5,
+        "importPath": "src.winder.Tools.csv2calibration",
+        "description": "src.winder.Tools.csv2calibration",
+        "peekOfCode": "points = []\nfor line in lines:\n  # Skip blank lines.\n  if line != \"\":\n    cols = line.split( \"\\t\" )\n    points.append( cols )\nif \"X\" == layer :\n  geometry = X_LayerGeometry()\nelif \"V\" == layer :\n  geometry = V_LayerGeometry()",
+        "detail": "src.winder.Tools.csv2calibration",
+        "documentation": {}
+    },
+    {
+        "label": "layerCalibration",
+        "kind": 5,
+        "importPath": "src.winder.Tools.csv2calibration",
+        "description": "src.winder.Tools.csv2calibration",
+        "peekOfCode": "layerCalibration = LayerCalibration( layer )\n# Offset of 0,0 on the APA to machine offset.\nlayerCalibration.offset = SerializableLocation()\n# Z-positions to level with front/back of pins.\nlayerCalibration.zFront = geometry.mostlyExtend\nlayerCalibration.zBack  = geometry.mostlyRetract\n# For each point...\nfor point in points :\n  pinFront = int( point[ 0 ] )\n  pinBack  = ( 399 - pinFront ) % 2399 + 1",
+        "detail": "src.winder.Tools.csv2calibration",
+        "documentation": {}
+    },
+    {
+        "label": "layerCalibration.offset",
+        "kind": 5,
+        "importPath": "src.winder.Tools.csv2calibration",
+        "description": "src.winder.Tools.csv2calibration",
+        "peekOfCode": "layerCalibration.offset = SerializableLocation()\n# Z-positions to level with front/back of pins.\nlayerCalibration.zFront = geometry.mostlyExtend\nlayerCalibration.zBack  = geometry.mostlyRetract\n# For each point...\nfor point in points :\n  pinFront = int( point[ 0 ] )\n  pinBack  = ( 399 - pinFront ) % 2399 + 1\n  x = point[ 1 ]\n  y = point[ 2 ]",
+        "detail": "src.winder.Tools.csv2calibration",
+        "documentation": {}
+    },
+    {
+        "label": "layerCalibration.zFront",
+        "kind": 5,
+        "importPath": "src.winder.Tools.csv2calibration",
+        "description": "src.winder.Tools.csv2calibration",
+        "peekOfCode": "layerCalibration.zFront = geometry.mostlyExtend\nlayerCalibration.zBack  = geometry.mostlyRetract\n# For each point...\nfor point in points :\n  pinFront = int( point[ 0 ] )\n  pinBack  = ( 399 - pinFront ) % 2399 + 1\n  x = point[ 1 ]\n  y = point[ 2 ]\n  locationFront = SerializableLocation( x, y, layerCalibration.zFront )\n  locationBack  = SerializableLocation( x, y, layerCalibration.zBack  )",
+        "detail": "src.winder.Tools.csv2calibration",
+        "documentation": {}
+    }
+]

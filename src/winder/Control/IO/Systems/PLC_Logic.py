@@ -324,7 +324,7 @@ class PLC_Logic :
     Returns:
       Maximum positive acceleration.
     """
-    if None != maxDeceleration :
+    if maxDeceleration is not None:
       self._maxDeceleration = maxDeceleration
 
     self._maxXY_Deceleration.set( self._maxDeceleration )
@@ -342,13 +342,13 @@ class PLC_Logic :
       maxAcceleration: Maximum positive acceleration.
       maxDeceleration: Maximum negative acceleration.
     """
-    if None != maxVelocity :
+    if None is not maxVelocity :
       self._velocity = maxVelocity
 
-    if None != maxAcceleration :
+    if None is not maxAcceleration :
       self._maxAcceleration = maxAcceleration
 
-    if None != maxDeceleration :
+    if None is not maxDeceleration :
       self._maxDeceleration = maxDeceleration
 
     self._maxXY_Velocity.set( self._velocity )
@@ -393,7 +393,7 @@ class PLC_Logic :
     return result
 
   #---------------------------------------------------------------------
-  def __init__( self, plc, xyAxis, zAxis ) :
+  def __init__( self, plc: PLC, xyAxis, zAxis ) :
     """
     Constructor.
 

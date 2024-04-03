@@ -44,7 +44,7 @@ class Settings :
 
     G_CODE_LOG_FILE = "_gCode.gc"
 
-    IO_LOG = str(src_winder / "Data/IO_log.csv")
+    IO_LOG = "../Data/IO_log.csv"
 
     MACHINE_CALIBRATION_FILE = "machineCalibration.xml"
 
