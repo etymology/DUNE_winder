@@ -7,13 +7,11 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
-from __future__ import absolute_import
 from .IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
 import six
 
-class Motor( six.with_metaclass(ABCMeta, IO_Point) ) :
+class Motor( IO_Point, metaclass=ABCMeta ) :
   # Make class abstract.
   list = []
   map = {}

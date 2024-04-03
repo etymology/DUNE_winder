@@ -10,9 +10,8 @@
 from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
 from .DigitalIO import DigitalIO
-import six
 
-class DigitalOutput( six.with_metaclass(ABCMeta, DigitalIO) ) :
+class DigitalOutput( DigitalIO, metaclass=ABCMeta ) :
   # Make class abstract.
   list = []
   map = {}

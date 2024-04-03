@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import xml.dom.minidom
 import importlib
 import types
+from pathlib import Path
 
 class Serializable :
 
@@ -205,7 +206,11 @@ class Serializable :
         # Name of variable.
         name = node.getAttribute( "name" )#.decode()
         # Is this a legitimate class variable?
-        if name in self.__dict__:
+        if not name in self.__dict__ :
+          if not self._ignoreMissing :
+            if name.decode() not in self.__dict__:
+              raise KeyError(name.decode() + " not in class.")        
+        else:
           if isinstance( self.__dict__[ name ], Serializable ) :
             self.__dict__[ name ].unserialize( node )
           else:
@@ -271,11 +276,9 @@ class Serializable :
     # Convert to XML string.
     outputText = self.toXML_String( nameOverride )
 
-    fullName = f"{filePath}/{fileName}"
-
     # Write XML data to file.
-    with open( fullName, "wb" ) as outputFile :
-      outputFile.write( str.encode(outputText) )
+    with open( str(Path(filePath) / fileName), "wb" ) as outputFile :
+      outputFile.write( outputText.encode() )
 
 
   #-------------------------------------------------------------------
@@ -288,9 +291,8 @@ class Serializable :
       fileName: File name to load.
       nameOverride: Top-level XML name.
     """
-
-    fullName = filePath + fileName
-    xmlDocument = xml.dom.minidom.parse( fullName )
+    print(str(Path(filePath) / fileName))
+    xmlDocument = xml.dom.minidom.parse( str(Path(filePath) / fileName) )
 
     name = nameOverride if nameOverride != None else self.__class__.__name__
     node = xmlDocument.getElementsByTagName( name )

@@ -186,7 +186,7 @@ class G_CodePath( Path3d ) :
 
     if enableLables:
       output.write( 'layer = Sketchup.active_model.layers.add "G-Codes"' + "\n" )
-      for index, gCodeList in six.iteritems(self._gCode):
+      for index, gCodeList in self._gCode.items() :
 
         location = self.path[ index ]
 

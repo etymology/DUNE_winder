@@ -4,9 +4,7 @@
 # Date: 2016-02-02
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
-
 
 from .DigitalIO import DigitalIO
 
@@ -17,7 +15,7 @@ class DigitalInput( DigitalIO ) :
   map = {}
 
   #---------------------------------------------------------------------
-  def __str__( self ):
+  def __str__( self ) :
     """
     Convert state to string.
 
@@ -25,10 +23,14 @@ class DigitalInput( DigitalIO ) :
       "1" for on, "0" for off.
     """
 
-    return "1" if self.get() else "0"
+    result = "0"
+    if self.get() :
+      result = "1"
+
+    return result
 
   #---------------------------------------------------------------------
-  def __init__( self, name ):
+  def __init__( self, name ) :
     """
     Constructor.
 
@@ -38,7 +40,7 @@ class DigitalInput( DigitalIO ) :
     """
 
     # Make sure this name isn't already in use.
-    assert name not in DigitalInput.list
+    assert( not name in DigitalInput.list )
 
     DigitalIO.__init__( self, name )
     DigitalInput.list.append( self )

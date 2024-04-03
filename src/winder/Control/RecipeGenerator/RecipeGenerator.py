@@ -366,7 +366,7 @@ class RecipeGenerator :
       side = node[ 0 ]
       pin = node[ 1: ]
       location = str( self.nodes[ node ] )[ 1:-1 ].replace( ' ', '' )
-      print(f"{side},{pin},{location}")
+      print(side + "," + pin + "," + location)
 
   #---------------------------------------------------------------------
   def printNet( self ) :

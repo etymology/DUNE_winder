@@ -6,18 +6,18 @@ function VersionDetails( modules )
   // Uses:
   //   Callback to update all the version information.
   //-----------------------------------------------------------------------------
-  this.versionUpdate = function()
-  {
-    winder.singleRemoteDisplay( "version.getVersion()", "#controlVersionString" )
-    winder.singleRemoteDisplay( "version.getHash()", "#controlVersionHash" )
-    winder.singleRemoteDisplay( "version.getDate()", "#controlVersionDate" )
-    winder.singleRemoteDisplay( "version.verify()", "#controlVersionValid" )
+  // this.versionUpdate = function()
+  // {
+  //   winder.singleRemoteDisplay( "version.getVersion()", "#controlVersionString" )
+  //   winder.singleRemoteDisplay( "version.getHash()", "#controlVersionHash" )
+  //   winder.singleRemoteDisplay( "version.getDate()", "#controlVersionDate" )
+  //   winder.singleRemoteDisplay( "version.verify()", "#controlVersionValid" )
 
-    winder.singleRemoteDisplay( "uiVersion.getVersion()", "#uiVersionString" )
-    winder.singleRemoteDisplay( "uiVersion.getHash()", "#uiVersionHash" )
-    winder.singleRemoteDisplay( "uiVersion.getDate()", "#uiVersionDate" )
-    winder.singleRemoteDisplay( "uiVersion.verify()", "#uiVersionValid" )
-  }
+  //   winder.singleRemoteDisplay( "uiVersion.getVersion()", "#uiVersionString" )
+  //   winder.singleRemoteDisplay( "uiVersion.getHash()", "#uiVersionHash" )
+  //   winder.singleRemoteDisplay( "uiVersion.getDate()", "#uiVersionDate" )
+  //   winder.singleRemoteDisplay( "uiVersion.verify()", "#uiVersionValid" )
+  // }
 
   //-----------------------------------------------------------------------------
   // Uses:

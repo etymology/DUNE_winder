@@ -6,12 +6,9 @@
 #   Andrew Que <aque@bb7.com>
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
-
-from __future__ import absolute_import
-import contextlib
-from six.moves.BaseHTTPServer import HTTPServer
-from six.moves.socketserver import ThreadingMixIn
-import six.moves.http_client
+from http.server import HTTPServer
+from socketserver import ThreadingMixIn
+import http.client
 import os
 
 from Threads.PrimaryThread import PrimaryThread
@@ -59,7 +56,7 @@ class WebServerThread( PrimaryThread ):
 
     with contextlib.suppress(Exception):
       # HEAD request just so thread unblocks.  This will throw an exception.
-      connection = six.moves.http_client.HTTPConnection( "127.0.0.1" )
+      connection = http.client.HTTPConnection( "127.0.0.1" )
       connection.request( "HEAD","/" )
 
 # end class

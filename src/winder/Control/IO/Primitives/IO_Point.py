@@ -13,7 +13,7 @@ from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
 import six
 
-class IO_Point(six.with_metaclass(ABCMeta)):
+class IO_Point(metaclass=ABCMeta):
   # Make class abstract.
   list = []
   map = {}

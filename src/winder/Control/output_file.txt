@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<version>
+	<string>0.0.1</string>
+	<hash>CEB-F2E-2162</hash>
+	<date>2024-04-02 16:18:56.333839</date>
+</version>

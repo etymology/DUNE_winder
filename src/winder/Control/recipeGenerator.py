@@ -93,8 +93,11 @@ def writeRubyCode( layer, recipe, geometry ):
 
   # Construct G-Code for first half.
   print("  Construct G-Code for first half.")
-  gCodePath = G_CodeToPath(f"{recipeDirectory}/{layer}-Layer_1.gc", geometry,
-                           calibration)
+  gCodePath = G_CodeToPath(
+    recipeDirectory + "/" + layer + "-Layer_1.gc",
+    geometry,
+    calibration
+  )
 
   # Write 1st wind G-Code path.
   print("  Write 1st wind G-Code path.")
@@ -122,8 +125,11 @@ def writeRubyCode( layer, recipe, geometry ):
   if overrideLaps > 1 or overrideLaps is None:
     # Construct G-Code for second half.
     print("  Construct G-Code for second half.")
-    gCodePath = G_CodeToPath(f"{recipeDirectory}/{layer}-Layer_2.gc", geometry,
-                             calibration)
+    gCodePath = G_CodeToPath(
+      recipeDirectory + "/" + layer + "-Layer_2.gc",
+      geometry,
+      calibration
+    )
 
     # Write 2nd wind G-Code path.
     print("  Write 2nd wind G-Code path.")
@@ -147,8 +153,8 @@ def generateLayer( layer, recipeClass, geometry, enable ):
     geometry - Geometry for layer.
     enable - True to generate data for this layer, False to skip.
   """
-  if enable:
-    print(f"Generating {layer}-layer recipe")
+  if enable :
+    print("Generating " + layer + "-layer recipe")
     recipe = recipeClass( geometry, overrideLaps )
     recipe.writeG_Code(f"{recipeDirectory}/{layer}-Layer", "gc", f"{layer} Layer")
 
@@ -159,8 +165,8 @@ def generateLayer( layer, recipeClass, geometry, enable ):
       recipe.writeRubyBasePath(f"{layer}-Layer.rb", False)
 
     recipe.printStats()
-  else:
-    print(f"Skipping {layer}-layer recipe")
+  else :
+    print("Skipping " + layer + "-layer recipe")
   print()
 
 #------------------------------------------------------------------------------

@@ -103,47 +103,40 @@ class Log:
     return result
 
   #---------------------------------------------------------------------
-  def _tail( self, inputFile, lines ) :
-    """
-    Return the last n lines from an open file.
+  def _tail(self, inputFile, lines):
+      """
+      Return the last n lines from an open file.
 
-    Args:
-      inputFile - File to read from.  Must be open and readable.
-      lines - Number of lines to read.
-    Returns:
-      Array of lines.
-    Notes:
-      Function copied from comment at stackoverflow.com.
-    """
-    total_lines_wanted = lines
+      Args:
+        inputFile - File to read from. Must be open and readable.
+        lines - Number of lines to read.
+      Returns:
+        Array of lines.
+      Notes:
+        Function copied from comment at stackoverflow.com.
+      """
+      total_lines_wanted = lines
 
-    BLOCK_SIZE = 1024
-    inputFile.seek( 0, 2 )
-    block_end_byte = inputFile.tell()
-    lines_to_go = total_lines_wanted
-    block_number = -1
+      BLOCK_SIZE = 1024
+      lines_to_go = total_lines_wanted
+      blocks = []
 
-    # Blocks of size BLOCK_SIZE, in reverse order starting
-    # from the end of the file.
-    blocks = []
+      while lines_to_go > 0 and inputFile.tell() > 0:
+          # Calculate the seek position for the next read
+          seek_position = max(0, inputFile.tell() - BLOCK_SIZE)
+          inputFile.seek(seek_position)
 
-    while lines_to_go > 0 and block_end_byte > 0:
-      if ( block_end_byte - BLOCK_SIZE > 0 ):
-        # Read the last block we haven't yet read
-        inputFile.seek( block_number * BLOCK_SIZE, 2 )
-        blocks.append( inputFile.read( BLOCK_SIZE ) )
-      else:
-        # File too small, start from beginning.
-        inputFile.seek( 0, 0 )
+          # Read the next block
+          block = inputFile.read(BLOCK_SIZE)
+          blocks.append(block)
 
-        # Only read what was not read
-        blocks.append( inputFile.read( block_end_byte ) )
-      lines_found = blocks[ -1 ].count( '\n' )
-      lines_to_go -= lines_found
-      block_end_byte -= BLOCK_SIZE
-      block_number -= 1
-    all_read_text = ''.join( reversed( blocks ) )
-    return all_read_text.splitlines()[ -total_lines_wanted: ]
+          # Count the number of lines in the block
+          lines_found = block.count('\n')
+          lines_to_go -= lines_found
+
+      # Concatenate and split the blocks to get the lines
+      all_read_text = ''.join(reversed(blocks))
+      return all_read_text.splitlines()[-total_lines_wanted:]
     #return '\n'.join(all_read_text.splitlines()[-total_lines_wanted:])
 
   #---------------------------------------------------------------------
@@ -205,7 +198,7 @@ class Log:
     # Write the message to each open log file.
     self._lock.acquire()
     self._recent.append( line )
-    for _, outputFile in six.iteritems(self._outputFileList):
+    for _, outputFile in self._outputFileList.items():
       outputFile.write( line + "\n" )
       outputFile.flush()
     self._lock.release()

@@ -38,12 +38,13 @@ from Simulation.SimulationTime import SimulationTime
 
 from Machine.DefaultCalibration import DefaultMachineCalibration
 from datetime import datetime
+from datetime import datetime
 
 # ==============================================================================
 # Debug settings.
 # These should all be set to False for production.
 # Can be overridden from the command-line.
-# ==============================================================================
+#  ==============================================================================
 
 
 # True if using simulated I/O.
@@ -68,11 +69,13 @@ isStartAPA = False
 # True if system should run in real-time.  Simulation option.
 isRealTime = True
 
-# ==============================================================================
+#  ==============================================================================
 
 # -----------------------------------------------------------------------
 
 
+
+# -----------------------------------------------------------------------
 def commandHandler(_, command):
     """
     Handle a remote command.
@@ -100,8 +103,7 @@ def commandHandler(_, command):
             "Main",
             "commandHandler",
             "Invalid command issued from UI.",
-            [command, exception, exceptionTypeName,
-             exceptionValues, tracebackAsString]
+            [command, exception, exceptionTypeName, exceptionValues, tracebackAsString],
         )
 
     # Try to make JSON object of result.
@@ -118,8 +120,29 @@ def commandHandler(_, command):
         return json.dumps(result, ensure_ascii=True)
 
 # -----------------------------------------------------------------------
+    # Try and make JSON object of result.
+    # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
+    # raise an exception.)
 
+    try:
+        if isinstance(result, datetime):
+            # Handle the case where result is a datetime object
+            # For example, you can convert it to a string representation
+            json_data = json.dumps({"datetime": result.isoformat()})
+        else:
+            # Handle other cases
+            result = json.dumps(result)
+    except TypeError:
+        # If it cannot be made JSON, just make it a string.
+        result = json.dumps(str(result), encoding="unicode_escape")
 
+    return result
+
+def signalHandler(signalNumber, frame):
+    """
+    Keyboard interrupt handler. Used to shutdown system for Ctrl-C.
+
+# -----------------------------------------------------------------------
 def signalHandler(signalNumber, frame):
     """
     Keyboard interrupt handler. Used to shutdown system for Ctrl-C.
@@ -133,9 +156,12 @@ def signalHandler(signalNumber, frame):
     PrimaryThread.stopAllThreads()
 
 # -----------------------------------------------------------------------
+
+# -----------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------
 
+# -----------------------------------------------------------------------
 
 # Handle command line.
 for argument in sys.argv:
@@ -143,6 +169,11 @@ for argument in sys.argv:
     option = argument
     value = "TRUE"
     if argument.find("=") != -1:
+        option, value = argument.split("=")
+    argument = argument.upper()
+    option = argument
+    value = "TRUE"
+    if -1 != argument.find("="):
         option, value = argument.split("=")
 
     if option == "APA":
@@ -161,6 +192,23 @@ for argument in sys.argv:
         version = Version(Settings.VERSION_FILE, ".", Settings.CONTROL_FILES)
         uiVersion = Version(Settings.UI_VERSION_FILE,
                             Settings.WEB_DIRECTORY, Settings.UI_FILES)
+    if "APA" == option:
+        loadAPA_File = value
+    elif "START" == option:
+        isStartAPA = "TRUE" == value
+    elif "SIMULATED" == option or "SIMULATOR" == option:
+        isSimulated = "TRUE" == value
+    elif "REAL_TIME" == option:
+        isRealTime = "TRUE" == value
+    elif "LOG" == option:
+        isLogEchoed = "TRUE" == value
+    elif "LOG_IO" == option:
+        isIO_Logged = "TRUE" == value
+    elif "VERIFY_VERSION" == option:
+        version = Version(Settings.VERSION_FILE, ".", Settings.CONTROL_FILES)
+        uiVersion = Version(
+            Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES
+        )
 
         returnResult = 0
         if not version.verify():
@@ -180,8 +228,15 @@ for argument in sys.argv:
 # Install signal handler for Ctrl-C shutdown.
 signal.signal(signal.SIGINT, signalHandler)
 
+#
+# Create various objects.
+#
 
-systemTime = SimulationTime(isRealTime=isRealTime)
+if not isSimulated:
+    systemTime = SystemTime()
+else:
+    systemTime = SimulationTime(isRealTime=isRealTime)
+
 startTime = systemTime.get()
 
 # Load configuration and setup default values.
@@ -193,12 +248,54 @@ Settings.defaultConfig(configuration)
 configuration.save()
 
 # Setup log file.
-log = Log(systemTime, configuration.get(
-    "LogDirectory") + '/log.csv', isLogEchoed)
+log = Log(systemTime, configuration.get("LogDirectory") + "/log.csv", isLogEchoed)
 log.add("Main", "START", "Control system starts.")
 
 try:
-    io = IO_map(configuration.get("plcAddress"))
+    # Version information for control software.
+    version = Version(Settings.VERSION_FILE, ".", Settings.CONTROL_FILES)
+
+    if version.update():
+        log.add("Main", "VERSION_CHANGE", "Control software has changed.")
+
+    # Version information for user interface.
+    uiVersion = Version(
+        Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES
+    )
+    if uiVersion.update():
+        log.add("Main", "VERSION_UI_CHANGE", "User interface has changed.")
+
+    log.add(
+        "Main",
+        "VERSION",
+        "Control software version " + str(version.getVersion()),
+        [version.getVersion(), version.getHash(), version.getDate()],
+    )
+
+    log.add(
+        "Main",
+        "VERSION_UI",
+        "User interface version " + str(uiVersion.getVersion()),
+        [uiVersion.getVersion(), uiVersion.getHash(), uiVersion.getDate()],
+    )
+
+    # Create I/O map.
+    if isSimulated:
+        from Simulator.PLC_Simulator import PLC_Simulator
+        from IO.Maps.SimulatedIO import SimulatedIO
+
+        io = SimulatedIO()
+        plcSimulator = PLC_Simulator(io, systemTime)
+        log.add(
+            "Main",
+            "SIMULATION",
+            "Running in simulation mode, real-time: " + str(isRealTime) + ".",
+            [isRealTime],
+        )
+    else:
+        from IO.Maps.ProductionIO import ProductionIO
+
+        io = ProductionIO(configuration.get("plcAddress"))
 
     # Use low-level I/O to avoid warning.
     # (Low-level I/O is needed by remote commands.)
@@ -207,18 +304,25 @@ try:
     # $$$TEMPORARY
     machineCalibration = DefaultMachineCalibration(
         configuration.get("machineCalibrationPath"),
-        configuration.get("machineCalibrationFile")
+        configuration.get("machineCalibrationFile"),
     )
 
     # Primary control process.
     process = Process(io, log, configuration, systemTime, machineCalibration)
 
+    # For the simulator, use a local file for the capture image.
+    if isSimulated:
+        process.setCameraImageURL("/capture.bmp")
+
+    #
     # Initialize threads.
+    #
 
     uiServer = UI_ServerThread(commandHandler, log)
     webServerThread = WebServerThread(commandHandler, log)
     controlThread = ControlThread(
-        io, log, process.controlStateMachine, systemTime, isIO_Logged)
+        io, log, process.controlStateMachine, systemTime, isIO_Logged
+    )
     cameraThread = CameraThread(io.camera, log, systemTime)
 
     # Begin operation.
@@ -232,7 +336,7 @@ try:
             process.start()
 
     # While the program is running...
-    while (PrimaryThread.isRunning):
+    while PrimaryThread.isRunning:
         time.sleep(0.1)
 
     PrimaryThread.stopAllThreads()
@@ -255,14 +359,17 @@ except Exception as exception:
             "Main",
             "FAILURE",
             "Caught an exception.",
-            [exception, exceptionType, exceptionValue, tracebackString]
+            [exception, exceptionType, exceptionValue, tracebackString],
         )
 
 elapsedTime = systemTime.getDelta(startTime)
 deltaString = systemTime.getElapsedString(elapsedTime)
 
 # Log run-time of this operation.
-log.add("Main", "RUN_TIME", f"Ran for {deltaString}.", [elapsedTime])
+log.add("Main", "RUN_TIME", "Ran for " + deltaString + ".", [elapsedTime])
 
 # Sign off.
 log.add("Main", "END", "Control system stops.")
+
+# "If you think you understand quantum mechanics, you don't understand quantum
+# mechanics." -- Richard Feynman

@@ -110,7 +110,7 @@ class LayerCorrection :
       sumXY = 0
 
       # For all pins in this row/column...
-      for _ in range(count):
+      for _ in range( 0, count ) :
 
         # Get the pin location.
         pinName = f"F{str(pinNumber)}"
@@ -205,7 +205,7 @@ if __name__ == "__main__" :
   # Check perfect (i.e. no noise) rotational error.
   for layer in [ 'X', 'V', 'U', 'G' ] :
     layerDefault = DefaultLayerCalibration( None, None, layer )
-    for _ in range(10) :
+    for _ in range( 0, 10 ) :
       layer = layerDefault.copy()
 
       rotation = random.uniform( -90, 90 )

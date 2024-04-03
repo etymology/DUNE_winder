@@ -7,8 +7,6 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
-from __future__ import absolute_import
 from .LayerGeometry import LayerGeometry
 
 class GX_LayerGeometry( LayerGeometry ) :

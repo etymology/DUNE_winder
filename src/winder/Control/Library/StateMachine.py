@@ -35,8 +35,11 @@ class StateMachine :
     Returns:
       Current state (as number).  -1 for uninitialized state.
     """
-    return (next((key for key, value in self.states.items()
-                  if value == self.state)) if self.state else -1)
+    result = -1
+    if self.state :
+      result = next((key for key,value in list(self.states.items()) if value==self.state))
+
+    return result
 
   #---------------------------------------------------------------------
   def changeState( self, newState ):

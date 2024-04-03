@@ -6,8 +6,6 @@
 #   Andrew Que <aque@bb7.com>
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
-
-from __future__ import absolute_import
 from .StateMachine import StateMachine
 
 class LoggedStateMachine( StateMachine ) :

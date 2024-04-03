@@ -13,7 +13,7 @@ from .IO_Point import IO_Point
 from abc import ABCMeta, abstractmethod
 import six
 
-class Camera( six.with_metaclass(ABCMeta, IO_Point) ) :
+class Camera( IO_Point, metaclass=ABCMeta ) :
   # Make class abstract.
   list = []
   map = {}

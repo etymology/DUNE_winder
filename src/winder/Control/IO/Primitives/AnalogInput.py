@@ -4,9 +4,7 @@
 # Date: 2016-02-02
 # Author(s):
 #   Andrew Que <aque@bb7.com>
-#   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
-
 
 from .IO_Point import IO_Point
 
@@ -17,7 +15,7 @@ class AnalogInput( IO_Point ) :
   map = {}
 
   #---------------------------------------------------------------------
-  def __init__( self, name ):
+  def __init__( self, name ) :
     """
     Constructor.
 
@@ -28,7 +26,7 @@ class AnalogInput( IO_Point ) :
     """
 
     # Make sure this name isn't already in use.
-    assert name not in AnalogInput.list
+    assert( not name in AnalogInput.list )
 
     IO_Point.__init__( self, name )
 

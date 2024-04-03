@@ -6,18 +6,15 @@
 #   Andrew Que <aque@bb7.com>
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
-
-from __future__ import absolute_import
-from __future__ import print_function
-import six.moves.http_cookies
+import http.cookies
 import xml.sax.saxutils
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+import urllib.request, urllib.parse, urllib.error
 import uuid
 import json
 import re
 
-from six.moves.BaseHTTPServer import HTTPServer
-from six.moves.SimpleHTTPServer import SimpleHTTPRequestHandler
+from http.server import HTTPServer
+from http.server import SimpleHTTPRequestHandler
 from Library.RemoteSession import RemoteSession
 
 class WebServerInterface( SimpleHTTPRequestHandler ):
@@ -52,9 +49,12 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       tag: Name of tag to encapsulate data.
       data: Data associated with tag.
     """
-    data = xml.sax.saxutils.escape( str( data ) )
-    data = f"<{tag}>{str(data)}</{tag}>"
-    self.wfile.write( data )
+    try:
+        data = xml.sax.saxutils.escape(str(data))
+        data = "<" + tag + ">" + str(data) + "</" + tag + ">"
+        self.wfile.write(data)
+    except Exception as e:
+        print("Error occurred while sending data:", e)
 
   #---------------------------------------------------------------------
   def _JSON_send( self, tag, data ) :
@@ -76,8 +76,7 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
     """
 
     # Get post data length.
-    length = int( self.headers.get( 'content-length' ) )
-
+    length = int(self.headers.get('content-length'))
     # Get cookie data.
     cookies = {}
     if "Cookie" in self.headers :
@@ -137,14 +136,14 @@ class WebServerInterface( SimpleHTTPRequestHandler ):
       postData = self.rfile.read( length )
 
       # Split the data by commands.
-      commands = postData.split(b"&")  # Use b"&" to denote bytes
+      commands = postData.decode().split("&")
       # For each command...
       for command in commands:
 
         # Break up the command.
         id, query = command.split(b"=")  # Use b"=" to denote bytes
         # Unquote the command.
-        query = six.moves.urllib.parse.unquote_plus( query )
+        query = urllib.parse.unquote_plus( query )
 
         # See if this is a basic query (i.e. changes nothing).
         isBasicQuery = re.search( WebServerInterface.BASIC_QUERIES, query )

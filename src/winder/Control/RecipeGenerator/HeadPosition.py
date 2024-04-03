@@ -7,10 +7,9 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
 from __future__ import absolute_import
 from __future__ import print_function
-from .G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
+import RecipeGenerator.G_CodeFunctions.HeadLocationG_Code
 
 class HeadPosition :
 

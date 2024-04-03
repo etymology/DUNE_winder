@@ -7,7 +7,6 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
 from __future__ import absolute_import
 from __future__ import print_function
 import os
@@ -16,7 +15,9 @@ import math
 
 from Library.Configuration import Configuration
 from Library.Geometry.Location import Location
+from Library.G_Code import G_Code
 from Library.Log import Log
+
 
 from Control.AnodePlaneArray import AnodePlaneArray
 from Control.APA_Base import APA_Base
@@ -171,10 +172,9 @@ class Process:
         # Fetch all files in recipe directory.
         recipeList = os.listdir(self._configuration.get("recipeDirectory"))
 
-        # Filter just the G-Code file extension.
-        expression = re.compile(r'\.gc$')
-        recipeList = [
-            index for index in recipeList if expression.search(index)]
+    # Filter just the G-Code file extension.
+    expression = re.compile( r'\.gc$' )
+    recipeList = [index for index in recipeList if expression.search( index )]
 
         return recipeList
 
@@ -231,35 +231,41 @@ class Process:
 
         self._io.plcLogic.reset()
 
-    # ---------------------------------------------------------------------
-    # Phil Heath (PWH)
-    # Added 19/08/2021 for the PLC_Init button
-    #
-    # ---------------------------------------------------------------------
-    def acknowledgePLC_Init(self):
-        #  """
-        #  Request that the winding process init.
-        #  """
-        self._io.plcLogic.PLC_init()
 
-    def EOT_resetButton(self):
-        state = self._io.plcLogic._state.get()
-        if state == 11:
-            self._io.plcLogic.EOT_reset()
-
-    # ---------------------------------------------------------------------
-    def servoDisable(self):
-        """
-        Disable motor servo control, thus idling the axises.
-        """
-        if self.controlStateMachine.isInMotion():
-            self._log.add(
-                self.__class__.__name__,
-                "SERVO",
-                "Idling servo control."
-            )
-            self.controlStateMachine.manualRequest = True
-            self.controlStateMachine.idleServos = True
+  #---------------------------------------------------------------------
+  # Phil Heath (PWH)
+  # Added 19/08/2021 for the PLC_Init button
+  #
+  #---------------------------------------------------------------------
+  def acknowledgePLC_Init( self ) :
+  #  """
+  #  Request that the winding process init.
+  #  """
+  
+    print("Hello World!")
+    self._io.plcLogic.PLC_init()
+  
+  def EOT_reset( self ) :
+  #  """
+  #  Request that the winding process init.
+  #  """
+  
+    print("Hello World!")
+    self._io.plcLogic.PLC_init()
+  
+  #---------------------------------------------------------------------
+  def servoDisable( self ) :
+    """
+    Disable motor servo control, thus idling the axises.
+    """
+    if self.controlStateMachine.isInMotion() :
+      self._log.add(
+        self.__class__.__name__,
+        "SERVO",
+        "Idling servo control."
+      )
+      self.controlStateMachine.manualRequest = True
+      self.controlStateMachine.idleServos    = True
 
     # ---------------------------------------------------------------------
     def createAPA(self, apaName):
@@ -1337,13 +1343,13 @@ class Process:
             # Edges starting on bottom right and moving counter-clockwise.
             edges = ["RB", "RT", "TR", "TL", "LT", "LB", "BL", "BR"]
 
-            front = {}
-            back = {}
-            frontSumX = 0
-            frontSumY = 0
-            backSumX = 0
-            backSumY = 0
-            for edgeIndex in range(4):
+      front = {}
+      back  = {}
+      frontSumX = 0
+      frontSumY = 0
+      backSumX = 0
+      backSumY = 0
+      for edgeIndex in range( 0, 4 ) :
 
                 frontCount = geometry.gridFront[edgeIndex][0]
                 frontDeltaX = geometry.gridFront[edgeIndex][1]

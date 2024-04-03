@@ -23,7 +23,7 @@ from .G_CodeFunctions.ArmCorrectG_Code import ArmCorrectG_Code
 from .G_CodeFunctions.AnchorPointG_Code import AnchorPointG_Code
 from .G_CodeFunctions.TransferCorrectG_Code import TransferCorrectG_Code
 
-from .RecipeGenerator import RecipeGenerator
+from RecipeGenerator.RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
 from .Path3d import Path3d
 from .G_CodePath import G_CodePath

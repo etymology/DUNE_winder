@@ -265,7 +265,8 @@ class G_CodeHandlerBase :
     print("$$$$$ seekT:edges", edges)
 
     location = edges.intersectSegment( segment )
-    print("$$$$$ seekT:loc", location)
+    if G_CodeHandlerBase.DEBUG_UNIT :
+      print("Finial location", location)
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("Final location", location)
@@ -418,7 +419,6 @@ class G_CodeHandlerBase :
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("  ARM_CORRECT", currentLocation, end=' ')
-    print("$$$$$ Y IS CLOSE: ", MathExtra.isclose( self._y, self._machineCalibration.transferTop ) or MathExtra.isclose( self._y, self._machineCalibration.transferBottom ))
 
     if   MathExtra.isclose( self._y, self._machineCalibration.transferTop ) \
       or MathExtra.isclose( self._y, self._machineCalibration.transferBottom, abs_tol = 0.001 ) :
@@ -452,8 +452,6 @@ class G_CodeHandlerBase :
           self._x = location.x
           if G_CodeHandlerBase.DEBUG_UNIT :
             print("Edge", self._x, self._y, end=' ')
-        print("$$$$$ edge: ", edge)
-
     else :
       print("$$$$$ Precorrected Y: %f" %self._y)
       self._y = self._headCompensation.correctY( currentLocation )
@@ -462,8 +460,6 @@ class G_CodeHandlerBase :
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print()
-    print("$$$$$  ARM_CORRECTED x: %f y: %f" %(self._x, self._y))
-    
     self._xyChange = True
 
   #---------------------------------------------------------------------
@@ -562,7 +558,7 @@ class G_CodeHandlerBase :
     self._functions.append( function )
 
     # Toggle spool latch.
-    if number in list(G_CodeHandlerBase.G_CODE_FUNCTION_TABLE.keys()):
+    if number in list(G_CodeHandlerBase.G_CODE_FUNCTION_TABLE.keys()) :
       G_CodeHandlerBase.G_CODE_FUNCTION_TABLE[ number ]( self, function )
     else:
       data = [ str( number ) ]

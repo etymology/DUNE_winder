@@ -4,7 +4,7 @@ function Time( modules )
 
   modules.load
   (
-    [ "/Scripts/Winder" ],
+    [ "../../Scripts/Winder" ],
     function()
     {
       var winder = modules.get( "Winder" )

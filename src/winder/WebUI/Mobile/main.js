@@ -135,10 +135,10 @@ function load( pageName )
     // Winder module is used on every page.
     page.addCommonModule( "/Scripts/Winder" )
   
-    // page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
-    // page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
-    // page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
-    // page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
+    page.addCommonPage( "../Desktop/Modules/RunStatus",   "#statesDiv"   )
+    page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
+    page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
+    page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
   
     // Loading sub page and setup main screen after sub page finishes loading.
     page.load
@@ -191,10 +191,10 @@ $( document ).ready
     // Winder module is used on every page.
     page.addCommonModule( "/Scripts/Winder" )
 
-    // page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
-    // page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
-    // page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
-    // page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
+    page.addCommonPage( "/Desktop/Modules/RunStatus",   "#statesDiv"   )
+    page.addCommonPage( "/Desktop/Modules/Time",        "#timeDiv"     )
+    page.addCommonPage( "/Desktop/Modules/Version",     "#versionDiv"  )
+    page.addCommonPage( "/Desktop/Modules/FullStop",    "#fullStopDiv" )
 
     // Load the requested page.
     page.load

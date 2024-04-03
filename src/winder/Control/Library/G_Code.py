@@ -432,6 +432,9 @@ class G_Code :
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
 
+  def printf( text ):
+    print(text)
+
   callbacks = G_CodeCallbacks()
   callbacks.registerCallback(
       'G', lambda parameter: print(f"Command: {str(parameter)}"))

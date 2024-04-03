@@ -7,8 +7,6 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
-from __future__ import absolute_import
 from .G_CodeFunction import G_CodeFunction
 from Machine.G_Codes import G_Codes
 

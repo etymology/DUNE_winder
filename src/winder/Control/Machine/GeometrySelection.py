@@ -7,8 +7,6 @@
 #   Benjamin Oye <oye@uchicago.edu> [port to python3, Jan 2024]
 ###############################################################################
 
-
-from __future__ import absolute_import
 from .LayerGeometry import LayerGeometry
 from .X_LayerGeometry import X_LayerGeometry
 from .V_LayerGeometry import V_LayerGeometry

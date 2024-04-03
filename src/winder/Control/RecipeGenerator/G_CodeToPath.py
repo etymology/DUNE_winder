@@ -21,9 +21,8 @@ from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 from Machine.DefaultCalibration import DefaultMachineCalibration
 from Machine.HeadCompensation import HeadCompensation
 
-from .G_CodePath import G_CodePath
-from .G_CodeFunctions.G_CodeFunction import G_CodeFunction
-from six.moves import range
+from G_CodePath import G_CodePath
+from G_CodeFunctions.G_CodeFunction import G_CodeFunction
 
 class G_CodeToPath( G_CodeHandlerBase ) :
 
@@ -96,9 +95,9 @@ class G_CodeToPath( G_CodeHandlerBase ) :
         self._gCode.executeNextLine( line )
       except Exception as exception:
         print("Unable to execute line", line)
-        print(f"  {self._gCode.lines[line]}")
-        print(f"  {str(exception)}")
-        raise Exception(f"Problems executing G-Code: {str(exception)}") from exception
+        print("  " + self._gCode.lines[ line ])
+        print("  " + str( exception ))
+        raise Exception( "Problems executing G-Code: " + str( exception ) )
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )

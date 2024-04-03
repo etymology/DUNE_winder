@@ -19,7 +19,6 @@ from .APA_Base import APA_Base
 
 
 class AnodePlaneArray(APA_Base):
-
     # There can only be a single working instance of an APA, and it must be
     # saved before loading or starting a new one.
     activeAPA = None
@@ -34,7 +33,7 @@ class AnodePlaneArray(APA_Base):
         name,
         log,
         systemTime,
-        createNew=False
+        createNew=False,
     ):
         """
         Constructor.
@@ -84,7 +83,7 @@ class AnodePlaneArray(APA_Base):
         Args:
           layer: Name of the layer.
         """
-        return f"{self.getPath()}/Layer{layer}{Settings.G_CODE_LOG_FILE}"
+        return self.getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
 
     # ---------------------------------------------------------------------
     def closeLoadedRecipe(self):
@@ -116,33 +115,42 @@ class AnodePlaneArray(APA_Base):
         Returns:
           True if there was an error, False if not.
         """
-        if layer != None:
+        isError = False
+
+        if None != layer:
             self._layer = layer
 
-        isError = False
         # If there is a calibration file, load it.
         if self._calibrationFile:
-            archivePath = f"{self.getPath()}/Calibration"
+            archivePath = self.getPath() + "/Calibration"
             self._calibration = LayerCalibration(archivePath=archivePath)
 
             try:
                 self._calibration.load(self.getPath(), self._calibrationFile)
             except LayerCalibration.Error as exception:
-
-                errorString = f"Invalid calibration hash for {self._calibrationFile} because {str(exception)}."
+                errorString = (
+                    "Invalid calibration hash for "
+                    + self._calibrationFile
+                    + " because "
+                    + str(exception)
+                    + "."
+                )
 
                 errorData = [self._calibrationFile] + exception.data
 
                 self._log.add(
                     self.__class__.__name__,
                     "LOAD",
-                    f"{errorString}  Rehashing.",
+                    errorString + "  Rehashing.",
                     errorData,
                 )
 
                 try:
                     self._calibration.load(
-                        self.getPath(), self._calibrationFile, exceptionForMismatch=False)
+                        self.getPath(),
+                        self._calibrationFile,
+                        exceptionForMismatch=False,
+                    )
                     self._calibration.save()
                 except LayerCalibration.Error as exception:
                     error = "Invalid calibration file."
@@ -153,14 +161,14 @@ class AnodePlaneArray(APA_Base):
                     self._log.add(
                         self.__class__.__name__,
                         "LOAD",
-                        f"{errorString}  Aborting.",
+                        errorString + "  Aborting.",
                         errorData,
                     )
 
             self._log.add(
                 self.__class__.__name__,
                 "LOAD",
-                f"Loaded calibration file {self._calibrationFile}.",
+                "Loaded calibration file " + self._calibrationFile + ".",
                 [self._calibrationFile, self._calibration.hashValue],
             )
 
@@ -171,19 +179,18 @@ class AnodePlaneArray(APA_Base):
             # If there is no calibration, use none.
             self._gCodeHandler.useLayerCalibration(None)
 
-        if recipeFile != None:
+        if None is not recipeFile:
             self._recipeFile = recipeFile
 
-        if startingLine != None:
+        if None is not startingLine:
             self._lineNumber = startingLine
 
         if not isError:
             self._recipe = Recipe(
-                f"{self._recipeDirectory}/{self._recipeFile}",
+                self._recipeDirectory + "/" + self._recipeFile,
                 self._recipeArchiveDirectory,
             )
-            self._gCodeHandler.loadG_Code(
-                self._recipe.getLines(), self._calibration)
+            self._gCodeHandler.loadG_Code(self._recipe.getLines(), self._calibration)
 
             # Assign a G-Code log.
             gCodeLogName = self._getG_CodeLogName(self._layer)
@@ -198,7 +205,12 @@ class AnodePlaneArray(APA_Base):
             self._log.add(
                 self.__class__.__name__,
                 "GCODE",
-                f"Loaded G-Code file {self._recipeFile}, active layer {self._layer}, starting at line {str(self._lineNumber)}",
+                "Loaded G-Code file "
+                + self._recipeFile
+                + ", active layer "
+                + self._layer
+                + ", starting at line "
+                + str(self._lineNumber),
                 [
                     self._recipeFile,
                     self._layer,
@@ -211,7 +223,10 @@ class AnodePlaneArray(APA_Base):
             self._log.add(
                 self.__class__.__name__,
                 "GCODE",
-                f"Failed to loaded G-Code file {self._recipeFile}, starting at line {str(self._lineNumber)}",
+                "Failed to loaded G-Code file "
+                + self._recipeFile
+                + ", starting at line "
+                + str(self._lineNumber),
                 [error, self._recipeFile, self._lineNumber],
             )
 
@@ -230,7 +245,7 @@ class AnodePlaneArray(APA_Base):
         self._log.add(
             self.__class__.__name__,
             "LOAD",
-            f"Loaded APA called {self._name}",
+            "Loaded APA called " + self._name,
             [self._name],
         )
 
@@ -238,8 +253,7 @@ class AnodePlaneArray(APA_Base):
 
         if self._recipeFile:
             self.loadRecipe(self._layer)
-            self._gCodeHandler.setInitialLocation(
-                self._x, self._y, self._headLocation)
+            self._gCodeHandler.setInitialLocation(self._x, self._y, self._headLocation)
 
     # ---------------------------------------------------------------------
     def getCalibrationFile(self):
@@ -260,7 +274,7 @@ class AnodePlaneArray(APA_Base):
         self._calibration = LayerCalibration()
         self._calibration.zFront = geometry.mostlyRetract
         self._calibration.zBack = geometry.mostlyExtend
-        self._calibrationFile = f"{layer}_Calibration.xml"
+        self._calibrationFile = layer + "_Calibration.xml"
         self._calibration.save(self.getPath(), self._calibrationFile)
 
     # ---------------------------------------------------------------------
@@ -277,7 +291,12 @@ class AnodePlaneArray(APA_Base):
         self._log.add(
             self.__class__.__name__,
             "STAGE",
-            f"APA stage change from {str(self._stage)} to {str(stage)}.  Reason: {message}",
+            "APA stage change from "
+            + str(self._stage)
+            + " to "
+            + str(stage)
+            + ".  Reason: "
+            + message,
             [self._stage, stage, message],
         )
         self._stage = stage
@@ -300,7 +319,7 @@ class AnodePlaneArray(APA_Base):
         self.setLocation(
             self._gCodeHandler._x,
             self._gCodeHandler._y,
-            self._gCodeHandler._headPosition
+            self._gCodeHandler._headPosition,
         )
 
         self._gCodeHandler.closeG_CodeLog()
@@ -312,17 +331,24 @@ class AnodePlaneArray(APA_Base):
         self._log.add(
             self.__class__.__name__,
             "CLOSE",
-            f"Closing APA {self._name}, {str(self._recipeFile)}:{str(self._lineNumber)} after {deltaString}",
+            "Closing APA "
+            + self._name
+            + ", "
+            + str(self._recipeFile)
+            + ":"
+            + str(self._lineNumber)
+            + " after "
+            + deltaString,
             [self._name, self._recipeFile, self._lineNumber, elapsedTime],
         )
         self._log.detach(self.getPath() + AnodePlaneArray.LOG_FILE)
         AnodePlaneArray.activeAPA = None
 
+
 # end class
 
 
 if __name__ == "__main__":
-
     from Library.Log import Log
     from Library.SystemTime import SystemTime
 
@@ -334,14 +360,7 @@ if __name__ == "__main__":
 
     gCodeHandler = G_CodeHandlerBase()
 
-    apa = AnodePlaneArray(
-        gCodeHandler,
-        ".",
-        ".",
-        ".",
-        "TestAPA",
-        log,
-        True)
+    apa = AnodePlaneArray(gCodeHandler, ".", ".", ".", "TestAPA", log, True)
 
     apa.save()
     apa.load()

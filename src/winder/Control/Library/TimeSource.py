@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
 import six
 
-class TimeSource(six.with_metaclass(ABCMeta)) :
+class TimeSource(metaclass=ABCMeta) :
 
   # Make class abstract.
   @abstractmethod

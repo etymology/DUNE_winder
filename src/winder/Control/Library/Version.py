@@ -14,7 +14,7 @@ import xml.dom.minidom
 import re
 import os
 import datetime
-from .Hash import Hash
+from Library.Hash import Hash
 
 class Version :
   #-------------------------------------------------------------------
@@ -174,7 +174,8 @@ class Version :
             # This fixes the fact the version control software can change
             # line ending types upon checkout which would otherwise cause a
             # different hash.
-            # buffer = buffer.replace( "\r", "" )
+            buffer = str(buffer)  # Convert buffer to a string if it's not already
+            buffer = buffer.replace("\\r", "")
 
             hashValue += buffer
 
@@ -220,8 +221,8 @@ class Version :
     outputText = \
       '\n'.join( [ line for line in outputText.split( '\n' ) if line.strip() ] ) + '\n'
 
-    with open( self._fileName, "wb" ) as outputFile :
-      outputFile.write( str.encode(outputText) )
+    with open('output_file.txt', 'wb') as outputFile:  # Note the 'wb' mode for writing bytes
+      outputFile.write(outputText.encode('utf-8'))
 
 #------------------------------------------------------------------------------
 # Unit test.
