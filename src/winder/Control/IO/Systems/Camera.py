@@ -11,7 +11,6 @@
 # accumulates capture data.  These two systems must be implemented in the PLC
 # for maximum speed.
 ###############################################################################
-import random
 from IO.Devices.PLC import PLC
 
 class Camera:

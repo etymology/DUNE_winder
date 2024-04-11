@@ -12,7 +12,7 @@ class ArrayToCSV :
 
   #---------------------------------------------------------------------
   @staticmethod
-  def saveDictionarySet( data, filePath, fileName, separator=",", isHashed=False ) :
+  def saveDictionarySet( data, filePath, fileName, separator=",", isHashed=False ):
     """
     Save an array of similarly keyed dictionaries to CSV file.
 
@@ -25,7 +25,7 @@ class ArrayToCSV :
       Hash string (if requested)
     """
 
-    fullName = filePath + "/" + fileName
+    fullName = f"{filePath}/{fileName}"
     hashValue = ""
 
     with open( fullName, "w" ) as outputFile :

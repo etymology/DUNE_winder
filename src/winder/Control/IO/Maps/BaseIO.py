@@ -7,7 +7,6 @@
 ###############################################################################
 
 from IO.Types.PLC_Input import PLC_Input
-from IO.Types.PLC_Output import PLC_Output
 from IO.Types.PLC_Motor import PLC_Motor
 
 from IO.Systems.MultiAxisMotor import MultiAxisMotor

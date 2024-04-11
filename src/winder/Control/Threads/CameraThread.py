@@ -8,81 +8,83 @@
 
 from Library.SystemSemaphore import SystemSemaphore
 from Threads.PrimaryThread import PrimaryThread
+from IO.Systems.Camera import Camera
 
-class CameraThread( PrimaryThread ) :
 
-  SHUTDOWN_COUNT = 5
+class CameraThread(PrimaryThread):
 
-  # Amount of time to sleep if FIFO is empty.
-  SLEEP_TIME = 0.050
+    SHUTDOWN_COUNT = 5
 
-  #---------------------------------------------------------------------
-  def __init__( self, camera, log, systemTime ) :
-    """
-    Constructor.
+    # Amount of time to sleep if FIFO is empty.
+    SLEEP_TIME = 0.050
 
-    Args:
-      camera: Instance of IO.Systems.Camera.
-      log: Instance of system log.
-      systemTime: Instance of SystemTime.
-    """
-    PrimaryThread.__init__( self, "CameraThread", log )
-    self._camera = camera
-    self._isRunning = False
-    self._semaphore = SystemSemaphore( 0 )
-    self._systemTime = systemTime
-    self._shutdownCount = 0
-    camera.setCallback( self._setEnable )
+    # ---------------------------------------------------------------------
+    def __init__(self, camera: Camera, log, systemTime):
+        """
+        Constructor.
 
-  #---------------------------------------------------------------------
-  def _setEnable( self, isEnabled ) :
-    """
-    Camera trigger enable callback.  Private.
+        Args:
+          camera: Instance of IO.Systems.Camera.
+          log: Instance of system log.
+          systemTime: Instance of SystemTime.
+        """
+        PrimaryThread.__init__(self, "CameraThread", log)
+        self._camera = camera
+        self._isRunning = False
+        self._semaphore = SystemSemaphore(0)
+        self._systemTime = systemTime
+        self._shutdownCount = 0
+        camera.setCallback(self._setEnable)
 
-    Args:
-      isEnabled: True if enabling camera trigger, False if disabling.
-    """
+    # ---------------------------------------------------------------------
+    def _setEnable(self, isEnabled):
+        """
+        Camera trigger enable callback.  Private.
 
-    self._isRunning = isEnabled
+        Args:
+          isEnabled: True if enabling camera trigger, False if disabling.
+        """
 
-    if isEnabled :
-      self._semaphore.release()
-    else:
-      self._shutdownCount = CameraThread.SHUTDOWN_COUNT
+        self._isRunning = isEnabled
 
-  #---------------------------------------------------------------------
-  def body( self ) :
-    """
-    Body of camera thread.
-    """
-    hasData = False
-    while PrimaryThread.isRunning :
+        if isEnabled:
+            self._semaphore.release()
+        else:
+            self._shutdownCount = CameraThread.SHUTDOWN_COUNT
 
-      # If not running, wait.
-      # NOTE: If we had data last time, keep running until we do not.  Makes
-      # sure FIFO is empty before pausing thread.
-      if not self._isRunning and not hasData and 0 == self._shutdownCount :
-        self._semaphore.acquire()
+    # ---------------------------------------------------------------------
+    def body(self):
+        """
+        Body of camera thread.
+        """
+        hasData = False
+        while PrimaryThread.isRunning:
 
-      # If not shutting down...
-      if PrimaryThread.isRunning :
+            # If not running, wait.
+            # NOTE: If we had data last time, keep running until we do not.  Makes
+            # sure FIFO is empty before pausing thread.
+            if not self._isRunning and not hasData and self._shutdownCount == 0:
+                self._semaphore.acquire()
 
-        if self._shutdownCount > 0 :
-          self._shutdownCount -= 1
+            # If not shutting down...
+            if PrimaryThread.isRunning:
 
-        # Assume there will be no sleep (a yield only).
-        sleepTime = 0
+                if self._shutdownCount > 0:
+                    self._shutdownCount -= 1
 
-        # Update camera if running...
-        if self._isRunning or self._shutdownCount > 0 :
-          hasData = self._camera.poll()
+                # Assume there will be no sleep (a yield only).
+                sleepTime = 0
 
-          # If there was no data to read, sleep for awhile.  Otherwise, read
-          # again soon.
-          if not hasData :
-            sleepTime = CameraThread.SLEEP_TIME
+                # Update camera if running...
+                if self._isRunning or self._shutdownCount > 0:
+                    hasData = self._camera.poll()
 
-        # Yield thread time.
-        self._systemTime.sleep( sleepTime )
+                    # If there was no data to read, sleep for awhile.  Otherwise, read
+                    # again soon.
+                    if not hasData:
+                        sleepTime = CameraThread.SLEEP_TIME
+
+                # Yield thread time.
+                self._systemTime.sleep(sleepTime)
 
 # end class

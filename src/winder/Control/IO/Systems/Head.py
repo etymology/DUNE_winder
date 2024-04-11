@@ -126,7 +126,7 @@ class Head :
     self._retracted = retracted
 
   #---------------------------------------------------------------------
-  def setPosition( self, position, velocity ) :
+  def setPosition( self, position, velocity ):
     """
     Set the head position.
 
@@ -137,7 +137,7 @@ class Head :
     isError = True
 
     # If the head is idle and the position is actually different...
-    if self.States.IDLE == self._state and position != self._position :
+    if self.States.IDLE == self._state and position != self._position:
 
       # Note from where we started.
       self._lastPosition = self._position
@@ -156,7 +156,7 @@ class Head :
         raise "Unknown head position request" + str( position )
 
       # No desired position likely means the locations have not been setup.
-      if None != self._desiredPosition :
+      if self._desiredPosition is not None:
 
         # Do we have to go get/leave the head?
         if self.EXTENDED == self._position or self.EXTENDED == position :

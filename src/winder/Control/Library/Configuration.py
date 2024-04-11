@@ -131,8 +131,7 @@ class Configuration :
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
   config = Configuration( "test.xml" )
-  value = int( config.get( "test" ) )
-  value += 1
+  value = int( config.get( "test" ) ) + 1
   config.set( "test", value )
   print(config.get( "test" ))
   config.save()

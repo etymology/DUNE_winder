@@ -7,8 +7,8 @@
 ###############################################################################
 
 from .IO_Device import IO_Device
-from .IO_Device import IO_Device
 from abc import ABCMeta, abstractmethod
+from typing import List
 
 class PLC( IO_Device, metaclass=ABCMeta ) :
 
@@ -27,7 +27,7 @@ class PLC( IO_Device, metaclass=ABCMeta ) :
     """
 
     # List of all tags.
-    list = []
+    list: List['Tag'] = []
 
     # Look-up table to match tag names to instances of Tag.  The look-up is
     # a list of tag instances in case there are multiple Tag instances for the

@@ -7,7 +7,6 @@
 ###############################################################################
 
 import signal
-import os
 import sys
 import traceback
 import time
@@ -17,7 +16,6 @@ from Library.SystemTime import SystemTime
 from Library.Log import Log
 from Library.Configuration import Configuration
 from Library.Version import Version
-from Library.RemoteSession import RemoteSession
 
 from Machine.Settings import Settings
 
@@ -33,8 +31,6 @@ from Threads.CameraThread import CameraThread
 from Simulator.SimulationTime import SimulationTime
 
 # $$$TEMPORARY - Temporary.
-import xml.dom.minidom
-from Debug.APA_Generator import APA_Generator
 from Machine.DefaultCalibration import DefaultMachineCalibration
 from datetime import datetime
 
@@ -97,7 +93,8 @@ def commandHandler(_, command):
             "Main",
             "commandHandler",
             "Invalid command issued from UI.",
-            [command, exception, exceptionTypeName, exceptionValues, tracebackAsString],
+            [command, exception, exceptionTypeName,
+                exceptionValues, tracebackAsString],
         )
 
     # Try and make JSON object of result.
@@ -108,15 +105,13 @@ def commandHandler(_, command):
         if isinstance(result, datetime):
             # Handle the case where result is a datetime object
             # For example, you can convert it to a string representation
-            json_data = json.dumps({"datetime": result.isoformat()})
+            return json.dumps({"datetime": result.isoformat()})
         else:
             # Handle other cases
-            result = json.dumps(result)
+            return json.dumps(result)
     except TypeError:
         # If it cannot be made JSON, just make it a string.
-        result = json.dumps(str(result), encoding="unicode_escape")
-
-    return result
+        return json.dumps(result, encoding="unicode_escape")
 
 
 # -----------------------------------------------------------------------
@@ -142,22 +137,22 @@ for argument in sys.argv:
     argument = argument.upper()
     option = argument
     value = "TRUE"
-    if -1 != argument.find("="):
+    if argument.find("=") != -1:
         option, value = argument.split("=")
 
-    if "APA" == option:
+    if option == "APA":
         loadAPA_File = value
-    elif "START" == option:
-        isStartAPA = "TRUE" == value
-    elif "SIMULATED" == option or "SIMULATOR" == option:
-        isSimulated = "TRUE" == value
-    elif "REAL_TIME" == option:
-        isRealTime = "TRUE" == value
-    elif "LOG" == option:
-        isLogEchoed = "TRUE" == value
-    elif "LOG_IO" == option:
-        isIO_Logged = "TRUE" == value
-    elif "VERIFY_VERSION" == option:
+    elif option == "START":
+        isStartAPA = value == "TRUE"
+    elif option in ["SIMULATED", "SIMULATOR"]:
+        isSimulated = value == "TRUE"
+    elif option == "REAL_TIME":
+        isRealTime = value == "TRUE"
+    elif option == "LOG":
+        isLogEchoed = value == "TRUE"
+    elif option == "LOG_IO":
+        isIO_Logged = value == "TRUE"
+    elif option == "VERIFY_VERSION":
         version = Version(Settings.VERSION_FILE, ".", Settings.CONTROL_FILES)
         uiVersion = Version(
             Settings.UI_VERSION_FILE, Settings.WEB_DIRECTORY, Settings.UI_FILES
@@ -201,7 +196,8 @@ Settings.defaultConfig(configuration)
 configuration.save()
 
 # Setup log file.
-log = Log(systemTime, configuration.get("LogDirectory") + "/log.csv", isLogEchoed)
+log = Log(systemTime, configuration.get(
+    "LogDirectory") + "/log.csv", isLogEchoed)
 log.add("Main", "START", "Control system starts.")
 
 try:
@@ -221,14 +217,14 @@ try:
     log.add(
         "Main",
         "VERSION",
-        "Control software version " + str(version.getVersion()),
+        f"Control software version {str(version.getVersion())}",
         [version.getVersion(), version.getHash(), version.getDate()],
     )
 
     log.add(
         "Main",
         "VERSION_UI",
-        "User interface version " + str(uiVersion.getVersion()),
+        f"User interface version {str(uiVersion.getVersion())}",
         [uiVersion.getVersion(), uiVersion.getHash(), uiVersion.getDate()],
     )
 
@@ -242,7 +238,7 @@ try:
         log.add(
             "Main",
             "SIMULATION",
-            "Running in simulation mode, real-time: " + str(isRealTime) + ".",
+            f"Running in simulation mode, real-time: {str(isRealTime)}.",
             [isRealTime],
         )
     else:
@@ -319,7 +315,7 @@ elapsedTime = systemTime.getDelta(startTime)
 deltaString = systemTime.getElapsedString(elapsedTime)
 
 # Log run-time of this operation.
-log.add("Main", "RUN_TIME", "Ran for " + deltaString + ".", [elapsedTime])
+log.add("Main", "RUN_TIME", f"Ran for {deltaString}.", [elapsedTime])
 
 # Sign off.
 log.add("Main", "END", "Control system stops.")

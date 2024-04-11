@@ -43,8 +43,9 @@ function IO( modules )
               let id = filteredTable.getCellId( localRow, 1 )
 
               // If this cell exists...
-              if ( id )
+              if (id) {
                 $( "#" + id ).html( data )
+              }
             }
           )
         }

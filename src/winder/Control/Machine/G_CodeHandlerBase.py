@@ -68,7 +68,7 @@ class G_CodeHandlerBase :
     self._z = z
 
   #---------------------------------------------------------------------
-  def _setVelocity( self, velocity ) :
+  def _setVelocity( self, velocity ):
     """
     Callback for setting velocity.
 
@@ -79,10 +79,7 @@ class G_CodeHandlerBase :
     Notes:
       Limited to 'maxVelocity'.
     """
-    if velocity < self._maxVelocity :
-      self._velocity = velocity
-    else :
-      self._velocity = self._maxVelocity
+    self._velocity = min(velocity, self._maxVelocity)
 
   #---------------------------------------------------------------------
   def _setLine( self, line ) :
@@ -102,7 +99,7 @@ class G_CodeHandlerBase :
 
 
   #---------------------------------------------------------------------
-  def _parameterExtract( self, parameters, start, finish, newType, errorMessage ) :
+  def _parameterExtract( self, parameters, start, finish, newType, errorMessage ):
     """
     Extract the parameters and format them, raising an exception if they are
     incorrect.  Internal function.
@@ -121,24 +118,26 @@ class G_CodeHandlerBase :
       G_CodeException if formatting is incorrect.
     """
 
-    try :
-      if None == finish :
+    try:
+      if finish is None:
         value = newType( parameters[ start ] )
       elif finish == start :
         value = newType( parameters[ start: ] )
-      else :
+      else:
         value = newType( parameters[ start:finish ] )
-    except ( IndexError, AttributeError, ValueError ) as exception :
+    except ( IndexError, AttributeError, ValueError ) as exception:
       data = [
         str( parameters )
       ]
 
-      raise G_CodeException( "G-Code " + errorMessage + " function incorrectly formatted.", data )
+      raise G_CodeException(
+          f"G-Code {errorMessage} function incorrectly formatted.",
+          data) from exception
 
     return value
 
   #---------------------------------------------------------------------
-  def _getHeadPosition( self, headPosition ) :
+  def _getHeadPosition( self, headPosition ):
     """
     Use the head position to determine the Z position.
 
@@ -153,25 +152,25 @@ class G_CodeHandlerBase :
     """
 
     # $$$DEBUG - Get rid of constants.
-    if 0 == headPosition :
+    if headPosition == 0:
       z = self._machineCalibration.zFront
-    elif 1 == headPosition :
+    elif headPosition == 1:
       z = self._layerCalibration.zFront
-    elif 2 == headPosition :
+    elif headPosition == 2:
       z = self._layerCalibration.zBack
-    elif 3 == headPosition :
+    elif headPosition == 3:
       z = self._machineCalibration.zBack
     else:
       data = [
         str( headPosition )
       ]
 
-      raise G_CodeException( "Unknown head position " + str( headPosition ) + ".", data )
+      raise G_CodeException(f"Unknown head position {str(headPosition)}.", data)
 
     return z
 
   #---------------------------------------------------------------------
-  def _getPin( self, pinName ) :
+  def _getPin( self, pinName ):
     """
     Function to fetch specific pin location.
 
@@ -184,14 +183,14 @@ class G_CodeHandlerBase :
     Throws:
       G_CodeException if pin is not found.
     """
-    try :
+    try:
       result = self._layerCalibration.getPinLocation( pinName )
-    except KeyError :
+    except KeyError as e:
       data = [
         str( pinName )
       ]
 
-      raise G_CodeException( "Unknown pin " + str( pinName ) + ".", data )
+      raise G_CodeException(f"Unknown pin {str(pinName)}.", data) from e
 
     return result
 
@@ -215,7 +214,7 @@ class G_CodeHandlerBase :
     self._wireLength = length
 
   #---------------------------------------------------------------------
-  def _seekTransfer( self, function ) :
+  def _seekTransfer( self, function ):
     """
     Seek to transfer area
     This will maintain the slope of the path between where the wire is
@@ -235,7 +234,7 @@ class G_CodeHandlerBase :
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("Pin correction", startLocation, end=' ')
 
-    if None == startLocation :
+    if startLocation is None:
       data = [
         str( self._headCompensation.anchorPoint() ),
         str( self._headCompensation.orientation() ),
@@ -248,7 +247,7 @@ class G_CodeHandlerBase :
 
     # Box that defines the Z hand-off edges.
     edges = \
-      Box(
+          Box(
         self._machineCalibration.transferLeft,
         self._machineCalibration.transferTop,
         self._machineCalibration.transferRight,
@@ -259,7 +258,7 @@ class G_CodeHandlerBase :
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("Finial location", location)
 
-    if None == location :
+    if location is None:
       data = [
         str( edges ),
         str( segment )
@@ -322,25 +321,25 @@ class G_CodeHandlerBase :
 
     self._xyChange |= ( oldX != self._x ) or ( oldY != self._y )
 
-  def _offset( self, function ) :
+  def _offset( self, function ):
     # Offset coordinates.
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("  OFFSET", end=' ')
 
     parameters = function[ 1: ]
-    for parameter in parameters :
+    for parameter in parameters:
       axis = self._parameterExtract( parameter, 0, None, str, "offset" )
       offset = self._parameterExtract( parameter, 1, 1, float, "offset" )
 
-      if "X" == axis :
+      if axis == "X":
         if G_CodeHandlerBase.DEBUG_UNIT :
           print("x", offset, end=' ')
 
         self._x += offset
         self._xyChange = True
 
-      if "Y" == axis :
+      if axis == "Y":
         if G_CodeHandlerBase.DEBUG_UNIT :
           print("y", offset, end=' ')
 
@@ -371,7 +370,7 @@ class G_CodeHandlerBase :
     self._delay = self._parameterExtract( function, 1, None, int, "delay" )
 
   #---------------------------------------------------------------------
-  def _anchorPoint( self, function ) :
+  def _anchorPoint( self, function ):
     """
     Correct for the arm on the winder head.
     """
@@ -384,7 +383,7 @@ class G_CodeHandlerBase :
     pin = self._getPin( pinNumber )
     pin = pin.add( self._layerCalibration.offset )
 
-    if "0" == orientation :
+    if orientation == "0":
       orientation = None
 
     self._headCompensation.anchorPoint( pin )
@@ -446,7 +445,7 @@ class G_CodeHandlerBase :
     self._xyChange = True
 
   #---------------------------------------------------------------------
-  def _transferCorrect( self, function ) :
+  def _transferCorrect( self, function ):
     """
     Correct for hand-off transfer.
     """
@@ -468,35 +467,35 @@ class G_CodeHandlerBase :
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("correction", correction, "orientation", orientation, end=' ')
 
-    if "X" == correction :
+    if correction == "X":
       # Which side of the anchor point pin the wire sits (left or right).
-      if None == orientation :
+      if orientation is None:
         direction = 0  # <- No pin compensation.
       elif orientation.find( "L" ) > -1 :
         direction = 1
       elif orientation.find( "R" ) > -1 :
         direction = -1
-      else :
+      else:
         data = [ str( orientation ) ]
-        raise G_CodeException( "Unknown orientation: " + orientation + ".", data )
+        raise G_CodeException(f"Unknown orientation: {orientation}.", data)
 
       self._x = self._headCompensation.transferCorrectX( start, zHead, direction )
-    elif "Y" == correction :
+    elif correction == "Y":
       # Which side of the anchor point pin the wire sits (top or bottom).
-      if None == orientation :
+      if orientation is None:
         direction = 0  # <- No pin compensation.
       elif orientation.find( "B" ) > -1 :
         direction = -1
       elif orientation.find( "T" ) > -1 :
         direction = 1
-      else :
+      else:
         data = [ str( orientation ) ]
-        raise G_CodeException( "Unknown orientation: " + orientation + ".", data )
+        raise G_CodeException(f"Unknown orientation: {orientation}.", data)
 
       self._y = self._headCompensation.transferCorrectY( start, zHead, direction )
-    else :
+    else:
       data = [ str( correction ) ]
-      raise G_CodeException( "Unknown correction type: " + str( correction ) + ".", data )
+      raise G_CodeException(f"Unknown correction type: {str(correction)}.", data)
 
     if G_CodeHandlerBase.DEBUG_UNIT :
       print("x", self._x, "y", self._y)
@@ -527,7 +526,7 @@ class G_CodeHandlerBase :
   }
 
   #---------------------------------------------------------------------
-  def _runFunction( self, function ) :
+  def _runFunction( self, function ):
     """
     Callback for G-Code function.
 
@@ -541,11 +540,11 @@ class G_CodeHandlerBase :
     self._functions.append( function )
 
     # Toggle spool latch.
-    if number in list(G_CodeHandlerBase.G_CODE_FUNCTION_TABLE.keys()) :
+    if number in list(G_CodeHandlerBase.G_CODE_FUNCTION_TABLE.keys()):
       G_CodeHandlerBase.G_CODE_FUNCTION_TABLE[ number ]( self, function )
     else:
       data = [ str( number ) ]
-      raise G_CodeException( "Unknown G-Code " + str( number ), data )
+      raise G_CodeException(f"Unknown G-Code {str(number)}", data)
 
   #---------------------------------------------------------------------
   def setLimitVelocity( self, maxVelocity ) :

@@ -9,7 +9,6 @@
 import math
 import queue
 import random
-from Simulator.SimulationTime import SimulationTime
 from Simulator.SimulatedMotor import SimulatedMotor
 from Simulator.Delay import Delay
 
@@ -55,7 +54,7 @@ class PLC_Simulator :
       self.set( default )
 
     #-------------------------------------------------------------------
-    def get( self ) :
+    def get( self ):
       """
       Return the value of the input.
 
@@ -64,9 +63,7 @@ class PLC_Simulator :
       """
       value = self._io.plc.getTag( self._tagName )
       value = value >> self._bit
-      value = value & 0x01
-
-      return value
+      return value & 0x01
 
     #-------------------------------------------------------------------
     def set( self, state ) :

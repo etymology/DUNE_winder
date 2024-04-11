@@ -8,10 +8,12 @@
 #   Motors can be grouped to act together.  This is most useful for an x/y
 #   set where to the motors act in unison.
 ###############################################################################
+from IO.Primitives.Motor import Motor
+from typing import List
 
 class MultiAxisMotor :
   #---------------------------------------------------------------------
-  def __init__( self, name, motors ) :
+  def __init__( self, name, motors: List[Motor] ) :
     """
     Constructor.
 
@@ -37,21 +39,17 @@ class MultiAxisMotor :
       motor.setEnable( isEnabled )
 
   #---------------------------------------------------------------------
-  def getPosition( self ) :
+  def getPosition( self ):
     """
     Return current motor positions.
 
     Returns:
       Array of motor positions (in motor units).
     """
-    position = []
-    for motor in self._motors :
-      position.append( motor.getPosition() )
-
-    return position
+    return [motor.getPosition() for motor in self._motors]
 
   #---------------------------------------------------------------------
-  def setDesiredPosition( self, positions ) :
+  def setDesiredPosition( self, positions ):
     """
     Go to a location specified by a list.
 
@@ -61,10 +59,8 @@ class MultiAxisMotor :
     """
     assert( len( positions ) == len( self._motors ) )
 
-    index = 0
-    for motor in self._motors :
+    for index, motor in enumerate(self._motors):
       motor.setDesiredPosition( positions[ index ] )
-      index += 1
 
   #---------------------------------------------------------------------
   def isSeeking( self ) :
@@ -116,7 +112,7 @@ class MultiAxisMotor :
     return self._motor[ 0 ].getMaxVelocity()
 
   #---------------------------------------------------------------------
-  def setVelocity( self, velocities ) :
+  def setVelocity( self, velocities ):
     """
     Set motor velocities.  Useful for jogging motor.  Set to 0 to stop.
 
@@ -126,10 +122,8 @@ class MultiAxisMotor :
 
     assert( len( velocities ) == len( self._motors ) )
 
-    index = 0
-    for motor in self._motors :
+    for index, motor in enumerate(self._motors):
       motor.setVelocity( velocities[ index ] )
-      index += 1
 
   #---------------------------------------------------------------------
   def setMaxAcceleration( self, maxAcceleration ) :

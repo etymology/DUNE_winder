@@ -17,14 +17,14 @@ class SimulatedMotor :
   JITTER = 0.015
 
   #---------------------------------------------------------------------
-  def positionDelta( self ) :
+  def positionDelta( self ):
     """
     Return the amount of distance that needs to be traversed for motion.
 
     Returns:
       Amount of distance that needs to be traversed for motion.
     """
-    if self._plc.getTag( self._desiredPositionTag ) == None :
+    if self._plc.getTag(self._desiredPositionTag) is None:
       return -self._position
     return self._plc.getTag( self._desiredPositionTag ) - self._position
 

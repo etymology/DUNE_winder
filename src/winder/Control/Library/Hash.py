@@ -15,7 +15,6 @@
 ###############################################################################
 
 import hashlib
-import base64
 import re
 
 class Hash :
@@ -70,7 +69,7 @@ class Hash :
     return self
 
   #-------------------------------------------------------------------
-  def __str__( self ) :
+  def __str__( self ):
     """
     Convert hash to a string.
 
@@ -78,5 +77,4 @@ class Hash :
       String of hash.
     """
     hex = self._hashValue.hexdigest()
-    hexString = re.sub( Hash.IN_PATTERN, Hash.OUT_PATTERN, hex ).upper()
-    return hexString
+    return re.sub( Hash.IN_PATTERN, Hash.OUT_PATTERN, hex ).upper()
