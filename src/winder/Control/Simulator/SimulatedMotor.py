@@ -134,16 +134,14 @@ class SimulatedMotor :
       )
 
   #---------------------------------------------------------------------
-  def startJog( self, acceleration, deceleration ) :
+  def startJog( self, acceleration, deceleration ):
     """
     Start jogging.
     """
-    velocity = seekPosition = self._plc.getTag( self._speedTag )
+    velocity = self._plc.getTag( self._speedTag )
 
-    if velocity != 0 :
-      direction = self._plc.getTag( self._directionTag )
-
-      if direction :
+    if velocity != 0:
+      if direction := self._plc.getTag(self._directionTag):
         velocity = -velocity
 
       self._startTime = self._simulationTime.get()
@@ -151,13 +149,13 @@ class SimulatedMotor :
       self._maxDeceleration = deceleration
 
       self._motion =                                          \
-        TrapezoidalMotion                                     \
-        (                                                     \
-          acceleration,                                       \
-          deceleration,                                       \
-          velocity,                                           \
-          self._position,                                     \
-          None
+          TrapezoidalMotion                                     \
+          (                                                     \
+            acceleration,                                       \
+            deceleration,                                       \
+            velocity,                                           \
+            self._position,                                     \
+            None
         )
 
       self._startPosition = self._position

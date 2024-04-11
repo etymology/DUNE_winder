@@ -6,6 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
+import pathlib
 import re
 
 from .Hash import Hash
@@ -105,9 +106,7 @@ class HashedSerializable( Serializable ) :
     Serializable.load( self, filePath, fileName, nameOverride )
 
     # Get all XML lines.
-    with open( filePath + "/" + fileName ) as inputFile :
-      lines = inputFile.read()
-
+    lines = pathlib.Path(f"{filePath}/{fileName}").read_text()
     # Extract the hash from the raw XML.
     body = re.search( '<str[\s]*?name="hashValue"[\s]*?>' + Hash.HASH_PATTERN + '?</str>', lines )
     self.hashValue = body[1]
@@ -171,7 +170,7 @@ class HashedSerializable( Serializable ) :
     """
 
     # File name/path omitted?
-    if filePath is None is fileName:
+    if filePath is None == fileName:
       filePath = self._filePath
       fileName = self._fileName
 

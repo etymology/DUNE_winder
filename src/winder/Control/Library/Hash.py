@@ -27,7 +27,7 @@ class Hash :
 
   #-------------------------------------------------------------------
   @staticmethod
-  def singleLine( line ) :
+  def singleLine( line ) :  # sourcery skip: avoid-builtin-shadow
     """
     Return hash of a single line of data.
 
@@ -69,7 +69,7 @@ class Hash :
     return self
 
   #-------------------------------------------------------------------
-  def __str__( self ):
+  def __str__( self ):  # sourcery skip: avoid-builtin-shadow
     """
     Convert hash to a string.
 

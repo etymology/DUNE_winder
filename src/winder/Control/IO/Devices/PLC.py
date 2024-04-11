@@ -68,7 +68,6 @@ class PLC( IO_Device, metaclass=ABCMeta ) :
       self._plc        = plc
       self._tagName    = tagName
       self._attributes = attributes
-      self._type       = tagType
       self._value      = attributes.defaultValue
 
     #---------------------------------------------------------------------
@@ -82,14 +81,14 @@ class PLC( IO_Device, metaclass=ABCMeta ) :
       return self._tagName
 
     #---------------------------------------------------------------------
-    def poll( self ) :
+    def poll( self ):
       """
       Update the input by reading the value form PLC.  Call periodically.
       """
       value = self._plc.read( self._tagName )
-      if not value == None and not self._plc.isNotFunctional() :
+      if value is not None and not self._plc.isNotFunctional():
         self.updateFromReadTag( value[ 0 ] )
-      else :
+      else:
         self._value = self._attributes.defaultValue
 
     #---------------------------------------------------------------------
@@ -137,18 +136,14 @@ class PLC( IO_Device, metaclass=ABCMeta ) :
 
 
     #---------------------------------------------------------------------
-    def getReadTag( self ) :
+    def getReadTag( self ):
       """
       Get read tag.  Used when reading multiple tags at once.
 
       Returns:
         Name of tag for reading.  None if this is a write-only tag.
       """
-      result = None
-      if self._attributes.canRead :
-        result = self._tagName
-
-      return result
+      return self._tagName if self._attributes.canRead else None
 
     #---------------------------------------------------------------------
     def updateFromReadTag( self, value ) :
@@ -175,7 +170,7 @@ class PLC( IO_Device, metaclass=ABCMeta ) :
       return self._value
 
     #---------------------------------------------------------------------
-    def set( self, value ) :
+    def set( self, value ):
       """
       Set the value.
 
@@ -187,10 +182,10 @@ class PLC( IO_Device, metaclass=ABCMeta ) :
       """
       isError = False
 
-      result = self._plc.write( self._tagName, value, self._type )
-      if None == result :
+      result = self._plc.write( self._tagName, value)
+      if result is None:
         isError = True
-      else :
+      else:
         self._value = value
 
       return isError

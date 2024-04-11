@@ -163,7 +163,7 @@ class Log:
     return lines
 
   #---------------------------------------------------------------------
-  def add( self, module, typeName, message, parameters = None ) :
+  def add( self, module, typeName, message, parameters = None ):
     """
     Add a message to log file.
 
@@ -176,15 +176,15 @@ class Log:
 
     currentTime = self._getTimestamp()
     line =                   \
-      str( currentTime )     \
-      + "\t"                 \
-      + str( module )        \
-      + "\t"                 \
-      + str( typeName )      \
-      + "\t"                 \
-      + message
+        str( currentTime )     \
+        + "\t"                 \
+        + str( module )        \
+        + "\t"                 \
+        + str( typeName )      \
+        + "\t"                 \
+        + message
 
-    if None == parameters :
+    if None is parameters :
       parameters = []
 
     for parameter in parameters:
@@ -199,19 +199,22 @@ class Log:
     self._lock.release()
 
     # Local echo if requested.
-    if self._localEcho :
-      line = str( currentTime ) + " " + message
-      isFirst = True
-      parameterLine = ""
-      for parameter in parameters:
-        if not isFirst :
-          parameterLine += ", "
-        isFirst = False
-        parameterLine += str( parameter )
+    if self._localEcho:
+      self.local_echo(currentTime, message, parameters)
 
-      if "" != parameterLine :
-        parameterLine = " [" + parameterLine + "]"
+  def local_echo(self, currentTime, message, parameters):
+    line = f"{str(currentTime)} {message}"
+    isFirst = True
+    parameterLine = ""
+    for parameter in parameters:
+      if not isFirst :
+        parameterLine += ", "
+      isFirst = False
+      parameterLine += str( parameter )
 
-      line += parameterLine
+    if parameterLine != "":
+      parameterLine = f" [{parameterLine}]"
 
-      print(line)
+    line += parameterLine
+
+    print(line)

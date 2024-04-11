@@ -11,7 +11,6 @@
 import os.path
 
 from Library.Serializable import Serializable
-from Machine.Settings import Settings
 
 class APA_Base( Serializable ) :
 
@@ -80,7 +79,7 @@ class APA_Base( Serializable ) :
 
   #---------------------------------------------------------------------
   @staticmethod
-  def create( apaDirectory, name ) :
+  def create( apaDirectory, name ):
     """
     Create and return a new APA_Base instance.
 
@@ -90,7 +89,7 @@ class APA_Base( Serializable ) :
     """
 
     # Create directory if it doesn't exist.
-    apaPath = apaDirectory + "/" + name + "/"
+    apaPath = f"{apaDirectory}/{name}/"
     if not os.path.exists( apaPath ) :
       os.makedirs( apaPath )
 
@@ -101,7 +100,7 @@ class APA_Base( Serializable ) :
     return apa
 
   #---------------------------------------------------------------------
-  def __init__( self, apaDirectory=None, name=None, systemTime=None ) :
+  def __init__( self, apaDirectory=None, name=None, systemTime=None ):
     """
     Constructor.
 
@@ -130,11 +129,7 @@ class APA_Base( Serializable ) :
     self._z = None
     self._headLocation = None
 
-    if self._systemTime :
-      now = self._systemTime.get()
-    else :
-      now = 0
-
+    now = self._systemTime.get() if self._systemTime else 0
     self._creationDate = str( now )
     self._lastModifyDate = self._creationDate
     self._loadedTime = 0
@@ -143,11 +138,11 @@ class APA_Base( Serializable ) :
 
 
   #---------------------------------------------------------------------
-  def getPath( self ) :
+  def getPath( self ):
     """
     Get the path for all files related to this APA.
     """
-    return self._apaDirectory + "/" + self._name + "/"
+    return f"{self._apaDirectory}/{self._name}/"
 
   #---------------------------------------------------------------------
   def getName( self ) :
@@ -180,7 +175,7 @@ class APA_Base( Serializable ) :
     return self._stage
 
   #---------------------------------------------------------------------
-  def getRecipe( self ) :
+  def getRecipe( self ):
     """
     Return the name of the loaded recipe.
 
@@ -188,7 +183,7 @@ class APA_Base( Serializable ) :
       String name of the loaded recipe.  Empty string if no recipe loaded.
     """
     result = self._recipeFile
-    if None == result :
+    if result is None:
       result = ""
 
     return result
@@ -204,18 +199,17 @@ class APA_Base( Serializable ) :
     self._windTime += time
 
   #---------------------------------------------------------------------
-  def toDictionary( self ) :
+  def toDictionary( self ):
     """
     Return class data as dictionary.
 
     Returns:
       Dictionary object with all class data typically serialized.
     """
-    result = {}
-    for variable in APA_Base.SERIALIZED_VARIABLES :
-      result[ variable ] = self.__dict__[ variable ]
-
-    return result
+    return {
+        variable: self.__dict__[variable]
+        for variable in APA_Base.SERIALIZED_VARIABLES
+    }
 
   #---------------------------------------------------------------------
   def setLocation( self, x, y, headLocation ) :

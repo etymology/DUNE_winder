@@ -8,7 +8,6 @@
 
 import xml.dom.minidom
 import importlib
-import types
 from pathlib import Path
 
 class Serializable :
@@ -18,7 +17,7 @@ class Serializable :
   SUPPORTED_PRIMITIVES = (int, int, float, complex, str, bool, list, dict, type(None) )
 
   #---------------------------------------------------------------------
-  def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ) :
+  def __init__( self, includeOnly=None, exclude=None, ignoreMissing=False ):
     """
     Constructor.
 
@@ -30,10 +29,10 @@ class Serializable :
         variables.
     """
 
-    if None != includeOnly :
+    if includeOnly is not None:
       self._serializeIncludeOnly = includeOnly
 
-    if None != exclude :
+    if exclude is not None:
       self._serializeIgnore = exclude
       self._serializeIgnore.append( "_serializeIgnore" )
       self._serializeIgnore.append( "_ignoreMissing" )
@@ -64,7 +63,7 @@ class Serializable :
     return variables
 
   #---------------------------------------------------------------------
-  def serializeObject( self, xmlDocument, variable, value ) :
+  def serializeObject( self, xmlDocument, variable, value ):
     """
     Convert variable/value pair into XML node.  Recursive.
 
@@ -82,42 +81,32 @@ class Serializable :
 
     node = None
 
-    if isinstance( value, ( list, dict ) ) :
+    if isinstance( value, ( list, dict ) ):
       # Create child node for the list/dictionary.
       node = xmlDocument.createElement( value.__class__.__name__ )
       node.setAttribute( "name", str( variable ) )
 
-      if isinstance( value, list ) :
-        # Turn list into dictionary.
-        subVariables = dict( enumerate( value ) )
-      else :
-        # Use the dictionary.
-        subVariables = value
-
+      subVariables = dict(enumerate(value)) if isinstance(value, list) else value
       for subVariable in subVariables :
         subValue = subVariables[ subVariable ]
         subNode = self.serializeObject( xmlDocument, subVariable, subValue )
         node.appendChild( subNode )
+    elif isinstance( value, Serializable ):
+      # Serialize the class add it to the list.
+      node = value.serialize( xmlDocument )
+      node.setAttribute( "name", str( variable ) )
+    elif type( value ) in Serializable.SUPPORTED_PRIMITIVES :
+      node = xmlDocument.createElement( value.__class__.__name__ )
+      node.setAttribute( "name", str( variable ) )
+      valueNode = xmlDocument.createTextNode( str( value ) )
+      node.appendChild( valueNode )
     else:
-      # If this item is serializable, serialize it.
-      if isinstance( value, Serializable ) :
-        # Serialize the class add it to the list.
-        node = value.serialize( xmlDocument )
-        node.setAttribute( "name", str( variable ) )
-      # If the object is not serializable, use a string representation.
-      elif type( value ) in Serializable.SUPPORTED_PRIMITIVES :
-        node = xmlDocument.createElement( value.__class__.__name__ )
-        node.setAttribute( "name", str( variable ) )
-        valueNode = xmlDocument.createTextNode( str( value ) )
-        node.appendChild( valueNode )
-      # We can't serialize anything other than primitives.
-      else:
-        raise TypeError( "Unable to serialize: " + value.__class__.__name__ )
+      raise TypeError(f"Unable to serialize: {value.__class__.__name__}")
 
     return node
 
   #---------------------------------------------------------------------
-  def serialize( self, xmlDocument, nameOverride=None ) :
+  def serialize( self, xmlDocument, nameOverride=None ):
     """
     Convert object into XML node.
 
@@ -134,10 +123,7 @@ class Serializable :
     $$$FUTURE - Verify this works with nested lists.
     """
 
-    # Name the top node after the class.
-    name = self.__class__.__name__
-    if None != nameOverride :
-      name = nameOverride
+    name = nameOverride if nameOverride is not None else self.__class__.__name__
     node = xmlDocument.createElement( name )
 
     variables = self.getVariableList()
@@ -154,7 +140,7 @@ class Serializable :
     return node
 
   #---------------------------------------------------------------------
-  def unserializeNode( self, node ) :
+  def unserializeNode( self, node ):
     """
     Recursively unserialize node and return result.
 
@@ -170,35 +156,33 @@ class Serializable :
     result = None
 
     # If we have a dictionary or a list, recursively extract the data...
-    if "list" == node.nodeName :
+    if node.nodeName == "list":
       result = []
-      for data in node.childNodes :
+      for data in node.childNodes:
         returnValue = self.unserializeNode( data )
-        if None != returnValue :
+        if returnValue is not None:
           result.append( returnValue )
-    elif "dict" == node.nodeName :
+    elif node.nodeName == "dict":
       result = {}
-      for data in node.childNodes :
+      for data in node.childNodes:
         returnValue = self.unserializeNode( data )
-        if None != returnValue :
+        if returnValue is not None:
           name = data.getAttribute( "name" ).encode()
           result[ name ] = self.unserializeNode( data )
-    # If not a list/dictionary...
-    else:
-      if node.firstChild :
-        if "NoneType" == node.nodeName :
-          result = None
-        else :
-          # Figure out the type by the name and make a cast from the string
-          # representation.
-          module = importlib.import_module( '__builtin__' )
-          typeCast = getattr( module, node.nodeName )
-          result = typeCast( node.firstChild.nodeValue )
+    elif node.firstChild:
+      if node.nodeName == "NoneType":
+        result = None
+      else:
+        # Figure out the type by the name and make a cast from the string
+        # representation.
+        module = importlib.import_module( '__builtin__' )
+        typeCast = getattr( module, node.nodeName )
+        result = typeCast( node.firstChild.nodeValue )
 
     return result
 
   #---------------------------------------------------------------------
-  def unserialize( self, startingNode ) :
+  def unserialize( self, startingNode ):
     """
     Extract state of class variables from XML node.
 
@@ -211,24 +195,21 @@ class Serializable :
     """
 
     # For each child node...
-    for node in startingNode.childNodes :
-      # If this is an element node (we ignore everything else)...
-      if xml.dom.minidom.Node.ELEMENT_NODE == node.nodeType :
+    for node in startingNode.childNodes:
+      if xml.dom.minidom.Node.ELEMENT_NODE == node.nodeType:
+        name = node.getAttribute("name").encode()
 
-        # Name of variable.
-        name = node.getAttribute( "name" ).encode()
-
-        # Is this a legitimate class variable?
-        if not name in self.__dict__ :
-          if not self._ignoreMissing :
-            if name.decode() not in self.__dict__:
-              raise KeyError(name.decode() + " not in class.")        
-        else:
-          if isinstance( self.__dict__[ name ], Serializable ) :
-            self.__dict__[ name ].unserialize( node )
+        if name in self.__dict__:
+          if isinstance(self.__dict__[name], Serializable):
+              self.__dict__[name].unserialize(node)
           else:
-            result = self.unserializeNode( node )
-            self.__dict__[ name ] = result
+              result = self.unserializeNode(node)
+              self.__dict__[name] = result
+
+        elif name.decode() not in self.__dict__:
+          if not self._ignoreMissing:
+            raise KeyError(f"{name.decode()} not in class.")
+
 
   #-------------------------------------------------------------------
   def toXML( self, nameOverride=None ) :
@@ -292,7 +273,7 @@ class Serializable :
 
 
   #-------------------------------------------------------------------
-  def load( self, filePath, fileName, nameOverride=None ) :
+  def load( self, filePath, fileName, nameOverride=None ):
     """
     Load an XML file and return instance.
 
@@ -301,19 +282,16 @@ class Serializable :
       fileName: File name to load.
       nameOverride: Top-level XML name.
     """
-    print(str(Path(filePath) / fileName))
+    print(f"Loading xml file {str(Path(filePath) / fileName)}")
     xmlDocument = xml.dom.minidom.parse( str(Path(filePath) / fileName) )
 
-    name = self.__class__.__name__
-    if None != nameOverride :
-      name = nameOverride
-
+    name = nameOverride if nameOverride is not None else self.__class__.__name__
     node = xmlDocument.getElementsByTagName( name )
 
-    if node and len( node ) > 0 :
+    if node and len( node ) > 0:
       self.unserialize( node[ 0 ] )
     else:
-      raise KeyError( self.__class__.__name__ + " not in XML data." )
+      raise KeyError(f"{self.__class__.__name__} not in XML data.")
 
 # Unit test.
 if __name__ == "__main__":

@@ -7,7 +7,7 @@
 ###############################################################################
 class StateMachine :
   #---------------------------------------------------------------------
-  def __init__( self, name = None ) :
+  def __init__( self, name = None ):
     """
     Constructor.
 
@@ -17,7 +17,7 @@ class StateMachine :
     """
 
 
-    if None == name :
+    if name is None:
       name = self.__class__.__name__
 
     self.name = name
@@ -26,21 +26,18 @@ class StateMachine :
     self.states = {}
 
   #---------------------------------------------------------------------
-  def getState( self ) :
+  def getState( self ):
     """
     Return the state (as a number).
 
     Returns:
       Current state (as number).  -1 for uninitialized state.
     """
-    result = -1
-    if self.state :
-      result = next((key for key,value in list(self.states.items()) if value==self.state))
-
-    return result
+    return (next((key for key, value in list(self.states.items())
+                  if value == self.state)) if self.state else -1)
 
   #---------------------------------------------------------------------
-  def changeState( self, newState ) :
+  def changeState( self, newState ):
     """
     Transition to a new state.
 
@@ -55,14 +52,15 @@ class StateMachine :
     newState = self.states[ newState ]
     isError = newState.enter()
 
-    if not isError :
+    if not isError:
       # Exit from the previous state (if it exists).
       if self.state :
         isError = self.state.exit()
 
-      # Change to this state.
-      if not isError :
-        self.state = newState
+    # Change to this state.
+    if not isError :
+      
+      self.state = newState
 
     return isError
 

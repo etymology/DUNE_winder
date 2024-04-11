@@ -414,7 +414,7 @@ if __name__ == "__main__":
   motion = Motion( jerk, acceleration, velocity, startPosition, endPosition )
 
   # Print the transition points.
-  for index in range(motion.Point.POINTS) :
+  for index in range(motion.Point.POINTS):
     print("T%u %9.4f: %9.4f %9.4f %9.4f %9.2f" % \
       (                                      \
         index,                               \

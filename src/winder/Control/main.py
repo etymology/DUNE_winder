@@ -66,52 +66,46 @@ isRealTime = True
 
 
 # -----------------------------------------------------------------------
+
+
+class CustomEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle various types."""
+
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return {"datetime": obj.isoformat()}
+        # Extend this method to handle more types if necessary
+        return json.JSONEncoder.default(self, obj)
+
+
 def commandHandler(_, command):
-    """
-    Handle a remote command.
-    This is define in main so that is has the most global access possible.
-
-    Args:
-      command: A command to evaluate.
-
-    Returns:
-      The data returned from the command.
-    """
-
     try:
         result = eval(command)
     except Exception as exception:
         result = "Invalid request"
-
-        exceptionTypeName, exceptionValues, tracebackValue = sys.exc_info()
-
         if debugInterface:
+            exceptionTypeName, exceptionValues, tracebackValue = sys.exc_info()
             traceback.print_tb(tracebackValue)
-
-        tracebackAsString = repr(traceback.format_tb(tracebackValue))
-        log.add(
-            "Main",
-            "commandHandler",
-            "Invalid command issued from UI.",
-            [command, exception, exceptionTypeName,
-                exceptionValues, tracebackAsString],
-        )
-
-    # Try and make JSON object of result.
-    # (Custom encoder escapes any invalid UTF-8 characters which would otherwise
-    # raise an exception.)
+            tracebackAsString = repr(traceback.format_tb(tracebackValue))
+            log.add(
+                "Main",
+                "commandHandler",
+                "Invalid command issued from UI.",
+                [
+                    command,
+                    exception,
+                    exceptionTypeName,
+                    exceptionValues,
+                    tracebackAsString,
+                ],
+            )
 
     try:
-        if isinstance(result, datetime):
-            # Handle the case where result is a datetime object
-            # For example, you can convert it to a string representation
-            return json.dumps({"datetime": result.isoformat()})
-        else:
-            # Handle other cases
-            return json.dumps(result)
+        result = json.dumps(result, cls=CustomEncoder)
     except TypeError:
-        # If it cannot be made JSON, just make it a string.
-        return json.dumps(result, encoding="unicode_escape")
+        result = json.dumps(result, ensure_ascii=False)
+
+    return result
 
 
 # -----------------------------------------------------------------------

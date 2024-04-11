@@ -70,7 +70,7 @@ class G_CodeClass :
 
     """
 
-    if self.callback != None:
+    if self.callback is not None:
       self.callback( self.get() )
 
   #---------------------------------------------------------------------
@@ -324,7 +324,7 @@ class G_CodeLine :
     """
 
     for command in self.commands:
-      if command.callback != None:
+      if command.callback is not None:
         command.execute()
 
 

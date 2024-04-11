@@ -198,15 +198,15 @@ if __name__ == "__main__":
     elif option == "G":
       enableG = value == "TRUE"
     elif option == "0":
-      zeroOffset = ( "TRUE" == value )
-    elif "BASEPATH" == option :
-      isRubyBasePath = ( "TRUE" == value )
-    elif "OVERRIDE" == option :
+      zeroOffset = value == "TRUE"
+    elif option == "BASEPATH":
+      isRubyBasePath = value == "TRUE"
+    elif option == "OVERRIDE":
       overrideLaps = int( value )
-    elif "CALIBRATION" == option :
-      isCalibration = ( "TRUE" == value )
+    elif option == "CALIBRATION":
+      isCalibration = value == "TRUE"
     else:
-      raise Exception( "Unknown:" + option )
+      raise Exception(f"Unknown:{option}")
 
   geometryX = X_LayerGeometry()
   geometryV = V_LayerGeometry()

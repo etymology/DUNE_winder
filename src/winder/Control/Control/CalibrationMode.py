@@ -34,7 +34,7 @@ class CalibrationMode( StateMachineState ) :
     self._shutdownCount = None
 
   #---------------------------------------------------------------------
-  def enter( self ) :
+  def enter( self ):
     """
     Enter into calibration mode.
     This acts much like manual mode, except a seek is the only allowed command.
@@ -49,14 +49,14 @@ class CalibrationMode( StateMachineState ) :
     self._shutdownCount = None
 
     # X/Y axis move?
-    if None != self.stateMachine.seekX or None != self.stateMachine.seekY :
+    if None is not self.stateMachine.seekX or None is not self.stateMachine.seekY :
 
       x = self.stateMachine.seekX
-      if None == x :
+      if None is x :
         x = self._io.xAxis.getPosition()
 
       y = self.stateMachine.seekY
-      if None == y :
+      if None is y :
         y = self._io.yAxis.getPosition()
 
       self._io.plcLogic.setXY_Position(
@@ -112,24 +112,24 @@ class CalibrationMode( StateMachineState ) :
     if self._shutdownCount > 0 :
       self._shutdownCount -= 1
 
-    isMotionCompleat = self._io.plcLogic.isReady()
+    isMotionComplete = self._io.plcLogic.isReady()
 
-    if isMotionCompleat and None == self._shutdownCount :
+    if isMotionComplete and self._shutdownCount is None:
       self._shutdownCount = CalibrationMode.SHUTDOWN_COUNT
 
     # Is movement done?
-    if isMotionCompleat and 0 == self._shutdownCount :
+    if isMotionComplete and self._shutdownCount == 0:
 
       # If we were seeking and stopped pre-maturely, note where.
-      if self._noteSeekStop :
+      if self._noteSeekStop:
         x = self._io.xAxis.getPosition()
         y = self._io.yAxis.getPosition()
         z = self._io.zAxis.getPosition()
         self._log.add(
-          self.__class__.__name__,
-          "CALIBRATION_STOP_LOCATION",
-          "Seek stopped at (" + str( x ) + "," + str( y ) + "," + str( z ) + ")",
-          [ x, y, z ]
+            self.__class__.__name__,
+            "CALIBRATION_STOP_LOCATION",
+            f"Seek stopped at ({str(x)},{str(y)},{str(z)})",
+            [x, y, z],
         )
 
       self._io.camera.endScan()

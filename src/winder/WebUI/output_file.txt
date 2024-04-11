@@ -4,14 +4,14 @@
 	<cameraURL>ftp://admin@192.168.140.19/image.bmp</cameraURL>
 	<pixelsPer_mm>18</pixelsPer_mm>
 	<serverAddress>127.0.0.1</serverAddress>
-	<serverPort>6626</serverPort>
+	<serverPort>4299</serverPort>
 	<webServerPort>80</webServerPort>
-	<LogDirectory>../Data</LogDirectory>
-	<machineCalibrationPath>../Data/</machineCalibrationPath>
+	<LogDirectory>C:\Users\Dune Admin\winder_py2\src\winder\Data</LogDirectory>
+	<machineCalibrationPath>C:\Users\Dune Admin\winder_py2\src\winder\Data</machineCalibrationPath>
 	<machineCalibrationFile>machineCalibration.xml</machineCalibrationFile>
-	<APA_LogDirectory>../Data/APA</APA_LogDirectory>
-	<recipeDirectory>../Recipes</recipeDirectory>
-	<recipeArchiveDirectory>../Recipes</recipeArchiveDirectory>
+	<APA_LogDirectory>C:\Users\Dune Admin\winder_py2\src\winder\Data\APA</APA_LogDirectory>
+	<recipeDirectory>C:\Users\Dune Admin\winder_py2\src\winder\Recipes</recipeDirectory>
+	<recipeArchiveDirectory>C:\Users\Dune Admin\winder_py2\src\winder\Data\Recipes</recipeArchiveDirectory>
 	<maxVelocity>406.4</maxVelocity>
 	<maxSlowVelocity>25.4</maxSlowVelocity>
 	<maxAcceleration>203.2</maxAcceleration>

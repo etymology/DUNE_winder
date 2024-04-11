@@ -45,7 +45,7 @@ class Path3d :
     return self.push( location.x + offsetX, location.y + offsetY, location.z )
 
   #---------------------------------------------------------------------
-  def push( self, x=None, y=None, z=None ) :
+  def push( self, x=None, y=None, z=None ):
     """
     Add an offset position to path.  Offset specified as a radius and angle.
 
@@ -58,13 +58,13 @@ class Path3d :
       The length between this new position and the previous position.
     """
 
-    if None == x :
+    if x is None:
       x = self.last.x - self.baseOffset.x
 
-    if None == y :
+    if y is None:
       y = self.last.y - self.baseOffset.y
 
-    if None == z :
+    if z is None:
       z = self.last.z - self.baseOffset.z
 
     x += self.baseOffset.x
@@ -76,16 +76,13 @@ class Path3d :
 
     segment = Segment( self.last, location )
 
-    length = 0
-    if None != self.last :
-      length = segment.length()
-
+    length = segment.length() if self.last is not None else 0
     self.last = location
 
     return length
 
   #---------------------------------------------------------------------
-  def toSketchUpRuby( self, output, name="Path" ) :
+  def toSketchUpRuby( self, output, name="Path" ):
     """
     Turn path into Ruby code for use in SketchUp.  Useful for visualizing
     paths.
@@ -95,13 +92,13 @@ class Path3d :
       name: Name of SketchUp layer for output.
     """
 
-    output.write( 'layer = Sketchup.active_model.layers.add "' + name + '"' + "\n" )
+    output.write(f'layer = Sketchup.active_model.layers.add "{name}"' + "\n")
     output.write( 'oldLayer = Sketchup.active_model.active_layer' + "\n" )
     output.write( 'Sketchup.active_model.active_layer = layer' + "\n" )
     output.write( "line = Sketchup.active_model.entities.add_line " )
 
     isFirst = True
-    for point in self.path :
+    for point in self.path:
 
       # Convert millimeters to inches.  Sketch-up always works in inches.
       x = point.x / 25.4
@@ -114,7 +111,7 @@ class Path3d :
       else :
         isFirst = False
 
-      output.write( "[" + str( x ) + "," + str( z ) + "," + str( y ) + "]" )
+      output.write(f"[{str(x)},{str(z)},{str(y)}]")
 
     output.write( "\n" )
     output.write( 'Sketchup.active_model.active_layer = oldLayer' + "\n" )

@@ -316,13 +316,13 @@ class PLC_Simulator :
     # Local function to validate that motor positions are within limits.
     def verifyPositionLimits( axis, axisIO, positionMin, positionMax, mEndOfTravel, pEndOfTravel ) :
       position = axisIO.getPosition()
-      if ( None != mEndOfTravel ) :
+      if ( None is not mEndOfTravel ) :
         if ( position < positionMin ) :
           mEndOfTravel.set( False )
         else:
           mEndOfTravel.set( True )
 
-      if ( None != pEndOfTravel ) :
+      if ( None is not pEndOfTravel ) :
         if ( position > positionMax ) :
           pEndOfTravel.set( False )
         else:

@@ -68,7 +68,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     return isOutOfWire
 
   #---------------------------------------------------------------------
-  def isDone( self ) :
+  def isDone( self ):
     """
     Check to see if the G-Code execution has finished.
 
@@ -77,25 +77,25 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     """
 
     isDone = True
-    if self._gCode :
+    if self._gCode:
       startLine = 0
       endLine = self._gCode.getLineCount() - 1
 
-      if -1 != self.runToLine :
-        if 1 == self._direction :
+      if self.runToLine != -1:
+        if self._direction == 1:
           endLine = self.runToLine - 1
-        else :
+        else:
           startLine = self.runToLine - 1
 
       isDone = False
-      isDone |= 1 == self._direction and self._nextLine >= endLine
-      isDone |= 1 != self._direction and self._nextLine <= startLine
+      isDone |= self._direction == 1 and self._nextLine >= endLine
+      isDone |= self._direction != 1 and self._nextLine <= startLine
       isDone |= self._isG_CodeError
 
     return isDone
 
   #---------------------------------------------------------------------
-  def getTotalLines( self ) :
+  def getTotalLines( self ):
     """
     Return the total number of G-Code lines for the current G-Code file.
 
@@ -103,14 +103,10 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       Total number of G-Code lines for the current G-Code file.  None if there
       is no G-Code file currently loaded.
     """
-    result = None
-    if self._gCode :
-      result = self._gCode.getLineCount()
-
-    return result
+    return self._gCode.getLineCount() if self._gCode else None
 
   #---------------------------------------------------------------------
-  def getLine( self ) :
+  def getLine( self ):
     """
     Get the current line number being executed/ready to execute.
 
@@ -119,11 +115,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       loaded.
     """
 
-    result = None
-    if self._gCode :
-      result = self._currentLine
-
-    return result
+    return self._currentLine if self._gCode else None
 
   #---------------------------------------------------------------------
   def setLine( self, line ) :
@@ -143,27 +135,24 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     return isError
 
   #---------------------------------------------------------------------
-  def setDirection( self, isForward ) :
+  def setDirection( self, isForward ):
     """
     Set the direction of G-Code execution.
 
     Args:
       isForward: True for normal direction, False to run in reverse.
     """
-    if isForward :
-      self._direction = 1
-    else :
-      self._direction = -1
+    self._direction = 1 if isForward else -1
 
   #---------------------------------------------------------------------
-  def getDirection( self ) :
+  def getDirection( self ):
     """
     Get the direction of G-Code execution.
 
     Returns
       True for normal direction, False to run in reverse.
     """
-    return 1 == self._direction
+    return self._direction == 1
 
   #---------------------------------------------------------------------
   def setVelocityScale( self, scaleFactor=1.0 ) :
@@ -206,7 +195,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._stopNextMove = True
 
   #---------------------------------------------------------------------
-  def poll( self ) :
+  def poll( self ):  # sourcery skip: low-code-quality
     """
     Update the logic for executing this line of G-Code.
 
@@ -217,7 +206,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
     isDone = False
 
-    if self._io.plcLogic.isReady() and self._io.head.isIdle() :
+    if self._io.plcLogic.isReady() and self._io.head.isIdle():
 
       moving = False
 
@@ -261,37 +250,30 @@ class G_CodeHandler( G_CodeHandlerBase ) :
         self._stopNextMove = True
 
       # If there are no more moves, run the next line of G-Code.
-      if not moving :
+      if not moving:
         self._currentLine = self._nextLine
 
         isDone = self.isDone() or self.isOutOfWire() or self._stopNextMove
         self._stopNextMove = False
 
-        if not isDone :
-          if self._delay > 0 :
+        if not isDone:
+          if self._delay > 0:
             self._delay -= 1
           elif self._pauseCount < self._PAUSE :
             self._pauseCount += 1
-          else :
+          else:
             self._pauseCount = 0
             self._nextLine += self._direction
 
-            if self._positionLog :
+            if self._positionLog:
               x = self._io.xAxis.getPosition()
               y = self._io.yAxis.getPosition()
               z = self._io.zAxis.getPosition()
               self._z = self._io.head.getTargetAxisPosition()
-              self._positionLog.write(
-                str( self._x )     + "," +
-                str( self._y )     + "," +
-                str( self._z )     + "," +
-                str( x )           + "," +
-                str( y )           + "," +
-                str( z )           + "," +
-                str( self._x - x ) + "," +
-                str( self._y - y ) + "," +
-                str( self._z - z ) + "\n"
-              )
+              self._positionLog.write(((((
+                  f"{str(self._x)},{str(self._y)},{str(self._z)},{str(x)},{str(y)},{str(z)}"
+                  + ",") + str(self._x - x) + ",") + str(self._y - y) + ",") +
+                                       str(self._z - z) + "\n"))
 
             self._isG_CodeError = False
             self._stopNextMove = self.singleStep
@@ -398,42 +380,46 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._wireLength = 0
 
     # Place adjusted line in G-Code output log.
-    if self._gCodeLog :
+    if self._gCodeLog:
 
-      line = ""
+      self.log_g_code()
 
-      #
-      # Only log what has changed since the self._last line.
-      #
+  # TODO Rename this here and in `runNextLine`
+  def log_g_code(self):
+    line = ""
 
-      if None != self._line :
-        line += "N" + str( self._line ) + " "
+    #
+    # Only log what has changed since the self._last line.
+    #
 
-      if self._lastX != self._x :
-        line += "X" + str( self._x ) + " "
+    if self._line is not None:
+      line += f"N{str(self._line)} "
 
-      if self._lastY != self._y :
-        line += "Y" + str( self._y ) + " "
+    if self._lastX != self._x:
+      line += f"X{str(self._x)} "
 
-      if self._lastZ != self._z :
-        line += "Z" + str( self._z ) + " "
+    if self._lastY != self._y:
+      line += f"Y{str(self._y)} "
 
-      if self._lastVelocity != self._velocity :
-        line += "F" + str( self._velocity ) + " "
+    if self._lastZ != self._z:
+      line += f"Z{str(self._z)} "
 
-      for function in self._functions :
-        line += "G" + str( function[ 0 ] ) + " "
-        for parameter in function[ 1: ] :
-          line += "P" + str( parameter ) + " "
+    if self._lastVelocity != self._velocity:
+      line += f"F{str(self._velocity)} "
 
-      # Strip trailing space.
-      line = line.strip()
+    for function in self._functions:
+      line += f"G{str(function[0])} "
+      for parameter in function[ 1: ]:
+        line += f"P{str(parameter)} "
 
-      # Add line-feed.
-      line += "\n"
+    # Strip trailing space.
+    line = line.strip()
 
-      # Place in G-Code log.
-      self._gCodeLog.write( line )
+    # Add line-feed.
+    line += "\n"
+
+    # Place in G-Code log.
+    self._gCodeLog.write( line )
 
   #---------------------------------------------------------------------
   def closeG_Code( self ) :
@@ -470,17 +456,17 @@ class G_CodeHandler( G_CodeHandlerBase ) :
     self._z = self._io.zAxis.getPosition()
 
   #---------------------------------------------------------------------
-  def isG_CodeLoaded( self ) :
+  def isG_CodeLoaded( self ):
     """
     Check to see if there is G-Code loaded.
 
     Returns:
       True if G-Code is loaded, False if not.
     """
-    return None != self._gCode
+    return self._gCode is not None
 
   #---------------------------------------------------------------------
-  def fetchLines( self, center, delta ) :
+  def fetchLines( self, center, delta ):
     """
     Fetch a sub-set of the G-Code self.lines.  Useful for showing what has
     recently executed, and what is to come.
@@ -493,11 +479,7 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       List of G-Code lines, padded with empty lines if needed.  Empty list if
       no G-Code is loaded.
     """
-    result = []
-    if self._gCode :
-      result = self._gCode.fetchLines( center, delta )
-
-    return result
+    return self._gCode.fetchLines( center, delta ) if self._gCode else []
 
   #---------------------------------------------------------------------
   def setG_CodeLog( self, gCodeLogFile ) :
@@ -519,14 +501,14 @@ class G_CodeHandler( G_CodeHandlerBase ) :
       self._gCodeLog = None
 
   #---------------------------------------------------------------------
-  def isPositionLogging( self ) :
+  def isPositionLogging( self ):
     """
     Check to see if position logging is enabled.
 
     Returns:
       True if position logging is enabled.
     """
-    return None != self._positionLog
+    return self._positionLog is not None
 
   #---------------------------------------------------------------------
   def startPositionLogging( self, positionLogFileName ) :

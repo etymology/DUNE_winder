@@ -77,7 +77,7 @@ class Camera:
     self._callback = callback
 
   #---------------------------------------------------------------------
-  def poll( self ) :
+  def poll( self ):
     """
     Update FIFO registers.
     Call periodically after a trigger has been setup.
@@ -92,31 +92,32 @@ class Camera:
     # Any data in FIFO?
     self.cameraFIFO_Status.poll()
 
-    isData = False
-    if self.cameraFIFO_Status.get() > 0 :
-      isData = True
+    return (self.capture()
+            if self.cameraFIFO_Status.get() > 0 else False)
 
-      # Update remaining FIFO values.
-      # $$$FUTURE - Do a block read.
-      self.cameraFIFO_MotorX.poll()
-      self.cameraFIFO_MotorY.poll()
-      self.cameraFIFO_MatchLevel.poll()
-      self.cameraFIFO_CameraX.poll()
-      self.cameraFIFO_CameraY.poll()
+  # TODO Rename this here and in `poll`
+  def capture(self):
+    # Update remaining FIFO values.
+    # $$$FUTURE - Do a block read.
+    self.cameraFIFO_MotorX.poll()
+    self.cameraFIFO_MotorY.poll()
+    self.cameraFIFO_MatchLevel.poll()
+    self.cameraFIFO_CameraX.poll()
+    self.cameraFIFO_CameraY.poll()
 
-      # Place all FIFO values in capture FIFO.
-      self.captureFIFO.append(
-        {
-          "MotorX"     : self.cameraFIFO_MotorX.get(),
-          "MotorY"     : self.cameraFIFO_MotorY.get(),
-          "Status"     : self.cameraFIFO_Status.get(),
-          "MatchLevel" : self.cameraFIFO_MatchLevel.get(),
-          "CameraX"    : self.cameraFIFO_CameraX.get(),
-          "CameraY"    : self.cameraFIFO_CameraY.get()
-        }
-      )
+    # Place all FIFO values in capture FIFO.
+    self.captureFIFO.append(
+      {
+        "MotorX"     : self.cameraFIFO_MotorX.get(),
+        "MotorY"     : self.cameraFIFO_MotorY.get(),
+        "Status"     : self.cameraFIFO_Status.get(),
+        "MatchLevel" : self.cameraFIFO_MatchLevel.get(),
+        "CameraX"    : self.cameraFIFO_CameraX.get(),
+        "CameraY"    : self.cameraFIFO_CameraY.get()
+      }
+    )
 
-    return isData
+    return True
 
   #---------------------------------------------------------------------
   def reset( self ) :

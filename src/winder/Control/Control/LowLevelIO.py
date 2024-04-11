@@ -103,7 +103,7 @@ class LowLevelIO :
     result = []
     for tag in PLC.Tag.list :
       name = tag.getName()
-      if not name in tags :
+      if name not in tags :
         tags.append( name )
         result.append( [ name, tag.get() ] )
 
