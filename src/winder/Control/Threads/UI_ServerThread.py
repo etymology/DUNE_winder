@@ -48,14 +48,14 @@ class _Client( threading.Thread ):
     ( address, port ) = self._socket.getpeername()
 
     self._log.add(
-      self.__class__.__name__,
-      "UI_CONNECT",
-      "Connection from " + str( address ) + ":" + str( port ) + " established.",
-      [ address, port ]
+        self.__class__.__name__,
+        "UI_CONNECT",
+        f"Connection from {str(address)}:{str(port)} established.",
+        [address, port],
     )
 
     isRunning = True
-    while isRunning :
+    while isRunning:
       try:
         # Get the client request.
         data = self._socket.recv( Settings.SERVER_MAX_DATA_SIZE )
@@ -65,7 +65,7 @@ class _Client( threading.Thread ):
         isRunning = False
 
       # Did we get anything?
-      if isRunning and not '' == data :
+      if isRunning and data != '':
 
         # Process the request.
         dataString = str( self._callback( None, data ) )
@@ -73,7 +73,7 @@ class _Client( threading.Thread ):
         # Break sting into chunks that are no larger than
         # Settings.SERVER_MAX_DATA_SIZE characters.
         chunks = \
-          [
+              [
             dataString[ index : index + Settings.SERVER_MAX_DATA_SIZE ]
               for index in range( 0, len( dataString ), Settings.SERVER_MAX_DATA_SIZE )
           ]
@@ -87,7 +87,7 @@ class _Client( threading.Thread ):
 
         # If the last chunk was either empty or exactly the max data size, send
         # a blank line as the client will expect at least/one more packet.
-        if Settings.SERVER_MAX_DATA_SIZE == chunkSize or 0 == chunkSize :
+        if Settings.SERVER_MAX_DATA_SIZE == chunkSize or chunkSize == 0:
           self._socket.send( "" )
 
       else:
@@ -98,10 +98,10 @@ class _Client( threading.Thread ):
     self._socket.close()
 
     self._log.add(
-      self.__class__.__name__,
-      "UI_CONNECT",
-      "Connection from " + str( address ) + ":" + str( port ) + " closed.",
-      [ address, port ]
+        self.__class__.__name__,
+        "UI_CONNECT",
+        f"Connection from {str(address)}:{str(port)} closed.",
+        [address, port],
     )
 
 # end class

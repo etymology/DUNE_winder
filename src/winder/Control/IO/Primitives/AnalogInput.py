@@ -15,7 +15,7 @@ class AnalogInput( IO_Point ) :
   map = {}
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -26,7 +26,7 @@ class AnalogInput( IO_Point ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in AnalogInput.list )
+    assert name not in AnalogInput.list
 
     IO_Point.__init__( self, name )
 

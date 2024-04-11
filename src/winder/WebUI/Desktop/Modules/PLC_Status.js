@@ -17,6 +17,11 @@ function PLC_Status( modules )
   {
     winder.remoteAction( 'process.acknowledgePLC_Init()' )
   }
+  
+  this.EOT_reset = function ()
+  {
+    winder.remoteAction( 'process.EOT_reset()' )
+  }
 
   //-----------------------------------------------------------------------------
   // Uses:

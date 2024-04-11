@@ -33,7 +33,7 @@ class SystemTime( TimeSource ) :
     return datetime.datetime.now()
 
   #-------------------------------------------------------------------
-  def getDelta( self, then, now=None ) :
+  def getDelta( self, then, now=None ):
     """
     Return the amount of time between two time stamps.
 
@@ -45,7 +45,7 @@ class SystemTime( TimeSource ) :
       Time between to time stamps.
     """
 
-    if None == now :
+    if now is None:
       now = self.get()
 
     delta = now - then

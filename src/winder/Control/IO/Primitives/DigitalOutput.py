@@ -31,7 +31,7 @@ class DigitalOutput( DigitalIO, metaclass=ABCMeta ) :
     return result
 
   #---------------------------------------------------------------------
-  def __init__( self, name, initialState = 0 ) :
+  def __init__( self, name, initialState = 0 ):
     """
     Constructor.
 
@@ -42,7 +42,7 @@ class DigitalOutput( DigitalIO, metaclass=ABCMeta ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in DigitalOutput.list )
+    assert name not in DigitalOutput.list
 
     DigitalIO.__init__( self, name )
     DigitalOutput.list.append( self )

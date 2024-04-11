@@ -30,7 +30,7 @@ class DigitalInput( DigitalIO ) :
     return result
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -40,7 +40,7 @@ class DigitalInput( DigitalIO ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in DigitalInput.list )
+    assert name not in DigitalInput.list
 
     DigitalIO.__init__( self, name )
     DigitalInput.list.append( self )

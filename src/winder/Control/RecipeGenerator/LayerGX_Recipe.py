@@ -16,7 +16,6 @@ from .G_CodeFunctions.OffsetG_Code import OffsetG_Code
 
 from .RecipeGenerator import RecipeGenerator
 from .HeadPosition import HeadPosition
-from .Path3d import Path3d
 from .G_CodePath import G_CodePath
 
 class LayerGX_Recipe( RecipeGenerator ) :
@@ -78,7 +77,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
     directionBB = +1
 
     y = self.geometry.pinSpacing * firstPinScale
-    for pinOffset in range( 0, self.geometry.pins / 2 ) :
+    for pinOffset in range(self.geometry.pins / 2 ) :
 
       # Side A, column A.
       pinNameAA = self._pinName( "F", startAA, directionAA * pinOffset )
@@ -114,7 +113,7 @@ class LayerGX_Recipe( RecipeGenerator ) :
     # connected.
     #
 
-    start1 = [ "B1", "B1" ]
+
     start2 = [ "F240", "F240" ]
 
     lastNet = self.net[ 0 ]

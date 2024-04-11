@@ -140,7 +140,7 @@ class S_CurveMotion( Motion ) :
     self.compute( jerk, acceleration, velocity, startPosition, endPosition )
 
   #---------------------------------------------------------------------
-  def compute( self, jerk, acceleration, velocity, startPosition, endPosition ) :
+  def compute( self, jerk, acceleration, velocity, startPosition, endPosition ):
     """
     Compute internal point table using the specified settings. Call before using 'interpolatePosition'.
 
@@ -161,10 +161,10 @@ class S_CurveMotion( Motion ) :
     acceleration = abs( acceleration )
     velocity     = abs( velocity     )
 
-    if None == endPosition :
+    if endPosition is None:
       endPosition = 0
 
-    if None == startPosition :
+    if startPosition is None:
       startPosition = 0
 
     position = endPosition - startPosition
@@ -178,11 +178,11 @@ class S_CurveMotion( Motion ) :
       svelocity   = -velocity
 
     # We must either not be moving or have a jerk term.
-    assert ( 0 == position or not 0 == jerk ), "Cannot move without a jerk term"
-    assert ( 0 == position or 0 != velocity ), "Cannot move without a velocity term"
+    assert position == 0 or not jerk == 0, "Cannot move without a jerk term"
+    assert position == 0 or velocity != 0, "Cannot move without a velocity term"
 
     # If actually moving...
-    if not 0 == position :
+    if not position == 0:
 
       # First point is the starting position and no motion.
       self._point[ self.Point.T0 ].t = 0.0
@@ -201,32 +201,32 @@ class S_CurveMotion( Motion ) :
       # Time until midpoint where jerk must be reversed to avoid exceeding
       # desired position.
       timeToMidPosition =                  \
-        pow                                \
-        (                                  \
-          jerk * jerk * position / 2.0,    \
-          1.0 / 3.0                        \
-        )                                  \
-        / jerk
+          pow                                \
+          (                                  \
+            jerk * jerk * position / 2.0,    \
+            1.0 / 3.0                        \
+          )                                  \
+          / jerk
 
       # First time point is the smallest of the various times.
       t1 = \
-        min( min( timeToFullAcceleration, timeToMidVelocity ), timeToMidPosition )
+          min( min( timeToFullAcceleration, timeToMidVelocity ), timeToMidPosition )
 
       self._nextPoint( self.Point.T1, self.Point.T0, forwardJerk, t1 )
 
       # Second time point is either the dwell time at maximum acceleration,
       # or zero in the event maximum acceleration is never reached.
       t2 =                                        \
-        (                                         \
-          (                                       \
-            svelocity                             \
-            - 2 * self._point[ self.Point.T1 ].v  \
-          )                                       \
-          / self._point[ self.Point.T1 ].a
+          (                                         \
+            (                                       \
+              svelocity                             \
+              - 2 * self._point[ self.Point.T1 ].v  \
+            )                                       \
+            / self._point[ self.Point.T1 ].a
         )
 
       if ( ( timeToFullAcceleration > timeToMidVelocity ) \
-        or ( timeToFullAcceleration > timeToMidPosition ) ) :
+          or ( timeToFullAcceleration > timeToMidPosition ) ) :
           t2 = 0
 
       self._nextPoint( self.Point.T2, self.Point.T1, 0, t2 )
@@ -234,11 +234,11 @@ class S_CurveMotion( Motion ) :
 
       # Time at maximum velocity.
       t4 =                                                                \
-        (                                                                 \
-          endPosition                                                     \
-          - ( 2 * self._point[ self.Point.T3 ].x - startPosition )        \
-        )                                                                 \
-        / self._point[ self.Point.T3 ].v
+          (                                                                 \
+            endPosition                                                     \
+            - ( 2 * self._point[ self.Point.T3 ].x - startPosition )        \
+          )                                                                 \
+          / self._point[ self.Point.T3 ].v
 
       self._nextPoint( self.Point.T4, self.Point.T3, 0, t4 )
 
@@ -413,7 +413,7 @@ if __name__ == "__main__":
   motion = Motion( jerk, acceleration, velocity, startPosition, endPosition )
 
   # Print the transition points.
-  for index in range( 0, motion.Point.POINTS ) :
+  for index in range(motion.Point.POINTS):
     print("T%u %9.4f: %9.4f %9.4f %9.4f %9.2f" % \
       (                                      \
         index,                               \

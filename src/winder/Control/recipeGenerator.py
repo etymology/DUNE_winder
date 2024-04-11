@@ -13,7 +13,6 @@ from Library.Configuration import Configuration
 from Library.Geometry.Location import Location
 
 from Machine.Settings import Settings
-from Machine.LayerCalibration import LayerCalibration
 from Machine.X_LayerGeometry import X_LayerGeometry
 from Machine.V_LayerGeometry import V_LayerGeometry
 from Machine.U_LayerGeometry import U_LayerGeometry
@@ -67,7 +66,7 @@ isCalibration = False
 #==============================================================================
 
 #------------------------------------------------------------------------------
-def writeRubyCode( layer, recipe, geometry ) :
+def writeRubyCode( layer, recipe, geometry ):
   """
   Generate the Ruby code for layer.
 
@@ -85,15 +84,12 @@ def writeRubyCode( layer, recipe, geometry ) :
   if zeroOffset :
     calibration.offset = Location()
 
-  outputFileName = layer + "-Layer.rb"
+  outputFileName = f"{layer}-Layer.rb"
 
   # Construct G-Code for first half.
   print("  Construct G-Code for first half.")
-  gCodePath = G_CodeToPath(
-    recipeDirectory + "/" + layer + "-Layer_1.gc",
-    geometry,
-    calibration
-  )
+  gCodePath = G_CodeToPath(f"{recipeDirectory}/{layer}-Layer_1.gc", geometry,
+                           calibration)
 
   # Write 1st wind G-Code path.
   print("  Write 1st wind G-Code path.")
@@ -118,14 +114,11 @@ def writeRubyCode( layer, recipe, geometry ) :
     True
   )
 
-  if overrideLaps > 1 or None == overrideLaps :
+  if overrideLaps > 1 or overrideLaps is None:
     # Construct G-Code for second half.
     print("  Construct G-Code for second half.")
-    gCodePath = G_CodeToPath(
-      recipeDirectory + "/" + layer + "-Layer_2.gc",
-      geometry,
-      calibration
-    )
+    gCodePath = G_CodeToPath(f"{recipeDirectory}/{layer}-Layer_2.gc", geometry,
+                             calibration)
 
     # Write 2nd wind G-Code path.
     print("  Write 2nd wind G-Code path.")
@@ -139,7 +132,7 @@ def writeRubyCode( layer, recipe, geometry ) :
     )
 
 #------------------------------------------------------------------------------
-def generateLayer( layer, recipeClass, geometry, enable ) :
+def generateLayer( layer, recipeClass, geometry, enable ):
   """
   Generate recipe data for given layer.
 
@@ -149,20 +142,20 @@ def generateLayer( layer, recipeClass, geometry, enable ) :
     geometry - Geometry for layer.
     enable - True to generate data for this layer, False to skip.
   """
-  if enable :
-    print("Generating " + layer + "-layer recipe")
+  if enable:
+    print(f"Generating {layer}-layer recipe")
     recipe = recipeClass( geometry, overrideLaps )
-    recipe.writeG_Code( recipeDirectory + "/" + layer + "-Layer", "gc", layer + " Layer" )
+    recipe.writeG_Code(f"{recipeDirectory}/{layer}-Layer", "gc", f"{layer} Layer")
 
     if isRubyCode :
       writeRubyCode( layer, recipe, geometry )
 
-    if isRubyBasePath :
-      recipe.writeRubyBasePath( layer + "-Layer.rb", False )
+    if isRubyBasePath:
+      recipe.writeRubyBasePath(f"{layer}-Layer.rb", False)
 
     recipe.printStats()
-  else :
-    print("Skipping " + layer + "-layer recipe")
+  else:
+    print(f"Skipping {layer}-layer recipe")
   print()
 
 #------------------------------------------------------------------------------
@@ -179,41 +172,41 @@ if __name__ == "__main__":
     os.makedirs( recipeDirectory )
 
   # Handle command line.
-  for argument in sys.argv[ 1: ] :
+  for argument in sys.argv[ 1: ]:
     argument = argument.upper()
     option = argument
     value = "TRUE"
-    if -1 != argument.find( "=" ) :
+    if argument.find("=") != -1:
       option, value = argument.split( "=" )
 
-    if "SKETCHUP" == option :
-      isRubyCode = ( "TRUE" == value )
-    elif "G-CODEPATHS" == option :
-      enablePath = ( "TRUE" == value )
-    elif "WIREPATHS" == option :
-      enableWire = ( "TRUE" == value )
-    elif "PINLABELS" == option :
-      enablePinLabels = ( "TRUE" == value )
-    elif "PATHLABELS" == option :
-      enablePathLabels = ( "TRUE" == value )
-    elif "X" == option :
-      enableX = ( "TRUE" == value )
-    elif "U" == option :
-      enableU = ( "TRUE" == value )
-    elif "V" == option :
-      enableV = ( "TRUE" == value )
-    elif "G" == option :
-      enableG = ( "TRUE" == value )
-    elif "0" == option :
-      zeroOffset = ( "TRUE" == value )
-    elif "BASEPATH" == option :
-      isRubyBasePath = ( "TRUE" == value )
-    elif "OVERRIDE" == option :
+    if option == "SKETCHUP":
+      isRubyCode = value == "TRUE"
+    elif option == "G-CODEPATHS":
+      enablePath = value == "TRUE"
+    elif option == "WIREPATHS":
+      enableWire = value == "TRUE"
+    elif option == "PINLABELS":
+      enablePinLabels = value == "TRUE"
+    elif option == "PATHLABELS":
+      enablePathLabels = value == "TRUE"
+    elif option == "X":
+      enableX = value == "TRUE"
+    elif option == "U":
+      enableU = value == "TRUE"
+    elif option == "V":
+      enableV = value == "TRUE"
+    elif option == "G":
+      enableG = value == "TRUE"
+    elif option == "0":
+      zeroOffset = value == "TRUE"
+    elif option == "BASEPATH":
+      isRubyBasePath = value == "TRUE"
+    elif option == "OVERRIDE":
       overrideLaps = int( value )
-    elif "CALIBRATION" == option :
-      isCalibration = ( "TRUE" == value )
-    else :
-      raise Exception( "Unknown:" + option )
+    elif option == "CALIBRATION":
+      isCalibration = value == "TRUE"
+    else:
+      raise Exception(f"Unknown:{option}")
 
   geometryX = X_LayerGeometry()
   geometryV = V_LayerGeometry()

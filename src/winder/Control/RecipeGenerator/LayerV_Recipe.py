@@ -6,7 +6,6 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Library.Geometry.Location import Location
 
 from .LayerUV_Recipe import LayerUV_Recipe
 
@@ -32,7 +31,7 @@ class LayerV_Recipe( LayerUV_Recipe ) :
 
 
   #---------------------------------------------------------------------
-  def __init__( self, geometry, windsOverride=None ) :
+  def __init__( self, geometry, windsOverride=None ):
     """
     Constructor.  Does all calculations.
 
@@ -66,20 +65,19 @@ class LayerV_Recipe( LayerUV_Recipe ) :
 
     # Define the first few net locations.
     # All following locations are just modifications of this initial set.
-    self.net = \
-    [
-      "F" + str( geometry.rows ),
-      "F" + str( geometry.rows + 2 * geometry.columns - 1 ),
-      "B" + str( 2 * geometry.rows ),
-      "B" + str( 2 * geometry.columns - 1 ),
-      "F" + str( geometry.rows + geometry.columns ),
-      "F" + str( geometry.rows + geometry.columns - 1 ),
-      "B" + str( 2 * geometry.columns ),
-      "B" + str( geometry.columns - 1 ),
-      "F" + str( geometry.rows + 2 * geometry.columns ),
-      "F" + str( geometry.rows - 1 ),
-      "B" + str( 1 ),
-      "B" + str( 2 * geometry.rows + 2 * geometry.columns - 2 ),
+    self.net = [
+        f"F{str(geometry.rows)}",
+        f"F{str(geometry.rows + 2 * geometry.columns - 1)}",
+        f"B{str(2 * geometry.rows)}",
+        f"B{str(2 * geometry.columns - 1)}",
+        f"F{str(geometry.rows + geometry.columns)}",
+        f"F{str(geometry.rows + geometry.columns - 1)}",
+        f"B{str(2 * geometry.columns)}",
+        f"B{str(geometry.columns - 1)}",
+        f"F{str(geometry.rows + 2 * geometry.columns)}",
+        f"F{str(geometry.rows - 1)}",
+        'B1',
+        f"B{str(2 * geometry.rows + 2 * geometry.columns - 2)}",
     ]
 
 

@@ -17,14 +17,14 @@ class SimulatedMotor :
   JITTER = 0.015
 
   #---------------------------------------------------------------------
-  def positionDelta( self ) :
+  def positionDelta( self ):
     """
     Return the amount of distance that needs to be traversed for motion.
 
     Returns:
       Amount of distance that needs to be traversed for motion.
     """
-    if self._plc.getTag( self._desiredPositionTag ) == None :
+    if self._plc.getTag(self._desiredPositionTag) is None:
       return -self._position
     return self._plc.getTag( self._desiredPositionTag ) - self._position
 
@@ -134,16 +134,14 @@ class SimulatedMotor :
       )
 
   #---------------------------------------------------------------------
-  def startJog( self, acceleration, deceleration ) :
+  def startJog( self, acceleration, deceleration ):
     """
     Start jogging.
     """
-    velocity = seekPosition = self._plc.getTag( self._speedTag )
+    velocity = self._plc.getTag( self._speedTag )
 
-    if velocity != 0 :
-      direction = self._plc.getTag( self._directionTag )
-
-      if direction :
+    if velocity != 0:
+      if direction := self._plc.getTag(self._directionTag):
         velocity = -velocity
 
       self._startTime = self._simulationTime.get()
@@ -151,13 +149,13 @@ class SimulatedMotor :
       self._maxDeceleration = deceleration
 
       self._motion =                                          \
-        TrapezoidalMotion                                     \
-        (                                                     \
-          acceleration,                                       \
-          deceleration,                                       \
-          velocity,                                           \
-          self._position,                                     \
-          None
+          TrapezoidalMotion                                     \
+          (                                                     \
+            acceleration,                                       \
+            deceleration,                                       \
+            velocity,                                           \
+            self._position,                                     \
+            None
         )
 
       self._startPosition = self._position

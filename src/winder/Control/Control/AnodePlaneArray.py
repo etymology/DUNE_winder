@@ -6,16 +6,15 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-import xml.dom.minidom
-import os.path
-
-from Library.Serializable import Serializable
+import sys
+sys.path.append('C:/Users/Dune Admin/winder_py2/src/winder/Control')
 from Library.Recipe import Recipe
 
 from Machine.Settings import Settings
 from Machine.LayerCalibration import LayerCalibration
+from .G_CodeHandler import G_CodeHandler
 
-from .APA_Base import APA_Base
+from Control.APA_Base import APA_Base
 
 
 class AnodePlaneArray(APA_Base):
@@ -26,7 +25,7 @@ class AnodePlaneArray(APA_Base):
     # ---------------------------------------------------------------------
     def __init__(
         self,
-        gCodeHandler,
+        gCodeHandler: G_CodeHandler,
         apaDirectory,
         recipeDirectory,
         recipeArchiveDirectory,
@@ -83,7 +82,7 @@ class AnodePlaneArray(APA_Base):
         Args:
           layer: Name of the layer.
         """
-        return self.getPath() + "/Layer" + layer + Settings.G_CODE_LOG_FILE
+        return f"{self.getPath()}/Layer{layer}{Settings.G_CODE_LOG_FILE}"
 
     # ---------------------------------------------------------------------
     def closeLoadedRecipe(self):
@@ -115,33 +114,26 @@ class AnodePlaneArray(APA_Base):
         Returns:
           True if there was an error, False if not.
         """
-        isError = False
-
-        if None != layer:
+        if layer is not None:
             self._layer = layer
 
+        isError = False
         # If there is a calibration file, load it.
         if self._calibrationFile:
-            archivePath = self.getPath() + "/Calibration"
+            archivePath = f"{self.getPath()}/Calibration"
             self._calibration = LayerCalibration(archivePath=archivePath)
 
             try:
                 self._calibration.load(self.getPath(), self._calibrationFile)
             except LayerCalibration.Error as exception:
-                errorString = (
-                    "Invalid calibration hash for "
-                    + self._calibrationFile
-                    + " because "
-                    + str(exception)
-                    + "."
-                )
+                errorString = f"Invalid calibration hash for {self._calibrationFile} because {str(exception)}."
 
                 errorData = [self._calibrationFile] + exception.data
 
                 self._log.add(
                     self.__class__.__name__,
                     "LOAD",
-                    errorString + "  Rehashing.",
+                    f"{errorString}  Rehashing.",
                     errorData,
                 )
 
@@ -161,14 +153,14 @@ class AnodePlaneArray(APA_Base):
                     self._log.add(
                         self.__class__.__name__,
                         "LOAD",
-                        errorString + "  Aborting.",
+                        f"{errorString}  Aborting.",
                         errorData,
                     )
 
             self._log.add(
                 self.__class__.__name__,
                 "LOAD",
-                "Loaded calibration file " + self._calibrationFile + ".",
+                f"Loaded calibration file {self._calibrationFile}.",
                 [self._calibrationFile, self._calibration.hashValue],
             )
 
@@ -187,7 +179,7 @@ class AnodePlaneArray(APA_Base):
 
         if not isError:
             self._recipe = Recipe(
-                self._recipeDirectory + "/" + self._recipeFile,
+                f"{self._recipeDirectory}/{self._recipeFile}",
                 self._recipeArchiveDirectory,
             )
             self._gCodeHandler.loadG_Code(self._recipe.getLines(), self._calibration)
@@ -205,10 +197,7 @@ class AnodePlaneArray(APA_Base):
             self._log.add(
                 self.__class__.__name__,
                 "GCODE",
-                "Loaded G-Code file "
-                + self._recipeFile
-                + ", active layer "
-                + self._layer
+                f"Loaded G-Code file {self._recipeFile}, active layer {self._layer}"
                 + ", starting at line "
                 + str(self._lineNumber),
                 [
@@ -245,7 +234,7 @@ class AnodePlaneArray(APA_Base):
         self._log.add(
             self.__class__.__name__,
             "LOAD",
-            "Loaded APA called " + self._name,
+            f"Loaded APA called {self._name}",
             [self._name],
         )
 
@@ -274,7 +263,7 @@ class AnodePlaneArray(APA_Base):
         self._calibration = LayerCalibration()
         self._calibration.zFront = geometry.mostlyRetract
         self._calibration.zBack = geometry.mostlyExtend
-        self._calibrationFile = layer + "_Calibration.xml"
+        self._calibrationFile = f"{layer}_Calibration.xml"
         self._calibration.save(self.getPath(), self._calibrationFile)
 
     # ---------------------------------------------------------------------

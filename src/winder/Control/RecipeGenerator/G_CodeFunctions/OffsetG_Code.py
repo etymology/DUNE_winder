@@ -15,7 +15,7 @@ class OffsetG_Code( G_CodeFunction ) :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, x=None, y=None, z=None ) :
+  def __init__( self, x=None, y=None, z=None ):
     """
     Constructor.
 
@@ -23,13 +23,13 @@ class OffsetG_Code( G_CodeFunction ) :
       pins: List of two pins.
     """
     parameters = []
-    if None != x :
-      parameters.append( "X" + str( x ) )
+    if x is not None:
+      parameters.append(f"X{str(x)}")
 
-    if None != y :
-      parameters.append( "Y" + str( y ) )
+    if y is not None:
+      parameters.append(f"Y{str(y)}")
 
-    if None != z :
-      parameters.append( "Z" + str( z ) )
+    if z is not None:
+      parameters.append(f"Z{str(z)}")
 
     G_CodeFunction.__init__( self, G_Codes.OFFSET, parameters )

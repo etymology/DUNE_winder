@@ -17,7 +17,7 @@ class AnalogOutput( IO_Point, metaclass=ABCMeta ) :
   _level = 0
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -27,7 +27,7 @@ class AnalogOutput( IO_Point, metaclass=ABCMeta ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in AnalogOutput.list )
+    assert name not in AnalogOutput.list
 
     IO_Point.__init__( self, name )
 

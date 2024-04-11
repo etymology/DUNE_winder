@@ -10,9 +10,7 @@ import random
 
 from Library.G_Code import G_Code
 
-from Library.Geometry.Location import Location
 
-from Machine.G_Codes import G_Codes
 from Machine.G_CodeHandlerBase import G_CodeHandlerBase
 from Machine.DefaultCalibration import DefaultMachineCalibration
 from Machine.HeadCompensation import HeadCompensation
@@ -56,7 +54,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self.useLayerCalibration( calibration )
 
   #---------------------------------------------------------------------
-  def toPath( self ) :
+  def toPath( self ):
     """
     Convert the G-Code into a 3d path.
 
@@ -78,22 +76,21 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     self._z = 0
 
     self._headZ = self._geometry.retracted
-    latchSide = FRONT
-    for line in range( 0, totalLines ) :
-
+    for line in range(totalLines):
       # Reset all values so we know what has changed.
       self._lastX = self._x
       self._lastY = self._y
       self._lastZ = self._z
       self._functions = []
 
-      try :
+      try:
         self._gCode.executeNextLine( line )
       except Exception as exception:
         print("Unable to execute line", line)
         print("  " + self._gCode.lines[ line ])
         print("  " + str( exception ))
-        raise Exception( "Problems executing G-Code: " + str( exception ) )
+        raise Exception("Problems executing G-Code: " +
+                        str(exception)) from exception
 
       for function in self._functions :
         path.pushG_Code( G_CodeFunction( function[ 0 ], function[ 1: ] ) )
@@ -135,10 +132,10 @@ class G_CodeToPath( G_CodeHandlerBase ) :
         + str( y ) + ' ]'
         + "\n" )
 
-    if None == offsetX :
+    if None is offsetX :
       offsetX = random.uniform( -3, 3 )
 
-    if None == offsetY :
+    if None is offsetY :
       offsetY = random.uniform( -3, 3 )
 
     output.write( 'vector = Geom::Vector3d.new ' + str( offsetX ) + ',0,' + str( offsetY ) + "\n" )
@@ -157,7 +154,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
     enablePathLabels=False,
     enablePinLabels=False,
     isAppend=False
-  ) :
+  ):
     """
     Export node paths to Ruby code for import into SketchUp for visual
     verification.
@@ -170,19 +167,17 @@ class G_CodeToPath( G_CodeHandlerBase ) :
       isAppend: True to append, False to overwrite output file.
     """
 
-    attributes = "w"
-    if isAppend :
-      attributes = "a"
-
-    with open( outputFileName, attributes ) as rubyFile :
+    attributes = "a" if isAppend else "w"
+    with open( outputFileName, attributes ) as rubyFile:
 
       gCodePath = self.toPath()
 
-      if enablePinLabels :
+      if enablePinLabels:
         rubyFile.write(
-          'layer = Sketchup.active_model.layers.add "Pin labels ' + layerName + '"' + "\n" )
+            f'layer = Sketchup.active_model.layers.add "Pin labels {layerName}"'
+            + "\n")
 
-        for pinName in self._calibration.getPinNames() :
+        for pinName in self._calibration.getPinNames():
           location = self._calibration.getPinLocation( pinName )
           location = location.add( self._calibration.offset )
 
@@ -191,7 +186,7 @@ class G_CodeToPath( G_CodeHandlerBase ) :
 
           y = 0.1
           x = 0.1
-          if "B" == pinName[ 0 ] :
+          if pinName[0] == "B":
             y = -y
             x = -x
 

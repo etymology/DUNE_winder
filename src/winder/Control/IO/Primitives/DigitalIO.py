@@ -18,7 +18,7 @@ class DigitalIO( IO_Point, metaclass=ABCMeta ) :
   _forcedState = False
 
   #---------------------------------------------------------------------
-  def __init__( self, name ) :
+  def __init__( self, name ):
     """
     Constructor.
 
@@ -28,7 +28,7 @@ class DigitalIO( IO_Point, metaclass=ABCMeta ) :
     """
 
     # Make sure this name isn't already in use.
-    assert( not name in DigitalIO.list )
+    assert name not in DigitalIO.list
 
     IO_Point.__init__( self, name )
 

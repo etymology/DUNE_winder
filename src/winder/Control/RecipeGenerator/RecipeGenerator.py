@@ -135,7 +135,7 @@ class RecipeGenerator :
     Returns:
       An instance of PinCenterG_Code (G_CodeFunction).
     """
-    if None == pinNames :
+    if None is pinNames :
       net = self.net[ self.netIndex ]
       direction = self.centering[ net ]
       pinNames = self.pinNames( self.netIndex, direction )
@@ -147,7 +147,7 @@ class RecipeGenerator :
     self,
     outputFileName,
     isAppend=True
-  ) :
+  ):
     """
     Make the basic wire path.  This is pin-center to pin-center without
     considering diameter of pin.  Debug function.
@@ -157,10 +157,7 @@ class RecipeGenerator :
       enableWire: Show the wire wound on the layer.
       isAppend: True to append file, False to overwrite.
     """
-    attributes = "w"
-    if isAppend :
-      attributes = "a"
-
+    attributes = "a" if isAppend else "w"
     with open( outputFileName, attributes ) as rubyFile :
 
       path3d = Path3d()
@@ -180,7 +177,7 @@ class RecipeGenerator :
     enablePathLabels=False,
     enableWire=True,
     isAppend=True
-  ) :
+  ):
     """
     Export node paths to Ruby code for import into SketchUp for visual
     verification.  Debug function.
@@ -194,29 +191,25 @@ class RecipeGenerator :
       isAppend: True to append the ruby file rather than overwrite it.
     """
 
-    attributes = "w"
-    if isAppend :
-      attributes = "a"
+    attributes = "a" if isAppend else "w"
+    with open( outputFileName, attributes ) as rubyFile:
 
-    with open( outputFileName, attributes ) as rubyFile :
-
-      if enablePath :
-        if 0 == half :
+      if enablePath:
+        if half == 0:
           if self.firstHalf :
             self.firstHalf.toSketchUpRuby( rubyFile, layerName, "1st", enablePathLabels )
-        else :
-          if self.secondHalf :
-            self.secondHalf.toSketchUpRuby( rubyFile, layerName, "2nd", enablePathLabels )
+        elif self.secondHalf:
+          self.secondHalf.toSketchUpRuby( rubyFile, layerName, "2nd", enablePathLabels )
 
-      if enableWire :
-        self.nodePath.toSketchUpRuby( rubyFile, "Path " + layerName )
+      if enableWire:
+        self.nodePath.toSketchUpRuby(rubyFile, f"Path {layerName}")
 
   #---------------------------------------------------------------------
   def writeRubyAnimateCode(
     self,
     outputFileName,
     number
-  ) :
+  ):
     """
     Create SketchUp ruby code to have an animation with one new path displayed
     in each scene.  Debug function.
@@ -225,14 +218,15 @@ class RecipeGenerator :
       outputFileName: Where to write this data.
       number: Number of segments of the path to animate.
     """
-    with open( outputFileName, "w" ) as output :
+    with open( outputFileName, "w" ) as output:
 
-      for index in range( 0, number ) :
-        output.write( 'layer' + str( index )
-          + ' = Sketchup.active_model.layers.add "wire' + str( index ) + '"' )
+      for index in range(number):
+        output.write(
+            f'layer{str(index)} = Sketchup.active_model.layers.add "wire{str(index)}"'
+        )
 
-        output.write( 'layer' + str( index ) + '.visible = false' )
-        output.write( 'Sketchup.active_model.active_layer = layer' + str( index ) )
+        output.write(f'layer{str(index)}.visible = false')
+        output.write(f'Sketchup.active_model.active_layer = layer{str(index)}')
 
         # Convert millimeters to inches.  Sketch-up always works in inches.
         point = self.nodePath.path[ index ]
@@ -250,21 +244,20 @@ class RecipeGenerator :
           + "[" + str( x2 ) + "," + str( z2 ) + "," + str( y2 ) + "]"
         )
 
-      for index in range( 0, number ) :
-        output.write(
-          'page' + str( index )
-          + ' = Sketchup.active_model.pages.add "page' + str( index ) + '"'
-        )
+      for index in range(number):
+        output.write((
+            f'page{str(index)} = Sketchup.active_model.pages.add "page{str(index)}'
+            + '"'))
 
-        for indexB in range( 0, number ) :
+        for indexB in range(number):
           visible = 'true'
           if indexB > index :
             visible = 'false'
 
-          output.write( 'layer' + str( indexB ) + '.visible = ' + visible )
+          output.write(f'layer{str(indexB)}.visible = {visible}')
 
   #---------------------------------------------------------------------
-  def writeG_Code( self, outputFileName, outputExtension, layerName ) :
+  def writeG_Code( self, outputFileName, outputExtension, layerName ):
     """
     Export G-Code to file.
 
@@ -279,22 +272,22 @@ class RecipeGenerator :
     """
 
     # Safe G-Code instructions.
-    if self.firstHalf :
-      with open( outputFileName + "_1." + outputExtension, "w" ) as gCodeFile :
-        self.firstHalf.toG_Code( gCodeFile, layerName + " first half" )
+    if self.firstHalf:
+      with open(f"{outputFileName}_1.{outputExtension}", "w") as gCodeFile:
+        self.firstHalf.toG_Code(gCodeFile, f"{layerName} first half")
 
       # Create an instance of Recipe to update the header with the correct hash.
-      Recipe( outputFileName + "_1." + outputExtension, None )
+      Recipe(f"{outputFileName}_1.{outputExtension}", None)
 
-    if self.secondHalf :
-      with open( outputFileName + "_2." + outputExtension, "w" ) as gCodeFile :
-        self.secondHalf.toG_Code( gCodeFile, layerName + " second half" )
+    if self.secondHalf:
+      with open(f"{outputFileName}_2.{outputExtension}", "w") as gCodeFile:
+        self.secondHalf.toG_Code(gCodeFile, f"{layerName} second half")
 
       # Create an instance of Recipe to update the header with the correct hash.
-      Recipe( outputFileName + "_2." + outputExtension, None )
+      Recipe(f"{outputFileName}_2.{outputExtension}", None)
 
   #---------------------------------------------------------------------
-  def defaultCalibration( self, layerName, geometry, saveCalibration=False ) :
+  def defaultCalibration( self, layerName, geometry, saveCalibration=False ):
     """
     Export node list to calibration file.  Debug function.
 
@@ -314,8 +307,8 @@ class RecipeGenerator :
     for node in self.nodes :
       calibration.setPinLocation( node, self.nodes[ node ] )
 
-    if saveCalibration :
-      calibration.save( ".", layerName + "_Calibration.xml" )
+    if saveCalibration:
+      calibration.save(".", f"{layerName}_Calibration.xml")
 
     return calibration
 
@@ -334,7 +327,7 @@ class RecipeGenerator :
 
   #---------------------------------------------------------------------
   @staticmethod
-  def _pinCompare( pinA, pinB ) :
+  def _pinCompare( pinA, pinB ):
     """
     Compare two pin numbers.  Used for sorting a list of pin names.
     Debug function.
@@ -352,27 +345,23 @@ class RecipeGenerator :
     pinB_Number = int( pinB[ 1: ] )
 
     result = 0
-    if pinA_Side < pinB_Side :
+    if (pinA_Side < pinB_Side or pinA_Side <= pinB_Side
+        and pinA_Number >= pinB_Number and pinA_Number > pinB_Number):
       result = 1
-    elif pinA_Side > pinB_Side :
+    elif pinA_Side > pinB_Side or pinA_Number < pinB_Number:
       result = -1
-    elif pinA_Number < pinB_Number :
-      result = -1
-    elif pinA_Number > pinB_Number :
-      result = 1
-
     return result
 
   #---------------------------------------------------------------------
-  def printNodes( self ) :
+  def printNodes( self ):
     """
     Print a sorted list of all the pin names.  Debug function.
     """
-    for node in sorted( self.nodes, cmp=RecipeGenerator._pinCompare ) :
+    for node in sorted( self.nodes, cmp=RecipeGenerator._pinCompare ):
       side = node[ 0 ]
       pin = node[ 1: ]
       location = str( self.nodes[ node ] )[ 1:-1 ].replace( ' ', '' )
-      print(side + "," + pin + "," + location)
+      print(f"{side},{pin},{location}")
 
   #---------------------------------------------------------------------
   def printNet( self ) :

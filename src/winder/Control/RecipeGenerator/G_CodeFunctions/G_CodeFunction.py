@@ -12,7 +12,7 @@ class G_CodeFunction :
   """
 
   #---------------------------------------------------------------------
-  def __init__( self, gCode, parameters = [] ) :
+  def __init__(self, gCode, parameters=None):
     """
     Constructor.
 
@@ -20,6 +20,8 @@ class G_CodeFunction :
       gCode: The G-Code function number (integer).
       parameters: A list of parameters for the function.
     """
+    if parameters is None:
+      parameters = []
     self._gCode = int( gCode )
     self._parameters = parameters
 

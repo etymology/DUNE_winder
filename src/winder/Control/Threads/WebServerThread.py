@@ -5,6 +5,7 @@
 # Author(s):
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
+import contextlib
 from http.server import HTTPServer
 from socketserver import ThreadingMixIn
 import http.client
@@ -48,16 +49,14 @@ class WebServerThread( PrimaryThread ):
       httpd.handle_request()
 
   #---------------------------------------------------------------------
-  def stop( self ) :
+  def stop( self ):
     """
     Send a dummy request to server to cause connection to close.
     """
 
-    try :
+    with contextlib.suppress(Exception):
       # HEAD request just so thread unblocks.  This will throw an exception.
       connection = http.client.HTTPConnection( "127.0.0.1" )
       connection.request( "HEAD","/" )
-    except :
-      pass
 
 # end class

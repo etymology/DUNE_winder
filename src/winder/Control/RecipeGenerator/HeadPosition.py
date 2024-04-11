@@ -8,7 +8,7 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import RecipeGenerator.G_CodeFunctions.HeadLocationG_Code
+from RecipeGenerator.G_CodeFunctions.HeadLocationG_Code import HeadLocationG_Code
 
 class HeadPosition :
 

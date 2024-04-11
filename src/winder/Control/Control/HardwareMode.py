@@ -30,7 +30,7 @@ class HardwareMode( StateMachineState ) :
     self.isStateClear    = True
 
   #---------------------------------------------------------------------
-  def enter( self ) :
+  def enter( self ):
     """
     Enter into manual mode.
 
@@ -39,13 +39,12 @@ class HardwareMode( StateMachineState ) :
       if there isn't a manual action to preform.
     """
 
-    if self.isPLC_Working and self.io.plcLogic.isError() :
+    if self.isPLC_Working and self.io.plcLogic.isError():
       self.log.add(
-        self.__class__.__name__,
-        "HARD_ERROR",
-        "PLC error reported: " + self.io.plcLogic.getErrorCodeString()
-          + " [" + str( self.io.plcLogic.getErrorCode() ) + "]",
-        [ str( self.io.plcLogic.getErrorCode() ) ]
+          self.__class__.__name__,
+          "HARD_ERROR",
+          f"PLC error reported: {self.io.plcLogic.getErrorCodeString()} [{str(self.io.plcLogic.getErrorCode())}]",
+          [str(self.io.plcLogic.getErrorCode())],
       )
 
     return False
