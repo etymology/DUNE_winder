@@ -37,9 +37,6 @@ def camera_login():
     ftp.login(CAMERA_USERNAME)
     print("FTP logged in")
 
-    # show all file in cognex
-    # files_list = ftp.dir()
-    # print(files_list)
     return tn, ftp
 
 
@@ -75,7 +72,6 @@ def find_best_match(template1, template2, img):
     return img_with_rect1, heatmap1, max_loc1, img_with_rect2, heatmap2, max_loc2
 
 
-# TODO Rename this here and in `find_best_match`
 def draw_image_with_rect(template, maxLoc, img):
     # Draw rectangle around the best match for template 1
     w1, h1 = template.shape[::-1]
@@ -106,16 +102,6 @@ if __name__ == "__main__":
             )  # camera_capture(tn, ftp)
 
             # Find template in main image
-            (
-                result_image1,
-                heatmap1,
-                best_match_loc1,
-                result_image2,
-                heatmap2,
-                best_match_loc2,
-            ) = find_best_match(bigPin, smallPin, main_image)
-
-            # Find the best match for both templates in the main image
             (
                 result_image1,
                 heatmap1,
