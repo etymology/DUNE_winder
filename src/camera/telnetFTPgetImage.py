@@ -4,6 +4,7 @@ import cv2
 from functools import wraps
 from time import time
 import numpy as np
+import os
 
 # cognex's config
 CAMERA_IP_ADDRESS = "192.168.140.19"
@@ -75,7 +76,6 @@ def find_best_match(template1, template2, img):
     return img_with_rect1, heatmap1, max_loc1, img_with_rect2, heatmap2, max_loc2
 
 
-# TODO Rename this here and in `find_best_match`
 def draw_image_with_rect(template, maxLoc, img):
     # Draw rectangle around the best match for template 1
     w1, h1 = template.shape[::-1]
@@ -86,25 +86,57 @@ def draw_image_with_rect(template, maxLoc, img):
 
     return result
 
+def detect_circles_and_average_spacing(img):
+    # Step 1: Load the image
+    # img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    # if img is None:
+    #     return "Image could not be loaded. Please check the path."
+
+    # Step 2: Convert to grayscale and apply Gaussian blur
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (9, 9), 2)
+
+    # Step 3: Detect circles using the Hough transform
+    circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, dp=1, minDist=20,
+                               param1=50, param2=30, minRadius=0, maxRadius=0)
+
+    if circles is None:
+        return "No circles detected."
+
+    # Step 4: Ensure the circles array is in the correct shape and sort by x-coordinate
+    circles = np.uint16(np.around(circles[0, :]))
+    circles_sorted = circles[circles[:, 0].argsort()]  # Sort circles based on the x-coordinate
+
+    if len(circles_sorted) <= 1:
+        return "Not enough circles to calculate spacing."
+    # Calculate distances between consecutive circle centers
+    distances = np.diff(circles_sorted[:, 0])
+    return np.mean(distances)
+
+# Function calls are commented out to prevent execution here
+
+
+
 
 if __name__ == "__main__":
     tn, ftp = camera_login()
     bigPin = cv2.imread(
-        "C:\\Users\\Dune Admin\\winder_py2\\src\\camera\\bigPin.bmp",
+        os.path.join(os.path.dirname(os.path.realpath(__file__)),"bigPin.bmp"),
         cv2.IMREAD_GRAYSCALE,
     )
     smallPin = cv2.imread(
-        "C:\\Users\\Dune Admin\\winder_py2\\src\\camera\\smallPin.bmp",
+        os.path.join(os.path.dirname(os.path.realpath(__file__)),"smallPin.bmp"),
         cv2.IMREAD_GRAYSCALE,
     )
+    # result = detect_circles_and_average_spacing('path_to_your_image.jpg')
+    # print(result)
     while True:
         user_input = input("enter c to capture\n")
         if user_input.lower() == "c":
             # capture a new image
-            main_image = cv2.imread(
-                "C:\\Users\\Dune Admin\\winder_py2\\src\\camera\\pins.bmp"
+            main_image = cv2.imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),"bigPin.bmp")
             )  # camera_capture(tn, ftp)
-
+            detect_circles_and_average_spacing(main_image)
             # Find template in main image
             (
                 result_image1,
