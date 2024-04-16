@@ -56,7 +56,7 @@ isIO_Logged = False
 # APA file to load.
 loadAPA_File = None
 
-# True to start APA (must be used with 'loadAPA_File'.
+# True to start APA must be used with 'loadAPA_File'.
 isStartAPA = False
 
 # True if system should run in real-time.  Simulation option.
@@ -313,6 +313,3 @@ log.add("Main", "RUN_TIME", f"Ran for {deltaString}.", [elapsedTime])
 
 # Sign off.
 log.add("Main", "END", "Control system stops.")
-
-# "If you think you understand quantum mechanics, you don't understand quantum
-# mechanics." -- Richard Feynman
