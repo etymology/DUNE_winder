@@ -47,9 +47,6 @@ def camera_login():
     ftp.login(CAMERA_USERNAME)
     print("FTP logged in")
 
-    # show all file in cognex
-    # files_list = ftp.dir()
-    # print(files_list)
     return tn, ftp
 
 
