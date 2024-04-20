@@ -83,36 +83,6 @@ def draw_image_with_rect(template, maxLoc, img):
 
     return result
 
-def detect_circles_and_average_spacing(img):
-    # Step 1: Load the image
-    # img = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    # if img is None:
-    #     return "Image could not be loaded. Please check the path."
-
-    # Step 2: Convert to grayscale and apply Gaussian blur
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (9, 9), 2)
-
-    # Step 3: Detect circles using the Hough transform
-    circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, dp=1, minDist=20,
-                               param1=50, param2=30, minRadius=0, maxRadius=0)
-
-    if circles is None:
-        return "No circles detected."
-
-    # Step 4: Ensure the circles array is in the correct shape and sort by x-coordinate
-    circles = np.uint16(np.around(circles[0, :]))
-    circles_sorted = circles[circles[:, 0].argsort()]  # Sort circles based on the x-coordinate
-
-    if len(circles_sorted) <= 1:
-        return "Not enough circles to calculate spacing."
-    # Calculate distances between consecutive circle centers
-    distances = np.diff(circles_sorted[:, 0])
-    return np.mean(distances)
-
-# Function calls are commented out to prevent execution here
-
-
 
 
 if __name__ == "__main__":
@@ -131,9 +101,8 @@ if __name__ == "__main__":
         user_input = input("enter c to capture\n")
         if user_input.lower() == "c":
             # capture a new image
-            main_image = cv2.imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),"bigPin.bmp")
+            main_image = cv2.imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),"pins.bmp")
             )  # camera_capture(tn, ftp)
-            detect_circles_and_average_spacing(main_image)
             # Find template in main image
             (
                 result_image1,
