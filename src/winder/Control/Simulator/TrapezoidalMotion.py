@@ -6,7 +6,7 @@
 #   Andrew Que <aque@bb7.com>
 ###############################################################################
 
-from Motion import Motion
+from Simulator.Motion import Motion
 from math import sqrt
 
 class TrapezoidalMotion( Motion ) :

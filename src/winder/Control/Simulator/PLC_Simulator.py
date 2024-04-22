@@ -11,6 +11,7 @@ import queue
 import random
 from Simulator.SimulatedMotor import SimulatedMotor
 from Simulator.Delay import Delay
+from IO.Maps.SimulatedIO import SimulatedIO
 
 from Machine.MachineGeometry import MachineGeometry
 
@@ -171,24 +172,18 @@ class PLC_Simulator :
     self._cameraEnabled = isEnabled
 
   #---------------------------------------------------------------------
-  def poll( self ) :
+  def poll( self ):
     """
     Update simulator.  Call periodically.
     """
 
-    def speedCheck( axis, last ) :
+    def speedCheck( axis, last ):
 
       speed = axis.getSpeedTag()
 
       # Speed change?
-      if last != speed :
-        # Speed of 0 means stop request.
-        if 0 == speed :
+      if last != speed and 0 == speed:
           axis.stop()
-        else:
-          # $$$FUTURE - Modify speed
-          pass
-
       return speed
 
     # Look for speed changes on both X and Y, and propagate these to the
@@ -316,23 +311,27 @@ class PLC_Simulator :
     # Local function to validate that motor positions are within limits.
     def verifyPositionLimits( axis, axisIO, positionMin, positionMax, mEndOfTravel, pEndOfTravel ) :
       position = axisIO.getPosition()
-      if ( None is not mEndOfTravel ) :
-        if ( position < positionMin ) :
-          mEndOfTravel.set( False )
-        else:
-          mEndOfTravel.set( True )
+      if (position is not None):
+        if ( None is not mEndOfTravel ) :
+          if ( position < positionMin ) :
+            mEndOfTravel.set( False )
+          else:
+            mEndOfTravel.set( True )
 
-      if ( None is not pEndOfTravel ) :
-        if ( position > positionMax ) :
-          pEndOfTravel.set( False )
-        else:
-          pEndOfTravel.set( True )
+        if (None is not pEndOfTravel ) :
+          if ( position > positionMax ) :
+            pEndOfTravel.set( False )
+          else:
+            pEndOfTravel.set( True )
+      elif ( None is not mEndOfTravel ) and ( None is not pEndOfTravel ):
+        mEndOfTravel.set( False )
+        pEndOfTravel.set( False ) 
 
       if axis.isInMotion() :
         velocity = axisIO.getVelocity()
 
         if   ( ( velocity + self.VELOCITY_ERROR ) < 0 and position < positionMin ) \
-          or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
+            or ( ( velocity - self.VELOCITY_ERROR ) > 0 and position > positionMax ) :
 
           #print axisIO.getName(), "out of range", positionMin, "<=", position, "<=", positionMax
           self._io.plc.write( self._errorCodeTag, 2002 )
@@ -362,7 +361,7 @@ class PLC_Simulator :
 
     # End-of-travels.
     if self._io.zAxis.getPosition() > self._zMax \
-      or self._io.zAxis.getPosition() < self._zMin :
+        or self._io.zAxis.getPosition() < self._zMin :
       self.Z_End_of_Travel.set( False )
     else :
       self.Z_End_of_Travel.set( True )
@@ -415,11 +414,11 @@ class PLC_Simulator :
 
     # All motions and delays finished?
     if not self._xAxis.isInMotion() \
-      and not self._yAxis.isInMotion() \
-      and not self._zAxis.isInMotion() \
-      and self._latchDelay.hasExpired() \
-      and self._io.plcLogic.States.LATCH_RELEASE != state \
-      and self._io.plcLogic.States.ERROR != state :
+        and not self._yAxis.isInMotion() \
+        and not self._zAxis.isInMotion() \
+        and self._latchDelay.hasExpired() \
+        and self._io.plcLogic.States.LATCH_RELEASE != state \
+        and self._io.plcLogic.States.ERROR != state :
 
       self._io.plc.write( self._moveTypeTag, self._io.plcLogic.MoveTypes.RESET )
       self._io.plc.write( self._stateTag, self._io.plcLogic.States.READY )
@@ -433,7 +432,7 @@ class PLC_Simulator :
     self._pollCamera()
 
   #---------------------------------------------------------------------
-  def __init__( self, io, systemTime ) :
+  def __init__( self, io:SimulatedIO, systemTime ) :
     """
     Construct.
 

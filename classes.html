@@ -1,0 +1,276 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class APA_Base {
+            FILE_NAME : str
+            LOG_FILE : str
+            SERIALIZED_VARIABLES : list
+            STAGE_SIDE : list
+            addWindTime(time)
+            create(apaDirectory, name)
+            getLayer()
+            getName()
+            getPath()
+            getRecipe()
+            getStage()
+            load(nameOverride)
+            save()
+            setLocation(x, y, headLocation)
+            toDictionary()
+          }
+          class AnodePlaneArray {
+            close()
+            closeLoadedRecipe()
+            getCalibrationFile()
+            load()
+            loadRecipe(layer, recipeFile, startingLine)
+            save()
+            setStage(stage, message)
+            setupBlankCalibration(layer, geometry)
+          }
+          class CalibrationMode {
+            SHUTDOWN_COUNT : int
+            enter()
+            exit()
+            update()
+          }
+          class CameraCalibration {
+            centerCurrentLocation()
+            commitCalibration(layerCalibration, geometry, isFront, offsetX, offsetY)
+            getCalibrationData()
+            pixelsPer_mm(pixelsPer_mm)
+            poll()
+            reset()
+            save(filePath, fileName)
+            setCalibrationData(pin, x, y)
+            setupCalibration(side, startPin, direction, pinMax)
+          }
+          class ControlStateMachine {
+            calibrationMode
+            calibrationRequest : bool
+            cameraCalibration : NoneType
+            executeGCode : bool
+            gCodeHandler : NoneType
+            hardwareMode
+            idleServos : bool
+            isJogging : bool
+            loopMode : bool
+            manualMode
+            manualRequest : bool
+            positionLogging : bool
+            seekAcceleration : NoneType
+            seekDeceleration : NoneType
+            seekVelocity : NoneType
+            seekX : NoneType
+            seekY : NoneType
+            seekZ : NoneType
+            setHeadPosition : NoneType
+            startRequest : bool
+            stopMode
+            stopNextRequest : bool
+            stopRequest : bool
+            systemTime
+            windMode
+            windTime : int
+            isInMotion()
+            isMovementReady()
+            isStopped()
+            update()
+          }
+          class EStop {
+            control
+            io
+            update()
+          }
+          class G_CodeHandler {
+            runToLine : int
+            singleStep : bool
+            clearCodeError()
+            closeG_Code()
+            closeG_CodeLog()
+            executeG_CodeLine(line)
+            fetchLines(center, delta)
+            getDirection()
+            getG_CodeErrorData()
+            getG_CodeErrorMessage()
+            getLine()
+            getTotalLines()
+            getVelocityScale()
+            isDone()
+            isG_CodeError()
+            isG_CodeLoaded()
+            isOutOfWire()
+            isPositionLogging()
+            loadG_Code(lines, calibration)
+            log_g_code()
+            poll()
+            runNextLine()
+            setDirection(isForward)
+            setG_CodeLog(gCodeLogFile)
+            setLine(line)
+            setVelocityScale(scaleFactor)
+            startPositionLogging(positionLogFileName)
+            stop()
+            stopNext()
+          }
+          class HardwareMode {
+            io
+            isPLC_Working : bool
+            isStateClear : bool
+            isX_axisWorking : bool
+            isY_axisWorking : bool
+            isZ_axisWorking : bool
+            log
+            enter()
+            exit()
+            update()
+          }
+          class IO_Log {
+            log(timeStamp, loopTime)
+          }
+          class Idle {
+            control
+            io
+            update()
+          }
+          class LowLevelIO {
+            getAllDigitalIO()
+            getAllIO()
+            getAnalogInput(name)
+            getAnalogInputs()
+            getAnalogOutput(name)
+            getAnalogOutputs()
+            getDigitalIO(name)
+            getIO(name)
+            getInput(name)
+            getInputs()
+            getMotor(name)
+            getMotors()
+            getOutput(name)
+            getOutputs()
+            getTag(name)
+            getTags()
+          }
+          class ManualMode {
+            enter()
+            update()
+          }
+          class Park {
+            control
+            io
+            update()
+          }
+          class Process {
+            STAGE_TABLE : dict
+            apa : NoneType
+            cameraCalibration
+            controlStateMachine
+            gCodeHandler
+            headCompensation
+            spool
+            EOT_reset()
+            acknowledgeError()
+            acknowledgePLC_Init()
+            cameraSeekCenter(velocity)
+            closeAPA()
+            commitCalibration(side, offsetX, offsetY)
+            createAPA(apaName)
+            executeG_CodeLine(line)
+            getAPA_DetailedList()
+            getAPA_Details(name)
+            getAPA_List()
+            getAPA_Side()
+            getCameraImageURL()
+            getG_CodeDirection()
+            getG_CodeList(center, delta)
+            getG_CodeLoop()
+            getHeadAngle()
+            getLayerPinGeometry()
+            getLoadedAPA_Name()
+            getPositionLogging()
+            getRecipeLayer()
+            getRecipeName()
+            getRecipes()
+            getRemainingWire()*
+            getStage()
+            jogXY(xVelocity, yVelocity, acceleration, deceleration)
+            jogZ(velocity)
+            manualHeadPosition(position, velocity)
+            manualSeekXY(xPosition, yPosition, velocity, acceleration, deceleration)
+            manualSeekZ(position, velocity)
+            maxVelocity(maxVelocity)
+            seekPin(pin, velocity)
+            seekPinNominal(pin, velocity)
+            servoDisable()
+            setAnchorPoint(pinA, pinB)
+            setCameraImageURL(url)
+            setG_CodeDirection(isForward)
+            setG_CodeLine(line)
+            setG_CodeLoop(isLoopMode)
+            setG_CodeRunToLine(line)
+            setG_CodeVelocityScale(scaleFactor)
+            setMinimumWire(length)*
+            setPositionLogging(isEnabled)
+            setStage(stage, message)
+            setWireLength(length)*
+            start()
+            startCalibrate(side, startPin, endPin, maxPins, deltaX, deltaY, velocity, acceleration, deceleration)
+            step()
+            stop()
+            stopNextLine()
+            switchAPA(apaName)
+          }
+          class Side {
+            BACK : int
+            FRONT : int
+            NONE : int
+          }
+          class Stages {
+            COMPLETE : int
+            LAYER_G_FIRST : int
+            LAYER_G_SECOND : int
+            LAYER_U_FIRST : int
+            LAYER_U_SECOND : int
+            LAYER_V_FIRST : int
+            LAYER_V_SECOND : int
+            LAYER_X_FIRST : int
+            LAYER_X_SECOND : int
+            SIGN_OFF : int
+            UNINITIALIZED : int
+          }
+          class States {
+            ESTOP : int
+            IDLE : int
+            PARK : int
+          }
+          class States {
+            CALIBRATE : tuple
+            HARDWARE : tuple
+            MANUAL : tuple
+            STOP : tuple
+            TENTION : int
+            WIND : tuple
+          }
+          class StopMode {
+            io
+            stateMachine
+            stopStateMachine
+            isIdle()
+            update()
+          }
+          class StopStateMachine {
+          }
+          class WindMode {
+            enter()
+            exit()
+            update()
+          }
+          StopStateMachine --* StopMode : stopStateMachine
+          G_CodeHandler --o AnodePlaneArray : _gCodeHandler
+  
+       </div>
+  </body>
+</html>

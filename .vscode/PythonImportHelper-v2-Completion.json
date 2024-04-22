@@ -3367,10 +3367,10 @@
     {
         "label": "S_CurveMotion",
         "kind": 6,
-        "importPath": "src.winder.Control.Simulator.S-CurveMotion",
-        "description": "src.winder.Control.Simulator.S-CurveMotion",
+        "importPath": "src.winder.Control.Simulator.S_CurveMotion",
+        "description": "src.winder.Control.Simulator.S_CurveMotion",
         "peekOfCode": "class S_CurveMotion( Motion ) :\n  #------------------------------------\n  # Private data.\n  #------------------------------------\n  # Transition point.\n  # There are 8 such points needed to compute travel location.\n  class Point :\n    T0 = 0\n    T1 = 1\n    T2 = 2",
-        "detail": "src.winder.Control.Simulator.S-CurveMotion",
+        "detail": "src.winder.Control.Simulator.S_CurveMotion",
         "documentation": {}
     },
     {

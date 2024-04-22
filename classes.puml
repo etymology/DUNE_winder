@@ -1,0 +1,1525 @@
+@startuml classes
+set namespaceSeparator none
+class "APA_Base" as winder.Control.Control.APA_Base.APA_Base {
+  FILE_NAME : str
+  LOG_FILE : str
+  SERIALIZED_VARIABLES : list
+  STAGE_SIDE : list
+  addWindTime(time)
+  create(apaDirectory, name)
+  getLayer()
+  getName()
+  getPath()
+  getRecipe()
+  getStage()
+  load(nameOverride)
+  save()
+  setLocation(x, y, headLocation)
+  toDictionary()
+}
+class "APA_Generator" as winder.Control.Debug.APA_Generator.APA_Generator {
+  create(process, number)
+}
+class "APA_Geometry" as winder.Control.Machine.APA_Geometry.APA_Geometry {
+  apaHeight : int
+  apaLength : float
+  apaLocation
+  apaThickness : float
+  apaToHead : float
+  apaWindLength : float
+  toAPA_OffsetX : float
+  toAPA_OffsetY : float
+  toAPA_OffsetZ : int
+}
+class "AnalogInput" as winder.Control.IO.Primitives.AnalogInput.AnalogInput {
+  list : list
+  map : dict
+}
+class "AnalogOutput" as winder.Control.IO.Primitives.AnalogOutput.AnalogOutput {
+  list : list
+  get()
+  set(level)
+}
+class "AnchorPointG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code.AnchorPointG_Code {
+}
+class "AnodePlaneArray" as winder.Control.Control.AnodePlaneArray.AnodePlaneArray {
+  close()
+  closeLoadedRecipe()
+  getCalibrationFile()
+  load()
+  loadRecipe(layer, recipeFile, startingLine)
+  save()
+  setStage(stage, message)
+  setupBlankCalibration(layer, geometry)
+}
+class "ArmCorrectG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code.ArmCorrectG_Code {
+}
+class "ArrayToCSV" as winder.Control.Library.ArrayToCSV.ArrayToCSV {
+  saveDictionarySet(data, filePath, fileName, separator, isHashed)
+}
+class "Attributes" as winder.Control.IO.Devices.PLC.PLC.Tag.Attributes {
+  canRead : bool
+  canWrite : bool
+  defaultValue : NoneType
+  isPolled : bool
+}
+class "BaseIO" as winder.Control.IO.Maps.BaseIO.BaseIO {
+  FrameLockFootBtm
+  FrameLockFootMid
+  FrameLockFootTop
+  FrameLockHeadBtm
+  FrameLockHeadMid
+  FrameLockHeadTop
+  Gate_Key
+  Latch_Actuator_Mid
+  Latch_Actuator_Top
+  Latch_Homed
+  Light_Curtain
+  Rotation_Lock_key
+  X_Park_OK
+  X_Transfer_OK
+  Y_Mount_Transfer_OK
+  Y_Transfer_OK
+  Z_End_of_Travel
+  Z_Extended
+  Z_Fixed_Latched
+  Z_Fixed_Present
+  Z_Retracted_1A
+  Z_Retracted_2A
+  Z_Retracted_2B
+  Z_Spring_Comp
+  Z_Stage_Latched
+  Z_Stage_Present
+  camera
+  endOfTravel_Xm
+  endOfTravel_Xp
+  endOfTravel_Ym
+  endOfTravel_Yp
+  estop
+  head
+  park
+  plc
+  plcLogic
+  pollCallbacks : list
+  xAxis
+  xyAxis
+  yAxis
+  zAxis
+  isFunctional()
+  pollInputs()
+}
+class "Box" as winder.Control.Library.Geometry.Box.Box {
+  intersectSegment(segment)
+}
+class "BreakG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code.BreakG_Code {
+}
+class "CalibrationMode" as winder.Control.Control.CalibrationMode.CalibrationMode {
+  SHUTDOWN_COUNT : int
+  enter()
+  exit()
+  update()
+}
+class "Camera" as winder.Control.IO.Systems.Camera.Camera {
+  FRAME_HEIGHT : int
+  FRAME_WIDTH : int
+  cameraDeltaEnable
+  cameraFIFO_CameraX
+  cameraFIFO_CameraY
+  cameraFIFO_Clock
+  cameraFIFO_MatchLevel
+  cameraFIFO_MotorX
+  cameraFIFO_MotorY
+  cameraFIFO_Status
+  cameraResultScore
+  cameraResultStatus
+  cameraResultX
+  cameraResultY
+  cameraTrigger
+  cameraTriggerEnable
+  cameraX_Delta
+  cameraY_Delta
+  captureFIFO : list
+  capture()
+  endScan()
+  poll()
+  reset()
+  setCallback(callback)
+  setManualTrigger(isEnabled)
+  startScan(deltaX, deltaY)
+}
+class "Camera" as winder.Control.IO.Primitives.Camera.Camera {
+  list : list
+  map : dict
+  {abstract}getPattern()
+  {abstract}isOnline()
+  {abstract}setPattern(pattern)
+  {abstract}trigger()
+}
+class "CameraCalibration" as winder.Control.Control.CameraCalibration.CameraCalibration {
+  centerCurrentLocation()
+  commitCalibration(layerCalibration, geometry, isFront, offsetX, offsetY)
+  getCalibrationData()
+  pixelsPer_mm(pixelsPer_mm)
+  poll()
+  reset()
+  save(filePath, fileName)
+  setCalibrationData(pin, x, y)
+  setupCalibration(side, startPin, direction, pinMax)
+}
+class "CameraThread" as winder.Control.Threads.CameraThread.CameraThread {
+  SHUTDOWN_COUNT : int
+  SLEEP_TIME : float
+  body()
+}
+class "Circle" as winder.Control.Library.Geometry.Circle.Circle {
+  tangentPoint(orientationString, target)
+}
+class "ClipG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code.ClipG_Code {
+}
+class "Configuration" as winder.Control.Library.Configuration.Configuration {
+  default(tag, defaultValue)
+  get(tag)
+  save()
+  set(tag, value)
+}
+class "ControlStateMachine" as winder.Control.Control.ControlStateMachine.ControlStateMachine {
+  calibrationMode
+  calibrationRequest : bool
+  cameraCalibration : NoneType
+  executeGCode : bool
+  gCodeHandler : NoneType
+  hardwareMode
+  idleServos : bool
+  isJogging : bool
+  loopMode : bool
+  manualMode
+  manualRequest : bool
+  positionLogging : bool
+  seekAcceleration : NoneType
+  seekDeceleration : NoneType
+  seekVelocity : NoneType
+  seekX : NoneType
+  seekY : NoneType
+  seekZ : NoneType
+  setHeadPosition : NoneType
+  startRequest : bool
+  stopMode
+  stopNextRequest : bool
+  stopRequest : bool
+  systemTime
+  windMode
+  windTime : int
+  isInMotion()
+  isMovementReady()
+  isStopped()
+  update()
+}
+class "ControlThread" as winder.Control.Threads.ControlThread.ControlThread {
+  body()
+}
+class "ControllogixPLC" as winder.Control.IO.Devices.ControllogixPLC.ControllogixPLC {
+  initialize()
+  isNotFunctional()
+  read(tagName: str)
+  write(tag, data, typeName)
+}
+class "CustomEncoder" as winder.Control.main.CustomEncoder {
+  default(obj)
+}
+class "DefaultLayerCalibration" as winder.Control.Machine.DefaultCalibration.DefaultLayerCalibration {
+  offset
+  zBack
+  zFront
+}
+class "DefaultMachineCalibration" as winder.Control.Machine.DefaultCalibration.DefaultMachineCalibration {
+  headArmLength
+  headRollerGap
+  headRollerRadius
+  limitBottom
+  limitLeft
+  limitRight
+  limitTop
+  parkX : int
+  parkY : int
+  pinDiameter
+  spoolLoadX : int
+  spoolLoadY : int
+  transferBottom
+  transferLeft
+  transferLeftTop
+  transferRight
+  transferRightTop
+  transferTop
+  zBack
+  zFront : int
+  zLimitFront
+  zLimitRear
+}
+class "Delay" as winder.Control.Simulator.Delay.Delay {
+  hasExpired()
+  set(delay)
+}
+class "DigitalIO" as winder.Control.IO.Primitives.DigitalIO.DigitalIO {
+  forcedState
+  isForced
+  list : list
+  force(state)
+  forceUpdate()
+  get()
+  unforce()
+}
+class "DigitalInput" as winder.Control.IO.Primitives.DigitalInput.DigitalInput {
+  list : list
+  map : dict
+}
+class "DigitalOutput" as winder.Control.IO.Primitives.DigitalOutput.DigitalOutput {
+  list : list
+  map : dict
+  set(state)
+  setAll()
+}
+class "EStop" as winder.Control.Control.StopMode.StopMode.EStop {
+  control
+  io
+  update()
+}
+class "<color:red>Error</color>" as winder.Control.Library.HashedSerializable.HashedSerializable.Error {
+  data : NoneType, list
+}
+class "GX_LayerGeometry" as winder.Control.Machine.GX_LayerGeometry.GX_LayerGeometry {
+  pinSpacing : float
+}
+class "G_Code" as winder.Control.Library.G_Code.G_Code {
+  callbacks
+  index : int
+  lines : list
+  execute(line)
+  executeNextLine(lineNumber)
+  fetchLines(center, delta)
+  getLineCount()
+}
+class "G_CodeCallbacks" as winder.Control.Library.G_Code.G_CodeCallbacks {
+  callbacks : dict
+  getCallback(code)
+  registerCallback(code, callback)
+}
+class "G_CodeClass" as winder.Control.Library.G_Code.G_CodeClass {
+  callback : NoneType
+  parameters : list
+  parentLine
+  addParameter(parameter)
+  execute()
+  get()
+  setCallback(callback)
+}
+class "G_CodeCommand" as winder.Control.Library.G_Code.G_CodeCommand {
+  addParameter(parameter)
+  get()
+}
+class "<color:red>G_CodeException</color>" as winder.Control.Library.G_Code.G_CodeException {
+  data : NoneType, list
+}
+class "G_CodeFeedRate" as winder.Control.Library.G_Code.G_CodeFeedRate {
+}
+class "G_CodeFunction" as winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction {
+  getFunction()
+  getParameter(index)
+  toG_Code()
+}
+class "G_CodeFunction" as winder.Control.Library.G_Code.G_CodeFunction {
+  addParameter(parameter)
+}
+class "G_CodeHandler" as winder.Control.Control.G_CodeHandler.G_CodeHandler {
+  runToLine : int
+  singleStep : bool
+  clearCodeError()
+  closeG_Code()
+  closeG_CodeLog()
+  executeG_CodeLine(line)
+  fetchLines(center, delta)
+  getDirection()
+  getG_CodeErrorData()
+  getG_CodeErrorMessage()
+  getLine()
+  getTotalLines()
+  getVelocityScale()
+  isDone()
+  isG_CodeError()
+  isG_CodeLoaded()
+  isOutOfWire()
+  isPositionLogging()
+  loadG_Code(lines, calibration)
+  log_g_code()
+  poll()
+  runNextLine()
+  setDirection(isForward)
+  setG_CodeLog(gCodeLogFile)
+  setLine(line)
+  setVelocityScale(scaleFactor)
+  startPositionLogging(positionLogFileName)
+  stop()
+  stopNext()
+}
+class "G_CodeHandlerBase" as winder.Control.Machine.G_CodeHandlerBase.G_CodeHandlerBase {
+  DEBUG_UNIT : bool
+  G_CODE_FUNCTION_TABLE : dict
+  getLayerCalibration()
+  setInitialLocation(x, y, headLocation)
+  setLimitVelocity(maxVelocity)
+  setVelocity(velocity)
+  useLayerCalibration(layerCalibration)
+}
+class "G_CodeLine" as winder.Control.Library.G_Code.G_CodeLine {
+  FUNCTION_TABLE : dict
+  commands : list
+  execute()
+}
+class "G_CodeLineNumber" as winder.Control.Library.G_Code.G_CodeLineNumber {
+  addParameter(parameter)
+}
+class "G_CodeParameter" as winder.Control.Library.G_Code.G_CodeParameter {
+}
+class "G_CodePath" as winder.Control.RecipeGenerator.G_CodePath.G_CodePath {
+  pushComment(comment)
+  pushG_Code(gCode)
+  pushSeekForce(forceX, forceY, forceZ)
+  toG_Code(output, name, isCommentOut)
+  toSketchUpRuby(output, layer, half, enableLables)
+}
+class "G_CodeProgramName" as winder.Control.Library.G_Code.G_CodeProgramName {
+  addParameter(parameter)
+}
+class "G_CodeSetX" as winder.Control.Library.G_Code.G_CodeSetX {
+}
+class "G_CodeSetY" as winder.Control.Library.G_Code.G_CodeSetY {
+}
+class "G_CodeSetZ" as winder.Control.Library.G_Code.G_CodeSetZ {
+}
+class "G_CodeTester" as winder.Control.Machine.G_CodeHandlerBase.G_CodeTester {
+}
+class "G_CodeToPath" as winder.Control.RecipeGenerator.G_CodeToPath.G_CodeToPath {
+  toPath()
+  writeRubyCode(outputFileName, layerName, layerHalf, enablePathLabels, enablePinLabels, isAppend)
+}
+class "G_Codes" as winder.Control.Machine.G_Codes.G_Codes {
+  ANCHOR_POINT : int
+  ARM_CORRECT : int
+  BREAK_POINT : int
+  CLIP : int
+  DELAY : int
+  HEAD_LOCATION : int
+  LATCH : int
+  OFFSET : int
+  PIN_CENTER : int
+  SEEK_TRANSFER : int
+  TRANSFER_CORRECT : int
+  WIRE_LENGTH : int
+}
+class "G_LayerGeometry" as winder.Control.Machine.G_LayerGeometry.G_LayerGeometry {
+  apaOffset
+  apaOffsetX : float
+  apaOffsetY : int
+  apaOffsetZ : float
+  depth : float
+  directionBack : int
+  directionFront : int
+  frontBackModulus : int
+  frontBackOffset : int
+  gridBack : list
+  gridFront : list
+  leftEdge : float
+  mostlyExtend : float
+  mostlyRetract : float
+  pins : int
+  rightEdge : float
+  rows : int
+  startPinBack : int
+  startPinFront : float
+}
+class "GeometrySelection" as winder.Control.Machine.GeometrySelection.GeometrySelection {
+}
+class "HardwareMode" as winder.Control.Control.HardwareMode.HardwareMode {
+  io
+  isPLC_Working : bool
+  isStateClear : bool
+  isX_axisWorking : bool
+  isY_axisWorking : bool
+  isZ_axisWorking : bool
+  log
+  enter()
+  exit()
+  update()
+}
+class "Hash" as winder.Control.Library.Hash.Hash {
+  ALGORITHM : md5
+  HASH_PATTERN : str
+  IN_PATTERN : str
+  OUT_PATTERN : str
+  singleLine(line)
+}
+class "HashedSerializable" as winder.Control.Library.HashedSerializable.HashedSerializable {
+  hashValue : str
+  getFileName()
+  getFilePath()
+  getFullFileName()
+  load(filePath, fileName, nameOverride, exceptionForMismatch)
+  save(filePath, fileName, nameOverride)
+}
+class "Head" as winder.Control.IO.Systems.Head.Head {
+  BACK : int
+  EXTENDED : int
+  FRONT : int
+  RETRACTED : int
+  getPosition()
+  getTargetAxisPosition()
+  isIdle()
+  setExtendedAndRetracted(retracted, extended)
+  setFrontAndBack(front, back)
+  setPosition(position, velocity)
+  stop()
+  update()
+}
+class "HeadCompensation" as winder.Control.Machine.HeadCompensation.HeadCompensation {
+  anchorPoint(location)
+  correctX(machineLocation)
+  correctY(machineLocation)
+  getActualLocation(machineLocation)
+  getHeadAngle(location)
+  orientation(value)
+  pinCompensation(endPoint)
+  transferCorrectX(machineLocation, zDesired, direction)
+  transferCorrectY(machineLocation, zDesired, direction)
+}
+class "HeadLocationG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code.HeadLocationG_Code {
+  BACK : int
+  FRONT : int
+  PARTIAL_BACK : int
+  PARTIAL_FRONT : int
+}
+class "HeadPosition" as winder.Control.RecipeGenerator.HeadPosition.HeadPosition {
+  BACK : int
+  FRONT : int
+  OTHER_SIDE : int
+  PARTIAL : int
+  PARTIAL_BACK : int
+  PARTIAL_FRONT : int
+  get()
+  set(location)
+}
+class "IO_Device" as winder.Control.IO.Devices.IO_Device.IO_Device {
+  list : list
+  getName()
+  {abstract}initialize()
+  {abstract}isNotFunctional()
+}
+class "IO_Log" as winder.Control.Control.IO_Log.IO_Log {
+  log(timeStamp, loopTime)
+}
+class "IO_Point" as winder.Control.IO.Primitives.IO_Point.IO_Point {
+  list : list
+  map : dict
+  {abstract}get()
+  getName()
+}
+class "Idle" as winder.Control.Control.StopMode.StopMode.Idle {
+  control
+  io
+  update()
+}
+class "LatchG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code.LatchG_Code {
+}
+class "LatchPosition" as winder.Control.Simulator.PLC_Simulator.PLC_Simulator.LatchPosition {
+  BOTTOM : int
+  MIDDLE : int
+  TOP : int
+}
+class "LatchPosition" as winder.Control.IO.Systems.PLC_Logic.PLC_Logic.LatchPosition {
+  DOWN : int
+  FULL_UP : int
+  PARTIAL_UP : int
+}
+class "LayerCalibration" as winder.Control.Machine.LayerCalibration.LayerCalibration {
+  offset
+  zBack : int, NoneType
+  zFront : NoneType, int
+  archive()
+  copy()
+  getLayerNames()
+  getPinExists(pin)
+  getPinLocation(pin)
+  getPinNames()
+  load(filePath, fileName, nameOverride, exceptionForMismatch)
+  save(filePath, fileName, nameOverride)
+  serialize(xmlDocument, nameOverride)
+  setPinLocation(pin, location)
+  unserialize(node)
+}
+class "LayerCorrection" as winder.Control.Machine.LayerCorrection.LayerCorrection {
+  layerCalibration
+  {abstract}getCalibrationError()
+  getRotation()
+  {abstract}getSag()
+}
+class "LayerError" as winder.Control.Simulator.LayerError.LayerError {
+  addError(layer, maxError, standardDeviations)
+  rotate(layer, angle)
+}
+class "LayerFunctions" as winder.Control.Machine.LayerFunctions.LayerFunctions {
+  offsetPin(geometry, pin, offset)
+  translateFrontBack(geometry, pin)
+}
+class "LayerGX_Recipe" as winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe {
+  OVERSHOOT : int
+  firstHalf : NoneType
+  gCodePath : NoneType
+  netIndex : int
+  secondHalf : NoneType
+  z
+}
+class "LayerG_Recipe" as winder.Control.RecipeGenerator.LayerG_Recipe.LayerG_Recipe {
+}
+class "LayerGeometry" as winder.Control.Machine.LayerGeometry.LayerGeometry {
+  boardHalfThickness : float
+  boardSpacing : float
+  boardThickness : float
+  edgeToGridIndex : dict
+  layerLength : float
+  pitchX : float
+  pitchY : float
+  pitches : int
+  wireDiameter : float
+  wireRadius : float
+}
+class "LayerUV_Recipe" as winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe {
+  OVERSHOOT : int
+  anchorOrientations : dict
+  firstHalf : NoneType
+  gCodePath : NoneType
+  netIndex : int
+  orientations : dict
+  secondHalf : NoneType
+  z
+}
+class "LayerU_Recipe" as winder.Control.RecipeGenerator.LayerU_Recipe.LayerU_Recipe {
+  net : list
+}
+class "LayerV_Recipe" as winder.Control.RecipeGenerator.LayerV_Recipe.LayerV_Recipe {
+  net : list
+}
+class "LayerX_Recipe" as winder.Control.RecipeGenerator.LayerX_Recipe.LayerX_Recipe {
+}
+class "Line" as winder.Control.Library.Geometry.Line.Line {
+  VERTICLE_SLOPE : float
+  intercept
+  slope
+  fromAngle(angle, intercept)
+  fromLocationAndSlope(location, slope)
+  fromLocations(start, finish)
+  fromSegment(segment)
+  getAngle()
+  getX(y)
+  getY(x)
+  intersection(line)
+}
+class "Location" as winder.Control.Library.Geometry.Location.Location {
+  x : float
+  y : float
+  z : float
+  add(location)
+  asList()
+  center(location)
+  copy(x, y, z)
+  sub(location)
+}
+class "Log" as winder.Control.Library.Log.Log {
+  add(module, typeName, message, parameters)
+  attach(outputFileName)
+  detach(outputFileName)
+  getAll(numberOfLines)
+  getRecent()
+  local_echo(currentTime, message, parameters)
+}
+class "LoggedStateMachine" as winder.Control.Library.LoggedStateMachine.LoggedStateMachine {
+  log
+  changeState(newState)
+}
+class "LowLevelIO" as winder.Control.Control.LowLevelIO.LowLevelIO {
+  getAllDigitalIO()
+  getAllIO()
+  getAnalogInput(name)
+  getAnalogInputs()
+  getAnalogOutput(name)
+  getAnalogOutputs()
+  getDigitalIO(name)
+  getIO(name)
+  getInput(name)
+  getInputs()
+  getMotor(name)
+  getMotors()
+  getOutput(name)
+  getOutputs()
+  getTag(name)
+  getTags()
+}
+class "MachineCalibration" as winder.Control.Machine.MachineCalibration.MachineCalibration {
+  headArmLength : NoneType
+  headRollerGap : NoneType
+  headRollerRadius : NoneType
+  limitBottom : NoneType, int
+  limitLeft : NoneType, int
+  limitRight : NoneType, int
+  limitTop : NoneType, int
+  park
+  parkX : NoneType
+  parkY : NoneType
+  pinDiameter : NoneType
+  spoolLoad
+  spoolLoadX : NoneType
+  spoolLoadY : NoneType
+  transferBottom : int, NoneType
+  transferLeft : int, NoneType
+  transferLeftTop : int, NoneType
+  transferRight : int, NoneType
+  transferRightTop : NoneType, int
+  transferTop : int, NoneType
+  zBack : int, NoneType
+  zFront : NoneType, int
+  zLimitFront : NoneType, int
+  zLimitRear : int, NoneType
+  get(item)
+  load()
+  save()
+  set(item, value)
+}
+class "MachineGeometry" as winder.Control.Machine.MachineGeometry.MachineGeometry {
+  bottom : float
+  edges
+  extended : int
+  handleWidth : float
+  headArmLength : float
+  headRollerGap : float
+  headRollerRadius : float
+  left : float
+  leftHandle : float
+  limitBottom : float
+  limitExtended : float
+  limitLeft : float
+  limitRetracted : float
+  limitRight : float
+  limitTop : float
+  lineBottom
+  lineLeft
+  lineRight
+  lineTop
+  retracted : int
+  right : float
+  rightHandle : float
+  scale : int
+  top : float
+  zTravel : int
+  zWindow : int
+}
+class "ManualMode" as winder.Control.Control.ManualMode.ManualMode {
+  enter()
+  update()
+}
+class "MathExtra" as winder.Control.Library.MathExtra.MathExtra {
+  isclose(a, b, rel_tol, abs_tol)
+}
+class "Motion" as winder.Control.Simulator.Motion.Motion {
+  {abstract}hardStop(time)
+  {abstract}interpolateAcceleration(time)
+  {abstract}interpolatePosition(time)
+  {abstract}interpolateVelocity(time)
+  {abstract}isMoving(time)
+}
+class "Motor" as winder.Control.IO.Primitives.Motor.Motor {
+  list : list
+  map : dict
+  get()
+  {abstract}getAcceleration()
+  {abstract}getDesiredPosition()
+  {abstract}getMaxAcceleration()
+  {abstract}getMaxVelocity()
+  {abstract}getPosition()
+  {abstract}getVelocity()
+  {abstract}isSeeking()
+  {abstract}poll()
+  pollAll()
+  {abstract}setDesiredPosition(position)
+  {abstract}setMaxAcceleration(maxAcceleration)
+  {abstract}setMaxVelocity(maxVelocity)
+  {abstract}setVelocity(velocity)
+}
+class "MoveTypes" as winder.Control.IO.Systems.PLC_Logic.PLC_Logic.MoveTypes {
+  EOT_RESET : int
+  HOME_LATCH : int
+  JOG_XY : int
+  JOG_Z : int
+  LATCH : int
+  LATCH_UNLOCK : int
+  PLC_INIT : int
+  RESET : int
+  SEEK_XY : int
+  SEEK_Z : int
+  UNSERVO : int
+}
+class "MultiAxisMotor" as winder.Control.IO.Systems.MultiAxisMotor.MultiAxisMotor {
+  getMaxAcceleration()
+  getMaxVelocity()
+  getPosition()
+  isSeeking()
+  seekWait()
+  setDesiredPosition(positions)
+  setEnable(isEnabled)
+  setMaxAcceleration(maxAcceleration)
+  setMaxVelocity(maxVelocity)
+  setVelocity(velocities)
+}
+class "OffsetG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code.OffsetG_Code {
+}
+class "PLC" as winder.Control.IO.Devices.PLC.PLC {
+  MAX_TAG_READS : int
+  {abstract}initialize()
+  {abstract}isNotFunctional()
+  {abstract}read(tag)
+  {abstract}write(tag, data, typeName)
+}
+class "PLC_Input" as winder.Control.IO.Types.PLC_Input.PLC_Input {
+  list : list
+}
+class "PLC_Logic" as winder.Control.IO.Systems.PLC_Logic.PLC_Logic {
+  ERROR_CODES : dict
+  PLC_init()
+  getErrorCode()
+  getErrorCodeString()
+  getLatchPosition()
+  getMoveType()
+  getState()
+  isError()
+  isReady()
+  jogXY(xVelocity, yVelocity, acceleration, deceleration)
+  jogZ(velocity)
+  latch()
+  latchHome()
+  latchUnlock()
+  maxAcceleration(maxAcceleration)
+  maxDeceleration(maxDeceleration)
+  maxVelocity(maxVelocity)
+  poll()
+  reset()
+  servoDisable()
+  setXY_Position(x, y, velocity, acceleration, deceleration)
+  setZ_Position(position, velocity)
+  setupLimits(maxVelocity, maxAcceleration, maxDeceleration)
+  stopSeek()
+}
+class "PLC_Motor" as winder.Control.IO.Types.PLC_Motor.PLC_Motor {
+  list : list
+  getAcceleration()
+  getDesiredPosition()
+  {abstract}getMaxAcceleration()
+  getMaxVelocity()
+  getPosition()
+  getSeekStartPosition()
+  getVelocity()
+  isFunctional()
+  isSeeking()
+  {abstract}poll()
+  setDesiredPosition(position)
+  {abstract}setMaxAcceleration(maxAcceleration)
+  setMaxVelocity(maxVelocity)
+  setVelocity(velocity)
+}
+class "PLC_Output" as winder.Control.IO.Types.PLC_Output.PLC_Output {
+  poll()
+}
+class "PLC_Simulator" as winder.Control.Simulator.PLC_Simulator.PLC_Simulator {
+  CAMERA_JITTER : int
+  Latch_Actuator_Mid
+  Latch_Actuator_Top
+  Latch_Homed
+  POSITION_ERROR : int
+  Rotation_Lock_key
+  VELOCITY_ERROR : float
+  X_Park_OK
+  X_Transfer_OK
+  Y_Mount_Transfer_OK
+  Y_Transfer_OK
+  Z_End_of_Travel
+  Z_Extended
+  Z_Fixed_Latched
+  Z_Fixed_Present
+  Z_Retracted_1A
+  Z_Retracted_2A
+  Z_Retracted_2B
+  Z_Spring_Comp
+  Z_Stage_Latched
+  Z_Stage_Present
+  endOfTravel_Xm
+  endOfTravel_Xp
+  endOfTravel_Ym
+  endOfTravel_Yp
+  cameraFIFO_ClockCallback(tag, value)
+  poll()
+}
+class "Park" as winder.Control.Control.StopMode.StopMode.Park {
+  control
+  io
+  update()
+}
+class "Path3d" as winder.Control.RecipeGenerator.Path3d.Path3d {
+  baseOffset
+  last
+  path : list
+  push(x, y, z)
+  pushOffset(location, radius, angle)
+  toSketchUpRuby(output, name)
+  totalLength()
+}
+class "PinCenterG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code.PinCenterG_Code {
+}
+class "Point" as winder.Control.Simulator.TrapezoidalMotion.TrapezoidalMotion.Point {
+  POINTS : int
+  T0 : int
+  T1 : int
+  T2 : int
+  T3 : int
+  a : int
+  t : int
+  v : int
+  x : int
+}
+class "Point" as winder.Control.Simulator.S_CurveMotion.S_CurveMotion.Point {
+  POINTS : int
+  T0 : int
+  T1 : int
+  T2 : int
+  T3 : int
+  T4 : int
+  T5 : int
+  T6 : int
+  T7 : int
+  a : int
+  j : int
+  t : int
+  v : int
+  x : int
+}
+class "PrimaryThread" as winder.Control.Threads.PrimaryThread.PrimaryThread {
+  isRunning : bool
+  list : list
+  useGracefulException : bool
+  run()
+  startAllThreads()
+  {abstract}stop()
+  stopAllThreads()
+}
+class "Process" as winder.Control.Control.Process.Process {
+  STAGE_TABLE : dict
+  apa : NoneType
+  cameraCalibration
+  controlStateMachine
+  gCodeHandler
+  headCompensation
+  spool
+  EOT_reset()
+  acknowledgeError()
+  acknowledgePLC_Init()
+  cameraSeekCenter(velocity)
+  closeAPA()
+  commitCalibration(side, offsetX, offsetY)
+  createAPA(apaName)
+  executeG_CodeLine(line)
+  getAPA_DetailedList()
+  getAPA_Details(name)
+  getAPA_List()
+  getAPA_Side()
+  getCameraImageURL()
+  getG_CodeDirection()
+  getG_CodeList(center, delta)
+  getG_CodeLoop()
+  getHeadAngle()
+  getLayerPinGeometry()
+  getLoadedAPA_Name()
+  getPositionLogging()
+  getRecipeLayer()
+  getRecipeName()
+  getRecipes()
+  {abstract}getRemainingWire()
+  getStage()
+  jogXY(xVelocity, yVelocity, acceleration, deceleration)
+  jogZ(velocity)
+  manualHeadPosition(position, velocity)
+  manualSeekXY(xPosition, yPosition, velocity, acceleration, deceleration)
+  manualSeekZ(position, velocity)
+  maxVelocity(maxVelocity)
+  seekPin(pin, velocity)
+  seekPinNominal(pin, velocity)
+  servoDisable()
+  setAnchorPoint(pinA, pinB)
+  setCameraImageURL(url)
+  setG_CodeDirection(isForward)
+  setG_CodeLine(line)
+  setG_CodeLoop(isLoopMode)
+  setG_CodeRunToLine(line)
+  setG_CodeVelocityScale(scaleFactor)
+  {abstract}setMinimumWire(length)
+  setPositionLogging(isEnabled)
+  setStage(stage, message)
+  {abstract}setWireLength(length)
+  start()
+  startCalibrate(side, startPin, endPin, maxPins, deltaX, deltaY, velocity, acceleration, deceleration)
+  step()
+  stop()
+  stopNextLine()
+  switchAPA(apaName)
+}
+class "ProductionIO" as winder.Control.IO.Maps.ProductionIO.ProductionIO {
+}
+class "Recipe" as winder.Control.Library.Recipe.Recipe {
+  getDescription()
+  getID()
+  getLines()
+  getParentID()
+}
+class "RecipeGenerator" as winder.Control.RecipeGenerator.RecipeGenerator.RecipeGenerator {
+  basePath
+  centering : dict
+  firstHalf : NoneType
+  gCodePath : NoneType
+  geometry
+  headZ : int
+  net : list
+  netIndex : int
+  nodePath : NoneType
+  nodes : dict
+  secondHalf : NoneType
+  z : NoneType
+  center(startPin, direction)
+  defaultCalibration(layerName, geometry, saveCalibration)
+  location(net)
+  offsetPin(pin, offset)
+  pinCenterTarget(axis, pinNames)
+  pinNames(startPin, direction)
+  printNet()
+  printNodes()
+  printStats()
+  writeG_Code(outputFileName, outputExtension, layerName)
+  writeRubyAnimateCode(outputFileName, number)
+  writeRubyBasePath(outputFileName, isAppend)
+  writeRubyCode(layerName, half, outputFileName, enablePath, enablePathLabels, enableWire, isAppend)
+}
+class "RemoteSession" as winder.Control.Library.RemoteSession.RemoteSession {
+  ACTIVE_EXPIRATION : int
+  INITIAL_EXPIRATION : int
+  PASSWORD : str
+  SALT_SIZE : int
+  sessions : dict
+  sessionsSemaphore
+  checkPassword(passwordHash, password)
+  getAuthenticated()
+  getId()
+  getSalt()
+  isAuthenticated(sessionId)
+  sessionSetup(sessionId)
+  setAuthenticated(isAuthenticated)
+}
+class "S_CurveMotion" as winder.Control.Simulator.S_CurveMotion.S_CurveMotion {
+  compute(jerk, acceleration, velocity, startPosition, endPosition)
+  hardStop(time)
+  interpolateAcceleration(time)
+  interpolatePosition(time)
+  interpolateVelocity(time)
+  isMoving(time)
+}
+class "SeekTransferG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code.SeekTransferG_Code {
+}
+class "Segment" as winder.Control.Library.Geometry.Segment.Segment {
+  finish
+  start
+  deltaX()
+  deltaY()
+  deltaZ()
+  intercept()
+  isPoint()
+  length()
+  slope()
+}
+class "Serializable" as winder.Control.Library.Serializable.Serializable {
+  SUPPORTED_PRIMITIVES : tuple
+  getVariableList()
+  load(filePath, fileName, nameOverride)
+  save(filePath, fileName, nameOverride)
+  serialize(xmlDocument, nameOverride)
+  serializeObject(xmlDocument, variable, value)
+  toXML(nameOverride)
+  toXML_String(nameOverride)
+  unserialize(startingNode)
+  unserializeNode(node)
+}
+class "SerializableLocation" as winder.Control.Library.SerializableLocation.SerializableLocation {
+  x
+  y
+  z
+  fromLocation(location)
+}
+class "Settings" as winder.Control.Machine.Settings.Settings {
+  CLIENT_MAX_DATA_SIZE : int
+  CONFIG_FILE : str
+  CONTROL_FILES : str
+  G_CODE_LOG_FILE : str
+  IO_LOG : str
+  IO_UPDATE_TIME : float
+  MACHINE_CALIBRATION_FILE : str
+  SERVER_BACK_LOG : int
+  SERVER_MAX_DATA_SIZE : int
+  SERVER_PORT : int
+  UI_FILES : str
+  UI_VERSION_FILE : str
+  VERSION_FILE : str
+  WEB_DIRECTORY : str
+  WEB_SERVER_PORT : int
+  src_winder : Path
+  defaultConfig(configuration)
+}
+class "Side" as winder.Control.Control.APA_Base.APA_Base.Side {
+  BACK : int
+  FRONT : int
+  NONE : int
+}
+class "SimulatedIO" as winder.Control.IO.Maps.SimulatedIO.SimulatedIO {
+}
+class "SimulatedInput" as winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput {
+  get()
+  set(state)
+}
+class "SimulatedMotor" as winder.Control.Simulator.SimulatedMotor.SimulatedMotor {
+  JITTER : float
+  computeJitter()
+  computeTimeLimited(acceleration, deceleration, maxVelocity, desiredTime)
+  computeVelocity(acceleration, deceleration, desiredTime)
+  getSpeedTag()
+  hardStop()
+  isInMotion()
+  poll()
+  positionDelta()
+  setSpeedTag(speed)
+  startJog(acceleration, deceleration)
+  startSeek(velocity, acceleration, deceleration)
+  stop()
+  travelTime(velocity, acceleration, deceleration)
+}
+class "SimulatedPLC" as winder.Control.IO.Devices.SimulatedPLC.SimulatedPLC {
+  readCallbacks : dict
+  tags : dict
+  writeCallbacks : dict
+  getTag(tag)
+  initialize()
+  isNotFunctional()
+  read(tag)
+  setupTag(tag, data, writeCallback, readCallback)
+  write(tag, data, typeName)
+}
+class "SimulationTime" as winder.Control.Simulator.SimulationTime.SimulationTime {
+  get()
+  getDelta(then, now)
+  set(time)
+  setLocal()
+  sleep(sleepTime)
+}
+class "SoftwareAnalogInput" as winder.Control.IO.Types.SoftwareAnalogInput.SoftwareAnalogInput {
+  get()
+  set(value)
+}
+class "SoftwareAnalogOutput" as winder.Control.IO.Types.SoftwareAnalogOutput.SoftwareAnalogOutput {
+}
+class "SoftwareInput" as winder.Control.IO.Types.SoftwareInput.SoftwareInput {
+  set(state)
+}
+class "SoftwareMotor" as winder.Control.IO.Types.SoftwareMotor.SoftwareMotor {
+  getAcceleration()
+  getDesiredPosition()
+  getMaxAcceleration()
+  getMaxTorque()
+  getMaxVelocity()
+  getPosition()
+  getTorque()
+  getVelocity()
+  isFunctional()
+  isSeeking()
+  poll()
+  setDesiredPosition(position)
+  setMaxAcceleration(maxAcceleration)
+  setMaxTorque(maxTorque)
+  setMaxVelocity(maxVelocity)
+  setTorque(torque)
+  setVelocity(velocity)
+}
+class "SoftwareOutput" as winder.Control.IO.Types.SoftwareOutput.SoftwareOutput {
+}
+class "SomeClass" as winder.Control.Library.Serializable.SomeClass {
+  a : NoneType, float
+  b : int, NoneType
+  c : int, NoneType
+  d : str, NoneType
+  e : list
+  f : dict
+  g
+  h
+  someClass2
+  {abstract}foo()
+}
+class "SomeClass2" as winder.Control.Library.Serializable.SomeClass2 {
+  aa : NoneType, int
+  bb : NoneType, int
+  cc : int, NoneType
+  dd : int, NoneType
+  {abstract}bar()
+}
+class "Spool" as winder.Control.Machine.Spool.Spool {
+  getWire()
+  isLow()
+  setWire(amount)
+  subtract(length)
+}
+class "Stages" as winder.Control.Control.APA_Base.APA_Base.Stages {
+  COMPLETE : int
+  LAYER_G_FIRST : int
+  LAYER_G_SECOND : int
+  LAYER_U_FIRST : int
+  LAYER_U_SECOND : int
+  LAYER_V_FIRST : int
+  LAYER_V_SECOND : int
+  LAYER_X_FIRST : int
+  LAYER_X_SECOND : int
+  SIGN_OFF : int
+  UNINITIALIZED : int
+}
+class "StateMachine" as winder.Control.Library.StateMachine.StateMachine {
+  name : str, NoneType
+  state : NoneType
+  states : dict
+  addState(state, index)
+  changeState(newState)
+  getState()
+  update()
+}
+class "StateMachineState" as winder.Control.Library.StateMachineState.StateMachineState {
+  stateMachine
+  changeState(state)
+  enter()
+  exit()
+  update()
+}
+class "States" as winder.Control.Control.StopMode.StopMode.StopStateMachine.States {
+  ESTOP : int
+  IDLE : int
+  PARK : int
+}
+class "States" as winder.Control.Control.ControlStateMachine.ControlStateMachine.States {
+  CALIBRATE : tuple
+  HARDWARE : tuple
+  MANUAL : tuple
+  STOP : tuple
+  TENTION : int
+  WIND : tuple
+}
+class "States" as winder.Control.IO.Systems.Head.Head.States {
+  IDLE : int
+  LATCH : int
+  SECOND_SEEK : int
+  SEEK : int
+  START_DOUBLE_LATCH : int
+  START_LATCH : int
+}
+class "States" as winder.Control.IO.Systems.PLC_Logic.PLC_Logic.States {
+  ERROR : int
+  INIT : int
+  LATCHING : int
+  LATCH_HOMEING : int
+  LATCH_RELEASE : int
+  READY : int
+  UNSERVO : int
+  XY_JOG : int
+  XY_SEEK : int
+  Z_JOG : int
+  Z_SEEK : int
+}
+class "StopMode" as winder.Control.Control.StopMode.StopMode {
+  io
+  stateMachine
+  stopStateMachine
+  isIdle()
+  update()
+}
+class "StopStateMachine" as winder.Control.Control.StopMode.StopMode.StopStateMachine {
+}
+class "SystemSemaphore" as winder.Control.Library.SystemSemaphore.SystemSemaphore {
+  acquire()
+  release()
+  releaseAll()
+}
+class "SystemTime" as winder.Control.Library.SystemTime.SystemTime {
+  get()
+  getDelta(then, now)
+  sleep(sleepTime)
+}
+class "Tag" as winder.Control.IO.Devices.PLC.PLC.Tag {
+  list : List['Tag']
+  map : dict
+  get()
+  getName()
+  getReadTag()
+  poll()
+  pollAll(plc)
+  set(value)
+  updateFromReadTag(value)
+}
+class "TestClass" as winder.Control.Library.HashedSerializable.TestClass {
+  a : NoneType, float
+  b : NoneType, int
+  c : NoneType, int
+  d : NoneType, str
+  e : list
+  f : dict
+  g
+  h
+  testClass2
+  {abstract}foo()
+}
+class "TestClass2" as winder.Control.Library.HashedSerializable.TestClass2 {
+  aa : int, NoneType
+  bb : int, NoneType
+  cc : int, NoneType
+  dd : int, NoneType
+  {abstract}bar()
+}
+class "ThreadedHTTPServer" as winder.Control.Threads.WebServerThread.WebServerThread.body.ThreadedHTTPServer {
+}
+class "TimeSource" as winder.Control.Library.TimeSource.TimeSource {
+  {abstract}get()
+  {abstract}getDelta(then, now)
+  getElapsedString(seconds)
+  {abstract}sleep(sleepTime)
+}
+class "TransferCorrectG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code.TransferCorrectG_Code {
+}
+class "TrapezoidalMotion" as winder.Control.Simulator.TrapezoidalMotion.TrapezoidalMotion {
+  compute(maxAcceleration, minAcceleration, velocity, startPosition, endPosition)
+  computeJog(maxAcceleration, velocity, startPosition)
+  computeLimitingVelocity(maxAcceleration, minAcceleration, startPosition, endPosition, desiredTime)
+  computeStop(minAcceleration, currentTime)
+  computeTimeLimited(maxAcceleration, minAcceleration, maxVelocity, startPosition, endPosition, desiredTime)
+  computeTravelTime(maxAcceleration, minAcceleration, maxVelocity, startPosition, endPosition)
+  hardStop(time)
+  interpolateAcceleration(time)
+  interpolatePosition(time)
+  interpolateVelocity(time)
+  isMoving(time)
+}
+class "UI_ClientConnection" as winder.Control.Library.UI_ClientConnection.UI_ClientConnection {
+  get(command)
+}
+class "UI_ServerThread" as winder.Control.Threads.UI_ServerThread.UI_ServerThread {
+  body()
+}
+class "UV_LayerGeometry" as winder.Control.Machine.UV_LayerGeometry.UV_LayerGeometry {
+  angle
+  columns : float
+  deltaX : float
+  deltaY : float
+  lengthXY
+  pinDiameter
+  pinHeight : int
+  pinRadius
+  pitches : int
+  rows : float
+  slope : float
+  wireSpacing
+}
+class "U_LayerGeometry" as winder.Control.Machine.U_LayerGeometry.U_LayerGeometry {
+  apaOffset
+  apaOffsetX : float
+  apaOffsetY : float
+  apaOffsetZ : int
+  depth : float
+  directionBack : int
+  directionFront : int
+  frontBackModulus
+  frontBackOffset : float
+  gridBack : list
+  gridFront : list
+  mostlyExtend : float
+  mostlyRetract : float
+  pins
+  startPinBack : int
+  startPinFront : int
+}
+class "Unserializable" as winder.Control.Library.Serializable.Unserializable {
+}
+class "Unserializable" as winder.Control.Library.HashedSerializable.Unserializable {
+}
+class "V_LayerGeometry" as winder.Control.Machine.V_LayerGeometry.V_LayerGeometry {
+  apaOffset
+  apaOffsetX : float
+  apaOffsetY : float
+  apaOffsetZ : int
+  depth : float
+  directionBack : int
+  directionFront : int
+  frontBackModulus
+  frontBackOffset : float
+  gridBack : list
+  gridFront : list
+  mostlyExtend : float
+  mostlyRetract : float
+  pins
+  startPinBack : int
+  startPinFront : int
+}
+class "Version" as winder.Control.Library.Version.Version {
+  compute()
+  getDate()
+  getHash()
+  getVersion()
+  isValid()
+  save()
+  update()
+  verify()
+}
+class "WebServerInterface" as winder.Control.Library.WebServerInterface.WebServerInterface {
+  BASIC_QUERIES : str
+  BYPASS_AUTHENTICATION : bool
+  callback : NoneType
+  do_POST()
+  {abstract}log_message()
+}
+class "WebServerThread" as winder.Control.Threads.WebServerThread.WebServerThread {
+  body()
+  stop()
+}
+class "WindMode" as winder.Control.Control.WindMode.WindMode {
+  enter()
+  exit()
+  update()
+}
+class "WireLengthG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code.WireLengthG_Code {
+}
+class "X_LayerGeometry" as winder.Control.Machine.X_LayerGeometry.X_LayerGeometry {
+  apaOffset
+  apaOffsetX : int
+  apaOffsetY : int
+  apaOffsetZ : float
+  depth : float
+  directionBack : int
+  directionFront : int
+  frontBackModulus : int
+  frontBackOffset : int
+  gridBack : list
+  gridFront : list
+  leftEdge : float
+  mostlyExtend : float
+  mostlyRetract : float
+  pins : int
+  rightEdge : float
+  rows : int
+  startPinBack : int
+  startPinFront : float
+}
+class "_Client" as winder.Control.Threads.UI_ServerThread._Client {
+  run()
+}
+winder.Control.IO.Devices.ControllogixPLC.ControllogixPLC --|> winder.Control.IO.Devices.PLC.PLC
+winder.Control.IO.Devices.PLC.PLC --|> winder.Control.IO.Devices.IO_Device.IO_Device
+winder.Control.IO.Maps.ProductionIO.ProductionIO --|> winder.Control.IO.Maps.BaseIO.BaseIO
+winder.Control.IO.Primitives.AnalogInput.AnalogInput --|> winder.Control.IO.Primitives.IO_Point.IO_Point
+winder.Control.IO.Primitives.AnalogOutput.AnalogOutput --|> winder.Control.IO.Primitives.IO_Point.IO_Point
+winder.Control.IO.Primitives.DigitalIO.DigitalIO --|> winder.Control.IO.Primitives.IO_Point.IO_Point
+winder.Control.IO.Primitives.DigitalInput.DigitalInput --|> winder.Control.IO.Primitives.DigitalIO.DigitalIO
+winder.Control.IO.Primitives.DigitalOutput.DigitalOutput --|> winder.Control.IO.Primitives.DigitalIO.DigitalIO
+winder.Control.IO.Primitives.Motor.Motor --|> winder.Control.IO.Primitives.IO_Point.IO_Point
+winder.Control.Library.G_Code.G_CodeCommand --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeFeedRate --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeFunction --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeLineNumber --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeParameter --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeProgramName --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeSetX --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeSetY --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.G_Code.G_CodeSetZ --|> winder.Control.Library.G_Code.G_CodeClass
+winder.Control.Library.HashedSerializable.HashedSerializable --|> winder.Control.Library.Serializable.Serializable
+winder.Control.Library.HashedSerializable.TestClass --|> winder.Control.Library.HashedSerializable.HashedSerializable
+winder.Control.Library.HashedSerializable.TestClass2 --|> winder.Control.Library.Serializable.Serializable
+winder.Control.Library.LoggedStateMachine.LoggedStateMachine --|> winder.Control.Library.StateMachine.StateMachine
+winder.Control.Library.Serializable.SomeClass --|> winder.Control.Library.Serializable.Serializable
+winder.Control.Library.Serializable.SomeClass2 --|> winder.Control.Library.Serializable.Serializable
+winder.Control.Machine.APA_Geometry.APA_Geometry --|> winder.Control.Machine.MachineGeometry.MachineGeometry
+winder.Control.Machine.GX_LayerGeometry.GX_LayerGeometry --|> winder.Control.Machine.LayerGeometry.LayerGeometry
+winder.Control.Machine.G_CodeHandlerBase.G_CodeTester --|> winder.Control.Machine.G_CodeHandlerBase.G_CodeHandlerBase
+winder.Control.Machine.G_LayerGeometry.G_LayerGeometry --|> winder.Control.Machine.GX_LayerGeometry.GX_LayerGeometry
+winder.Control.Machine.GeometrySelection.GeometrySelection --|> winder.Control.Machine.LayerGeometry.LayerGeometry
+winder.Control.Machine.LayerGeometry.LayerGeometry --|> winder.Control.Machine.APA_Geometry.APA_Geometry
+winder.Control.Machine.UV_LayerGeometry.UV_LayerGeometry --|> winder.Control.Machine.LayerGeometry.LayerGeometry
+winder.Control.Machine.U_LayerGeometry.U_LayerGeometry --|> winder.Control.Machine.UV_LayerGeometry.UV_LayerGeometry
+winder.Control.Machine.V_LayerGeometry.V_LayerGeometry --|> winder.Control.Machine.UV_LayerGeometry.UV_LayerGeometry
+winder.Control.Machine.X_LayerGeometry.X_LayerGeometry --|> winder.Control.Machine.GX_LayerGeometry.GX_LayerGeometry
+winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code.AnchorPointG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code.ArmCorrectG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code.ClipG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code.OffsetG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code.PinCenterG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code.SeekTransferG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code.TransferCorrectG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code.WireLengthG_Code --|> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --|> winder.Control.RecipeGenerator.Path3d.Path3d
+winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe --|> winder.Control.RecipeGenerator.RecipeGenerator.RecipeGenerator
+winder.Control.RecipeGenerator.LayerG_Recipe.LayerG_Recipe --|> winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe
+winder.Control.RecipeGenerator.LayerU_Recipe.LayerU_Recipe --|> winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe
+winder.Control.RecipeGenerator.LayerV_Recipe.LayerV_Recipe --|> winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe
+winder.Control.RecipeGenerator.LayerX_Recipe.LayerX_Recipe --|> winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe
+winder.Control.Simulator.S_CurveMotion.S_CurveMotion --|> winder.Control.Simulator.Motion.Motion
+winder.Control.Control.StopMode.StopMode.StopStateMachine --* winder.Control.Control.StopMode.StopMode : stopStateMachine
+winder.Control.Library.HashedSerializable.TestClass2 --* winder.Control.Library.HashedSerializable.TestClass : testClass2
+winder.Control.Library.HashedSerializable.Unserializable --* winder.Control.Library.HashedSerializable.TestClass : g
+winder.Control.Library.Serializable.SomeClass2 --* winder.Control.Library.Serializable.SomeClass : someClass2
+winder.Control.Library.Serializable.Unserializable --* winder.Control.Library.Serializable.SomeClass : g
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe : gCodePath
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe : gCodePath
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe : firstHalf
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe : secondHalf
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe : gCodePath
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe : gCodePath
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe : firstHalf
+winder.Control.RecipeGenerator.G_CodePath.G_CodePath --* winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe : secondHalf
+winder.Control.RecipeGenerator.HeadPosition.HeadPosition --* winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe : z
+winder.Control.RecipeGenerator.HeadPosition.HeadPosition --* winder.Control.RecipeGenerator.LayerGX_Recipe.LayerGX_Recipe : z
+winder.Control.RecipeGenerator.HeadPosition.HeadPosition --* winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe : z
+winder.Control.RecipeGenerator.HeadPosition.HeadPosition --* winder.Control.RecipeGenerator.LayerUV_Recipe.LayerUV_Recipe : z
+winder.Control.RecipeGenerator.Path3d.Path3d --* winder.Control.RecipeGenerator.RecipeGenerator.RecipeGenerator : nodePath
+winder.Control.RecipeGenerator.Path3d.Path3d --* winder.Control.RecipeGenerator.RecipeGenerator.RecipeGenerator : basePath
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Latch_Homed
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Retracted_1A
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Retracted_2B
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Retracted_2B
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Retracted_2A
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Extended
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Stage_Latched
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Fixed_Latched
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_End_of_Travel
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Stage_Present
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Fixed_Present
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Z_Spring_Comp
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Latch_Actuator_Top
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Latch_Actuator_Mid
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : X_Park_OK
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : X_Transfer_OK
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Y_Mount_Transfer_OK
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Y_Transfer_OK
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : endOfTravel_Yp
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : endOfTravel_Ym
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : endOfTravel_Xp
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : endOfTravel_Xm
+winder.Control.Simulator.PLC_Simulator.PLC_Simulator.SimulatedInput --* winder.Control.Simulator.PLC_Simulator.PLC_Simulator : Rotation_Lock_key
+winder.Control.Control.G_CodeHandler.G_CodeHandler --o winder.Control.Control.AnodePlaneArray.AnodePlaneArray : _gCodeHandler
+@enduml

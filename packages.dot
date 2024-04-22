@@ -1,0 +1,19 @@
+digraph "packages" {
+rankdir=BT
+charset="utf-8"
+"winder.Control.Control" [color="black", label=<winder.Control.Control>, shape="box", style="solid"];
+"winder.Control.Control.APA_Base" [color="black", label=<winder.Control.Control.APA_Base>, shape="box", style="solid"];
+"winder.Control.Control.AnodePlaneArray" [color="black", label=<winder.Control.Control.AnodePlaneArray>, shape="box", style="solid"];
+"winder.Control.Control.CalibrationMode" [color="black", label=<winder.Control.Control.CalibrationMode>, shape="box", style="solid"];
+"winder.Control.Control.CameraCalibration" [color="black", label=<winder.Control.Control.CameraCalibration>, shape="box", style="solid"];
+"winder.Control.Control.ControlStateMachine" [color="black", label=<winder.Control.Control.ControlStateMachine>, shape="box", style="solid"];
+"winder.Control.Control.G_CodeHandler" [color="black", label=<winder.Control.Control.G_CodeHandler>, shape="box", style="solid"];
+"winder.Control.Control.HardwareMode" [color="black", label=<winder.Control.Control.HardwareMode>, shape="box", style="solid"];
+"winder.Control.Control.IO_Log" [color="black", label=<winder.Control.Control.IO_Log>, shape="box", style="solid"];
+"winder.Control.Control.LowLevelIO" [color="black", label=<winder.Control.Control.LowLevelIO>, shape="box", style="solid"];
+"winder.Control.Control.ManualMode" [color="black", label=<winder.Control.Control.ManualMode>, shape="box", style="solid"];
+"winder.Control.Control.Process" [color="black", label=<winder.Control.Control.Process>, shape="box", style="solid"];
+"winder.Control.Control.StopMode" [color="black", label=<winder.Control.Control.StopMode>, shape="box", style="solid"];
+"winder.Control.Control.WindMode" [color="black", label=<winder.Control.Control.WindMode>, shape="box", style="solid"];
+"winder.Control.Control.AnodePlaneArray" -> "winder.Control.Control.G_CodeHandler" [arrowhead="open", arrowtail="none"];
+}

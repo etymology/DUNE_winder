@@ -1,0 +1,390 @@
+@startuml packages
+set namespaceSeparator none
+package "winder" as winder {
+}
+package "winder.Control" as winder.Control {
+}
+package "winder.Control.Control" as winder.Control.Control {
+}
+package "winder.Control.Control.APA_Base" as winder.Control.Control.APA_Base {
+}
+package "winder.Control.Control.AnodePlaneArray" as winder.Control.Control.AnodePlaneArray {
+}
+package "winder.Control.Control.CalibrationMode" as winder.Control.Control.CalibrationMode {
+}
+package "winder.Control.Control.CameraCalibration" as winder.Control.Control.CameraCalibration {
+}
+package "winder.Control.Control.ControlStateMachine" as winder.Control.Control.ControlStateMachine {
+}
+package "winder.Control.Control.G_CodeHandler" as winder.Control.Control.G_CodeHandler {
+}
+package "winder.Control.Control.HardwareMode" as winder.Control.Control.HardwareMode {
+}
+package "winder.Control.Control.IO_Log" as winder.Control.Control.IO_Log {
+}
+package "winder.Control.Control.LowLevelIO" as winder.Control.Control.LowLevelIO {
+}
+package "winder.Control.Control.ManualMode" as winder.Control.Control.ManualMode {
+}
+package "winder.Control.Control.Process" as winder.Control.Control.Process {
+}
+package "winder.Control.Control.StopMode" as winder.Control.Control.StopMode {
+}
+package "winder.Control.Control.WindMode" as winder.Control.Control.WindMode {
+}
+package "winder.Control.Debug" as winder.Control.Debug {
+}
+package "winder.Control.Debug.APA_Generator" as winder.Control.Debug.APA_Generator {
+}
+package "winder.Control.IO" as winder.Control.IO {
+}
+package "winder.Control.IO.Devices" as winder.Control.IO.Devices {
+}
+package "winder.Control.IO.Devices.ControllogixPLC" as winder.Control.IO.Devices.ControllogixPLC {
+}
+package "winder.Control.IO.Devices.IO_Device" as winder.Control.IO.Devices.IO_Device {
+}
+package "winder.Control.IO.Devices.PLC" as winder.Control.IO.Devices.PLC {
+}
+package "winder.Control.IO.Devices.SimulatedPLC" as winder.Control.IO.Devices.SimulatedPLC {
+}
+package "winder.Control.IO.Maps" as winder.Control.IO.Maps {
+}
+package "winder.Control.IO.Maps.BaseIO" as winder.Control.IO.Maps.BaseIO {
+}
+package "winder.Control.IO.Maps.ProductionIO" as winder.Control.IO.Maps.ProductionIO {
+}
+package "winder.Control.IO.Maps.SimulatedIO" as winder.Control.IO.Maps.SimulatedIO {
+}
+package "winder.Control.IO.Primitives" as winder.Control.IO.Primitives {
+}
+package "winder.Control.IO.Primitives.AnalogInput" as winder.Control.IO.Primitives.AnalogInput {
+}
+package "winder.Control.IO.Primitives.AnalogOutput" as winder.Control.IO.Primitives.AnalogOutput {
+}
+package "winder.Control.IO.Primitives.Camera" as winder.Control.IO.Primitives.Camera {
+}
+package "winder.Control.IO.Primitives.DigitalIO" as winder.Control.IO.Primitives.DigitalIO {
+}
+package "winder.Control.IO.Primitives.DigitalInput" as winder.Control.IO.Primitives.DigitalInput {
+}
+package "winder.Control.IO.Primitives.DigitalOutput" as winder.Control.IO.Primitives.DigitalOutput {
+}
+package "winder.Control.IO.Primitives.IO_Point" as winder.Control.IO.Primitives.IO_Point {
+}
+package "winder.Control.IO.Primitives.Motor" as winder.Control.IO.Primitives.Motor {
+}
+package "winder.Control.IO.Systems" as winder.Control.IO.Systems {
+}
+package "winder.Control.IO.Systems.Camera" as winder.Control.IO.Systems.Camera {
+}
+package "winder.Control.IO.Systems.Head" as winder.Control.IO.Systems.Head {
+}
+package "winder.Control.IO.Systems.MultiAxisMotor" as winder.Control.IO.Systems.MultiAxisMotor {
+}
+package "winder.Control.IO.Systems.PLC_Logic" as winder.Control.IO.Systems.PLC_Logic {
+}
+package "winder.Control.IO.Types" as winder.Control.IO.Types {
+}
+package "winder.Control.IO.Types.PLC_Input" as winder.Control.IO.Types.PLC_Input {
+}
+package "winder.Control.IO.Types.PLC_Motor" as winder.Control.IO.Types.PLC_Motor {
+}
+package "winder.Control.IO.Types.PLC_Output" as winder.Control.IO.Types.PLC_Output {
+}
+package "winder.Control.IO.Types.SoftwareAnalogInput" as winder.Control.IO.Types.SoftwareAnalogInput {
+}
+package "winder.Control.IO.Types.SoftwareAnalogOutput" as winder.Control.IO.Types.SoftwareAnalogOutput {
+}
+package "winder.Control.IO.Types.SoftwareInput" as winder.Control.IO.Types.SoftwareInput {
+}
+package "winder.Control.IO.Types.SoftwareMotor" as winder.Control.IO.Types.SoftwareMotor {
+}
+package "winder.Control.IO.Types.SoftwareOutput" as winder.Control.IO.Types.SoftwareOutput {
+}
+package "winder.Control.Library" as winder.Control.Library {
+}
+package "winder.Control.Library.ArrayToCSV" as winder.Control.Library.ArrayToCSV {
+}
+package "winder.Control.Library.Configuration" as winder.Control.Library.Configuration {
+}
+package "winder.Control.Library.G_Code" as winder.Control.Library.G_Code {
+}
+package "winder.Control.Library.Geometry" as winder.Control.Library.Geometry {
+}
+package "winder.Control.Library.Geometry.Box" as winder.Control.Library.Geometry.Box {
+}
+package "winder.Control.Library.Geometry.Circle" as winder.Control.Library.Geometry.Circle {
+}
+package "winder.Control.Library.Geometry.Line" as winder.Control.Library.Geometry.Line {
+}
+package "winder.Control.Library.Geometry.Location" as winder.Control.Library.Geometry.Location {
+}
+package "winder.Control.Library.Geometry.Segment" as winder.Control.Library.Geometry.Segment {
+}
+package "winder.Control.Library.Hash" as winder.Control.Library.Hash {
+}
+package "winder.Control.Library.HashedSerializable" as winder.Control.Library.HashedSerializable {
+}
+package "winder.Control.Library.Log" as winder.Control.Library.Log {
+}
+package "winder.Control.Library.LoggedStateMachine" as winder.Control.Library.LoggedStateMachine {
+}
+package "winder.Control.Library.MathExtra" as winder.Control.Library.MathExtra {
+}
+package "winder.Control.Library.Recipe" as winder.Control.Library.Recipe {
+}
+package "winder.Control.Library.RemoteSession" as winder.Control.Library.RemoteSession {
+}
+package "winder.Control.Library.Serializable" as winder.Control.Library.Serializable {
+}
+package "winder.Control.Library.SerializableLocation" as winder.Control.Library.SerializableLocation {
+}
+package "winder.Control.Library.StateMachine" as winder.Control.Library.StateMachine {
+}
+package "winder.Control.Library.StateMachineState" as winder.Control.Library.StateMachineState {
+}
+package "winder.Control.Library.SystemSemaphore" as winder.Control.Library.SystemSemaphore {
+}
+package "winder.Control.Library.SystemTime" as winder.Control.Library.SystemTime {
+}
+package "winder.Control.Library.TimeSource" as winder.Control.Library.TimeSource {
+}
+package "winder.Control.Library.UI_ClientConnection" as winder.Control.Library.UI_ClientConnection {
+}
+package "winder.Control.Library.Version" as winder.Control.Library.Version {
+}
+package "winder.Control.Library.WebServerInterface" as winder.Control.Library.WebServerInterface {
+}
+package "winder.Control.Machine" as winder.Control.Machine {
+}
+package "winder.Control.Machine.APA_Geometry" as winder.Control.Machine.APA_Geometry {
+}
+package "winder.Control.Machine.DefaultCalibration" as winder.Control.Machine.DefaultCalibration {
+}
+package "winder.Control.Machine.GX_LayerGeometry" as winder.Control.Machine.GX_LayerGeometry {
+}
+package "winder.Control.Machine.G_CodeHandlerBase" as winder.Control.Machine.G_CodeHandlerBase {
+}
+package "winder.Control.Machine.G_Codes" as winder.Control.Machine.G_Codes {
+}
+package "winder.Control.Machine.G_LayerGeometry" as winder.Control.Machine.G_LayerGeometry {
+}
+package "winder.Control.Machine.GeometrySelection" as winder.Control.Machine.GeometrySelection {
+}
+package "winder.Control.Machine.HeadCompensation" as winder.Control.Machine.HeadCompensation {
+}
+package "winder.Control.Machine.LayerCalibration" as winder.Control.Machine.LayerCalibration {
+}
+package "winder.Control.Machine.LayerCorrection" as winder.Control.Machine.LayerCorrection {
+}
+package "winder.Control.Machine.LayerFunctions" as winder.Control.Machine.LayerFunctions {
+}
+package "winder.Control.Machine.LayerGeometry" as winder.Control.Machine.LayerGeometry {
+}
+package "winder.Control.Machine.MachineCalibration" as winder.Control.Machine.MachineCalibration {
+}
+package "winder.Control.Machine.MachineGeometry" as winder.Control.Machine.MachineGeometry {
+}
+package "winder.Control.Machine.Settings" as winder.Control.Machine.Settings {
+}
+package "winder.Control.Machine.Spool" as winder.Control.Machine.Spool {
+}
+package "winder.Control.Machine.UV_LayerGeometry" as winder.Control.Machine.UV_LayerGeometry {
+}
+package "winder.Control.Machine.U_LayerGeometry" as winder.Control.Machine.U_LayerGeometry {
+}
+package "winder.Control.Machine.V_LayerGeometry" as winder.Control.Machine.V_LayerGeometry {
+}
+package "winder.Control.Machine.X_LayerGeometry" as winder.Control.Machine.X_LayerGeometry {
+}
+package "winder.Control.RecipeGenerator" as winder.Control.RecipeGenerator {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions" as winder.Control.RecipeGenerator.G_CodeFunctions {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction" as winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code" as winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code {
+}
+package "winder.Control.RecipeGenerator.G_CodePath" as winder.Control.RecipeGenerator.G_CodePath {
+}
+package "winder.Control.RecipeGenerator.G_CodeToPath" as winder.Control.RecipeGenerator.G_CodeToPath {
+}
+package "winder.Control.RecipeGenerator.HeadPosition" as winder.Control.RecipeGenerator.HeadPosition {
+}
+package "winder.Control.RecipeGenerator.LayerGX_Recipe" as winder.Control.RecipeGenerator.LayerGX_Recipe {
+}
+package "winder.Control.RecipeGenerator.LayerG_Recipe" as winder.Control.RecipeGenerator.LayerG_Recipe {
+}
+package "winder.Control.RecipeGenerator.LayerUV_Recipe" as winder.Control.RecipeGenerator.LayerUV_Recipe {
+}
+package "winder.Control.RecipeGenerator.LayerU_Recipe" as winder.Control.RecipeGenerator.LayerU_Recipe {
+}
+package "winder.Control.RecipeGenerator.LayerV_Recipe" as winder.Control.RecipeGenerator.LayerV_Recipe {
+}
+package "winder.Control.RecipeGenerator.LayerX_Recipe" as winder.Control.RecipeGenerator.LayerX_Recipe {
+}
+package "winder.Control.RecipeGenerator.Path3d" as winder.Control.RecipeGenerator.Path3d {
+}
+package "winder.Control.RecipeGenerator.RecipeGenerator" as winder.Control.RecipeGenerator.RecipeGenerator {
+}
+package "winder.Control.Simulator" as winder.Control.Simulator {
+}
+package "winder.Control.Simulator.Delay" as winder.Control.Simulator.Delay {
+}
+package "winder.Control.Simulator.LayerError" as winder.Control.Simulator.LayerError {
+}
+package "winder.Control.Simulator.Motion" as winder.Control.Simulator.Motion {
+}
+package "winder.Control.Simulator.PLC_Simulator" as winder.Control.Simulator.PLC_Simulator {
+}
+package "winder.Control.Simulator.S_CurveMotion" as winder.Control.Simulator.S_CurveMotion {
+}
+package "winder.Control.Simulator.SimulatedMotor" as winder.Control.Simulator.SimulatedMotor {
+}
+package "winder.Control.Simulator.SimulationTime" as winder.Control.Simulator.SimulationTime {
+}
+package "winder.Control.Simulator.TrapezoidalMotion" as winder.Control.Simulator.TrapezoidalMotion {
+}
+package "winder.Control.Threads" as winder.Control.Threads {
+}
+package "winder.Control.Threads.CameraThread" as winder.Control.Threads.CameraThread {
+}
+package "winder.Control.Threads.ControlThread" as winder.Control.Threads.ControlThread {
+}
+package "winder.Control.Threads.PrimaryThread" as winder.Control.Threads.PrimaryThread {
+}
+package "winder.Control.Threads.UI_ServerThread" as winder.Control.Threads.UI_ServerThread {
+}
+package "winder.Control.Threads.WebServerThread" as winder.Control.Threads.WebServerThread {
+}
+package "winder.Control.main" as winder.Control.main {
+}
+package "winder.Control.recipeGenerator" as winder.Control.recipeGenerator {
+}
+winder.Control.Control.AnodePlaneArray --> winder.Control.Control.G_CodeHandler
+winder.Control.IO.Devices.ControllogixPLC --> winder.Control.IO.Devices.PLC
+winder.Control.IO.Devices.PLC --> winder.Control.IO.Devices.IO_Device
+winder.Control.IO.Devices.SimulatedPLC --> winder.Control.IO.Devices.PLC
+winder.Control.IO.Maps.ProductionIO --> winder.Control.IO.Maps.BaseIO
+winder.Control.IO.Maps.SimulatedIO --> winder.Control.IO.Maps.BaseIO
+winder.Control.IO.Primitives.AnalogInput --> winder.Control.IO.Primitives.IO_Point
+winder.Control.IO.Primitives.AnalogOutput --> winder.Control.IO.Primitives.IO_Point
+winder.Control.IO.Primitives.Camera --> winder.Control.IO.Primitives.IO_Point
+winder.Control.IO.Primitives.DigitalIO --> winder.Control.IO.Primitives.IO_Point
+winder.Control.IO.Primitives.DigitalInput --> winder.Control.IO.Primitives.DigitalIO
+winder.Control.IO.Primitives.DigitalOutput --> winder.Control.IO.Primitives.DigitalIO
+winder.Control.IO.Primitives.Motor --> winder.Control.IO.Primitives.IO_Point
+winder.Control.IO.Systems.PLC_Logic --> winder.Control.IO.Systems.MultiAxisMotor
+winder.Control.Library.Geometry.Line --> winder.Control.Library.Geometry.Location
+winder.Control.Library.Geometry.Line --> winder.Control.Library.Geometry.Segment
+winder.Control.Library.HashedSerializable --> winder.Control.Library.Hash
+winder.Control.Library.HashedSerializable --> winder.Control.Library.Serializable
+winder.Control.Library.LoggedStateMachine --> winder.Control.Library.StateMachine
+winder.Control.Library.Recipe --> winder.Control.Library.Hash
+winder.Control.Machine.APA_Geometry --> winder.Control.Machine.MachineGeometry
+winder.Control.Machine.GX_LayerGeometry --> winder.Control.Machine.LayerGeometry
+winder.Control.Machine.G_CodeHandlerBase --> winder.Control.Machine.G_Codes
+winder.Control.Machine.G_LayerGeometry --> winder.Control.Machine.GX_LayerGeometry
+winder.Control.Machine.GeometrySelection --> winder.Control.Machine.G_LayerGeometry
+winder.Control.Machine.GeometrySelection --> winder.Control.Machine.LayerGeometry
+winder.Control.Machine.GeometrySelection --> winder.Control.Machine.U_LayerGeometry
+winder.Control.Machine.GeometrySelection --> winder.Control.Machine.V_LayerGeometry
+winder.Control.Machine.GeometrySelection --> winder.Control.Machine.X_LayerGeometry
+winder.Control.Machine.HeadCompensation --> winder.Control.Machine.MachineCalibration
+winder.Control.Machine.LayerCorrection --> winder.Control.Machine.DefaultCalibration
+winder.Control.Machine.LayerCorrection --> winder.Control.Machine.GeometrySelection
+winder.Control.Machine.LayerGeometry --> winder.Control.Machine.APA_Geometry
+winder.Control.Machine.UV_LayerGeometry --> winder.Control.Machine.LayerGeometry
+winder.Control.Machine.U_LayerGeometry --> winder.Control.Machine.UV_LayerGeometry
+winder.Control.Machine.V_LayerGeometry --> winder.Control.Machine.UV_LayerGeometry
+winder.Control.Machine.X_LayerGeometry --> winder.Control.Machine.GX_LayerGeometry
+winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.BreakG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.ClipG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.LatchG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodePath --> winder.Control.RecipeGenerator.G_CodeFunctions.HeadLocationG_Code
+winder.Control.RecipeGenerator.G_CodePath --> winder.Control.RecipeGenerator.Path3d
+winder.Control.RecipeGenerator.G_CodeToPath --> winder.Control.RecipeGenerator.G_CodeFunctions.G_CodeFunction
+winder.Control.RecipeGenerator.G_CodeToPath --> winder.Control.RecipeGenerator.G_CodePath
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.G_CodePath
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.HeadPosition
+winder.Control.RecipeGenerator.LayerGX_Recipe --> winder.Control.RecipeGenerator.RecipeGenerator
+winder.Control.RecipeGenerator.LayerG_Recipe --> winder.Control.RecipeGenerator.LayerGX_Recipe
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.AnchorPointG_Code
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.ArmCorrectG_Code
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.OffsetG_Code
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.SeekTransferG_Code
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.TransferCorrectG_Code
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodeFunctions.WireLengthG_Code
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.G_CodePath
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.HeadPosition
+winder.Control.RecipeGenerator.LayerUV_Recipe --> winder.Control.RecipeGenerator.RecipeGenerator
+winder.Control.RecipeGenerator.LayerU_Recipe --> winder.Control.RecipeGenerator.LayerUV_Recipe
+winder.Control.RecipeGenerator.LayerV_Recipe --> winder.Control.RecipeGenerator.LayerUV_Recipe
+winder.Control.RecipeGenerator.LayerX_Recipe --> winder.Control.RecipeGenerator.LayerGX_Recipe
+winder.Control.RecipeGenerator.RecipeGenerator --> winder.Control.RecipeGenerator.G_CodeFunctions.PinCenterG_Code
+winder.Control.RecipeGenerator.RecipeGenerator --> winder.Control.RecipeGenerator.Path3d
+winder.Control.Simulator.S_CurveMotion --> winder.Control.Simulator.Motion
+winder.Control.Simulator.TrapezoidalMotion --> winder.Control.Simulator.Motion
+winder.Control.main --> winder.Control.Control.LowLevelIO
+winder.Control.main --> winder.Control.Control.Process
+winder.Control.main --> winder.Control.IO.Maps.ProductionIO
+winder.Control.main --> winder.Control.IO.Maps.SimulatedIO
+winder.Control.main --> winder.Control.Library.Configuration
+winder.Control.main --> winder.Control.Library.Log
+winder.Control.main --> winder.Control.Library.SystemTime
+winder.Control.main --> winder.Control.Library.Version
+winder.Control.main --> winder.Control.Machine.DefaultCalibration
+winder.Control.main --> winder.Control.Machine.Settings
+winder.Control.main --> winder.Control.Simulator.PLC_Simulator
+winder.Control.main --> winder.Control.Simulator.SimulationTime
+winder.Control.main --> winder.Control.Threads.CameraThread
+winder.Control.main --> winder.Control.Threads.ControlThread
+winder.Control.main --> winder.Control.Threads.PrimaryThread
+winder.Control.main --> winder.Control.Threads.UI_ServerThread
+winder.Control.main --> winder.Control.Threads.WebServerThread
+winder.Control.recipeGenerator --> winder.Control.Library.Configuration
+winder.Control.recipeGenerator --> winder.Control.Library.Geometry.Location
+winder.Control.recipeGenerator --> winder.Control.Machine.G_LayerGeometry
+winder.Control.recipeGenerator --> winder.Control.Machine.Settings
+winder.Control.recipeGenerator --> winder.Control.Machine.U_LayerGeometry
+winder.Control.recipeGenerator --> winder.Control.Machine.V_LayerGeometry
+winder.Control.recipeGenerator --> winder.Control.Machine.X_LayerGeometry
+winder.Control.recipeGenerator --> winder.Control.RecipeGenerator.G_CodeToPath
+winder.Control.recipeGenerator --> winder.Control.RecipeGenerator.LayerG_Recipe
+winder.Control.recipeGenerator --> winder.Control.RecipeGenerator.LayerU_Recipe
+winder.Control.recipeGenerator --> winder.Control.RecipeGenerator.LayerV_Recipe
+winder.Control.recipeGenerator --> winder.Control.RecipeGenerator.LayerX_Recipe
+@enduml
