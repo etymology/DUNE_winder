@@ -169,6 +169,7 @@ class AnodePlaneArray(APA_Base):
 
         else:
             # If there is no calibration, use none.
+            print("THERE IS NO CALIBRATION")
             self._gCodeHandler.useLayerCalibration(None)
 
         if None is not recipeFile:

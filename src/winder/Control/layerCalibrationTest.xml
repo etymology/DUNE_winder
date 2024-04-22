@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<SerializableData>
+	<LayerCalibration layer="V">
+		<int name="zFront">10</int>
+		<int name="zBack">20</int>
+		<str name="_layer">V</str>
+		<SerializableLocation name="Offset">
+			<float name="x">1.0</float>
+			<float name="y">2.0</float>
+			<float name="z">0.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="F1">
+			<float name="x">0.0</float>
+			<float name="y">0.0</float>
+			<float name="z">0.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="F2">
+			<float name="x">1.0</float>
+			<float name="y">0.0</float>
+			<float name="z">0.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="F3">
+			<float name="x">1.0</float>
+			<float name="y">1.0</float>
+			<float name="z">0.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="F4">
+			<float name="x">0.0</float>
+			<float name="y">1.0</float>
+			<float name="z">0.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="B1">
+			<float name="x">0.0</float>
+			<float name="y">0.0</float>
+			<float name="z">1.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="B2">
+			<float name="x">1.0</float>
+			<float name="y">0.0</float>
+			<float name="z">1.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="B3">
+			<float name="x">1.0</float>
+			<float name="y">1.0</float>
+			<float name="z">1.0</float>
+		</SerializableLocation>
+		<SerializableLocation name="B4">
+			<float name="x">0.0</float>
+			<float name="y">1.0</float>
+			<float name="z">1.0</float>
+		</SerializableLocation>
+		<str name="hashValue">C69-42F-4335</str>
+	</LayerCalibration>
+</SerializableData>

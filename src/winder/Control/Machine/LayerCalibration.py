@@ -128,18 +128,18 @@ class LayerCalibration( HashedSerializable ) :
     return self._layer
 
   #-------------------------------------------------------------------
-  def archive( self ) :
+  def archive( self ):
     """
     Archive this calibration data if archive does not already exist.
     """
 
-    if self._archivePath :
+    if self._archivePath:
       # Create directory if it doesn't exist.
       if not os.path.exists( self._archivePath ) :
         os.makedirs( self._archivePath )
 
       # If this file does not exist in the archive, copy it there.
-      archiveFile = self._archivePath + "/" + self.hashValue
+      archiveFile = f"{self._archivePath}/{self.hashValue}"
       fileName = self.getFullFileName()
       if not os.path.isfile( archiveFile ) :
         # Make an archive copy of the file.
@@ -154,7 +154,7 @@ class LayerCalibration( HashedSerializable ) :
       filePath: Override file path.
       fileName: Override file name.
     """
-    if None == filePath and None == fileName :
+    if None is filePath and None is fileName :
       filePath = self._filePath
       fileName = self._fileName
 
@@ -228,7 +228,7 @@ class LayerCalibration( HashedSerializable ) :
     return node
 
   #---------------------------------------------------------------------
-  def unserialize( self, node ) :
+  def unserialize( self, node ):
     """
     Take an XML node and load values into this object.
 
@@ -244,12 +244,12 @@ class LayerCalibration( HashedSerializable ) :
     self._layer = str( node.getAttribute( "layer" ) )
 
     nodes = node.getElementsByTagName( "SerializableLocation" )
-    for node in nodes :
+    for node in nodes:
       location = SerializableLocation()
       location.unserialize( node )
 
       name = node.getAttribute( "name" )
-      if "Offset" == name :
+      if name == "Offset":
         self.offset = location
       else:
         self._locations[ name ] = location
