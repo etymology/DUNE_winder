@@ -192,7 +192,7 @@ class HashedSerializable( Serializable ) :
 
     # Write XML data to file.
     with open(f"{filePath}/{fileName}", "wb") as outputFile:
-      outputFile.write( outputText )
+      outputFile.write( outputText.encode() )
 
 # end class
 

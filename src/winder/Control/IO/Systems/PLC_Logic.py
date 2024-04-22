@@ -13,7 +13,7 @@
 #   this unit.
 ###############################################################################
 from IO.Devices.PLC import PLC
-from MultiAxisMotor import MultiAxisMotor
+from IO.Systems.MultiAxisMotor import MultiAxisMotor
 
 class PLC_Logic :
 

@@ -384,7 +384,6 @@ class G_CodeHandler( G_CodeHandlerBase ) :
 
       self.log_g_code()
 
-  # TODO Rename this here and in `runNextLine`
   def log_g_code(self):
     line = ""
 
